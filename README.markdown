@@ -5,5 +5,5 @@ To download a copy of all specifications:
         hg clone https://hg.css-houdini.org/drafts
 
 For help using or setting up Mercurial see instructions [here](http://wiki.csswg.org/tools/hg).  Specification issues are discussed on the
-public [public-wtf mailing list](http://lists.w3.org/Archives/Public/public-wtf/).
+public [public-houdini mailing list](http://lists.w3.org/Archives/Public/public-houdini/).
 
