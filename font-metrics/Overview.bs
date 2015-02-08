@@ -1,0 +1,11 @@
+<pre class='metadata'>
+Title:  CSS Font Metrics Extensions Level 1
+Status: DREAM
+ED: http://dev.w3.org/houdini/font-metrics/
+Shortname: css-font-metrics
+Level: 1
+Abstract: 
+Editor: Stephen Zilles, szilles@adobe.com
+Editor: Alan Stearns, stearns@adobe.com
+Editor: Chris Lilley, chris@w3.org
+</pre>
