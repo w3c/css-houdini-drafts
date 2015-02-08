@@ -1,0 +1,13 @@
+<pre class='metadata'>
+Title:  CSS Properties and Values Extensions Level 1
+Status: DREAM
+ED: http://dev.w3.org/houdini/css-properties-values/
+Shortname: css-properties-values
+Level: 1
+Abstract: 
+Editor: Tab Atkins, jackalmage@gmail.com
+Editor: Shane Stephens, shanestephens@google.com
+Editor: Daniel Glazman, glazou@disruptiveinnovations.com
+Editor: Elliot Sprehn, esprehn@chromium.org
+Editor: Greg Whitworth, gwhit@microsoft.com
+</pre>
