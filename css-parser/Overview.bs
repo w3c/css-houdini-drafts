@@ -1,0 +1,12 @@
+<pre class='metadata'>
+Title:  CSS Parser Level 1
+Status: DREAM
+ED: http://dev.w3.org/houdini/css-parser/
+Shortname: css-parser
+Level: 1
+Abstract: 
+Editor: Tab Atkins, jackalmage@gmail.com
+Editor: Shane Stephens, shanestephens@google.com
+Editor: Daniel Glazman, glazou@disruptiveinnovations.com
+Editor: Brian Kardell, bkardell@gmail.com
+</pre>
