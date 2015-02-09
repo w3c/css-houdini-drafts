@@ -1,0 +1,14 @@
+<pre class='metadata'>
+Title:  CSS Layout Level 1
+Status: DREAM
+ED: http://dev.w3.org/houdini/css-layout/
+Shortname: css-layout
+Level: 1
+Abstract:
+Editor: Greg Whitworth, gwhit@microsoft.com 
+Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+Editor: Tab Atkins, jackalmage@gmail.com
+Editor: Shane Stephens, shanestephens@google.com
+Editor: Robert O'Callahan, robert@ocallahan.org
+Editor: Rossen Atanassov, rossen.atanassov@microsoft.com
+</pre>
