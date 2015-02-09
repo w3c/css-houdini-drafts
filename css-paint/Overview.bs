@@ -1,0 +1,10 @@
+<pre class='metadata'>
+Title:  CSS Painting Level 1
+Status: DREAM
+ED: http://dev.w3.org/houdini/css-paint/
+Shortname: css-paint
+Level: 1
+Abstract: 
+Editor: Shane Stephens, shanestephens@google.com
+Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+</pre>
