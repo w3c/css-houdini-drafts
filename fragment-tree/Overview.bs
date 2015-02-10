@@ -66,4 +66,31 @@ Boxes are not explicitly exposed by this API.
 
 <pre class='idl'>
 
+interface DeadFragmentInformation {
+  readonly attribute Node node;
+  readonly attribute double width;
+  readonly attribute double height;
+  readonly attribute double top;
+  readonly attribute double left;
+  readonly attribute boolean isOverflowed;
+  readonly attribute sequence&lt;DeadFragmentInformation&gt;? children;
+  readonly attribute DeadFragmentInformation? nextSibling;
+  readonly attribute DeadFragmentInformation? previousSibling;
+  readonly attribute DeadFragmentInformation? nextInBox;
+  readonly attribute DeadFragmentInformation? previousInBox;
+};
+
+enum FragmentFilter {
+  "direct-fragments-only",
+  "fragment-hierarchy"
+};
+
+partial interface Element {
+  Promise&lt;DeadFragmentInformation&gt; getFragmentInformation(FragmentFilter filter);
+};
+
+partial interface Document {
+  void layoutNow();
+};
+
 </pre>
