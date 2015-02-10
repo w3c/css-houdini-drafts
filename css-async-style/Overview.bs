@@ -1,8 +1,8 @@
 <pre class='metadata'>
-Title:  CSS Asynchronous Style Level 1
+Title:  CSS Asynchronous Style Module Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/async-style/
-Shortname: async-style
+ED: http://dev.w3.org/houdini/css-async-style/
+Shortname: css-async-style
 Level: 1
 Abstract:
 Editor: Ian Vollick, vollick@chromium.org
