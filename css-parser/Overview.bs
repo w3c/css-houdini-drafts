@@ -7,6 +7,6 @@ Level: 1
 Abstract: 
 Editor: Tab Atkins, jackalmage@gmail.com
 Editor: Shane Stephens, shanestephens@google.com
-Editor: Daniel Glazman, glazou@disruptiveinnovations.com
+Editor: Daniel Glazman, danie.glazman@disruptiveinnovations.com
 Editor: Brian Kardell, bkardell@gmail.com
 </pre>
