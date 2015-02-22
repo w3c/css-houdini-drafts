@@ -7,4 +7,5 @@ Level: 1
 Abstract: 
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+Editor: Dean Jackson, dino@apple.com
 </pre>
