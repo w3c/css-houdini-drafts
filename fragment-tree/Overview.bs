@@ -12,7 +12,11 @@ Editor: Rossen Atanassov, rossen.atanassov@microsoft.com
 Editor: Shane Stephens, shanestephens@google.com
 </pre>
 
-<h2>Introduction</h2>
+<pre class='link-defaults'>
+spec:dom-core-ls; type:interface; text:Document
+</pre>
+
+<h2 id='intro'>Introduction</h2>
 
 The layout stage of CSS is responsible for generating the position and size of
 a document's content.  During this process, each DOM element produces
@@ -22,7 +26,7 @@ fragments.
 This specification describes an API that gives developers access to geometry,
 text and other information about boxes and fragments.
 
-<h2>Boxes and Fragments</h2>
+<h2 id='boxes-and-fragments'>Boxes and Fragments</h2>
 
 The [[!css-display-3]] specification describes the relationship between
 elements, boxes, and fragments.
@@ -34,63 +38,63 @@ Fragments do not in general form a tree that maps cleanly back to the DOM. When
 an element generates multiple fragment trees, the element that generates a least common ancestor can be arbitrarily far up the DOM tree.
 
 <div class='example'>
-Assuming that layout places "foo bar" on the first line, and "baz" on the
-second, the following HTML produces six fragments in a single tree.
-<pre class=lang-markup>
-&lt;style&gt;
-p::first-line { color: green; }
+	Assuming that layout places "foo bar" on the first line, and "baz" on the
+	second, the following HTML produces six fragments in a single tree.
 
-p::first-letter { color: red; }
-&lt;/style&gt;
-&lt;p&gt;foo &lt;i&gt;bar baz&lt;/i&gt;&lt;/p&gt;
-</pre>
-The fragments are:
-* the first line box
-* the second line box
-* the first letter fragment, parented by the first line box and styled by the first-letter rule.
-* a fragment containing "oo", parented by the first line box and styled by the first-line rule.
-* a fragment containing "bar", parented by the first line box and italic.
-* a fragment containing "baz", parented by the second line box and italic.
+	<pre class=lang-markup>
+	&lt;style>
+	p::first-line { color: green; }
 
-The italic element produces two fragments ("bar" and "baz"), each in its own
-tree. In this example, the paragraph element generates the common root for
-these fragments; however if (for example) the paragraph element were itself a
-descendant of a multi-column div then the common root may be further up the
-tree.
+	p::first-letter { color: red; }
+	&lt;/style>
+	&lt;p>foo &lt;i>bar baz&lt;/i>&lt;/p>
+	</pre>
 
+	The fragments are:
+
+	* the first line box
+	* the second line box
+	* the first letter fragment, parented by the first line box and styled by the first-letter rule.
+	* a fragment containing "oo", parented by the first line box and styled by the first-line rule.
+	* a fragment containing "bar", parented by the first line box and italic.
+	* a fragment containing "baz", parented by the second line box and italic.
+
+	The italic element produces two fragments ("bar" and "baz"), each in its own
+	tree. In this example, the paragraph element generates the common root for
+	these fragments; however if (for example) the paragraph element were itself a
+	descendant of a multi-column div then the common root may be further up the
+	tree.
 </div>
 
 Boxes are not explicitly exposed by this API.
 
-<h2>API</h2>
+<h2 id='api'>API</h2>
 
 <pre class='idl'>
-
 interface DeadFragmentInformation {
-  readonly attribute Node node;
-  readonly attribute double width;
-  readonly attribute double height;
-  readonly attribute double top;
-  readonly attribute double left;
-  readonly attribute boolean isOverflowed;
-  readonly attribute sequence&lt;DeadFragmentInformation&gt;? children;
-  readonly attribute DeadFragmentInformation? nextSibling;
-  readonly attribute DeadFragmentInformation? previousSibling;
-  readonly attribute DeadFragmentInformation? nextInBox;
-  readonly attribute DeadFragmentInformation? previousInBox;
+	readonly attribute Node node;
+	readonly attribute double width;
+	readonly attribute double height;
+	readonly attribute double top;
+	readonly attribute double left;
+	readonly attribute boolean isOverflowed;
+	readonly attribute sequence&lt;DeadFragmentInformation>? children;
+	readonly attribute DeadFragmentInformation? nextSibling;
+	readonly attribute DeadFragmentInformation? previousSibling;
+	readonly attribute DeadFragmentInformation? nextInBox;
+	readonly attribute DeadFragmentInformation? previousInBox;
 };
 
 enum FragmentFilter {
-  "direct-fragments-only",
-  "fragment-hierarchy"
+	"direct-fragments-only",
+	"fragment-hierarchy"
 };
 
 partial interface Element {
-  Promise&lt;DeadFragmentInformation&gt; getFragmentInformation(FragmentFilter filter);
+	Promise&lt;DeadFragmentInformation> getFragmentInformation(FragmentFilter filter);
 };
 
 partial interface Document {
-  void layoutNow();
+	void layoutNow();
 };
-
 </pre>
