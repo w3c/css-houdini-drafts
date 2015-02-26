@@ -1,8 +1,8 @@
 <pre class='metadata'>
-Title:  CSS Layout Level 1
+Title:  CSS Layout API Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/css-layout/
-Shortname: css-layout
+ED: http://dev.w3.org/houdini/css-layout-api/
+Shortname: css-layout-api
 Level: 1
 Abstract:
 Editor: Greg Whitworth, gwhit@microsoft.com 

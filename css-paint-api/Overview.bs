@@ -1,8 +1,8 @@
 <pre class='metadata'>
-Title:  CSS Painting Level 1
+Title:  CSS Painting API Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/css-paint/
-Shortname: css-paint
+ED: http://dev.w3.org/houdini/css-paint-api/
+Shortname: css-paint-api
 Level: 1
 Abstract: 
 Editor: Shane Stephens, shanestephens@google.com

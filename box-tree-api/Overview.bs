@@ -1,10 +1,10 @@
 <pre class='metadata'>
-Title: Fragment Tree API Level 1
+Title: Box Tree API Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/fragment-tree/
-Shortname: fragment-tree
+ED: http://dev.w3.org/houdini/box-tree-api/
+Shortname: box-tree-api
 Level: 1
-Abstract: Layout as described by CSS produces fragments that control how content is displayed and positioned. This specification describes an API for accessing information about these fragments.
+Abstract: Layout as described by CSS produces boxes that control how content is displayed and positioned. This specification describes an API for accessing information about these boxes.
 Editor: Tab Atkins, jackalmage@gmail.com
 Editor: Peter Linss, peter.linss@hp.com
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org

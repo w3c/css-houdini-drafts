@@ -1,8 +1,8 @@
 <pre class='metadata'>
-Title:  CSS Parser Level 1
+Title:  CSS Parser API Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/css-parser/
-Shortname: css-parser
+ED: http://dev.w3.org/houdini/css-parser-api/
+Shortname: css-parser-api
 Level: 1
 Abstract: 
 Editor: Tab Atkins, jackalmage@gmail.com
