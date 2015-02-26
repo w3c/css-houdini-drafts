@@ -1,8 +1,8 @@
 <pre class='metadata'>
-Title:  CSS Font Metrics API Level 1
+Title:  Font Metrics API Level 1
 Status: DREAM
-ED: http://dev.w3.org/houdini/css-font-metrics-api/
-Shortname: css-font-metrics-api
+ED: http://dev.w3.org/houdini/font-metrics-api/
+Shortname: font-metrics-api
 Level: 1
 Abstract: 
 Editor: Stephen Zilles, szilles@adobe.com
