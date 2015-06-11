@@ -11,3 +11,144 @@ Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
 Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
 </pre>
+
+Introduction
+============
+
+Registering custom properties
+=============================
+
+<pre class='idl'>
+dictionary PropertyDescriptor {
+  DOMString name;
+  DOMString syntax;
+  boolean   inherits;
+  DOMString initialValue;
+};
+
+partial interface Document {
+  void registerProperty(PropertyDescriptor descriptor);
+};
+</pre>
+
+
+
+The apply hook
+==============
+
+
+<div class='notes'>
+
+syntax: is a string, doesn't accept anything for V1 except '<a single type here>' (e.g. <length>).
+Specifically: <length>, <color>, <number>, <angle>, <url>, <image>, <position>, <transform>
+type: not needed for V1 (because it's derived from syntax).
+animation: not needed for V1 (because it's derived from syntax).
+
+Limitation: can't have percentages without a computation hook.
+
+Does invalidation go here?
+
+What does this give us:
+(1) the ability to feed typed information to custom paint/layout
+(2) the ability to animate custom properties
+
+Things that are missing:
+(1) there's no way to define a custom computation - i.e. we can take '33em' to '330px' in the standard way, but
+    we can't convert '33em' to something special.
+(2) there's no way to define custom animation. So we can't register for strings and define some crazy way
+    to animate them.
+(3) there's no way (outside of direct var references or custom painters/layouters) for the custom properties
+    to impact layout or paint. This is 'applying the value', and refers to manipulating the used value of
+    other properties.
+
+Minimum Viable Use Cases
+------------------------
+* register --layout, which uses abspos to emulate grid.
+
+
+Elephants in the room
+---------------------
+* The apply model means that you can't have two custom properties that apply to the same used
+  values coexisting on the same element.
+
+
+registerProperty({
+  name: '--layout',
+  syntax: '<string>',
+  inherit: false,
+  initialValue: 'none',
+  apply: function(used, value) {
+    if (value == 'shittygrid') {
+      used.width = '500px';
+    }
+  }
+});
+
+registerProperty({
+  name: '--extraBorder',
+  syntax: '<length>',
+  inherit: false,
+  initialValue: '0px',
+  apply: function(used, value) {
+    used.width += value;
+  }
+});
+
+
+<script>
+registerProperty({
+  name: '--leftLinePosition',
+  syntax: '<length>',
+  inherit: true,
+  initialValue: '0px',
+  invalidation: 'geometry'
+  // what's missing: the compute hook ('type')
+  // what's missing: the animation hook ('type' too?)
+  // what's missing: applying the value
+ });
+</script>
+
+<script> // in a worker / context / something.
+registerPaintCallback({
+  name: 'leftLinePainter',
+  impl: myRegisterPaintCallbackFunction,
+  properties: ['--leftLinePosition']
+}
+</script>
+
+<style>
+.foo {
+  transition: --leftLinePosition; // this is valid!
+  --leftLinePosition: 44px;
+  --leftLinePosition: 44rad; // rejected at parse time.
+  background-image: paint(leftLinePainter);
+}
+
+.foo:hover {
+  --leftLinePosition: 100px; // transitions to this on hover
+}
+</style>
+
+<style>
+.foo {
+  --myProperty: 44px;
+}
+
+.bar { @ this is a child of .foo
+  width: var(--myProperty);
+}
+</style>
+
+<script>
+registerProperty({
+  name: '--extraLeftMargin',
+  syntax: '<length>',
+  inherit: true,
+  initialValue: '0px',
+  apply: function(used, value) {
+    used.width += value;
+  }
+});
+</script>
+
+
