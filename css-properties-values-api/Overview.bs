@@ -10,14 +10,14 @@ Editor: Shane Stephens, shanestephens@google.com
 Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
 Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
-Ignored Terms: boolean, Animatable, Map 
+Ignored Terms: boolean, Animatable, Map, Context 
 </pre>
 
-Introduction
-============
+Introduction {#intro}
+=====================
 
-Registering custom properties
-=============================
+Registering custom properties {#registering-custom-properties}
+==============================================================
 
 <pre class='idl'>
 dictionary PropertyDescriptor {
@@ -68,16 +68,17 @@ that doesn't match an existing property then an exception is thrown.
 
 Calls to both {{registerProperty()}} and {{unregisterProperty()}} trigger a reparse of all parsed CSS.
 
-The apply hook
-==============
+The apply hook {#the-apply-hook}
+================================
 
 <pre class='idl'>
 
-interface StyleWriter {
-  // affordances for writing to used values, but only those in outputProperties
+interface ElementProxy {
+  // includes affordances for writing to used values, but only those in outputProperties.
+  // Also for reading computed style values, but only those in inputProperties..
 };
 
-callback ApplyCallback = void (Animatable element, StyleWriter writer, Map<DOMString, any> computedValues);
+callback ApplyCallback = void (ElementProxy element);
 
 dictionary ApplyDescriptor {
   ApplyCallback applyHook;
@@ -85,13 +86,11 @@ dictionary ApplyDescriptor {
   sequence&lt;DOMString&gt; outputProperties;
 };
 
-partial interface CSS {
+partial interface Context {
   long registerApplyHook(ApplyDescriptor apply);
   void unregisterApplyHook(long hookID);
 };
 </pre>
-
-Issue: CSS? Document?
 
 
 :   <dfn dict-member for=ApplyDescriptor>inputProperties</dfn>
@@ -106,6 +105,117 @@ If a {{registerApplyHook()}} call is made with a list of outputProperties that c
 properties that have already been registered for output, then an exception is thrown and
 the call fails.
 
+Examples {#examples}
+====================
+
+Example 1: Polyfill scale, translate, rotate {#example-1}
+---------------------------------------------------------
+
+This approach prohibits the direct use of the transform property.
+
+<pre class='lang-markup'>
+&lt;script&gt;
+["--scale-x", "--scale-y"].forEach(function(prop){
+document.registerProperty({
+    name: prop,
+    inherits: false,
+    initial: 1,
+    syntax: "&lt;number&gt;"
+    });
+});
+
+["--translate-x", "--translate-y"].forEach(function(name) {
+  document.registerProperty({
+    name: name,
+    initial: "0px",
+    inherits: false,
+    type: "&lt;length&gt;"
+  });
+});
+
+document.registerProperty({
+  name: "--rotate",
+  initial: "0deg",
+  type: "&lt;angle&gt;"
+  inherits: false
+});
+&lt;/script&gt;
+&lt;style&gt;
+* {
+    transform: translate(var(--translate-x), var(--translate-y)) rotate(var(--rotate)) scale(var(--scale-x), var(--scale-y));
+}
+
+#myElement {
+    --translate-x: 5px;
+    --translate-y: 10px;
+    --rotate: 10deg;
+    --scale-x: 25;
+    --scale-y: 25;
+}
+
+.foobar {
+    --rotate: 20deg;
+}
+&lt;/style&gt;
+</pre>
+
+Example 2: as above, but with transform property still operational {#example-2}
+-------------------------------------------------------------------------------
+
+<pre class='lang-javascript'>
+this.registerApplyHook({
+    apply: function(el) {
+      el.outputStyle.transform = 'translate(' + el.style.get('--translate-x') + ', ' + el.style.get('--translate-y') + 
+                                   ') rotate(' + el.style.get('--rotate') + 
+                                   ') scale(' + el.style.get('--scale-x') + ', ' + el.style.get('--scale-y') + ')' + 
+                                   el.style.get('transform');
+    },
+    inputProperties: ["--translate-*", "--scale-*", "--rotate", "transform"],
+    outputProperties: ["transform"]
+});
+</pre>
+
+Example 3: Disabling floats {#example-3}
+----------------------------------------
+
+<pre class='lang-javascript'>
+this.registerApplyHook({
+  apply: function(el) {
+    el.outputStyle.float = 'none';
+  },
+  inputProperties: ["float"],
+  outputProperties: ["float"]
+}); // \m/
+</pre>
+
+Example 4: Simple "layout" - media block {#example-4}
+-----------------------------------------------------
+This example lays out two children, with the right child taking the leftover space not taken by the left child.
+
+<pre class='lang-javascript'>
+document.registerProperty({
+    name: '--media-block',
+    syntax: '<ident>',
+    inherits: false,
+    initial: 'no'
+});
+
+this.registerApplyHook({
+    apply: function(element) {
+        let [right, left] = element.childElements;
+        let outerWidth = el.style.get("width"); // This is just the CSS value... what happens with 'auto';
+        let rightWidth = right.style.get("width");
+        left.outputStyle.width = "calc("+outerWidth+" - "+ rightWidth +")";
+        right.outputStyle.float = "left";
+        left.outputStyle.float = "left";
+    },
+    inputProperties: ["--media-block", "width", "child/width"],
+    outputProperties: ["width", "float"]
+});
+</pre>
+
+Notes {#Notes}
+==============
 
 <pre class='note'>
 
