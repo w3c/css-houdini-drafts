@@ -42,10 +42,10 @@ Issue: CSS? Document?
 ::  A string representing how this custom property is parsed. Only
     simple type references are supported.
 
-    Note: for example, the syntax string could be '<length>' or '<number>'.
+    Note: for example, the syntax string could be '&lt;length&gt;' or '&lt;number&gt;'.
 
     Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
-    '<length> || <number>'
+    '&lt;length&gt; || &lt;number&gt;'
 
 :   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
