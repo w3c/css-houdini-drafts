@@ -13,7 +13,7 @@ Editor: Shane Stephens, shanestephens@google.com
 </pre>
 
 <pre class='link-defaults'>
-spec:dom-core-ls; type:interface; text:Document
+spec:dom-ls; type:interface; text:Document
 </pre>
 
 <h2 id='intro'>Introduction</h2>
