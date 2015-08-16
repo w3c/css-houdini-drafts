@@ -470,6 +470,63 @@ Issue: Need to add a section describing unions of types.
 
 Issue: Need to add a section describing shorthands.
 
+{{PositionValue}} objects {#positionvalue-objects}
+--------------------------------------------------
+
+<pre class='idl'>
+
+[Constructor(LengthValue x, LengthValue y)]
+interface PositionValue : StyleValue {
+  readonly attribute LengthValue x;
+  readonly attribute LengthValue y;
+};
+
+</pre>
+
+{{PositionValue}} objects represent values for properties that take <<position>> 
+productions, for example 'background-position'.
+
+The <dfn attribute for=PositionValue>x</dfn> attribute contains the position offset
+from the left edge of the container, expressed as a length.
+
+The <dfn attribute for=PositionValue>y</dfn> attribute contains the position offset
+from the top edge of the container, expressed as a length.
+
+Note that <<position>> productions accept a complicated combination of keywords
+and values. When specified as such in a stylesheet or via the untyped CSSOM,
+the <a attribute for=StyleValue>cssString</a> attribute will contain the specified
+string. However, this string is normalized as two Lengths into the <a attribute
+for=PositionValue>x</a> and <a attribute for=PositionValue>y</a> values of the
+{{StyleValue}} object.
+
+New {{PositionValue}} objects can only be constructed via pairs of lengths, and
+will only return the direct serialization of these lengths in the 
+<a attribute for=StyleValue>cssString</a> attribute.
+
+<div class='example'>
+
+For example, the following style sheet:
+
+<pre class='style'>
+.example {
+  background-position: center bottom 10px;
+}
+</pre>
+
+Will produce the following behavior:
+
+<pre class='lang-javascript'>
+// "center bottom 10px"
+document.querySelector('.example').styleMap.get('background-position').cssString;
+
+// 50% - as a SimpleLength
+document.querySelector('.example').styleMap.get('background-position').x;
+
+// calc(100% - 10px) - as a CalcLength
+document.querySelector('.example').styleMap.get('background-position').y;
+</pre>
+
+</div>
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
