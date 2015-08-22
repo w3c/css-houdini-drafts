@@ -40,7 +40,7 @@ Issue: CSS? Document?
 :   <dfn dict-member for=PropertyDescriptor>name</dfn>
 ::  The name of the custom property being defined. This must begin with a double dash ('--').
 
-Issue: Describe what happens if the name doesn't begin with a double dash. Don't use 'must'.
+Issue: Describe what happens if the name doesn't begin with a double dash. Don't use must.
 
 Issue: what happens if syntax doesn't parse?
 
