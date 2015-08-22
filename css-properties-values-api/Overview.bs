@@ -11,6 +11,7 @@ Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
 Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
 Ignored Terms: boolean, Animatable, Map, Context 
+Repository: w3c/css-houdini-drafts
 </pre>
 
 Introduction {#intro}
@@ -47,17 +48,21 @@ Issue: CSS? Document?
     Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
     '&lt;length&gt; || &lt;number&gt;'
 
+Issue(5): Add more types here.
+
 :   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
 
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
+Issue(6): initialValue must match syntax.
+
 When a custom property is registered with a given type, its computed value is defined
 fully by the type selected. Furthermore, the property will interpolate in a manner
 defined for that type by [[css3-animations]].
 
-TODO: Actually work out whether we need to describe computation per type
+Issue(1): Need to define what the computed value for each type is. Work out whether we need to describe computation per type
 here, or whether we can crib from another spec.
 
 If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
@@ -97,6 +102,10 @@ partial interface Context {
 ::  If this value is not null, then the apply function is only called for elements or
     pseudoelements on which the listed properties all have non-initial values.
 
+Issue(4): It should it be possible to access properties on the parent.
+
+Issue(2): Should this be available only if explicitly requested in inputProperties?
+
 :   <dfn dict-member for=ApplyDescriptor>outputProperties</dfn>
 ::  This value defines the properties for which the apply function can modify the used
     value.
@@ -104,6 +113,11 @@ partial interface Context {
 If a {{registerApplyHook()}} call is made with a list of outputProperties that contains
 properties that have already been registered for output, then an exception is thrown and
 the call fails.
+
+Issue(3): Need to state that apply gets called every time any of the inputs change.
+
+Issue: Need to state that apply runs in its own context.
+
 
 Examples {#examples}
 ====================
@@ -213,6 +227,8 @@ this.registerApplyHook({
     outputProperties: ["width", "float"]
 });
 </pre>
+
+Issue: this example doesn't work, and access to child style probably *can't* work.
 
 Notes {#Notes}
 ==============
