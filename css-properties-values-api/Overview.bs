@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Properties and Values API Level 1
 Status: DREAM
+Group: houdini
 ED: http://dev.w3.org/houdini/css-properties-values-api/
 Shortname: css-properties-values-api
 Level: 1
@@ -39,6 +40,10 @@ Issue: CSS? Document?
 :   <dfn dict-member for=PropertyDescriptor>name</dfn>
 ::  The name of the custom property being defined. This must begin with a double dash ('--').
 
+Issue: Describe what happens if the name doesn't begin with a double dash. Don't use 'must'.
+
+Issue: what happens if syntax doesn't parse?
+
 :   <dfn dict-member for=PropertyDescriptor>syntax</dfn>
 ::  A string representing how this custom property is parsed. Only
     simple type references are supported.
@@ -50,13 +55,15 @@ Issue: CSS? Document?
 
 Issue(5): Add more types here.
 
+Issue: Be explicit about which types are supported.
+
 :   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
 
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
-Issue(6): initialValue must match syntax.
+Issue(6): initialValue must match syntax. What happens if it doesn't?
 
 When a custom property is registered with a given type, its computed value is defined
 fully by the type selected. Furthermore, the property will interpolate in a manner
@@ -79,8 +86,9 @@ The apply hook {#the-apply-hook}
 <pre class='idl'>
 
 interface ElementProxy {
-  // includes affordances for writing to used values, but only those in outputProperties.
-  // Also for reading computed style values, but only those in inputProperties..
+  // includes affordances for writing to computed values, but only
+  // those in outputProperties. Also for reading computed style
+  // values, but only those in inputProperties..
 };
 
 callback ApplyCallback = void (ElementProxy element);
@@ -105,6 +113,8 @@ partial interface Context {
 Issue(4): It should it be possible to access properties on the parent.
 
 Issue(2): Should this be available only if explicitly requested in inputProperties?
+
+Issue: inputProperties probably shouldn't be nullable (or if it is then what does that mean?).
 
 :   <dfn dict-member for=ApplyDescriptor>outputProperties</dfn>
 ::  This value defines the properties for which the apply function can modify the used
@@ -193,6 +203,8 @@ this.registerApplyHook({
     outputProperties: ["transform"]
 });
 </pre>
+
+Issue: merge examples 1 and 2.
 
 Example 3: Disabling floats {#example-3}
 ----------------------------------------
