@@ -158,14 +158,14 @@ document.registerProperty({
     name: name,
     initial: "0px",
     inherits: false,
-    type: "&lt;length&gt;"
+    syntax: "&lt;length&gt;"
   });
 });
 
 document.registerProperty({
   name: "--rotate",
   initial: "0deg",
-  type: "&lt;angle&gt;"
+  syntax: "&lt;angle&gt;"
   inherits: false
 });
 &lt;/script&gt;
