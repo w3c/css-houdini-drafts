@@ -114,9 +114,14 @@ If a {{registerApplyHook()}} call is made with a list of outputProperties that c
 properties that have already been registered for output, then an exception is thrown and
 the call fails.
 
+Issue: Need to determine whether this is too inflexible.
+
 Issue(3): Need to state that apply gets called every time any of the inputs change.
 
 Issue: Need to state that apply runs in its own context.
+
+Issue: Need to determine an ordering between apply getting called and transitions triggering.
+
 
 
 Examples {#examples}
