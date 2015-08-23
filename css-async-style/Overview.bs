@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Asynchronous Style Module Level 1
 Status: DREAM
+Group: houdini
 ED: http://dev.w3.org/houdini/css-async-style/
 Shortname: css-async-style
 Level: 1
