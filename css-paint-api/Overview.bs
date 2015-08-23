@@ -2,7 +2,7 @@
 Title:  CSS Painting API Level 1
 Status: DREAM
 Group: houdini
-ED: http://dev.w3.org/houdini/css-paint-api/
+ED: https://drafts.css-houdini.org/css-paint-api-1/
 Shortname: css-paint-api
 Level: 1
 Abstract: 

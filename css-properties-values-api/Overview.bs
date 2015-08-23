@@ -2,7 +2,7 @@
 Title:  CSS Properties and Values API Level 1
 Status: DREAM
 Group: houdini
-ED: http://dev.w3.org/houdini/css-properties-values-api/
+ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 Shortname: css-properties-values-api
 Level: 1
 Abstract: 

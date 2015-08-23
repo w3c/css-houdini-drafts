@@ -2,7 +2,7 @@
 Title:  CSS Scroll API Level 1
 Status: DREAM
 Group: houdini
-ED: http://dev.w3.org/houdini/css-scroll-api/
+ED: https://drafts.css-houdini.org/css-scroll-api-1/
 Shortname: css-scroll-api
 Level: 1
 Abstract:

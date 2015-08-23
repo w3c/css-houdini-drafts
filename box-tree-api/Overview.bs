@@ -2,7 +2,7 @@
 Title: Box Tree API Level 1
 Status: DREAM
 Group: houdini
-ED: http://dev.w3.org/houdini/box-tree-api/
+ED: https://drafts.css-houdini.org/box-tree-api-1/
 Shortname: box-tree-api
 Level: 1
 Abstract: Layout as described by CSS produces boxes that control how content is displayed and positioned. This specification describes an API for accessing information about these boxes.

@@ -2,7 +2,7 @@
 Title:  Font Metrics API Level 1
 Status: DREAM
 Group: houdini
-ED: http://dev.w3.org/houdini/font-metrics-api/
+ED: https://drafts.css-houdini.org/font-metrics-api-1/
 Shortname: font-metrics-api
 Level: 1
 Abstract: 
