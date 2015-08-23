@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title: Box Tree API Level 1
 Status: DREAM
+Group: houdini
 ED: http://dev.w3.org/houdini/box-tree-api/
 Shortname: box-tree-api
 Level: 1

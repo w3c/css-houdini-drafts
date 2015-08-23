@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Scroll API Level 1
 Status: DREAM
+Group: houdini
 ED: http://dev.w3.org/houdini/css-scroll-api/
 Shortname: css-scroll-api
 Level: 1
