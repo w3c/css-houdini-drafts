@@ -21,9 +21,9 @@ This specification describes an API which allows developers to paint a part of a
 Issue: Currently this spec doesn't provide any mechanism for setting clip, opacity, filter, etc. on either the context, background of an element. This would be nice to have.
 
 Paint Invalidation {#paint-invalidation}
-==================================
+========================================
 
-At any point in time the output of a paint callback for an element may be either <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>.
+At any point in time the output of a paint callback for a fragment may be either <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>.
 
 Issue: Describe output in a nicer way. This could be pixels, or a display list type object.
 
@@ -32,16 +32,14 @@ If the output is <a>paint-invalid</a> and the output should not be used for rend
 Invoking the paint callback will cause the output to become <a>paint-valid</a>.
 
 The output of a paint callback will become <a>paint-invalid</a> when:
- * The geometry of an element/fragment (as determined by layout) changes.
+ * The geometry of a fragment (as determined by layout) changes.
  * The computed style of a property that the paint callback has registered a dependency on has changed.
 
 Output which is <a>paint-valid</a> does not provide a guarantee that the paint callback is not invoked. Browsers may choose to invoke all callbacks every frame for simplicity.
 Thus to ensure cross-browser compatibility paint callbacks should be idempotent.
 
 Output which is <a>paint-invalid</a> are not necessarily invoked on the current frame.
-For example if the element is outside the current viewport, the browser may choose to only invoke the callback when it appears in the viewport.
-
-Issue: This describes everything in terms of element which is incorrect. Callbacks should be at the fragment level.
+For example if a fragment is outside the current viewport, the browser may choose to only invoke the callback when it appears in the viewport.
 
 Issue: Describe what happens if a callback doesn't hit a frame timing boundary. I.e. just renders a transparent image instead?
 
@@ -82,7 +80,7 @@ dictionary VisualOverflowRectDict {
     float? right;
 };
 
-dictionary PaintDescriptor {
+dictionary PaintRegistrationOptions {
     DOMString name;
     PaintCallback paintCallback;
     sequence&lt;DOMString&gt; dependencies;
@@ -91,28 +89,28 @@ dictionary PaintDescriptor {
 };
 
 partial interface PaintGlobalScope {
-      long registerPaint(PaintDescriptor paint);
-      void unregisterPaint(long hookID);
+      long registerPaint(PaintRegistrationOptions paint);
+      void unregisterPaint(long paintHandleID);
 };
 </pre>
 
-:   <dfn dict-member for=PaintDescriptor>name</dfn>
+:   <dfn dict-member for=PaintRegistrationOptions>name</dfn>
 ::  The name of the custom paint being defined. Any valid <<ident>> can be a custom paint name.
 
-:   <dfn dict-member for=PaintDescriptor>paintCallback</dfn>
+:   <dfn dict-member for=PaintRegistrationOptions>paintCallback</dfn>
 ::  The custom paint callback.
 
-Issue: This should probably be a class instead.
+Issue: Change this to be a class instead.
 
-:   <dfn dict-member for=PaintDescriptor>dependencies</dfn>
-::  The list of CSS properties (custom or native) which are provided to the custom paint callback. In addition when any of these properties changes, an element will become <a>paint-invalid</a>.
+:   <dfn dict-member for=PaintRegistrationOptions>dependencies</dfn>
+::  The list of CSS properties (custom or native) which are provided to the custom paint callback. In addition when any of these properties changes, a fragment will become <a>paint-invalid</a>.
 
-:   <dfn dict-member for=PaintDescriptor>contextType</dfn>
+:   <dfn dict-member for=PaintRegistrationOptions>contextType</dfn>
 ::  The type of context to provide for paint. Providing the "2d" will result in a <a href=''>CanvasRenderingContext2d</a>.
 
 Issue: We probably won't support any others initially. Remove this?
 
-:   <dfn dict-member for=PaintDescriptor>visualOverflowRect</dfn>
+:   <dfn dict-member for=PaintRegistrationOptions>visualOverflowRect</dfn>
 ::  The amount of additional canvas to provide for drawing for the fragment.
     This additional canvas can be used for drawing outside the box determined by layout for achieving overflow effects like box-shadow.
 
@@ -122,7 +120,7 @@ Issue: This is not how CSS works. We probably need an additional callback to pro
 :   <dfn method for=PaintGlobalScope>registerPaint(<var>paint</var>)</dfn>
 ::  Registers a paint callback.
 
-:   <dfn method for=PaintGlobalScope>unregisterPaint(<var>hookID</var>)</dfn>
+:   <dfn method for=PaintGlobalScope>unregisterPaint(<var>paintHandleID</var>)</dfn>
 ::  Unregisters a paint callback based on the ID given by <a>registerPaint()</a>.
 
 :   <dfn argument for=PaintCallback>context</dfn>
