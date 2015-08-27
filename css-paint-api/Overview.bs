@@ -84,7 +84,6 @@ dictionary PaintRegistrationOptions {
     DOMString name;
     PaintCallback paintCallback;
     sequence&lt;DOMString&gt; dependencies;
-    DOMString contextType;
     VisualOverflowRectDict visualOverflowRect;
 };
 
@@ -94,21 +93,20 @@ partial interface PaintGlobalScope {
 };
 </pre>
 
+PaintRegistrationOptions
+------------------------
+
+Issue: Change this to be used like a class, similar to Document#registerElement.
+
+
 :   <dfn dict-member for=PaintRegistrationOptions>name</dfn>
 ::  The name of the custom paint being defined. Any valid <<ident>> can be a custom paint name.
 
 :   <dfn dict-member for=PaintRegistrationOptions>paintCallback</dfn>
 ::  The custom paint callback.
 
-Issue: Change this to be a class instead.
-
 :   <dfn dict-member for=PaintRegistrationOptions>dependencies</dfn>
 ::  The list of CSS properties (custom or native) which are provided to the custom paint callback. In addition when any of these properties changes, a fragment will become <a>paint-invalid</a>.
-
-:   <dfn dict-member for=PaintRegistrationOptions>contextType</dfn>
-::  The type of context to provide for paint. Providing the "2d" will result in a <a href=''>CanvasRenderingContext2d</a>.
-
-Issue: We probably won't support any others initially. Remove this?
 
 :   <dfn dict-member for=PaintRegistrationOptions>visualOverflowRect</dfn>
 ::  The amount of additional canvas to provide for drawing for the fragment.
@@ -117,11 +115,19 @@ Issue: We probably won't support any others initially. Remove this?
 Issue: This is not how CSS works. We probably need an additional callback to provide the visual overflow rect based on the InputProperties.
        This is another argument for making the API class based.
 
+Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext. In particular the author may want a WebGL based rendering context to render 3D effects.
+
+PaintGlobalScope
+----------------
+
 :   <dfn method for=PaintGlobalScope>registerPaint(<var>paint</var>)</dfn>
 ::  Registers a paint callback.
 
 :   <dfn method for=PaintGlobalScope>unregisterPaint(<var>paintHandleID</var>)</dfn>
 ::  Unregisters a paint callback based on the ID given by <a>registerPaint()</a>.
+
+PaintCallback
+-------------
 
 :   <dfn argument for=PaintCallback>context</dfn>
 ::  The paint callback is passed a new <a href=''>CanvasRenderingContext2d</a> each time it is invoked. Implicitly this means that there is no stored data, or state on the rendering context.
@@ -187,7 +193,6 @@ Example 1: A colored circle. {#example-1}
 this.registerPaint({
     name: 'circle',
     dependencies: ['--circle-color'],
-    contextType: '2d',
     paintCallback: function(ctx, geom, properties) {
         // Change the fill color.
         var color = properties['--circle-color'];
