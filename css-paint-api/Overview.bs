@@ -141,14 +141,18 @@ PaintCallback
 
 Note: The litmus test used for deciding above was: methods should become no-ops if they can, otherwise throw an error if they'd require an IDL change.
 
-Issue: We should probably create a new interface for CanvasRenderingContext2d and use IDL mixins (like CanvasPathMethods) to share common interfaces.
+Issue: Instead of saying how CanvasRenderingContext2d changes in a paint execution context.
+       Create a new interface which uses IDL mixins to share methods with CanvasRenderingContext2d.
+
+Issue: What happens when the paint function throws an exception after writing some partial commands to the rendering context?
+       Should it output the partial image, or output an empty image?
 
 :   <dfn argument for=PaintCallback>geometry</dfn>
 ::  The geometry information for the callback.
 
 Issue: Decide what is needed here (in level 1). Obviously we need the width/height of the fragment.
-       If we are going down the fragment route do we need continuation data? I.e. what edge is shared etc.
-       Do we need children position data?
+       For slicing images, we would need all the fragment information (size, position) for the parent element.
+       Do we also need continuation data? I.e. what is the continuing edge.
        Should make sure we don't rabbit hole too much on this, provide what we think is useful for v1, iterate in v2.
 
 :   <dfn argument for=PaintCallback>inputProperties</dfn>
@@ -158,6 +162,13 @@ Issue: No way for image data to appear here yet. Everything string based.
        For example if you load the image data via. url('http://example.com/image.png') how does this appear in the paint callback?
        I think the answer to this is to provide this information in the Typed CSS Value OM.
        Will need access to a loaded bit, width, height, and a way to render into rendering context.
+
+Issue: Should this be blocked on a typed style OM? Instead of everything being string based?
+
+Issue: What information should we provide for read-modify-write use-cases?
+       Are read-modify-write use-cases important for v1?
+       For example, if you are sliding the previous paint output out?
+       For providing the previous paint output we should provide an ImageBitmap if you ask.
 
 Issue: Should VisualOverflowRectDict just be based on longs instead? Do floats make sense?
 
@@ -182,11 +193,13 @@ Issue: Word-smith this better.
 
 Issue: Change 'background-image', 'border-image' and 'content' to accept <<image-or-paint>> or <<paint()>>.
 
+Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
+
 Examples {#examples}
 ====================
 
 Example 1: A colored circle. {#example-1}
-----------------------------------------
+-----------------------------------------
 
 <pre class='lang-javascript'>
 // Inside PaintGlobalScope.
@@ -224,4 +237,8 @@ this.registerPaint({
 &lt;/style&gt;
 </pre>
 
-Issue: How to do conic-gradient as a use-case?
+Issue: Add conic-gradient as a use case.
+
+Issue: Add image with placeholder as a use case. E.g. mountainy-thingy.
+
+Issue: Add image url with var() input to custom paint as a use case.
