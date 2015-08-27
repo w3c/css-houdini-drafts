@@ -93,8 +93,8 @@ partial interface PaintGlobalScope {
 };
 </pre>
 
-PaintRegistrationOptions
-------------------------
+PaintRegistrationOptions {#paintregistrationoptions}
+----------------------------------------------------
 
 Issue: Change this to be used like a class, similar to Document#registerElement.
 
@@ -117,8 +117,8 @@ Issue: This is not how CSS works. We probably need an additional callback to pro
 
 Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext. In particular the author may want a WebGL based rendering context to render 3D effects.
 
-PaintGlobalScope
-----------------
+PaintGlobalScope {#paintglobalscope}
+------------------------------------
 
 :   <dfn method for=PaintGlobalScope>registerPaint(<var>paint</var>)</dfn>
 ::  Registers a paint callback.
@@ -126,8 +126,8 @@ PaintGlobalScope
 :   <dfn method for=PaintGlobalScope>unregisterPaint(<var>paintHandleID</var>)</dfn>
 ::  Unregisters a paint callback based on the ID given by <a>registerPaint()</a>.
 
-PaintCallback
--------------
+PaintCallback {#paintcallback}
+------------------------------
 
 :   <dfn argument for=PaintCallback>context</dfn>
 ::  The paint callback is passed a new <a href=''>CanvasRenderingContext2d</a> each time it is invoked. Implicitly this means that there is no stored data, or state on the rendering context.
