@@ -18,6 +18,10 @@ Repository: w3c/css-houdini-drafts
 Introduction {#intro}
 =====================
 
+This text is non-normative. In order to allow for the creation of custom properties (e.g. "myproperty:") this specification
+details the API to create a new property, what values it can except, and how to handle the property during cascade. It is recommended not to
+use this API for layout but only to affect cascading in a non-native manner.
+
 Registering custom properties {#registering-custom-properties}
 ==============================================================
 
