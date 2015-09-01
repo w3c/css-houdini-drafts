@@ -195,9 +195,6 @@ document.registerProperty({
 });
 &lt;/script&gt;
 &lt;style&gt;
-* {
-    transform: translate(var(--translate-x), var(--translate-y)) rotate(var(--rotate)) scale(var(--scale-x), var(--scale-y));
-}
 
 #myElement {
     --translate-x: 5px;
