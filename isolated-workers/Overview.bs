@@ -1,0 +1,10 @@
+<pre class='metadata'>
+Title:  Isolated Workers Level 1
+Status: DREAM
+Group: houdini
+ED: https://drafts.css-houdini.org/isolated-workers-1/
+Shortname: isolated-workers
+Level: 1
+Abstract: 
+Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+</pre>
