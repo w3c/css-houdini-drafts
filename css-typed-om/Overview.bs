@@ -1,0 +1,347 @@
+<pre class='metadata'>
+Title:  CSS Typed OM Level 1
+Status: DREAM
+Group: houdini
+ED: https://drafts.css-houdini.org/css-typed-om-1/
+Shortname: css-typed-om
+Level: 1
+Abstract: 
+Editor: Shane Stephens, shanestephens@google.com
+Repository: w3c/css-houdini-drafts
+</pre>
+
+<pre class=link-defaults>
+spec: dom-ls; type:interface; text:Document;
+spec: dom-ls; type:interface; text:Element;
+</pre>
+
+Introduction {#intro}
+=====================
+
+Converting CSSOM value strings into meaningfully typed JavaScript representations and
+back can incur a significant performance overhead. This specification exposes CSS values
+as typed JavaScript objects to facilitate their performant manipulation.
+
+{{StyleValue}} objects {#stylevalue-objects}
+============================================
+
+<pre class='idl'>
+enum StyleValueKeyword {"initial", "inherit", "default", "unset"};
+
+interface StyleValue {
+  attribute StyleValueKeyword? keywordValue;
+  attribute DOMString cssString;
+  static (StyleValue or sequence&ltStyleValue>)? parse(DOMString property, DOMString cssText);
+};
+</pre>
+
+{{StyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+
+For a given {{StyleValue}}:
+:   The <dfn attribute for=StyleValue>keywordValue</dfn> attribute
+::  is either set to one of the universal keywords represented in the  
+    {{StyleValueKeyword}} enum, or null if the object has a more specific
+    value.
+:   The <dfn attribute for=StyleValue>cssString</dfn> attribute
+::  provides a normalized representation (see <a section href="#stylevalue-normalization"></a>)
+    of the value.
+
+The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
+method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue> for
+<var>property</var>, returning null on failure.
+
+Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
+           this or should it be a subclass?
+
+The {{StylePropertyMap}} {#the-stylepropertymap}
+================================================
+
+<pre class='idl'>
+interface StylePropertyMap {
+  void append(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
+  void delete(DOMString property);
+  StyleValue? get(DOMString property);
+  sequence&lt;StyleValue> getAll(DOMString property);
+  boolean has(DOMString property);
+  void set(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
+  iterable&lt;DOMString, (StyleValue or sequence&lt;StyleValue> or DOMString)>;
+  sequence&lt;DOMString> getProperties();
+  stringifier;
+};
+</pre>
+
+Issue: I don't think we can use maplike here because this is a multimap :(
+
+A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
+which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
+is initialized differently depending on where the {{StyleValue}} is used
+(see
+<a section href="#computed-stylepropertymap-objects"></a>, 
+<a section href="#specified-stylepropertymap-objects"></a>, and
+<a section href="#inline-stylepropertymap-objects"></a>).
+
+<div class='note'>
+The sequence of {{StyleValue}}s associated with a property do
+not represent multiple successive definitions of that property's value.
+Instead, sequences represent values associated with list-valued properties.
+
+This approach allows single-valued properties to become list-valued in the
+future without breaking code that relies on calling 
+<a method for=StylePropertyMap>get()</a> and/or
+<a method for=StylePropertyMap>set()</a> for those properties.
+</div>
+
+Issue: this is different to the other multimaps on the platform because append/set take
+       sequences.
+
+When invoked, the <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or sequence&lt;StyleValue> or DOMString) <var>value</var>)</dfn> method follows the following steps:
+
+Issue: first need to check whether the property is a valid property.
+
+1.  
+    :   if <var>property</var> is not list-valued
+    ::  throw a TypeError
+
+1.
+    :   if the <a>property model</a> has no entry for <var>property</var>
+    ::  initialize an empty sequence in the <a>property model</a> for <var>property</var>
+
+1.
+    :   if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
+    ::  throw a TypeError
+
+1.
+    :   if <var>value</var> is a sequence&lt;{{StyleValue}}>, and it contains a {{StyleValue}} that has a type
+        that <var>property</var> can't accept
+    ::  throw a TypeError
+
+1.
+    :   if <var>value</var> is a DOMString
+    ::  set <var>value</var> to the result of invoking <a method for=StyleValue>parse()</a>, providing <var>property</var>
+        and <var>value</var> as inputs.
+
+1.
+    :   if <var>value</var> is null
+    ::  throw a TypeError
+    :   else, if <var>value</var> is a StyleValue
+    ::  append <var>value</var> to the entry in the <a>property model</a>
+    :   else, if <var>value</var> is a sequence&lt;StyleValue>
+    ::  concatenate <var>value</var> onto the end of the entry in the <a>property model</a>
+
+
+Issue: should refactor out value type-checking, as it'll be needed by the rest of the setters too
+
+Issue: need a robust description of what "a type that <var>property</var> can't accept" means.
+
+Issue: add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
+
+Issue: describe that these are not live objects
+
+Computed {{StylePropertyMap}} objects {#computed-stylepropertymap-objects}
+--------------------------------------------------------------------------
+
+<pre class='idl'>
+partial interface Document {
+  StylePropertyMap getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+};
+</pre>
+
+<dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
+{{Element}} or {{PseudoElement}}, and are accessed by calling the
+<dfn method for=Document>getComputedStyleMap(Element, optional DOMString?)</dfn>
+method.
+
+The <a>property model</a> for <a>computed StylePropertyMap</a> objects contains
+an entry for every valid CSS property supported by the User Agent.
+
+Issue: add a StylePropertyMapReadOnly and make getComputedStyleMap return that.
+
+Issue: better wording here and below - the property model is initialized to contain these things.
+
+Issue: need to describe what values are here too.
+
+Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
+      not resolved style. In this regard it provides different values than those
+      in objects returned by getComputedStyle.
+
+Issue: do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
+
+Specified {{StylePropertyMap}} objects {#specified-stylepropertymap-objects}
+----------------------------------------------------------------------------
+
+<pre class='idl'>
+partial interface CSSStyleRule {
+  readonly attribute StylePropertyMap styleMap;
+};
+</pre>
+
+<dfn>Specified StylePropertyMap</dfn> objects represent style property-value pairs embedded
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> 
+attribute of {{CSSStyleRule}} objects.
+
+The <a>property model</a> for <a>specified StylePropertyMap</a> objects contains
+an entry for each property that is paired with at least one valid value inside the
+{{CSSStyleRule}} that the object represents. The value for a given property is
+the last valid value provided by the {{CSSStyleRule}} object.
+
+
+Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
+----------------------------------------------------------------------
+
+<pre class='idl'>
+partial interface Element {
+  readonly attribute StylePropertyMap styleMap;
+};
+</pre>
+
+<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
+directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
+attribute of {{Element}} objects.
+
+The <a>property model</a> for <a>inline StylePropertyMap</a> objects contains an
+entry for each property that is paired with at least one valid value in the string 
+representing the style attribute for the Element that the object is associated with.
+The value for a given property is the last valid value provided in the string.
+
+{{StyleValue}} subclasses {#stylevalue-subclasses}
+==================================================
+
+{{NumberValue}} objects {#numbervalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+[Constructor(double), Constructor(DOMString cssString)]
+interface NumberValue : StyleValue {
+  attribute double value;
+};
+</pre>
+
+{{NumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
+
+{{NumberValue}} objects are not range-restricted. Any valid number can be represented by a {{NumberValue}},
+and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
+<a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
+
+Issue: Is this the behaviour we want for out-of-range (as opposed to incorrectly typed) values?
+
+<div class='example'>
+The following code is valid
+
+<pre class='lang-javascript'>
+  myElement.styleMap.set("opacity", new NumberValue(3));
+  myElement.styleMap.set("z-index", new NumberValue(15.4));
+
+  console.log(myElement.styleMap.get("opacity").value); // 3
+  console.log(myElement.styleMap.get("z-index").value); // 15.4
+
+  var computedStyle = getComputedStyleMap(myElement);
+  var opacity = computedStyle.get("opacity");
+  var zIndex = computedStyle.get("z-index");
+</pre>
+
+After execution, the value of <code>opacity</code> is 1 ('opacity' is range-restricted), 
+and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
+</div>
+
+Issue: where does a description of parsing values go? For example, where do we indicate that
+       calc(4 + 8) will create a {{NumberValue}} with a value of 12? 
+
+Issue: do we actually want to collapse calc values down to their minimum representations? I assume
+       so, given that this is what the old CSSOM is now specified to do. 
+
+{{LengthValue}} objects {#lengthvalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+enum LengthType {
+  "px", "percent",
+  "em", "ex", "ch", "rem",
+  "vw", "vh", "vmin", "vmax",
+  "cm", "mm", "q", "in", "pc", "pt"
+};
+
+dictionary CalcDictionary {
+  double? px = null;
+  double? percent = null;
+  double? em = null;
+  double? ex = null;
+  double? ch = null;
+  double? rem = null;
+  double? vw = null;
+  double? vh = null;
+  double? vmin = null;
+  double? vmax = null;
+  double? cm = null;
+  double? mm = null;
+  double? q = null;
+  double? in = null;
+  double? pc = null;
+  double? pt = null;
+};
+
+interface LengthValue : StyleValue {
+  LengthValue add(LengthValue value); // can throw
+  LengthValue subtract(LengthValue value); // can throw
+  LengthValue multiply(double value); // can throw
+  LengthValue divide(double value); // can throw
+  static LengthValue parse(DOMString cssString);
+  static LengthValue fromValue(double value, LengthType type);
+  static LengthValue fromDictionary(CalcDictionary dictionary);
+};
+
+[Constructor(DOMString cssString),
+ Constructor(LengthValue),
+ Constructor(CalcDictionary)
+]
+interface CalcLength : LengthValue {
+  attribute double? px;
+  attribute double? percent;
+  attribute double? em;
+  attribute double? ex;
+  attribute double? ch;
+  attribute double? rem;
+  attribute double? vw;
+  attribute double? vh;
+  attribute double? vmin;
+  attribute double? vmax;
+  attribute double? cm;
+  attribute double? mm;
+  attribute double? q;
+  attribute double? in;
+  attribute double? pc;
+  attribute double? pt;
+};
+
+// lengths that are *just* keywords don't become SimpleLengths or CalcLengths.
+[Constructor(DOMString cssString),
+ Constructor(LengthValue),
+ Constructor(double value, LengthType type)]
+interface SimpleLength : LengthValue {
+  attribute double value;
+  readonly attribute LengthType type;
+};
+</pre>
+
+Issue: do we want an enum of length keywords too?
+
+Issue: write long descriptions of all of this
+
+Issue: There are now 3 ways of creating Length values - 
+       StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
+       Is this too much?
+
+Issue: What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
+
+Issue: Need to add a section for each of the other primitive types.
+
+Issue: Need to add a section describing unions of types.
+
+Issue: Need to add a section describing shorthands.
+
+
+{{StyleValue}} normalization {#stylevalue-normalization}
+========================================================
+
+Issue: write me
+
+
