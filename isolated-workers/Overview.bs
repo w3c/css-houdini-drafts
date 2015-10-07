@@ -5,6 +5,113 @@ Group: houdini
 ED: https://drafts.css-houdini.org/isolated-workers-1/
 Shortname: isolated-workers
 Level: 1
-Abstract: 
+Abstract:  This specification defines an API for running scripts in stages of the rendering pipeline independent of the main javascript execution environment.
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+</pre>
+
+<pre class="anchors">
+urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
+    text: web workers
+    text: DedicatedWorkerGlobalScope
+urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
+    text: document environment
+urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
+    text: javascript global environment
+</pre>
+
+Introduction {#intro}
+=====================
+
+Motivations {#motivations}
+--------------------------
+
+<p><em>This section is not normative.</em></p>
+
+Rendering engines for web pages have been built assuming that there is no user defined script run in the middle of a rendering phase.
+
+Due to this allowing extension points defined in the <a>document environment</a>
+is difficult, as rendering engines would need to abandon previously held assumptions for what could happen in the middle of a phase.
+
+For example, during the layout phase the rendering engine assumes that no DOM will be modified.
+
+Additionally defining extension points in the <a>document environment</a>
+would restrict rendering engines to performing work in the same thread as the <a>document environment</a>.
+(Unless rendering engines added complex, high-overhead infrastructure to allow thread-safe APIs in addition to thread joining guarantees).
+
+The isolated worker is designed to allow such extension points in rendering engines, while keeping guarantees which rendering engines rely currently on.
+
+Isolated workers are similar to <a>web workers</a> however they:
+ - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
+ - Are able to have multiple duplicate instances created for the purpose of parallelism.
+ - Are not event API based. Instead callbacks are registered on the global scope, to be invoked by the rendering engine.
+ - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
+ - Have a lifetime tied to running a callback or set of callbacks.
+
+As isolated workers have a relatively high overhead, they should be used sparingly. Due to this isolated workers are expected to be shared between separate scripts.
+This is similar to the <a>document environment</a>.
+
+Infrastructure {#infrastructure}
+================================
+
+The Global Scope {#the-global-scope}
+------------------------------------
+
+<pre class='idl'>
+interface IsolatedWorkerGlobalScope {
+};
+IsolatedWorkerGlobalScope implements WindowBase64;
+</pre>
+
+The IsolatedWorkerGlobalScope has a limited global scope when compared to a <a>DedicatedWorkerGlobalScope</a>.
+
+The Event Loop {#the-event-loop}
+--------------------------------
+
+Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
+------------------------------------------------------------------
+
+Processing Model {#processing-model}
+------------------------------------
+
+Using IsolatedWorkers {#using-isolatedworkers}
+----------------------------------------------
+
+<pre class='idl'>
+interface IsolatedWorker {
+    [NewObject] Promise&lt;boolean&gt; importScripts(DOMString... urls);
+};
+</pre>
+
+Examples {#examples}
+====================
+
+For these examples we'll use a mock isolated worker on window.
+
+<pre class='idl'>
+partial interface Window {
+  [SameObject] readonly attribute IsolatedWorker mockWorker1;
+  [SameObject] readonly attribute IsolatedWorker mockWorker2;
+};
+</pre>
+
+Loading scripts into an isolated worker. {#example-single}
+----------------------------------------------------------
+<pre class='lang-javascript'>
+window.mockWorker1.importScripts('script1.js');
+window.mockWorker2.importScripts('script2.js', 'script3.js');
+
+// Assuming no other calls to mockWorker1 valid script loading orderings are:
+// 1. 'script1.js', 'script2.js', 'script3.js'
+// 2. 'script2.js', 'script3.js', 'script1.js'
+</pre>
+
+Loading scripts into multiple isolated workers. {#example-multiple}
+-------------------------------------------------------------------
+<pre class='lang-javascript'>
+Promise.all([
+    window.mockWorker1.importScripts('script1.js'),
+    window.mockWorker2.importScripts('script2.js')
+]).then(function() {
+    // Both scripts now have loaded code, can do something which relies on this.
+});
 </pre>
