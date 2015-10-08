@@ -10,13 +10,29 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
 <pre class="anchors">
+urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
+    text: ok status
+    urlPrefix: #concept-response-;
+        text: body
+        text: status
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
-    text: web workers
     text: DedicatedWorkerGlobalScope
+    text: get a fetch result
+    text: import scripts into worker global scope
+    text: importing scripts and libraries
+    text: postprocess the fetch result
+    text: validate the state
+    text: web workers
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
+    text: create a script
     text: document environment
+    text: environment settings object
 urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
+    text: in parallel
     text: javascript global environment
+    text: unsafe response
+urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
+    text: a new promise
 </pre>
 
 Introduction {#intro}
@@ -78,9 +94,30 @@ Using IsolatedWorkers {#using-isolatedworkers}
 
 <pre class='idl'>
 interface IsolatedWorker {
-    [NewObject] Promise&lt;boolean&gt; importScripts(DOMString... urls);
+    [NewObject] Promise&lt;void&gt; importScripts(DOMString... urls);
 };
 </pre>
+
+When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is called on an {{IsolatedWorker}} object, the user agent <em>must</em> run the following steps:
+ 1. Let <em>promise</em> be <a>a new promise</a>.
+ 2. Run the following steps <a>in parallel</a>:
+    1. For each {{IsolatedWorkerGlobalScope}} associated with the {{IsolatedWorker}} run these substeps:
+        1. Run <a>import scripts into worker global scope</a> with the following options:
+            - To <a>validate the state</a>, the user agent <em>must</em> do nothing.
+            - To <a>get a fetch result</a>, the user agent <em>must</em> run the steps defined in <a>importing scripts and libraries</a>.
+            - To <a>postprocess the fetch result</a>, the user agent <em>must</em> run the following steps:
+                1. If the <em>response</em>'s <a>status</a> is not an <a>ok status</a> then abort all these steps.
+                2. If the <em>response</em>'s <a>body</a> is null then abort all these steps.
+                3. Let <em>source</em> be the result of running the UTF-8 decode algorithm on <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
+                    <br>Let <em>language</em> be JavaScript.
+                4. <a>Create a script</a> using <em>source</em> as the script source, the URL from which <em>source</em> was obtained, <em>language</em> as the scripting language,
+                    and <em>settings object</em> as the <a>environment settings object</a>.
+                5. If the newly created <em>script</em> fails to parse then abort all these steps.
+                6. Prepend the string <code class='lang-javascript'>(function() {'use strict';</code> to the <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
+                    <br>Append the string <code class='lang-javascript'>})();</code> to the <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
+    2. If <em>all</em> the steps above succeeded (in particular, if all of the scripts were loaded into their global scope), resolve <em>promise</em>
+        <br>Otherwise, reject <em>promise</em>.
+ 2. Return <em>promise</em>.
 
 Examples {#examples}
 ====================
