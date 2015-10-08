@@ -23,6 +23,8 @@ urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
     text: postprocess the fetch result
     text: validate the state
     text: web workers
+    urlPrefix: #dom-workerglobalscope-;
+        text: self
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: create a script
     text: document environment
@@ -33,6 +35,8 @@ urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn
     text: unsafe response
 urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
     text: a new promise
+urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
+    text: strict mode code
 </pre>
 
 Introduction {#intro}
@@ -41,7 +45,7 @@ Introduction {#intro}
 Motivations {#motivations}
 --------------------------
 
-<p><em>This section is not normative.</em></p>
+<em>This section is not normative.</em>
 
 Rendering engines for web pages have been built assuming that there is no user defined script run in the middle of a rendering phase.
 
@@ -59,12 +63,33 @@ The isolated worker is designed to allow such extension points in rendering engi
 Isolated workers are similar to <a>web workers</a> however they:
  - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
  - Are able to have multiple duplicate instances created for the purpose of parallelism.
- - Are not event API based. Instead callbacks are registered on the global scope, to be invoked by the rendering engine.
+ - Are not event API based. Instead callbacks are registered on the global scope, to be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
  - Have a lifetime tied to running a callback or set of callbacks.
 
 As isolated workers have a relatively high overhead, they should be used sparingly. Due to this isolated workers are expected to be shared between separate scripts.
 This is similar to the <a>document environment</a>.
+
+Code Idempotency {#code-idempotency}
+------------------------------------
+
+<em>This section is not normative.</em>
+
+Multiple instances of {{IsolatedWorkerGlobalScope}} can be created for each {{IsolatedWorker}} that they belong to.
+User agents may choose to do this in order to parallelize work over multiple threads, or to move work between threads as required.
+
+Additionally different user agents <em>may</em> invoke a callbacks in a different order to other user agents.
+
+Due to this, in order to prevent this compatibility risk between user agents, authors who register callbacks on the global scope should make their code idempotent.
+That is, a callback or set of callbacks should produce the same output given a particular input.
+
+The following techniques <em>may</em> be used in order to encourage authors to write code in an idempotent way:
+ - No reference to the global object, e.g. <a>self</a> on a <a>DedicatedWorkerGlobalScope</a>.
+ - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an anonymous function.
+    This prevents two different scripts sharing state by referencing shared objects on the global scope.
+ - User agents <em>may</em> choose to always have at least two {{IsolatedWorkerGlobalScope}}'s per {{IsolatedWorker}} and
+    randomly assign a callback or set of callbacks to a particular global scope.
+ - User agents <em>may</em> create and destroy {{IsolatedWorkerGlobalScope}}'s at any time.
 
 Infrastructure {#infrastructure}
 ================================
@@ -80,6 +105,8 @@ IsolatedWorkerGlobalScope implements WindowBase64;
 
 The IsolatedWorkerGlobalScope has a limited global scope when compared to a <a>DedicatedWorkerGlobalScope</a>.
 
+Issue(w3c/css-houdini-drafts#15): Add console API to {{IsolatedWorkerGlobalScope}} when it exists.
+
 The Event Loop {#the-event-loop}
 --------------------------------
 
@@ -89,8 +116,8 @@ Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
 Processing Model {#processing-model}
 ------------------------------------
 
-Using IsolatedWorkers {#using-isolatedworkers}
-----------------------------------------------
+IsolatedWorker {#isolatedworker}
+--------------------------------
 
 <pre class='idl'>
 interface IsolatedWorker {
@@ -119,6 +146,8 @@ When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is call
         <br>Otherwise, reject <em>promise</em>.
  2. Return <em>promise</em>.
 
+Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{IsolatedWorkerGlobalScope}} declaratively.
+
 Examples {#examples}
 ====================
 
@@ -135,7 +164,7 @@ Loading scripts into an isolated worker. {#example-single}
 ----------------------------------------------------------
 <pre class='lang-javascript'>
 window.mockWorker1.importScripts('script1.js');
-window.mockWorker2.importScripts('script2.js', 'script3.js');
+window.mockWorker1.importScripts('script2.js', 'script3.js');
 
 // Assuming no other calls to mockWorker1 valid script loading orderings are:
 // 1. 'script1.js', 'script2.js', 'script3.js'
