@@ -116,8 +116,8 @@ Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
 Processing Model {#processing-model}
 ------------------------------------
 
-IsolatedWorker {#isolatedworker}
---------------------------------
+IsolatedWorker {#isolatedworker-section}
+----------------------------------------
 
 <pre class='idl'>
 interface IsolatedWorker {
