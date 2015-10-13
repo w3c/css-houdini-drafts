@@ -60,6 +60,10 @@ per-document custom properties within a Window.
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
+Issue(48): It'd be nice to be able to specify e.g. "<width>" or "<background-color>" too.
+
+Issue(10): It'd be nice to be able to specify that a property can take the name of any property as a value.
+
 Attempting to register properties with a {{PropertyDescriptor/name}} that doesn't 
 correspond to the <<custom-property-name>> production must cause {{registerProperty()}}
 to throw a SyntaxError.
@@ -68,12 +72,10 @@ Attempting to call {{registerProperty()}} with a {{PropertyDescriptor/initialVal
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
 throw a SyntaxError.
 
-When a custom property is registered with a given type, its computed value is defined
+When a custom property is registered with a given type, the process via which specified
+values for that property are turned into computed values is defined
 fully by the type selected. Furthermore, the property will interpolate in a manner
 defined for that type by [[css3-animations]].
-
-Issue(1): Need to define what the computed value for each type is. Work out whether we need to describe computation per type
-here, or whether we can crib from another spec.
 
 If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
 then an exception is thrown and the re-registration fails.
@@ -103,6 +105,31 @@ The following syntax strings are supported:
 :   "*"
 ::  Any valid token stream
 
+<div class='example'>
+For example, the following are all valid syntax strings.
+
+:   <code>"&lt;length>"</code>
+::  accepts length values
+:   <code>"&lt;length>|&lt;percent>"</code>
+::  accepts lengths, or percentages, or length calc expressions, but not
+    calc expressions containing a combination of length and percent values.
+:   <code>"big|bigger|BIGGER"</code>
+::  accepts the string "big", or the string "bigger", or the string "BIGGER".
+
+</div>
+
+Calculation of Computed values
+------------------------------
+
+The syntax of a custom property fully determines how computed values are generated from specified values for that property.
+
+For &lt;length> values, the computed value is the absolute length expressed in pixels.
+
+For &lt;number>, &lt;percentage>, &lt;custom-ident>, string or "*" values, the computed value is identical to the specified value.
+
+For values specified by a syntax string that include "|" clauses, the computed
+value is given by applying the calculation rules for the first clause that
+matches to the specified value.
 
 The apply hook {#the-apply-hook}
 ================================

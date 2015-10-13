@@ -6,7 +6,7 @@
 
 SOURCEFILE=Overview.bs
 OUTPUTFILE=Overview.html
-PREPROCESSOR=bikeshed.py
+PREPROCESSOR=bikeshed
 REMOTE_PREPROCESSOR_URL=https://api.csswg.org/bikeshed/
 
 all: $(OUTPUTFILE)
