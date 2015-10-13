@@ -85,8 +85,8 @@ that doesn't match an existing property then an exception is thrown.
 
 Calls to both {{registerProperty()}} and {{unregisterProperty()}} trigger a reparse of all parsed CSS.
 
-Supported syntax strings
-------------------------
+Supported syntax strings {#supported-syntax-strings}
+----------------------------------------------------
 
 The following syntax strings are supported:
 
@@ -110,16 +110,16 @@ For example, the following are all valid syntax strings.
 
 :   <code>"&lt;length>"</code>
 ::  accepts length values
-:   <code>"&lt;length>|&lt;percent>"</code>
+:   <code>"&lt;length> | &lt;percent>"</code>
 ::  accepts lengths, or percentages, or length calc expressions, but not
     calc expressions containing a combination of length and percent values.
-:   <code>"big|bigger|BIGGER"</code>
+:   <code>"big | bigger | BIGGER"</code>
 ::  accepts the string "big", or the string "bigger", or the string "BIGGER".
 
 </div>
 
-Calculation of Computed values
-------------------------------
+Calculation of Computed values {#calculation-of-computed-values}
+----------------------------------------------------------------
 
 The syntax of a custom property fully determines how computed values are generated from specified values for that property.
 
