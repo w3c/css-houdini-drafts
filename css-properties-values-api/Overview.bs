@@ -39,7 +39,7 @@ partial interface CSS {
 };
 </pre>
 
-Issue: Maybe should be on Document instead of CSS? Probably not as we can't think of a reason to want
+Issue(50): Maybe should be on Document instead of CSS? Probably not as we can't think of a reason to want
 per-document custom properties within a Window.
 
 :   <dfn dict-member for=PropertyDescriptor>name</dfn>
