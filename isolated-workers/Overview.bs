@@ -131,11 +131,10 @@ Note:
 
 Issue(w3c/css-houdini-drafts#15): Add console API to {{IsolatedWorkerGlobalScope}} when it exists.
 
-### Creating an {{IsolatedWorkerGlobalScope}}
+### Initializing an IsolatedWorkerGlobalScope ### {#initializing-an-isolatedworkerglobalscope}
 
-When a user agent is to <dfn>create an {{IsolatedWorkerGlobalScope}}</dfn>, for a given <em>isolated worker</em>, it <em>must</em> run the following steps:
-    1. Let <em>worker global scope</em> be a new {{IsolatedWorkerGlobalScope}} that this algorithm will subsequently initialise.
-    2. Let <em>worker event loop</em> be a new <a>event loop</a>.
+When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, for a given <em>worker global scope</em> and <em>isolated worker</em>, it <em>must</em> run the following steps:
+    1. Let <em>worker event loop</em> be a new <a>event loop</a>.
 
         Let <em>inherited responsible browsing context</em> be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
 
@@ -143,7 +142,7 @@ When a user agent is to <dfn>create an {{IsolatedWorkerGlobalScope}}</dfn>, for 
 
         Let <em>inherited origin</em> be the <a>origin</a> specified by the <a>incumbent settings object</a>.
 
-    3. Let <em>settings object</em> be a new environment settings object whose algorithms are defined as follows:
+    2. Let <em>settings object</em> be a new environment settings object whose algorithms are defined as follows:
         : The <a>script execution environments</a>:
         :: When the <a>environment settings object</a> is created, for each language supported by the user agent, create an appropriate execution environment as defined by the relevant specification.
         :: When a <a>script execution environment</a> is needed, return the appropriate one from those created when the <a>environment settings object</a> was created.
@@ -169,13 +168,9 @@ When a user agent is to <dfn>create an {{IsolatedWorkerGlobalScope}}</dfn>, for 
         : The <a>origin</a> and <a>effective script origin</a>:
         :: Return <em>inherited origin</em>.
 
-    4. Associate the <em>settings object</em> with <em>worker global scope</em>.
+    3. Associate the <em>settings object</em> with <em>worker global scope</em>.
 
-    5. For each <em>script</em> in the given <em>isolated worker</em>'s <b>worker's loaded scripts</b> run the <em>script</em> in the <em>worker global scope</em>.
-
-    6. Return <em>worker global scope</em>.
-
-Issue: TODO Add to github. Add in argument which allows other specs to define the type of global scope.
+    4. For each <em>script</em> in the given <em>isolated worker</em>'s <b>worker's loaded scripts</b> run the <em>script</em> in the <em>worker global scope</em>.
 
 IsolatedWorker {#isolatedworker-section}
 ----------------------------------------
@@ -214,9 +209,9 @@ When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is call
         <br>Otherwise, reject <em>promise</em>.
  3. Return <em>promise</em>.
 
-Issue: TODO Add to github. What happens when a script throws an exception during executing for the first time?
+Issue(w3c/css-houdini-drafts#51): What should happen when a script throws an exception while executing for the first time?
 
-Issue: TODO Add to github. Is importScripts the right API call? Should it be singular instead?
+Issue(w3c/css-houdini-drafts#52): Is importScripts the right API call? Should it be singular instead?
 
 When a user agent is to <dfn>create an isolated script</dfn> given some <em>script source</em>, a <em>script source URL</em>, an <a>environment settings object</a>,
 it must run the following steps:
@@ -252,12 +247,21 @@ callbacks exceeding imposed time limits.
 Processing Model {#processing-model}
 ------------------------------------
 
-When a user agent is to <dfn export>invoke a callback on an {{IsolatedWorker}}</dfn> it must run the following steps:
+The <a>invoke a callback on an {{IsolatedWorker}}</a> has two hooks for algorithm steps that may be customized by any callers:
+    - <dfn export>create an isolated worker global scope</dfn>
+    - <dfn export>lookup a function on an isolated worker global scope</dfn>
+
+When a user agent is to <dfn export>invoke a callback on an {{IsolatedWorker}}</dfn> given <em>arguments</em>, it must run the following steps:
 
     1. Select an {{IsolatedWorkerGlobalScope}} from the list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
 
-Issue:
-    Define the rest of the steps here.  1. Selected a global scope, or create and load scripts if none exist yet.  2. Lookup a function based on the provided reference function.  3. Invoke with the arguments provided.
+        If none exist the user agent <em>must</em> run the following substeps:
+            1. Let <em>worker global scope</em> be the result of <a>create an isolated worker global scope</a>.
+            2. <a>Initialize an {{IsolatedWorkerGlobalScope}}</a>, given <em>worker global scope</em> and <em>isolated worker</em>.
+            3. Add <em>worker global scope</em> to the <em>isolated worker's</em> list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+
+    2. Let <em>function</em> be the result of <a>lookup a function on an isolated worker global scope</a> given <em>worker global scope</em>.
+    3. Invoke the <em>function</em> with <em>arguments</em> as arguments.
 
 Examples {#examples}
 ====================
