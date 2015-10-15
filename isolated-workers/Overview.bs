@@ -15,8 +15,10 @@ urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
     urlPrefix: #concept-response-;
         text: body
         text: status
+urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
+    text: effective script origin
+    url: #origin-2; text: origin
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
-    text: DedicatedWorkerGlobalScope
     text: get a fetch result
     text: import scripts into worker global scope
     text: importing scripts and libraries
@@ -26,17 +28,34 @@ urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
     urlPrefix: #dom-workerglobalscope-;
         text: self
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
+    text: api base url
+    text: api url character encoding
+    text: code entry-point
     text: create a script
     text: document environment
     text: environment settings object
+    text: event loop
+    text: global object
+    text: incumbent settings object
+    text: responsible browsing context
+    text: responsible document
+    text: responsible event loop
+    text: script execution environment
 urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
     text: in parallel
     text: javascript global environment
     text: unsafe response
+    text: utf-8 decode
+    urlPrefix: #js-;
+        text: syntaxerror;
+    url: resolve-a-url; text: resolve;
 urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
     text: a new promise
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
+    text: FunctionCreate
+    text: NewObjectEnvironment
     text: strict mode code
+    url: function-definitions; text: FunctionBody;
 </pre>
 
 Introduction {#intro}
@@ -47,9 +66,7 @@ Motivations {#motivations}
 
 <em>This section is not normative.</em>
 
-Rendering engines for web pages have been built assuming that there is no user defined script run in the middle of a rendering phase.
-
-Due to this allowing extension points defined in the <a>document environment</a>
+Allowing extension points defined in the <a>document environment</a>
 is difficult, as rendering engines would need to abandon previously held assumptions for what could happen in the middle of a phase.
 
 For example, during the layout phase the rendering engine assumes that no DOM will be modified.
@@ -62,7 +79,7 @@ The isolated worker is designed to allow such extension points in rendering engi
 
 Isolated workers are similar to <a>web workers</a> however they:
  - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
- - Are able to have multiple duplicate instances created for the purpose of parallelism.
+ - Are able to have multiple duplicate instances of the global scope created for the purpose of parallelism.
  - Are not event API based. Instead callbacks are registered on the global scope, to be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
  - Have a lifetime tied to running a callback or set of callbacks.
@@ -78,18 +95,18 @@ Code Idempotency {#code-idempotency}
 Multiple instances of {{IsolatedWorkerGlobalScope}} can be created for each {{IsolatedWorker}} that they belong to.
 User agents may choose to do this in order to parallelize work over multiple threads, or to move work between threads as required.
 
-Additionally different user agents <em>may</em> invoke a callbacks in a different order to other user agents.
+Additionally different user agents may invoke a callback in a different order to other user agents.
 
 Due to this, in order to prevent this compatibility risk between user agents, authors who register callbacks on the global scope should make their code idempotent.
 That is, a callback or set of callbacks should produce the same output given a particular input.
 
-The following techniques <em>may</em> be used in order to encourage authors to write code in an idempotent way:
- - No reference to the global object, e.g. <a>self</a> on a <a>DedicatedWorkerGlobalScope</a>.
+The following techniques should be used in order to encourage authors to write code in an idempotent way:
+ - No reference to the global object, e.g. <a>self</a> on a {{DedicatedWorkerGlobalScope}}.
  - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an anonymous function.
     This prevents two different scripts sharing state by referencing shared objects on the global scope.
- - User agents <em>may</em> choose to always have at least two {{IsolatedWorkerGlobalScope}}'s per {{IsolatedWorker}} and
+ - User agents may choose to always have at least two {{IsolatedWorkerGlobalScope}}s per {{IsolatedWorker}} and
     randomly assign a callback or set of callbacks to a particular global scope.
- - User agents <em>may</em> create and destroy {{IsolatedWorkerGlobalScope}}'s at any time.
+ - User agents may create and destroy {{IsolatedWorkerGlobalScope}}s at any time.
 
 Infrastructure {#infrastructure}
 ================================
@@ -97,27 +114,74 @@ Infrastructure {#infrastructure}
 The Global Scope {#the-global-scope}
 ------------------------------------
 
+The {{IsolatedWorkerGlobalScope}} object represents the global execution context of an {{IsolatedWorker}}.
+
 <pre class='idl'>
 interface IsolatedWorkerGlobalScope {
 };
 IsolatedWorkerGlobalScope implements WindowBase64;
 </pre>
 
-The IsolatedWorkerGlobalScope has a limited global scope when compared to a <a>DedicatedWorkerGlobalScope</a>.
+An {{IsolatedWorkerGlobalScope}} has an associated <a>environment settings object</a> <b>settings object</b>.
+
+Note:
+    The {{IsolatedWorkerGlobalScope}} has a limited global scope when compared to a {{DedicatedWorkerGlobalScope}}.
+    It is expected that other specifications will extend {{IsolatedWorkerGlobalScope}} with <code class='lang-javascript'>registerACallback</code> methods which
+    will allow authors to register callbacks for the user agent to invoke.
 
 Issue(w3c/css-houdini-drafts#15): Add console API to {{IsolatedWorkerGlobalScope}} when it exists.
 
-The Event Loop {#the-event-loop}
---------------------------------
+### Creating an {{IsolatedWorkerGlobalScope}}
 
-Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
-------------------------------------------------------------------
+When a user agent is to <dfn>create an {{IsolatedWorkerGlobalScope}}</dfn>, for a given <em>isolated worker</em>, it <em>must</em> run the following steps:
+    1. Let <em>worker global scope</em> be a new {{IsolatedWorkerGlobalScope}} that this algorithm will subsequently initialise.
+    2. Let <em>worker event loop</em> be a new <a>event loop</a>.
 
-Processing Model {#processing-model}
-------------------------------------
+        Let <em>inherited responsible browsing context</em> be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
+
+        Let <em>inherited API base URL</em> be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+
+        Let <em>inherited origin</em> be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+
+    3. Let <em>settings object</em> be a new environment settings object whose algorithms are defined as follows:
+        : The <a>script execution environments</a>:
+        :: When the <a>environment settings object</a> is created, for each language supported by the user agent, create an appropriate execution environment as defined by the relevant specification.
+        :: When a <a>script execution environment</a> is needed, return the appropriate one from those created when the <a>environment settings object</a> was created.
+
+        : The <a>global object</a>:
+        :: Return <em>worker global scope</em>.
+
+        : The <a>responsible browsing context</a>:
+        :: Return <em>inherited responsible browsing context</em>.
+
+        : The <a>responsible event loop</a>:
+        :: Return <em>worker event loop</em>.
+
+        : The <a>responsible document</a>:
+        :: Not applicable (the responsible event loop is not a browsing context event loop).
+
+        : The <a>API URL character encoding</a>:
+        :: Return UTF-8.
+
+        : The <a>API base URL</a>:
+        :: Return <em>inherited API base URL</em>.
+
+        : The <a>origin</a> and <a>effective script origin</a>:
+        :: Return <em>inherited origin</em>.
+
+    4. Associate the <em>settings object</em> with <em>worker global scope</em>.
+
+    5. For each <em>script</em> in the given <em>isolated worker</em>'s <b>worker's loaded scripts</b> run the <em>script</em> in the <em>worker global scope</em>.
+
+    6. Return <em>worker global scope</em>.
+
+Issue: TODO Add to github. Add in argument which allows other specs to define the type of global scope.
 
 IsolatedWorker {#isolatedworker-section}
 ----------------------------------------
+
+The {{IsolatedWorker}} object provides the capability to import scripts into its associated {{IsolatedWorkerGlobalScope}}s. The user agent can then invoke callbacks registered
+on the {{IsolatedWorkerGlobalScope}}s.
 
 <pre class='idl'>
 interface IsolatedWorker {
@@ -125,48 +189,106 @@ interface IsolatedWorker {
 };
 </pre>
 
+An {{IsolatedWorker}} has a list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>. Initially this list is empty; it is populated when the user agent chooses to create its {{IsolatedWorkerGlobalScope}}.
+
+An {{IsolatedWorker}} has a list of the <b>worker's loaded scripts</b>. Initially this list is empty; it is populated when scripts are fetched and parsed.
+
 When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is called on an {{IsolatedWorker}} object, the user agent <em>must</em> run the following steps:
  1. Let <em>promise</em> be <a>a new promise</a>.
  2. Run the following steps <a>in parallel</a>:
-    1. For each {{IsolatedWorkerGlobalScope}} associated with the {{IsolatedWorker}} run these substeps:
-        1. Run <a>import scripts into worker global scope</a> with the following options:
-            - To <a>validate the state</a>, the user agent <em>must</em> do nothing.
-            - To <a>get a fetch result</a>, the user agent <em>must</em> run the steps defined in <a>importing scripts and libraries</a>.
-            - To <a>postprocess the fetch result</a>, the user agent <em>must</em> run the following steps:
-                1. If the <em>response</em>'s <a>status</a> is not an <a>ok status</a> then abort all these steps.
-                2. If the <em>response</em>'s <a>body</a> is null then abort all these steps.
-                3. Let <em>source</em> be the result of running the UTF-8 decode algorithm on <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
-                    <br>Let <em>language</em> be JavaScript.
-                4. <a>Create a script</a> using <em>source</em> as the script source, the URL from which <em>source</em> was obtained, <em>language</em> as the scripting language,
-                    and <em>settings object</em> as the <a>environment settings object</a>.
-                5. If the newly created <em>script</em> fails to parse then abort all these steps.
-                6. Prepend the string <code class='lang-javascript'>(function() {'use strict';</code> to the <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
-                    <br>Append the string <code class='lang-javascript'>})();</code> to the <em>response</em>'s <a>unsafe response</a>'s <a>body</a>.
-    2. If <em>all</em> the steps above succeeded (in particular, if all of the scripts were loaded into their global scope), resolve <em>promise</em>
+    1. Let <em>settings object</em> be the <a>incumbent settings object</a>.
+    2. If there are no arguments, return without doing anything. Abort these steps.
+    3. <a>Resolve</a> each argument relative to settings object's <a>API base URL</a>.
+    4. If any fail, throw a SyntaxError</a> exception and abort these steps.
+    5. For each URL in the resulting absolute URLs, run these substeps:
+        1. Let response be the result of <a>get a fetch result</a>, given <em>url</em> and <em>settings object</em>.
+        2. Let <em>source</em> be the result of running the <a>UTF-8 decode</a> algorithm on response's <a>unsafe response</a>'s <a>body</a>.
+        3. Let <em>script</em> be the result of running <a>create an isolated script</a> using <em>source</em> as the script source, the <a>URL</a> from which source was obtained, and <em>settings object</em> as the environment settings object.
+
+            Parse the newly created <em>script</em>. If it failed to parse, then reject the <em>promise</em> and abort all these steps.
+
+        4. Add <em>script</em> to the list of the <b>worker's loaded scripts</b>.
+    6. For each {{IsolatedWorkerGlobalScope}} in the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>, run these substeps.
+        1. For each newly created <em>script</em> in <b>worker's loaded scripts</b> run the script in the {{IsolatedWorkerGlobalScope}}.
+    7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and loaded into the global scopes), resolve <em>promise</em>
         <br>Otherwise, reject <em>promise</em>.
- 2. Return <em>promise</em>.
+ 3. Return <em>promise</em>.
+
+Issue: TODO Add to github. What happens when a script throws an exception during executing for the first time?
+
+Issue: TODO Add to github. Is importScripts the right API call? Should it be singular instead?
+
+When a user agent is to <dfn>create an isolated script</dfn> given some <em>script source</em>, a <em>script source URL</em>, an <a>environment settings object</a>,
+it must run the following steps:
+    1. Let <em>script</em> be a new script that this algorithm will subsequently initialise.
+    2. Obtain the appropriate <a>script execution environment</a> for the given scripting language from the <a>environment settings object</a> provided.
+    3. Let <em>kind</em> be Normal.
+
+        Let <em>parameter list</em> be an empty list.
+
+        Let <em>parsed body source</em> be the result of parsing <em>script source</em> as a <a>FunctionBody</a> using the <a>script execution environment</a>.
+
+        Let <em>strict</em> be true.
+
+        Let <em>scope</em> be the result of <a>NewObjectEnvironment</a>(O=<em>null</em>, E=<em>the global environment</em>).
+    4. Let <em>function</em> be the result of <a>FunctionCreate</a>(kind=<em>kind</em>, ParameterList=<em>parameter list</em>, Body=<em>parsed body source</em>, Scope=<em>scope</em>, Strict=<em>strict</em>).
+    5. Let <em>script</em>'s <a>code entry-point</a> be <em>function</em>.
+    6. Return <em>script</em>.
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{IsolatedWorkerGlobalScope}} declaratively.
+
+Issue: TODO write initialization for IsolatedWorker.
+
+Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
+------------------------------------------------------------------
+
+The lifetime of an {{IsolatedWorker}} is tied to the object it belongs to, for example the {{Window}}.
+
+The lifetime of an {{IsolatedWorkerGlobalScope}} is tied to the execution lifetime of a callback or set of callbacks, not to the lifetime of the {{IsolatedWorker}} object.
+
+The user agent <em>may</em> terminate an {{IsolatedWorkerGlobalScope}} at any time it has no callbacks to handle or detects abnormal operation such as infinite loops and
+callbacks exceeding imposed time limits.
+
+Processing Model {#processing-model}
+------------------------------------
+
+When a user agent is to <dfn export>invoke a callback on an {{IsolatedWorker}}</dfn> it must run the following steps:
+
+    1. Select an {{IsolatedWorkerGlobalScope}} from the list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+
+Issue:
+    Define the rest of the steps here.  1. Selected a global scope, or create and load scripts if none exist yet.  2. Lookup a function based on the provided reference function.  3. Invoke with the arguments provided.
 
 Examples {#examples}
 ====================
 
-For these examples we'll use a mock isolated worker on window.
+<em>This section is not normative.</em>
+
+For these examples we'll use a fake isolated worker on window.
 
 <pre class='idl'>
 partial interface Window {
-  [SameObject] readonly attribute IsolatedWorker mockWorker1;
-  [SameObject] readonly attribute IsolatedWorker mockWorker2;
+  [SameObject] readonly attribute IsolatedWorker fakeWorker1;
+  [SameObject] readonly attribute IsolatedWorker fakeWorker2;
+};
+</pre>
+
+<pre class='idl'>
+
+callback AnArbitaryCallback = void ();
+
+interface FakeWorkerGlobalScope : IsolatedWorkerGlobalScope {
+    void registerArbitaryCallback(DOMString name, AnArbitaryCallback callback);
 };
 </pre>
 
 Loading scripts into an isolated worker. {#example-single}
 ----------------------------------------------------------
 <pre class='lang-javascript'>
-window.mockWorker1.importScripts('script1.js');
-window.mockWorker1.importScripts('script2.js', 'script3.js');
+window.fakeWorker1.importScripts('script1.js');
+window.fakeWorker1.importScripts('script2.js', 'script3.js');
 
-// Assuming no other calls to mockWorker1 valid script loading orderings are:
+// Assuming no other calls to fakeWorker1 valid script loading orderings are:
 // 1. 'script1.js', 'script2.js', 'script3.js'
 // 2. 'script2.js', 'script3.js', 'script1.js'
 </pre>
@@ -175,9 +297,14 @@ Loading scripts into multiple isolated workers. {#example-multiple}
 -------------------------------------------------------------------
 <pre class='lang-javascript'>
 Promise.all([
-    window.mockWorker1.importScripts('script1.js'),
-    window.mockWorker2.importScripts('script2.js')
+    window.fakeWorker1.importScripts('script1.js'),
+    window.fakeWorker2.importScripts('script2.js')
 ]).then(function() {
-    // Both scripts now have loaded code, can do something which relies on this.
+    // Both scripts now have loaded code, can do a task which relies on this.
 });
 </pre>
+
+Invoking a registered callback. {#example-invoke}
+-------------------------------------------------
+
+Issue: TODO
