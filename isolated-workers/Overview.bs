@@ -52,7 +52,9 @@ urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn
 urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
     text: a new promise
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
+    text: Construct
     text: FunctionCreate
+    text: Invoke
     text: NewObjectEnvironment
     text: strict mode code
     url: function-definitions; text: FunctionBody;
@@ -80,9 +82,9 @@ The isolated worker is designed to allow such extension points in rendering engi
 Isolated workers are similar to <a>web workers</a> however they:
  - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
  - Are able to have multiple duplicate instances of the global scope created for the purpose of parallelism.
- - Are not event API based. Instead callbacks are registered on the global scope, to be invoked by the user agent.
+ - Are not event API based. Instead classes are registered on the global scope, whose methods are to be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
- - Have a lifetime tied to running a callback or set of callbacks.
+ - Have a lifetime tied to running a method or set of methods on a class.
 
 As isolated workers have a relatively high overhead, they should be used sparingly. Due to this isolated workers are expected to be shared between separate scripts.
 This is similar to the <a>document environment</a>.
@@ -95,17 +97,17 @@ Code Idempotency {#code-idempotency}
 Multiple instances of {{IsolatedWorkerGlobalScope}} can be created for each {{IsolatedWorker}} that they belong to.
 User agents may choose to do this in order to parallelize work over multiple threads, or to move work between threads as required.
 
-Additionally different user agents may invoke a callback in a different order to other user agents.
+Additionally different user agents may invoke a method on a class in a different order to other user agents.
 
-Due to this, in order to prevent this compatibility risk between user agents, authors who register callbacks on the global scope should make their code idempotent.
-That is, a callback or set of callbacks should produce the same output given a particular input.
+Due to this, in order to prevent this compatibility risk between user agents, authors who register classes on the global scope should make their code idempotent.
+That is, a method or set of methods on a class should produce the same output given a particular input.
 
 The following techniques should be used in order to encourage authors to write code in an idempotent way:
  - No reference to the global object, e.g. <a>self</a> on a {{DedicatedWorkerGlobalScope}}.
  - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an anonymous function.
     This prevents two different scripts sharing state by referencing shared objects on the global scope.
  - User agents may choose to always have at least two {{IsolatedWorkerGlobalScope}}s per {{IsolatedWorker}} and
-    randomly assign a callback or set of callbacks to a particular global scope.
+    randomly assign a method or set of methods on a class to a particular global scope.
  - User agents may create and destroy {{IsolatedWorkerGlobalScope}}s at any time.
 
 Infrastructure {#infrastructure}
@@ -126,35 +128,35 @@ An {{IsolatedWorkerGlobalScope}} has an associated <a>environment settings objec
 
 Note:
     The {{IsolatedWorkerGlobalScope}} has a limited global scope when compared to a {{DedicatedWorkerGlobalScope}}.
-    It is expected that other specifications will extend {{IsolatedWorkerGlobalScope}} with <code class='lang-javascript'>registerACallback</code> methods which
-    will allow authors to register callbacks for the user agent to invoke.
+    It is expected that other specifications will extend {{IsolatedWorkerGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
+    will allow authors to register classes for the user agent create and invoke methods on.
 
 Issue(w3c/css-houdini-drafts#15): Add console API to {{IsolatedWorkerGlobalScope}} when it exists.
 
 ### Initializing an IsolatedWorkerGlobalScope ### {#initializing-an-isolatedworkerglobalscope}
 
-When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, for a given <em>worker global scope</em> and <em>isolated worker</em>, it <em>must</em> run the following steps:
-    1. Let <em>worker event loop</em> be a new <a>event loop</a>.
+When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, for a given |workerGlobalScope| and |isolatedWorker|, it <em>must</em> run the following steps:
+    1. Let |workerEventLoop| be a new <a>event loop</a>.
 
-        Let <em>inherited responsible browsing context</em> be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
+        Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
 
-        Let <em>inherited API base URL</em> be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+        Let |inheritedAPIBaseURL| be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
 
-        Let <em>inherited origin</em> be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+        Let |inheritedOrigin| be the <a>origin</a> specified by the <a>incumbent settings object</a>.
 
-    2. Let <em>settings object</em> be a new environment settings object whose algorithms are defined as follows:
+    2. Let |settingsObject| be a new environment settings object whose algorithms are defined as follows:
         : The <a>script execution environments</a>:
         :: When the <a>environment settings object</a> is created, for each language supported by the user agent, create an appropriate execution environment as defined by the relevant specification.
         :: When a <a>script execution environment</a> is needed, return the appropriate one from those created when the <a>environment settings object</a> was created.
 
         : The <a>global object</a>:
-        :: Return <em>worker global scope</em>.
+        :: Return |workerGlobalScope|.
 
         : The <a>responsible browsing context</a>:
-        :: Return <em>inherited responsible browsing context</em>.
+        :: Return |inheritedResponsibleBrowsingContext|.
 
         : The <a>responsible event loop</a>:
-        :: Return <em>worker event loop</em>.
+        :: Return |workerEventLoop|.
 
         : The <a>responsible document</a>:
         :: Not applicable (the responsible event loop is not a browsing context event loop).
@@ -163,20 +165,20 @@ When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, 
         :: Return UTF-8.
 
         : The <a>API base URL</a>:
-        :: Return <em>inherited API base URL</em>.
+        :: Return |inheritedAPIBaseURL|.
 
         : The <a>origin</a> and <a>effective script origin</a>:
-        :: Return <em>inherited origin</em>.
+        :: Return |inheritedOrigin|.
 
-    3. Associate the <em>settings object</em> with <em>worker global scope</em>.
+    3. Associate the |settingsObject| with |workerGlobalScope|.
 
-    4. For each <em>script</em> in the given <em>isolated worker</em>'s <b>worker's loaded scripts</b> run the <em>script</em> in the <em>worker global scope</em>.
+    4. For each |script| in the given |isolatedWorker|'s <b>worker's loaded scripts</b> run the |script| in the |workerGlobalScope|.
 
 IsolatedWorker {#isolatedworker-section}
 ----------------------------------------
 
-The {{IsolatedWorker}} object provides the capability to import scripts into its associated {{IsolatedWorkerGlobalScope}}s. The user agent can then invoke callbacks registered
-on the {{IsolatedWorkerGlobalScope}}s.
+The {{IsolatedWorker}} object provides the capability to import scripts into its associated {{IsolatedWorkerGlobalScope}}s. The user agent can then create classes registered
+on the {{IsolatedWorkerGlobalScope}}s and invoke their methods.
 
 <pre class='idl'>
 interface IsolatedWorker {
@@ -189,46 +191,46 @@ An {{IsolatedWorker}} has a list of the <b>worker's {{IsolatedWorkerGlobalScope}
 An {{IsolatedWorker}} has a list of the <b>worker's loaded scripts</b>. Initially this list is empty; it is populated when scripts are fetched and parsed.
 
 When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is called on an {{IsolatedWorker}} object, the user agent <em>must</em> run the following steps:
- 1. Let <em>promise</em> be <a>a new promise</a>.
+ 1. Let |promise| be <a>a new promise</a>.
  2. Run the following steps <a>in parallel</a>:
-    1. Let <em>settings object</em> be the <a>incumbent settings object</a>.
+    1. Let |settingsObject| be the <a>incumbent settings object</a>.
     2. If there are no arguments, return without doing anything. Abort these steps.
     3. <a>Resolve</a> each argument relative to settings object's <a>API base URL</a>.
     4. If any fail, throw a SyntaxError</a> exception and abort these steps.
     5. For each URL in the resulting absolute URLs, run these substeps:
-        1. Let response be the result of <a>get a fetch result</a>, given <em>url</em> and <em>settings object</em>.
-        2. Let <em>source</em> be the result of running the <a>UTF-8 decode</a> algorithm on response's <a>unsafe response</a>'s <a>body</a>.
-        3. Let <em>script</em> be the result of running <a>create an isolated script</a> using <em>source</em> as the script source, the <a>URL</a> from which source was obtained, and <em>settings object</em> as the environment settings object.
+        1. Let response be the result of <a>get a fetch result</a>, given |url| and |settingsObject|.
+        2. Let |source| be the result of running the <a>UTF-8 decode</a> algorithm on response's <a>unsafe response</a>'s <a>body</a>.
+        3. Let |script| be the result of running <a>create an isolated script</a> using |source| as the script source, the <a>URL</a> from which source was obtained, and |settingsObject| as the environment settings object.
 
-            Parse the newly created <em>script</em>. If it failed to parse, then reject the <em>promise</em> and abort all these steps.
+            Parse the newly created |script|. If it failed to parse, then reject the |promise| and abort all these steps.
 
-        4. Add <em>script</em> to the list of the <b>worker's loaded scripts</b>.
+        4. Add |script| to the list of the <b>worker's loaded scripts</b>.
     6. For each {{IsolatedWorkerGlobalScope}} in the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>, run these substeps.
-        1. For each newly created <em>script</em> in <b>worker's loaded scripts</b> run the script in the {{IsolatedWorkerGlobalScope}}.
-    7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and loaded into the global scopes), resolve <em>promise</em>
-        <br>Otherwise, reject <em>promise</em>.
- 3. Return <em>promise</em>.
+        1. For each newly created |script| in <b>worker's loaded scripts</b> run the script in the {{IsolatedWorkerGlobalScope}}.
+    7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and loaded into the global scopes), resolve |promise|
+        <br>Otherwise, reject |promise|.
+ 3. Return |promise|.
 
 Issue(w3c/css-houdini-drafts#51): What should happen when a script throws an exception while executing for the first time?
 
 Issue(w3c/css-houdini-drafts#52): Is importScripts the right API call? Should it be singular instead?
 
-When a user agent is to <dfn>create an isolated script</dfn> given some <em>script source</em>, a <em>script source URL</em>, an <a>environment settings object</a>,
+When a user agent is to <dfn>create an isolated script</dfn> given some |scriptSource|, an <a>environment settings object</a>,
 it must run the following steps:
-    1. Let <em>script</em> be a new script that this algorithm will subsequently initialise.
+    1. Let |script| be a new script that this algorithm will subsequently initialise.
     2. Obtain the appropriate <a>script execution environment</a> for the given scripting language from the <a>environment settings object</a> provided.
-    3. Let <em>kind</em> be Normal.
+    3. Let |kind| be Normal.
 
-        Let <em>parameter list</em> be an empty list.
+        Let |parameterList| be an empty list.
 
-        Let <em>parsed body source</em> be the result of parsing <em>script source</em> as a <a>FunctionBody</a> using the <a>script execution environment</a>.
+        Let |parsedBodySource| be the result of parsing |scriptSource| as a <a>FunctionBody</a> using the <a>script execution environment</a>.
 
-        Let <em>strict</em> be true.
+        Let |strict| be true.
 
-        Let <em>scope</em> be the result of <a>NewObjectEnvironment</a>(O=<em>null</em>, E=<em>the global environment</em>).
-    4. Let <em>function</em> be the result of <a>FunctionCreate</a>(kind=<em>kind</em>, ParameterList=<em>parameter list</em>, Body=<em>parsed body source</em>, Scope=<em>scope</em>, Strict=<em>strict</em>).
-    5. Let <em>script</em>'s <a>code entry-point</a> be <em>function</em>.
-    6. Return <em>script</em>.
+        Let |scope| be the result of <a>NewObjectEnvironment</a>(O=<em>null</em>, E=<em>the global environment</em>).
+    4. Let |function| be the result of <a>FunctionCreate</a>(kind=|kind|, ParameterList=|parameterList|, Body=|parsedBodySource|, Scope=|scope|, Strict=|strict|).
+    5. Let |script|'s <a>code entry-point</a> be |function|.
+    6. Return |script|.
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{IsolatedWorkerGlobalScope}} declaratively.
 
@@ -239,29 +241,46 @@ Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
 
 The lifetime of an {{IsolatedWorker}} is tied to the object it belongs to, for example the {{Window}}.
 
-The lifetime of an {{IsolatedWorkerGlobalScope}} is tied to the execution lifetime of a callback or set of callbacks, not to the lifetime of the {{IsolatedWorker}} object.
+The lifetime of an {{IsolatedWorkerGlobalScope}} is tied to the execution lifetime of a method or set of methods on a class, not to the lifetime of the {{IsolatedWorker}} object.
 
 The user agent <em>may</em> terminate an {{IsolatedWorkerGlobalScope}} at any time it has no callbacks to handle or detects abnormal operation such as infinite loops and
 callbacks exceeding imposed time limits.
 
+Disposing Classes {#disposing-classes}
+--------------------------------------
+
+Creating classes registered on the global scope is the responsibility user agent. To allow authors to release resources used by these classes, the user agent <em>must</em> call
+the <dfn method for=Disposable>dispose()</dfn> method on the class before destroying.
+
+<pre class='idl'>
+[NoInterfaceObject]
+interface Disposable {
+    void dispose();
+};
+</pre>
+
 Processing Model {#processing-model}
 ------------------------------------
 
-The <a>invoke a callback on an {{IsolatedWorker}}</a> has two hooks for algorithm steps that may be customized by any callers:
+The <a>invoke a method on a class inside an {{IsolatedWorker}}</a> has two hooks for algorithm steps that may be customized by any callers:
     - <dfn export>create an isolated worker global scope</dfn>
-    - <dfn export>lookup a function on an isolated worker global scope</dfn>
+    - <dfn export>lookup a class instance on an isolated worker global scope</dfn>
 
-When a user agent is to <dfn export>invoke a callback on an {{IsolatedWorker}}</dfn> given <em>arguments</em>, it must run the following steps:
+When a user agent is to <dfn export>invoke a method on a class inside an {{IsolatedWorker}}</dfn> given a |methodPropertyKey|, some |arguments|, 
+it must run the following steps:
 
-    1. Select an {{IsolatedWorkerGlobalScope}} from the list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+    1. Let |workerGlobalScope| be an {{IsolatedWorkerGlobalScope}} from the list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
 
-        If none exist the user agent <em>must</em> run the following substeps:
-            1. Let <em>worker global scope</em> be the result of <a>create an isolated worker global scope</a>.
-            2. <a>Initialize an {{IsolatedWorkerGlobalScope}}</a>, given <em>worker global scope</em> and <em>isolated worker</em>.
-            3. Add <em>worker global scope</em> to the <em>isolated worker's</em> list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+        If none exist or a new {{IsolatedWorkerGlobalScope}} is required, the user agent <em>must</em> run the following substeps:
+            1. Let |workerGlobalScope| be the result of <a>create an isolated worker global scope</a>.
+            2. <a>Initialize an {{IsolatedWorkerGlobalScope}}</a>, given |workerGlobalScope| and |isolatedWorker|.
+            3. Add |workerGlobalScope| to the |isolatedWorker|'s list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
 
-    2. Let <em>function</em> be the result of <a>lookup a function on an isolated worker global scope</a> given <em>worker global scope</em>.
-    3. Invoke the <em>function</em> with <em>arguments</em> as arguments.
+    2. Let |classInstance| be the result of <a>lookup a class instance on an isolated worker global scope</a> given |workerGlobalScope|.
+    3. Let |result| be the result of <a>Invoke</a>(O=|classInstance|, P=|methodPropertyKey|, Arguments=|arguments|).
+    4. Return |result|.
+
+Note: It is up to the user agent to select an appropriate {{IsolatedWorkerGlobalScope}} to invoke the method in.
 
 Examples {#examples}
 ====================
@@ -278,13 +297,18 @@ partial interface Window {
 </pre>
 
 <pre class='idl'>
-
-callback AnArbitaryCallback = void ();
+callback Function = any (any... arguments);
 
 interface FakeWorkerGlobalScope : IsolatedWorkerGlobalScope {
-    void registerArbitaryCallback(DOMString name, AnArbitaryCallback callback);
+    void registerAnArbitaryClass(DOMString type, Function classConstructor);
 };
 </pre>
+
+Each {{FakeWorkerGlobalScope}} has an map of the <b>registered class constructors</b>.
+
+When the <dfn method for=FakeWorkerGlobalScope>registerAnArbitaryClass(type, classConstructor)</dfn> method is called,
+the user agent will add the <em>classConstructor</em> of <em>type</em> to the map of <b>registered class constructors</b>.
+
 
 Loading scripts into an isolated worker. {#example-single}
 ----------------------------------------------------------
@@ -308,7 +332,23 @@ Promise.all([
 });
 </pre>
 
-Invoking a registered callback. {#example-invoke}
--------------------------------------------------
+Create a registered class and invoke a method. {#example-class}
+---------------------------------------------------------------
 
-Issue: TODO
+<pre class='lang-javascript'>
+// Inside FakeWorkerGlobalScope
+registerAnArbitaryClass('foo', class FooClass {
+    process(arg) {
+        return !arg;
+    }
+});
+</pre>
+
+When the user agent wants to invoke <b>process</b> on an instance of class with key <b>foo</b> it will:
+    1. Call <a>invoke a method on a class inside an {{IsolatedWorker}}</a> given <b>process</b> as the |methodPropertyKey| and some |arguments| with the following options:
+        - To <a>create an isolated worker global scope</a> the user agent will:
+
+            Return a new {{FakeWorkerGlobalScope}}.
+        - To <a>lookup a class instance on an isolated worker global scope</a> given a |workerGlobalScope|, the user agent will:
+            1. Let |classConstructor| be the result of looking up <b>foo</b> on the |workerGlobalScope|'s map of <b>registered class constructors</b>.
+            2. Return the result of <a>Construct</a>(|classConstructor|).
