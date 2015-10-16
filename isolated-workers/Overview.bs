@@ -246,18 +246,7 @@ The lifetime of an {{IsolatedWorkerGlobalScope}} is tied to the execution lifeti
 The user agent <em>may</em> terminate an {{IsolatedWorkerGlobalScope}} at any time it has no callbacks to handle or detects abnormal operation such as infinite loops and
 callbacks exceeding imposed time limits.
 
-Disposing Classes {#disposing-classes}
---------------------------------------
-
-Creating classes registered on the global scope is the responsibility user agent. To allow authors to release resources used by these classes, the user agent <em>must</em> call
-the <dfn method for=Disposable>dispose()</dfn> method on the class before destroying.
-
-<pre class='idl'>
-[NoInterfaceObject]
-interface Disposable {
-    void dispose();
-};
-</pre>
+Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean-up?
 
 Processing Model {#processing-model}
 ------------------------------------
