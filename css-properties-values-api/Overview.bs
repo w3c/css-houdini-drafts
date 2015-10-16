@@ -5,7 +5,7 @@ Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 Shortname: css-properties-values-api
 Level: 1
-Abstract: 
+Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and a default value.
 Editor: Tab Atkins, jackalmage@gmail.com
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
@@ -13,14 +13,41 @@ Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
 Ignored Terms: boolean, Animatable, Map, Context, isolated worker 
 Repository: w3c/css-houdini-drafts
+At Risk: the apply hook (<a section href="#the-apply-hook"></a>)
+</pre>
+
+<pre class='biblio'>
+{
+  "css-paint-api": {
+    "title": "CSS Painting API"
+  },
+  "css-layout-api": {
+    "title": "CSS Layout API"
+  }
+}
 </pre>
 
 Introduction {#intro}
 =====================
 
-This text is non-normative. In order to allow for the creation of custom properties (e.g. "myproperty:") this specification
-details the API to create a new property, what values it can except, and how to handle the property during cascade. It is recommended not to
-use this API for layout but only to affect cascading in a non-native manner.
+CSS defines a comprehensive set of properties that can be manipulated in order
+to modify the layout, paint, or behaviour of a web document. However, web authors
+frequently wish to extend this set with additional properties.
+
+[[css-variables]] provides primitive means for defining user-controlled properties,
+however these properties always take token lists as values, must always inherit, and
+can only impact document layout or paint by being re-incorporated into the value
+of other properties via a var() reference.
+
+This specification extends [[css-variables]], allowing the registration of properties
+that have a value type, an initial value, and a defined inheritance behaviour. This
+specification also provides an additional javascript-mediated means via which custom 
+properties can modify the computed value of native properties.
+
+This specification is complementary to [[css-paint-api]] and [[css-layout-api]], which
+allow custom properties to directly impact paint and layout behaviours respectively.
+Accordingly, it is recommended not to use the computed value modification facilities of this 
+specification for layout, but only to impact cascading in a non-native manner.
 
 Registering custom properties {#registering-custom-properties}
 ==============================================================
