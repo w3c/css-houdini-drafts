@@ -22,6 +22,18 @@ Converting CSSOM value strings into meaningfully typed JavaScript representation
 back can incur a significant performance overhead. This specification exposes CSS values
 as typed JavaScript objects to facilitate their performant manipulation.
 
+The API exposed by this specification is designed for performance rather than ergonomics.
+Some particular considerations:
+*   retrieved JavaScript representations of CSS values are not mutable - instead updates
+    must explicitly be set using the API.
+*   objects are organized for consistency rather than ease of access. For example, even
+    though lengths are often numeric pixel values, a specified {{LengthValue}} can't be
+    treated as a number without first explicitly casting it to a {{SimpleLength}}, as calc
+    expressions and keywords are also valid lengths.
+
+Issue: is it possible to amalgamate this API with value objects once they're specced by
+       TC39?
+
 {{StyleValue}} objects {#stylevalue-objects}
 ============================================
 
