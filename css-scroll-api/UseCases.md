@@ -88,3 +88,22 @@ Custom overscroll effect
 - When reaching the scroll limit, draw a custom effect indicating how far beyond the limit scrolling is being attempted
 - Takes scroll fling behavior into account.  May also take precise finger position into account (eg. horizontal position in a vertical-scroll-only scroller) when drawing the effect
 - Example: native scroll behavior on Android ("blue glow" pre Android L, "scroll tongue" post Android L).
+
+Other examples (combined effects)
+----
+http://www.nytimes.com/interactive/2014/09/19/travel/reif-larsen-norway.html
+(fading, snap points, video/animation sync)
+
+http://www.nytimes.com/projects/2013/gun-country/
+(snap points, video sync)
+
+http://www.nytimes.com/projects/2013/the-jockey/
+(fading, snap points, video/animation sync, sticky positioning...)
+Note the interesting pull quotes that combine it all.
+
+http://www.nytimes.com/projects/2013/tomato-can-blues/
+(parallax, sticky positioning, progressively-insert-and-move-things, 
+
+http://www.nytimes.com/projects/2012/snow-fall/
+(automatic scrolling, fading, video/animation sync, sticky positioning)
+
