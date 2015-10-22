@@ -51,6 +51,11 @@ Parallax
 - the position of elements on the page is related to the scroll position of their container (or maybe another container)
 - not a direct link between scroll offset and position. Rather it is some factor, possibly with damping or a curve.
 - postion is the most common output, but it could also be opacity or a filter effect such as blur (or really any rendering property)
+
+Video sync
+-----
+- Video whose time point is determined as a function of the scroll offset.
+- Must be synced perfectly with scrolling, eg. scrolling down one pixel may advance the video by one frame, and that video frame may move everything up one pixel to counter the scroll.  To the user it must appear as if the content didn't move with the scroll.
  
 Custom scrollers
 -----
