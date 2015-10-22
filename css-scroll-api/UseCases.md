@@ -36,9 +36,11 @@ This is one of the more tricky effects.
 - Can transition into and out-of the overscroll effect without lifting the finger
 - Can fling into the overscroll effect ("peek")
 - Can fling out of the overscroll effect
-- In browsers that lack scroll latching, chains correctly for spring physics.  Effectively the spring "captures" the scroll impulse first when collapsing and last when expanding. 
-  - Eg. scrolling an iframe inside a document with p2r, pull UI starts to show, finger direction is reversed, now pull UI needs to collapse in preference is scrolling the iframe.  
+- Scroll targeted correctly for spring physics.  Effectively, the spring "captures" the scroll impulse first when collapsing and last when expanding. 
+  - Eg. If you place your finger inside an iframe within a document with p2r while the header is showing, target the p2r document if the scroll would collapse the header, but target the iframe if the scroll would expand the header.
+  - In browsers without scroll latching, scrolling an iframe inside a document with p2r, pull UI starts to show, finger direction is reversed, now pull UI needs to collapse in preference is scrolling the iframe.  
   - Scrolling an iframe with p2r inside of a normal document, when the limit of the iframe is reached first, the document scrolls, and only when that limit is reached does the spring effect begin (in our prototypes, anything else feels like broken physics).
+- Pull to refresh must compose properly with snap points.
 
 This means the effect has a number of inputs and outputs.
 input: the scroll value, the limit of the rubber band
