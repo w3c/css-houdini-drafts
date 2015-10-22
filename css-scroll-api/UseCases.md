@@ -8,7 +8,6 @@
 - Advanced: content may “hide” into a smaller version of itself, that is sticky positioned (e.g. iPhone Safari URL bar)
 
 ## Scroll header
-
 - A header at the top of the document
 - When approaching scrollTop=0 header smoothly animates into a more substantial one. Eg. images, opacity, text size animate with scroll position.
 - May also only be shown when scrolling down (like hidey bars)
@@ -16,8 +15,11 @@
   - The top bar on [Twitter user pages](https://twitter.com/LEGO_Group)
   - Polymer's [core-scroll-header-panel](http://polymer.github.io/core-scroll-header-panel/components/core-scroll-header-panel/demos/demo9.html) and [paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html)
   - Rubber banding
-
+  
 ## Pull to refresh
+
+- Pull to refresh should behave correctly when it contains a scrollable div
+- Pull to refresh should compose correctly with other effects, such as snap points
 
 ## Parallax
 
@@ -26,6 +28,8 @@
 ## Re-targeting scrolling
 
 ## Linked scrollers
+- Multiple scrollers which scroll simultaneously
+- Artificial example [here](http://fiddle.jshell.net/kunknown/VVaEq/2/show/)
 
 ## Disable scroll chaining
 
