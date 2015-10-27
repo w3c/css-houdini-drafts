@@ -11,6 +11,34 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 Editor: Dean Jackson, dino@apple.com
 </pre>
 
+<pre class="link-defaults">
+spec:css-break-3; type:dfn; text:fragment
+</pre>
+
+<pre class="anchors">
+urlPrefix: https://drafts.css-houdini.org/isolated-workers/; type: dfn;
+    text: IsolatedWorker
+    text: IsolatedWorkerGlobalScope
+    text: create an isolated worker global scope
+    text: invoke a method on a class inside an isolatedworker
+    text: lookup a class instance on an isolated worker global scope
+urlPrefix: https://heycam.github.io/webidl/; type: dfn;
+    text: NotSupportedError
+    urlPrefix: #dfn-;
+        text: exception
+        text: throw
+        url: throw; text: thrown
+urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
+    text: reset the rendering context to its default state
+urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
+    text: Construct
+    text: IsArray
+    text: IsCallable
+    text: IsConstructor
+    text: HasProperty
+    url: get-o-p; text: Get
+</pre>
+
 Introduction {#intro}
 =====================
 
@@ -18,46 +46,93 @@ The paint stage of CSS is responsible for painting the background, content and h
 
 This specification describes an API which allows developers to paint a part of an element in response to geometry / computed style changes.
 
-Issue: Currently this spec doesn't provide any mechanism for setting clip, opacity, filter, etc. on either the context, background of an element. This would be nice to have.
+Note: In a future version of the spec, support may be added for defining the clip, global alpha, filter on a portion of an element (for example on the background layers).
 
 Paint Invalidation {#paint-invalidation}
 ========================================
 
-At any point in time the output of a paint callback for a fragment may be either <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>.
+A <a>document</a> has an associated <b>paint name to dependencies map</b>. Initially it is empty and is populated when {{registerPaint(name, paintCtor)}} is called.
 
-Issue: Describe output in a nicer way. This could be pixels, or a display list type object.
+Each <<paint()>> function for a fragment has an associated <b>paint valid flag</b>. It may be either <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
 
-If the output is <a>paint-invalid</a> and the output should not be used for rendering, and can be safely disposed.
+When the geometry (as determined by layout) of a <var>fragment</var> changes, each <<paint()>> function's <b>paint valid flag</b> should be set to <a>paint-invalid</a>.
 
-Invoking the paint callback will cause the output to become <a>paint-valid</a>.
+When the computed style for an element changes, the user agent must run the following steps:
+    1. For each <<paint()>> function on the element, perform the following substeps:
+        1. Let <var>name</var> be the first argument of the <<paint()>> function.
+        2. Let <var>dependencies</var> be the result of performing a lookup in <b>paint name to dependencies map</b> with |name| as the key.
+        3. For each <var>property</var> in |dependencies|, if the |property|'s <a>computed value</a> has changed, set the <b>paint valid flag</b> on the |fragment| to <a>paint-invalid</a>.
 
-The output of a paint callback will become <a>paint-invalid</a> when:
- * The geometry of a fragment (as determined by layout) changes.
- * The computed style of a property that the paint callback has registered a dependency on has changed.
+[[#drawing-an-image]] results in the <b>paint valid flag</b> for a <<paint()>> function to be set to <a>paint-valid</a>.
 
-Output which is <a>paint-valid</a> does not provide a guarantee that the paint callback is not invoked. Browsers may choose to invoke all callbacks every frame for simplicity.
-Thus to ensure cross-browser compatibility paint callbacks should be idempotent.
-
-Output which is <a>paint-invalid</a> are not necessarily invoked on the current frame.
-For example if a fragment is outside the current viewport, the browser may choose to only invoke the callback when it appears in the viewport.
-
-Issue: Describe what happens if a callback doesn't hit a frame timing boundary. I.e. just renders a transparent image instead?
-
-Issue: Should paint callbacks support partial area invalidation?
-       For example if the paint callback just invalidates 1/4 of the actual element, should we provide an API to just update that area?
-       This may be expensive for memory/computation for display list based implementations.
+Note: In a future version of the spec, support may be added for partial invalidation.
+    The user agent will be able to specify a region of the rendering context which needs to be re-painted by the paint class.
 
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
 
 <pre class='idl'>
-interface PaintGlobalScope {
-    // TODO once we have a spec for separate script execution contexts, make this inherit.
-    // A PaintGlobalScope is inside of a 'worker', so not in the main script execution context.
-    // A PaintGlobalScope and by extension custom paint callbacks don't have access to things like the DOM, XHRs, etc.
+interface IsolatedWorkerGlobalScope {
+    // TODO link to actual IsolatedWorkerGlobalScope.
 };
 
-interface CanvasRenderingContext2d {
+callback VoidFunction = void ();
+
+interface PaintWorkerGlobalScope : IsolatedWorkerGlobalScope {
+    void registerPaint(DOMString name, VoidFunction paintCtor);
+    void unregisterPaint(DOMString name);
+};
+</pre>
+
+A {{PaintWorkerGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+
+When the <dfn method for=PaintWorkerGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
+    1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    2. If the |name| exists as a key in the <b>name to paint instance map</b>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    3. If the result of <a>IsConstructor</a>(argument=|paintCtor|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    4. Let <var>prototype</var> be the result of <a>Get</a>(O=|paintCtor|, P="prototype").
+    5. If the result of <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="paint")) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    6. If the result of <a>HasProperty</a>(O=|prototype|, P="overflow") and <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="overflow")) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    7. Let <var>dependencies</var> be the result of <a>Get</a>(O=|paintCtor|, P="dependencies").
+    8. If the result of <a>IsArray</a>(argument=|dependencies|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    9. Add the key-value pair (|name| - |dependencies|) to the <b>paint name to dependencies map</b> of the associated <a>document</a>.
+    10. Let <var>paintInstance</var> be the result of <a>Construct</a>(|paintCtor|).
+    11. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{PaintWorkerGlobalScope}}.
+
+Note: The list of CSS properties provided by the dependencies getter can either be custom or native CSS properties.
+
+Note: The list of dependencies should only be looked up once, the class doesn't have the opportunity to dynamically change its dependencies.
+
+Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext. In particular the author may want a WebGL based rendering context to render 3D effects.
+
+Issue(w3c/css-houdini-drafts#31): Allow author to specify the intrinsic size.
+
+When the <dfn method for=PaintWorkerGlobalScope>unregisterPaint(<var>name</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
+    1. Remove the key-value pair associated with the |name| key in the <b>paint name to dependencies map</b> of the associated <a>document</a>.
+    2. Remove the key-value pair associated with the |name| key in the <b>name to paint instance map</b> of the {{PaintWorkerGlobalScope}}.
+
+Paint Notation {#paint-notation}
+================================
+
+<pre class='prod'>
+    <dfn>paint()</dfn> = paint( <<ident>> )
+</pre>
+
+The <<paint()>> function is an additional notation to be supported by the <<image>> type.
+
+<div class="example">
+    <pre>background-image: paint(my_logo);</pre>
+</div>
+
+Issue(w3c/css-houdini-drafts#33): What to do about cursor.
+
+Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
+
+Drawing an image {#drawing-an-image}
+====================================
+
+<pre class='idl'>
+interface PaintRenderingContext2d {
     // TODO link to actual CanvasRenderingContext2d.
 };
 
@@ -65,135 +140,82 @@ interface Geometry {
     readonly attribute double width;
     readonly attribute double height;
 };
-
-interface InputProperties {
-    // Similar to ComputedStyle, but only includes properties listed in 'dependencies'.
-    // Eventually provide typed access to properties instead of string based access.
-};
-
-callback PaintCallback = void (CanvasRenderingContext2d context, Geometry geometry, InputProperties inputProperties);
-
-dictionary VisualOverflowRectDict {
-    float? top;
-    float? bottom;
-    float? left;
-    float? right;
-};
-
-dictionary PaintRegistrationOptions {
-    DOMString name;
-    PaintCallback paintCallback;
-    sequence&lt;DOMString&gt; dependencies;
-    VisualOverflowRectDict visualOverflowRect;
-};
-
-partial interface PaintGlobalScope {
-      long registerPaint(PaintRegistrationOptions paint);
-      void unregisterPaint(long paintHandleID);
-};
 </pre>
 
-PaintRegistrationOptions {#paintregistrationoptions}
-----------------------------------------------------
+Issue: Create a new interface which uses IDL mixins to share methods with CanvasRenderingContext2d.
 
-Issue: Change this to be used like a class, similar to Document#registerElement.
+When the user agent wants to draw an image of a <<paint()>> for a <var>fragment</var> into its appropriate stacking level (as defined by the property the CSS property it's associated with) it <em>must</em> run the following steps:
+    1. If the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| is <a>paint-valid</a> the user agent <em>may</em> use the drawn image from the previous invocation.
+        If so it can abort all these steps.
 
+        Note: The user agent for implementation reasons may also continue with all these steps in this case. It can do this every frame, or multiple times per frame.
 
-:   <dfn dict-member for=PaintRegistrationOptions>name</dfn>
-::  The name of the custom paint being defined. Any valid <<ident>> can be a custom paint name.
+    2. Let <var>name</var> be the first argument of the <<paint()>> function.
 
-:   <dfn dict-member for=PaintRegistrationOptions>paintCallback</dfn>
-::  The custom paint callback.
+    3. If no paint class was registered with |name|, the resulting image output will be an <a>invalid image</a> and the user agent must abort all these steps.
 
-:   <dfn dict-member for=PaintRegistrationOptions>dependencies</dfn>
-::  The list of CSS properties (custom or native) which are provided to the custom paint callback. In addition when any of these properties changes, a fragment will become <a>paint-invalid</a>.
+    4. Let <var>dependencies</var> be the result of looking up |name| on the associated <a>document</a>'s <b>paint name to dependencies map</b>.
 
-:   <dfn dict-member for=PaintRegistrationOptions>visualOverflowRect</dfn>
-::  The amount of additional canvas to provide for drawing for the fragment.
-    This additional canvas can be used for drawing outside the box determined by layout for achieving overflow effects like box-shadow.
+    5. Let <var>styleMap</var> be a new {{StylePropertyMap}} populated with <em>only</em> the <a>computed value</a>'s for properties listed in |dependencies|.
 
-Issue: This is not how CSS works. We probably need an additional callback to provide the visual overflow rect based on the InputProperties.
-       This is another argument for making the API class based.
+    6. Let <var>overflow</var> be the result <a>invoke a method on a class inside an IsolatedWorker</a> given "overflow" as the <em>methodPropertyKey</em> and [|styleMap|] as the <em>arguments</em> with the following options:
+        - To <a>create an isolated worker global scope</a> the user agent will:
 
-Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext. In particular the author may want a WebGL based rendering context to render 3D effects.
+            Return a new {{PaintWorkerGlobalScope}}.
+        - To <a>lookup a class instance on an isolated worker global scope</a> given a |workerGlobalScope|, the user agent will:
 
-PaintGlobalScope {#paintglobalscope}
-------------------------------------
+            Return the result of looking up |name| on the |workerGlobalScope|'s <b>name to paint instance map</b>.
 
-:   <dfn method for=PaintGlobalScope>registerPaint(<var>paint</var>)</dfn>
-::  Registers a paint callback.
+        Note: User agents may have to compute overflow before entering their paint phase in order to determine which fragments to paint (overflow changes what could be seen on the output device).
+            User agents may opt into running the steps up to this point, to determine overflow, then continuing later to determine the drawn image for the fragments which need painting.
 
-:   <dfn method for=PaintGlobalScope>unregisterPaint(<var>paintHandleID</var>)</dfn>
-::  Unregisters a paint callback based on the ID given by <a>registerPaint()</a>.
+    7. Let <var>renderingContext</var> be a new {{PaintRenderingContext2d}}.
 
-PaintCallback {#paintcallback}
-------------------------------
+        The backing size of the |renderingContext| must be the size of the |fragment| plus the size specified by |overflow|.
 
-:   <dfn argument for=PaintCallback>context</dfn>
-::  The paint callback is passed a new <a href=''>CanvasRenderingContext2d</a> each time it is invoked. Implicitly this means that there is no stored data, or state on the rendering context.
-    For example you can't setup a clip on the context, and expect the same clip to be applied next time the function is called.
+        The user agent must ensure to <a>reset the rendering context to its default state</a>.
 
-    Several methods will be modified from the current CanvasRenderingContext2d. For example:
-     * The <a href=''>canvas</a> accessor will throw a <a href=''>InvalidAccessError</a> as the context doesn't have a parent <a href=''>HTMLCanvasElement</a>.
-     * <a href=''>getImageData()</a> and similar pixel data accessors will be no-ops.
-     * <a href=''>addHitRegion()</a>, <a href=''>removeHitRegion()</a>, <a href=''>clearHitRegions()</a> will be no-ops.
-     * <a href=''>drawFocusIfNeeded()</a> will be a no-op.
+        The origin of the |renderingContext| must be offset by the left, top size specified by |overflow|.
 
-Note: The litmus test used for deciding above was: methods should become no-ops if they can, otherwise throw an error if they'd require an IDL change.
+        Note: (0,0) is the top-left of the |fragment|, (-offsetLeft,-offsetTop) is the top-left of the |overflow|.
 
-Issue: Instead of saying how CanvasRenderingContext2d changes in a paint execution context.
-       Create a new interface which uses IDL mixins to share methods with CanvasRenderingContext2d.
+        Note: The |renderingContext| must not be re-used between invocations of paint. Implicitly this means that there is no stored data, or state on the |renderingContext| between invocations.
+            For example you can't setup a clip on the context, and expect the same clip to be applied next time the paint method is called.
 
-Issue: What happens when the paint function throws an exception after writing some partial commands to the rendering context?
-       Should it output the partial image, or output an empty image?
+        Issue: TODO add note we should specify the output of overflow.
 
-:   <dfn argument for=PaintCallback>geometry</dfn>
-::  The geometry information for the callback.
+    8. Let <var>geometry</var> be a new {{Geometry}} initialized to the width and height of the |fragment|.
 
-Issue: Decide what is needed here (in level 1). Obviously we need the width/height of the fragment.
-       For slicing images, we would need all the fragment information (size, position) for the parent element.
-       Do we also need continuation data? I.e. what is the continuing edge.
-       Should make sure we don't rabbit hole too much on this, provide what we think is useful for v1, iterate in v2.
+        Issue(w3c/css-houdini-drafts#23): Decide geometry information should be in level 1.
 
-:   <dfn argument for=PaintCallback>inputProperties</dfn>
-::  Similar to <a href=''>ComputedStyle</a>, but only includes properties listed in dependencies.
+    9. To produce the image output, <a>invoke a method on a class inside an IsolatedWorker</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
+        - To <a>create an isolated worker global scope</a> the user agent will:
 
-Issue: No way for image data to appear here yet. Everything string based.
-       For example if you load the image data via. url('http://example.com/image.png') how does this appear in the paint callback?
-       I think the answer to this is to provide this information in the Typed CSS Value OM.
-       Will need access to a loaded bit, width, height, and a way to render into rendering context.
+            Return a new {{PaintWorkerGlobalScope}}.
+        - To <a>lookup a class instance on an isolated worker global scope</a> given a |workerGlobalScope|, the user agent will:
 
-Issue: Should this be blocked on a typed style OM? Instead of everything being string based?
+            Return the result of looking up |name| on the |workerGlobalScope|'s <b>name to paint instance map</b>.
+
+        If an exception is <a>thrown</a> the resulting image output will be an <a>invalid image</a>.
+
+        Otherwise the image output should be produced from the |renderingContext| given to the paint method.
+
+    10. Set the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| to <a>paint-valid</a>.
+
+Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
+    For example, they should how a "unresponsive script" dialog or similar.
+
+Note: The user agent doesn't have produce the image output for a <<paint()>> function on the current frame if it's <b>paint valid flag</b> is <a>paint-invalid</a>.
+    For example the fragment may be outside the visible viewport, and not required for display on the output device. 
+
+Issue(w3c/css-houdini-drafts#24): Determine how to side-load images or other data.
 
 Issue: What information should we provide for read-modify-write use-cases?
        Are read-modify-write use-cases important for v1?
        For example, if you are sliding the previous paint output out?
        For providing the previous paint output we should provide an ImageBitmap if you ask.
 
-Issue: Should VisualOverflowRectDict just be based on longs instead? Do floats make sense?
-
-Using Custom Paint {#using-custom-paint}
-========================================
-
-The <<image-or-paint>> type extends the <<image>> type to allow the <<paint()>> function.
-
-<pre class="prod"><dfn>&lt;image-or-paint&gt;</dfn> = <<image>> | <<paint()>></pre>
-
-Issue: Should this just replace the <<image>> type instead? I don't think so as it'll mean that we can custom paint the cursor. Which I don't think we want.
-
-The <<paint()>> function will lookup to see if there has been a paint callback registered with the same name.
-If it has the output of the paint callback should appear in the appropriate place.
-If there is no paint callback registered, the function output should be replaced with a transparent image, as if nothing was there.
-
-Issue: Word-smith this better.
-
-<pre class='prod'>
-    <dfn>paint()</dfn> = paint( <<ident>> )
-</pre>
-
-Issue: Change 'background-image', 'border-image' and 'content' to accept <<image-or-paint>> or <<paint()>>.
-
-Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
+Issue: Describe what happens if a callback doesn't hit a frame timing boundary. I.e. just renders a transparent image instead?
 
 Examples {#examples}
 ====================
@@ -202,13 +224,12 @@ Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
 <pre class='lang-javascript'>
-// Inside PaintGlobalScope.
-this.registerPaint({
-    name: 'circle',
-    dependencies: ['--circle-color'],
-    paintCallback: function(ctx, geom, properties) {
+// Inside PaintWorkerGlobalScope.
+registerPaint('circle', class {
+    static get dependencies() { return ['--circle-color']; }
+    paint(ctx, geom, properties) {
         // Change the fill color.
-        var color = properties['--circle-color'];
+        var color = properties.get('--circle-color');
         ctx.fillStyle = color;
 
         // Determine the center point and radius.
