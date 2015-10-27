@@ -5,7 +5,7 @@ Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om
 Level: 1
-Abstract: 
+Abstract:
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
 </pre>
@@ -13,6 +13,7 @@ Repository: w3c/css-houdini-drafts
 <pre class=link-defaults>
 spec: dom-ls; type:interface; text:Document;
 spec: dom-ls; type:interface; text:Element;
+spec:css-transforms-1; type:property; text:transform
 </pre>
 
 Introduction {#intro}
@@ -88,7 +89,7 @@ A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
 which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
 is initialized differently depending on where the {{StyleValue}} is used
 (see
-<a section href="#computed-stylepropertymap-objects"></a>, 
+<a section href="#computed-stylepropertymap-objects"></a>,
 <a section href="#specified-stylepropertymap-objects"></a>, and
 <a section href="#inline-stylepropertymap-objects"></a>).
 
@@ -98,7 +99,7 @@ not represent multiple successive definitions of that property's value.
 Instead, sequences represent values associated with list-valued properties.
 
 This approach allows single-valued properties to become list-valued in the
-future without breaking code that relies on calling 
+future without breaking code that relies on calling
 <a method for=StylePropertyMap>get()</a> and/or
 <a method for=StylePropertyMap>set()</a> for those properties.
 </div>
@@ -188,7 +189,7 @@ partial interface CSSStyleRule {
 </pre>
 
 <dfn>Specified StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> 
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
 The <a>property model</a> for <a>specified StylePropertyMap</a> objects contains
@@ -211,7 +212,7 @@ directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>s
 attribute of {{Element}} objects.
 
 The <a>property model</a> for <a>inline StylePropertyMap</a> objects contains an
-entry for each property that is paired with at least one valid value in the string 
+entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
 The value for a given property is the last valid value provided in the string.
 
@@ -251,15 +252,15 @@ The following code is valid
   var zIndex = computedStyle.get("z-index");
 </pre>
 
-After execution, the value of <code>opacity</code> is 1 ('opacity' is range-restricted), 
+After execution, the value of <code>opacity</code> is 1 ('opacity' is range-restricted),
 and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
 </div>
 
 Issue: where does a description of parsing values go? For example, where do we indicate that
-       calc(4 + 8) will create a {{NumberValue}} with a value of 12? 
+       calc(4 + 8) will create a {{NumberValue}} with a value of 12?
 
 Issue: do we actually want to collapse calc values down to their minimum representations? I assume
-       so, given that this is what the old CSSOM is now specified to do. 
+       so, given that this is what the old CSSOM is now specified to do.
 
 {{LengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
@@ -338,11 +339,130 @@ Issue: do we want an enum of length keywords too?
 
 Issue: write long descriptions of all of this
 
-Issue: There are now 3 ways of creating Length values - 
+Issue: There are now 3 ways of creating Length values -
        StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
        Is this too much?
 
 Issue: What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
+
+{{TransformValue}} objects {#transformvalue-objects}
+-----------------------------------------------------------
+
+<pre class='idl'>
+[Constructor(),
+ Constructor(sequence&lt;TransformComponent>)]
+interface TransformValue : StyleValue {
+  iterable&lt;TransformComponent>;
+  Matrix asMatrix();
+  boolean is2D();
+};
+
+interface TransformComponent {
+  readonly attribute DOMString cssString;
+  boolean is2DComponent();
+  Matrix asMatrix();
+};
+
+[Constructor(LengthValue x, LengthValue y),
+ Constructor(LengthValue x, LengthValue y, LengthValue z)]
+interface Translation : TransformComponent {
+  readonly attribute LengthValue x;
+  readonly attribute LengthValue y;
+  readonly attribute LengthValue z;
+};
+
+[Constructor(double angle),
+ Constructor(double angle, double x, double y, double z)]
+interface Rotation : TransformComponent {
+  readonly attribute double angle;
+  readonly attribute double x;
+  readonly attribute double y;
+  readonly attribute double z;
+};
+
+[Constructor(double x, double y),
+ Constructor(double x, double y, double z)]
+interface Scale : TransformComponent {
+  readonly attribute double x;
+  readonly attribute double y;
+  readonly attribute double z;
+};
+
+[Constructor(double ax, double ay)]
+interface Skew : TransformComponent {
+  readonly attribute double ax;
+  readonly attribute double ay;
+};
+
+[Constructor(LengthValue length)]
+interface Perspective : TransformComponent {
+  readonly attribute LengthValue length;
+};
+
+[Constructor(double a, double b, double c, double d, double e, double f),
+ Constructor(double a, double b, double c, double d,
+             double e, double f, double g, double h,
+             double i, double j, double k, double l,
+             double m, double n, double o, double p)]
+interface Matrix : TransformComponent {
+  readonly attribute double a;
+  readonly attribute double b;
+  readonly attribute double c;
+  readonly attribute double d;
+  readonly attribute double e;
+  readonly attribute double f;
+  readonly attribute double g;
+  readonly attribute double h;
+  readonly attribute double i;
+  readonly attribute double j;
+  readonly attribute double k;
+  readonly attribute double l;
+  readonly attribute double m;
+  readonly attribute double n;
+  readonly attribute double o;
+  readonly attribute double p;
+};
+</pre>
+
+{{TransformValue}} objects represent values for the 'transform' property. A
+{{TransformValue}} represents a list of {{TransformComponent}}s.
+
+The <dfn method for=TransformComponent>is2DComponent()</dfn> method returns
+true if the component on which it is invoked represents a 2D transform function,
+and false otherwise. The transform function which the component represents is
+stored in string form in the <dfn attribute for=TransformComponent>cssText</dfn>
+attribute.
+
+<div class=note>
+Each {{TransformComponent}} can correspond to one of a number of underlying
+transform functions. For example, a {{Translation}} with an x value of "10px"
+and y &amp; z values of 0 could be:
+*   translate(10px)
+*   translate(10px, 0)
+*   translateX(10px)
+*   translate3d(10px, 0, 0)
+
+</div>
+
+When a {{TransformValue}} is read from a {{StylePropertyMap}}, each
+{{TransformComponent}} will maintain the relevant transform function in
+its <code>cssText</code> attribute. However, newly constructed {{TransformValue}}s
+will always generate <code>cssText</code> according to the following rules:
+*   {{Skew}} will always serialize to skew(ax, ay)
+*   {{Perspective}} will always serialize to perspective(length)
+*   {{Translation}}, {{Rotation}}, {{Scale}} and {{Matrix}} each have two
+    constructors. In each case, the constructor with fewer arguments constructs
+    a {{TransformComponent}} for which <a>is2DComponent()</a> will return true,
+    with <code>cssText</code> employing the 2D version of the relevant transform
+    function (translate, rotate, scale, matrix). The constructor with more
+    arguments constructs a {{TransformComponent}} for which
+    <a>is2DComponent()</a> will return false, with <code>cssText</code>
+    employing the 3D version of the relevant transform function (translate3d,
+    rotate3d, scale3d, matrix3d).
+
+<dfn method for=TransformValue>is2D()</dfn> returns true if the <a>is2DComponent()</a>
+method of every {{TransformComponent}} referenced by the {{TransformValue}} returns true,
+and false otherwise.
 
 Issue: Need to add a section for each of the other primitive types.
 
@@ -355,5 +475,3 @@ Issue: Need to add a section describing shorthands.
 ========================================================
 
 Issue: write me
-
-
