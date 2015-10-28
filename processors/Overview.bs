@@ -1,9 +1,9 @@
 <pre class='metadata'>
-Title:  Isolated Workers Level 1
+Title:  Processors Level 1
 Status: DREAM
 Group: houdini
-ED: https://drafts.css-houdini.org/isolated-workers-1/
-Shortname: isolated-workers
+ED: https://drafts.css-houdini.org/processors/
+Shortname: processors
 Level: 1
 Abstract:  This specification defines an API for running scripts in stages of the rendering pipeline independent of the main javascript execution environment.
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
@@ -77,16 +77,16 @@ Additionally defining extension points in the <a>document environment</a>
 would restrict rendering engines to performing work in the same thread as the <a>document environment</a>.
 (Unless rendering engines added complex, high-overhead infrastructure to allow thread-safe APIs in addition to thread joining guarantees).
 
-The isolated worker is designed to allow such extension points in rendering engines, while keeping guarantees which rendering engines rely currently on.
+The processor is designed to allow such extension points in rendering engines, while keeping guarantees which rendering engines rely currently on.
 
-Isolated workers are similar to <a>web workers</a> however they:
+Processors are similar to <a>web workers</a> however they:
  - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
  - Are able to have multiple duplicate instances of the global scope created for the purpose of parallelism.
  - Are not event API based. Instead classes are registered on the global scope, whose methods are to be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
  - Have a lifetime tied to running a method or set of methods on a class.
 
-As isolated workers have a relatively high overhead, they should be used sparingly. Due to this isolated workers are expected to be shared between separate scripts.
+As processors have a relatively high overhead, they should be used sparingly. Due to this processors are expected to be shared between separate scripts.
 This is similar to the <a>document environment</a>.
 
 Code Idempotency {#code-idempotency}
@@ -94,7 +94,7 @@ Code Idempotency {#code-idempotency}
 
 <em>This section is not normative.</em>
 
-Multiple instances of {{IsolatedWorkerGlobalScope}} can be created for each {{IsolatedWorker}} that they belong to.
+Multiple instances of {{ProcessorGlobalScope}} can be created for each {{Processor}} that they belong to.
 User agents may choose to do this in order to parallelize work over multiple threads, or to move work between threads as required.
 
 Additionally different user agents may invoke a method on a class in a different order to other user agents.
@@ -106,9 +106,9 @@ The following techniques should be used in order to encourage authors to write c
  - No reference to the global object, e.g. <a>self</a> on a {{DedicatedWorkerGlobalScope}}.
  - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an anonymous function.
     This prevents two different scripts sharing state by referencing shared objects on the global scope.
- - User agents may choose to always have at least two {{IsolatedWorkerGlobalScope}}s per {{IsolatedWorker}} and
+ - User agents may choose to always have at least two {{ProcessorGlobalScope}}s per {{Processor}} and
     randomly assign a method or set of methods on a class to a particular global scope.
- - User agents may create and destroy {{IsolatedWorkerGlobalScope}}s at any time.
+ - User agents may create and destroy {{ProcessorGlobalScope}}s at any time.
 
 Infrastructure {#infrastructure}
 ================================
@@ -116,26 +116,26 @@ Infrastructure {#infrastructure}
 The Global Scope {#the-global-scope}
 ------------------------------------
 
-The {{IsolatedWorkerGlobalScope}} object represents the global execution context of an {{IsolatedWorker}}.
+The {{ProcessorGlobalScope}} object represents the global execution context of a {{Processor}}.
 
 <pre class='idl'>
-interface IsolatedWorkerGlobalScope {
+interface ProcessorGlobalScope {
 };
-IsolatedWorkerGlobalScope implements WindowBase64;
+ProcessorGlobalScope implements WindowBase64;
 </pre>
 
-An {{IsolatedWorkerGlobalScope}} has an associated <a>environment settings object</a> <b>settings object</b>.
+A {{ProcessorGlobalScope}} has an associated <a>environment settings object</a> <b>settings object</b>.
 
 Note:
-    The {{IsolatedWorkerGlobalScope}} has a limited global scope when compared to a {{DedicatedWorkerGlobalScope}}.
-    It is expected that other specifications will extend {{IsolatedWorkerGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
+    The {{ProcessorGlobalScope}} has a limited global scope when compared to a {{DedicatedWorkerGlobalScope}}.
+    It is expected that other specifications will extend {{ProcessorGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
     will allow authors to register classes for the user agent create and invoke methods on.
 
-Issue(w3c/css-houdini-drafts#15): Add console API to {{IsolatedWorkerGlobalScope}} when it exists.
+Issue(w3c/css-houdini-drafts#15): Add console API to {{ProcessorGlobalScope}} when it exists.
 
-### Initializing an IsolatedWorkerGlobalScope ### {#initializing-an-isolatedworkerglobalscope}
+### Initializing a ProcessorGlobalScope ### {#initializing-a-processorglobalscope}
 
-When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, for a given |workerGlobalScope| and |isolatedWorker|, it <em>must</em> run the following steps:
+When a user agent is to <dfn>initialize a {{ProcessorGlobalScope}}</dfn>, for a given |processorGlobalScope| and |processor|, it <em>must</em> run the following steps:
     1. Let |workerEventLoop| be a new <a>event loop</a>.
 
         Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
@@ -150,7 +150,7 @@ When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, 
         :: When a <a>script execution environment</a> is needed, return the appropriate one from those created when the <a>environment settings object</a> was created.
 
         : The <a>global object</a>:
-        :: Return |workerGlobalScope|.
+        :: Return |processorGlobalScope|.
 
         : The <a>responsible browsing context</a>:
         :: Return |inheritedResponsibleBrowsingContext|.
@@ -170,27 +170,27 @@ When a user agent is to <dfn>initialize an {{IsolatedWorkerGlobalScope}}</dfn>, 
         : The <a>origin</a> and <a>effective script origin</a>:
         :: Return |inheritedOrigin|.
 
-    3. Associate the |settingsObject| with |workerGlobalScope|.
+    3. Associate the |settingsObject| with |processorGlobalScope|.
 
-    4. For each |script| in the given |isolatedWorker|'s <b>worker's loaded scripts</b> run the |script| in the |workerGlobalScope|.
+    4. For each |script| in the given |processor|'s <b>processor's loaded scripts</b> run the |script| in the |processorGlobalScope|.
 
-IsolatedWorker {#isolatedworker-section}
-----------------------------------------
+Processor {#processor-section}
+------------------------------
 
-The {{IsolatedWorker}} object provides the capability to import scripts into its associated {{IsolatedWorkerGlobalScope}}s. The user agent can then create classes registered
-on the {{IsolatedWorkerGlobalScope}}s and invoke their methods.
+The {{Processor}} object provides the capability to import scripts into its associated {{ProcessorGlobalScope}}s. The user agent can then create classes registered
+on the {{ProcessorGlobalScope}}s and invoke their methods.
 
 <pre class='idl'>
-interface IsolatedWorker {
+interface Processor {
     [NewObject] Promise&lt;void&gt; importScripts(DOMString... urls);
 };
 </pre>
 
-An {{IsolatedWorker}} has a list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>. Initially this list is empty; it is populated when the user agent chooses to create its {{IsolatedWorkerGlobalScope}}.
+A {{Processor}} has a list of the <b>processor's {{ProcessorGlobalScope}}s</b>. Initially this list is empty; it is populated when the user agent chooses to create its {{ProcessorGlobalScope}}.
 
-An {{IsolatedWorker}} has a list of the <b>worker's loaded scripts</b>. Initially this list is empty; it is populated when scripts are fetched and parsed.
+A {{Processor}} has a list of the <b>processor's loaded scripts</b>. Initially this list is empty; it is populated when scripts are fetched and parsed.
 
-When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is called on an {{IsolatedWorker}} object, the user agent <em>must</em> run the following steps:
+When the <dfn method for=Processor>importScripts(urls)</dfn> method is called on a {{Processor}} object, the user agent <em>must</em> run the following steps:
  1. Let |promise| be <a>a new promise</a>.
  2. Run the following steps <a>in parallel</a>:
     1. Let |settingsObject| be the <a>incumbent settings object</a>.
@@ -204,9 +204,9 @@ When the <dfn method for=IsolatedWorker>importScripts(urls)</dfn> method is call
 
             Parse the newly created |script|. If it failed to parse, then reject the |promise| and abort all these steps.
 
-        4. Add |script| to the list of the <b>worker's loaded scripts</b>.
-    6. For each {{IsolatedWorkerGlobalScope}} in the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>, run these substeps.
-        1. For each newly created |script| in <b>worker's loaded scripts</b> run the script in the {{IsolatedWorkerGlobalScope}}.
+        4. Add |script| to the list of the <b>processor's loaded scripts</b>.
+    6. For each {{ProcessorGlobalScope}} in the <b>processor's {{ProcessorGlobalScope}}s</b>, run these substeps.
+        1. For each newly created |script| in <b>processor's loaded scripts</b> run the script in the {{ProcessorGlobalScope}}.
     7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and loaded into the global scopes), resolve |promise|
         <br>Otherwise, reject |promise|.
  3. Return |promise|.
@@ -232,18 +232,18 @@ it must run the following steps:
     5. Let |script|'s <a>code entry-point</a> be |function|.
     6. Return |script|.
 
-Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{IsolatedWorkerGlobalScope}} declaratively.
+Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{ProcessorGlobalScope}} declaratively.
 
-Issue: TODO write initialization for IsolatedWorker.
+Issue: TODO write initialization for Processor.
 
-Lifetime of the Isolated Worker {#lifetime-of-the-isolated-worker}
-------------------------------------------------------------------
+Lifetime of the Processor {#lifetime-of-the-processor}
+------------------------------------------------------
 
-The lifetime of an {{IsolatedWorker}} is tied to the object it belongs to, for example the {{Window}}.
+The lifetime of a {{Processor}} is tied to the object it belongs to, for example the {{Window}}.
 
-The lifetime of an {{IsolatedWorkerGlobalScope}} is tied to the execution lifetime of a method or set of methods on a class, not to the lifetime of the {{IsolatedWorker}} object.
+The lifetime of a {{ProcessorGlobalScope}} is tied to the execution lifetime of a method or set of methods on a class, not to the lifetime of the {{Processor}} object.
 
-The user agent <em>may</em> terminate an {{IsolatedWorkerGlobalScope}} at any time it has no callbacks to handle or detects abnormal operation such as infinite loops and
+The user agent <em>may</em> terminate a {{ProcessorGlobalScope}} at any time it has no callbacks to handle or detects abnormal operation such as infinite loops and
 callbacks exceeding imposed time limits.
 
 Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean-up?
@@ -251,56 +251,57 @@ Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean
 Processing Model {#processing-model}
 ------------------------------------
 
-The <a>invoke a method on a class inside an {{IsolatedWorker}}</a> has two hooks for algorithm steps that may be customized by any callers:
-    - <dfn export>create an isolated worker global scope</dfn>
-    - <dfn export>lookup a class instance on an isolated worker global scope</dfn>
+The <a>invoke a method on a class inside a {{Processor}}</a> has two hooks for algorithm steps that may be customized by any callers:
+    - <dfn export>create a processor global scope</dfn>
+    - <dfn export>lookup a class instance on a processor global scope</dfn>
 
-When a user agent is to <dfn export>invoke a method on a class inside an {{IsolatedWorker}}</dfn> given a |methodPropertyKey|, some |arguments|, 
+When a user agent is to <dfn export>invoke a method on a class inside a {{Processor}}</dfn> given a |methodPropertyKey|, some |arguments|, 
 it must run the following steps:
 
-    1. Let |workerGlobalScope| be an {{IsolatedWorkerGlobalScope}} from the list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+    1. Let |processorGlobalScope| be a {{ProcessorGlobalScope}} from the list of the <b>processor's {{ProcessorGlobalScope}}s</b>.
 
-        If none exist or a new {{IsolatedWorkerGlobalScope}} is required, the user agent <em>must</em> run the following substeps:
-            1. Let |workerGlobalScope| be the result of <a>create an isolated worker global scope</a>.
-            2. <a>Initialize an {{IsolatedWorkerGlobalScope}}</a>, given |workerGlobalScope| and |isolatedWorker|.
-            3. Add |workerGlobalScope| to the |isolatedWorker|'s list of the <b>worker's {{IsolatedWorkerGlobalScope}}s</b>.
+        If none exist or a new {{ProcessorGlobalScope}} is required, the user agent <em>must</em> run the following substeps:
+            1. Let |processorGlobalScope| be the result of <a>create a processor global scope</a>.
+            2. <a>Initialize a {{ProcessorGlobalScope}}</a>, given |processorGlobalScope| and |processor|.
+            3. Add |processorGlobalScope| to the |processor|'s list of the <b>processor's {{ProcessorGlobalScope}}s</b>.
 
-    2. Let |classInstance| be the result of <a>lookup a class instance on an isolated worker global scope</a> given |workerGlobalScope|.
+    2. Let |classInstance| be the result of <a>lookup a class instance on a processor global scope</a> given |processorGlobalScope|.
     3. Let |result| be the result of <a>Invoke</a>(O=|classInstance|, P=|methodPropertyKey|, Arguments=|arguments|).
     4. Return |result|.
 
-Note: It is up to the user agent to select an appropriate {{IsolatedWorkerGlobalScope}} to invoke the method in.
+Note: It is up to the user agent to select a appropriate {{ProcessorGlobalScope}} to invoke the method in.
 
 Examples {#examples}
 ====================
 
 <em>This section is not normative.</em>
 
-For these examples we'll use a fake isolated worker on window.
+For these examples we'll use a fake processor on window.
 
 <pre class='idl'>
 partial interface Window {
-  [SameObject] readonly attribute IsolatedWorker fakeWorker1;
-  [SameObject] readonly attribute IsolatedWorker fakeWorker2;
+  [SameObject] readonly attribute Processor fakeWorker1;
+  [SameObject] readonly attribute Processor fakeWorker2;
 };
 </pre>
 
 <pre class='idl'>
 callback Function = any (any... arguments);
 
-interface FakeWorkerGlobalScope : IsolatedWorkerGlobalScope {
+interface FakeWorkerGlobalScope : ProcessorGlobalScope {
     void registerAnArbitaryClass(DOMString type, Function classConstructor);
 };
 </pre>
 
-Each {{FakeWorkerGlobalScope}} has an map of the <b>registered class constructors</b>.
+Each {{FakeWorkerGlobalScope}} has a map of the <b>registered class constructors</b>.
 
 When the <dfn method for=FakeWorkerGlobalScope>registerAnArbitaryClass(type, classConstructor)</dfn> method is called,
 the user agent will add the <em>classConstructor</em> of <em>type</em> to the map of <b>registered class constructors</b>.
 
 
-Loading scripts into an isolated worker. {#example-single}
-----------------------------------------------------------
+Loading scripts into a processor. {#example-single}
+---------------------------------------------------
+
 <pre class='lang-javascript'>
 window.fakeWorker1.importScripts('script1.js');
 window.fakeWorker1.importScripts('script2.js', 'script3.js');
@@ -310,8 +311,9 @@ window.fakeWorker1.importScripts('script2.js', 'script3.js');
 // 2. 'script2.js', 'script3.js', 'script1.js'
 </pre>
 
-Loading scripts into multiple isolated workers. {#example-multiple}
--------------------------------------------------------------------
+Loading scripts into multiple processors. {#example-multiple}
+-------------------------------------------------------------
+
 <pre class='lang-javascript'>
 Promise.all([
     window.fakeWorker1.importScripts('script1.js'),
@@ -334,10 +336,10 @@ registerAnArbitaryClass('foo', class FooClass {
 </pre>
 
 When the user agent wants to invoke <b>process</b> on an instance of class with key <b>foo</b> it will:
-    1. Call <a>invoke a method on a class inside an {{IsolatedWorker}}</a> given <b>process</b> as the |methodPropertyKey| and some |arguments| with the following options:
-        - To <a>create an isolated worker global scope</a> the user agent will:
+    1. Call <a>invoke a method on a class inside a {{Processor}}</a> given <b>process</b> as the |methodPropertyKey| and some |arguments| with the following options:
+        - To <a>create a processor global scope</a> the user agent will:
 
             Return a new {{FakeWorkerGlobalScope}}.
-        - To <a>lookup a class instance on an isolated worker global scope</a> given a |workerGlobalScope|, the user agent will:
-            1. Let |classConstructor| be the result of looking up <b>foo</b> on the |workerGlobalScope|'s map of <b>registered class constructors</b>.
+        - To <a>lookup a class instance on a processor global scope</a> given a |processorGlobalScope|, the user agent will:
+            1. Let |classConstructor| be the result of looking up <b>foo</b> on the |processorGlobalScope|'s map of <b>registered class constructors</b>.
             2. Return the result of <a>Construct</a>(|classConstructor|).
