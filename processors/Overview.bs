@@ -116,7 +116,7 @@ Infrastructure {#infrastructure}
 The Global Scope {#the-global-scope}
 ------------------------------------
 
-The {{ProcessorGlobalScope}} object represents the global execution context of a {{Processor}}.
+The {{ProcessorGlobalScope}} object provides a <dfn>processor global scope</dfn> which represents the global execution context of a {{Processor}}.
 
 <pre class='idl'>
 interface ProcessorGlobalScope {
