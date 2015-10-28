@@ -11,7 +11,7 @@ Editor: Shane Stephens, shanestephens@google.com
 Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
 Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
-Ignored Terms: boolean, Animatable, Map, Context, isolated worker 
+Ignored Terms: boolean, Animatable, Map, Context, isolated worker, SyntaxError, InvalidModificationError, NotFoundError
 Repository: w3c/css-houdini-drafts
 At Risk: the apply hook (<a section href="#the-apply-hook"></a>)
 </pre>
@@ -41,13 +41,13 @@ of other properties via a var() reference.
 
 This specification extends [[css-variables]], allowing the registration of properties
 that have a value type, an initial value, and a defined inheritance behaviour. This
-specification also provides an additional javascript-mediated means via which custom 
+specification also provides an additional javascript-mediated means via which custom
 properties can modify the computed value of native properties.
 
 This specification is complementary to [[css-paint-api]] and [[css-layout-api]], which
 allow custom properties to directly impact paint and layout behaviours respectively.
-Accordingly, it is recommended not to use the computed value modification facilities of this 
-specification for layout, but only to impact cascading in a non-native manner.
+Accordingly, it is recommended not to use the computed value modification facilities of this
+specification directly for layout, but only to impact cascading in a non-native manner.
 
 Registering custom properties {#registering-custom-properties}
 ==============================================================
@@ -66,20 +66,18 @@ partial interface CSS {
 };
 </pre>
 
-Issue(50): Maybe should be on Document instead of CSS? Probably not as we can't think of a reason to want
-per-document custom properties within a Window.
+The {{PropertyDescriptor}} dictionary {#the-propertydescriptor-dictionary}
+--------------------------------------------------------------------------
+
+A <dfn>PropertyDescriptor</dfn> dictionary represents author-specified configuration
+options for a custom property. {{PropertyDescriptor}} dictionaries contain the
+following members:
 
 :   <dfn dict-member for=PropertyDescriptor>name</dfn>
 ::  The name of the custom property being defined.
 
 :   <dfn dict-member for=PropertyDescriptor>syntax</dfn>
-::  A string representing how this custom property is parsed. Only
-    simple type references are supported.
-
-    Note: for example, the syntax string could be "&lt;length&gt;" or "&lt;number&gt;".
-
-    Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
-    "&lt;length&gt; || &lt;number&gt;"
+::  A string representing how this custom property is parsed.
 
 :   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
@@ -87,30 +85,52 @@ per-document custom properties within a Window.
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
-Issue(48): It'd be nice to be able to specify e.g. "<width>" or "<background-color>" too.
+The {{registerProperty()}} function {#the-registerproperty-function}
+--------------------------------------------------------------------
+
+The <dfn method for=CSS>registerProperty(PropertyDescriptor descriptor)</dfn> method
+registers a custom property according the to configuration options provided in
+<code>descriptor</code>.
+
+Attempting to register properties with a {{PropertyDescriptor/name}} that doesn't
+correspond to the <<custom-property-name>> production must cause {{registerProperty()}}
+to throw a {{SyntaxError}}.
+
+The list of types supported in the {{PropertyDescriptor/syntax}} member are listed
+in <a section href="#supported-syntax-strings"></a>. Currently, only simple
+type references are supported. Attempting to register properties with a
+{{PropertyDescriptor/syntax}} that is not supported must cause {{registerProperty()}}
+to throw a {{SyntaxError}}.
+
+Note: for example, the syntax string could be "&lt;length&gt;" or "&lt;number&gt;".
+
+Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
+"&lt;length&gt; || &lt;number&gt;"
+
+Issue(48): It'd be nice to be able to specify e.g. "&lt;width>" or "&lt;background-color>" too.
 
 Issue(10): It'd be nice to be able to specify that a property can take the name of any property as a value.
 
-Attempting to register properties with a {{PropertyDescriptor/name}} that doesn't 
-correspond to the <<custom-property-name>> production must cause {{registerProperty()}}
-to throw a SyntaxError.
-
-Attempting to call {{registerProperty()}} with a {{PropertyDescriptor/initialValue}} that is
+Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
-throw a SyntaxError.
+throw a {{SyntaxError}}.
 
 When a custom property is registered with a given type, the process via which specified
 values for that property are turned into computed values is defined
-fully by the type selected. Furthermore, the property will interpolate in a manner
-defined for that type by [[css3-animations]].
+fully by the type selected, as described in
+<a section href="#calculation-of-computed-values"></a>. Furthermore, the
+property will interpolate in a manner defined for that type by [[!css3-animations]].
 
 If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
-then an exception is thrown and the re-registration fails.
+then an {{InvalidModificationError}} is thrown and the re-registration fails.
 
-Properties can be unregistered using {{unregisterProperty()}}. If this function is called with a name
-that doesn't match an existing property then an exception is thrown.
+Properties can be unregistered using
+<dfn method for=CSS>unregisterProperty(DOMString name)</dfn>.
+If this function is called with a name that doesn't match an existing property
+then a {{NotFoundError}} is thrown.
 
-Calls to both {{registerProperty()}} and {{unregisterProperty()}} trigger a reparse of all parsed CSS.
+Successful calls to both {{registerProperty()}} and {{unregisterProperty()}}
+trigger a reparse of all parsed CSS.
 
 Supported syntax strings {#supported-syntax-strings}
 ----------------------------------------------------
@@ -204,8 +224,8 @@ Issue(49): This is too inflexible. There’s a strong use case around writing to
 same native property for different elements. Maybe throw exception to
 window.onError in this case?
 
-Each time style is recomputed for an Element, each registered {{ApplyDescriptor/applyHook}} 
-for which any of the matching {{ApplyDescriptor/inputProperties}} changes as a result of 
+Each time style is recomputed for an Element, each registered {{ApplyDescriptor/applyHook}}
+for which any of the matching {{ApplyDescriptor/inputProperties}} changes as a result of
 that recomputation is invoked. This invocation happens after any transitions or animations
 registered on the Element have finished applying.
 
@@ -268,9 +288,9 @@ document.registerProperty({
 &lt;script&gt;
 this.registerApplyHook({
     apply: function(el) {
-      el.outputStyle.transform = 'translate(' + el.style.get('--translate-x') + ', ' + el.style.get('--translate-y') + 
-                                   ') rotate(' + el.style.get('--rotate') + 
-                                   ') scale(' + el.style.get('--scale-x') + ', ' + el.style.get('--scale-y') + ')' + 
+      el.outputStyle.transform = 'translate(' + el.style.get('--translate-x') + ', ' + el.style.get('--translate-y') +
+                                   ') rotate(' + el.style.get('--rotate') +
+                                   ') scale(' + el.style.get('--scale-x') + ', ' + el.style.get('--scale-y') + ')' +
                                    el.style.get('transform');
     },
     inputProperties: ["--translate-*", "--scale-*", "--rotate", "transform"],
