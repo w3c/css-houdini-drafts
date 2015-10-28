@@ -93,7 +93,9 @@ Note: The list of CSS properties provided by the dependencies getter can either 
 
 Note: The list of dependencies should only be looked up once, the class doesn't have the opportunity to dynamically change its dependencies.
 
-Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext. In particular the author may want a WebGL based rendering context to render 3D effects.
+Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext.
+    In particular the author may want a WebGL rendering context to render 3D effects.
+    There are complexities in setting up a WebGL rendering context to take the {{Geometry}} and {{StylePropertyMap}} as inputs.
 
 Issue(w3c/css-houdini-drafts#31): Allow author to specify the intrinsic size.
 
