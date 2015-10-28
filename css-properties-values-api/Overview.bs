@@ -107,10 +107,6 @@ Note: for example, the syntax string could be "&lt;length&gt;" or "&lt;number&gt
 Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
 "&lt;length&gt; || &lt;number&gt;"
 
-Issue(48): It'd be nice to be able to specify e.g. "&lt;width>" or "&lt;background-color>" too.
-
-Issue(10): It'd be nice to be able to specify that a property can take the name of any property as a value.
-
 Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
 throw a {{SyntaxError}}.
@@ -118,8 +114,17 @@ throw a {{SyntaxError}}.
 When a custom property is registered with a given type, the process via which specified
 values for that property are turned into computed values is defined
 fully by the type selected, as described in
-<a section href="#calculation-of-computed-values"></a>. Furthermore, the
-property will interpolate in a manner defined for that type by [[!css3-animations]].
+<a section href="#calculation-of-computed-values"></a>.
+
+Note: As defined by [[css3-animations]] and [][css3-transitions]], it is possible to
+specify animations and transitions that reference custom properties.
+
+When referenced by animations and transitions, custom properties will interpolate
+in a manner defined by their types.
+If the start and end of an interpolation have matching types, then they
+will interpolate as specified in [[!css3-animations]] or the corresponding property.
+Otherwise, the interpolation falls back to the default 50% flip described in
+[[!css3-animations]].
 
 If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
 then an {{InvalidModificationError}} is thrown and the re-registration fails.
@@ -147,32 +152,53 @@ The following syntax strings are supported:
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
 ::  That string
+:   "&lt;[property-name]>", Where [property-name] is any existing CSS property
+    name
+::  Any value that parses as a value of the specified property.
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
 :   "*"
 ::  Any valid token stream
+
+Regardless of the syntax specified, all custom properties will accept
+<a>CSS-wide keywords</a> as well as ''revert'', and process these values
+appropriately.
+
+Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
+of the {{PropertyDescriptor}} dictionary.
 
 <div class='example'>
 For example, the following are all valid syntax strings.
 
 :   <code>"&lt;length>"</code>
 ::  accepts length values
-:   <code>"&lt;length> | &lt;percent>"</code>
+:   <code>"&lt;length> | &lt;percentage>"</code>
 ::  accepts lengths, or percentages, or length calc expressions, but not
     calc expressions containing a combination of length and percent values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the string "big", or the string "bigger", or the string "BIGGER".
+:   <code>"&lt;background-color>"</code>
+::  accepts any value that would be accepted by the 'background-color' property
+    (e.g. "#F00", "red", "rgba(10, 10, 10, 0.5)", etc.)
 
 </div>
 
 Calculation of Computed values {#calculation-of-computed-values}
 ----------------------------------------------------------------
 
-The syntax of a custom property fully determines how computed values are generated from specified values for that property.
+The syntax of a custom property fully determines how computed values are
+generated from specified values for that property.
+
+The <a>CSS-wide keywords</a> and ''revert'' generate computed values as
+described in [[!css3-values]] and [[!css-cascade-4]] respectively. Otherwise:
 
 For &lt;length> values, the computed value is the absolute length expressed in pixels.
 
-For &lt;number>, &lt;percentage>, &lt;custom-ident>, string or "*" values, the computed value is identical to the specified value.
+For &lt;number>, &lt;percentage>, &lt;custom-ident>, string or "*" values, the
+computed value is identical to the specified value.
+
+For values with a syntax that references a CSS property, the computed value
+is defined by that property.
 
 For values specified by a syntax string that include "|" clauses, the computed
 value is given by applying the calculation rules for the first clause that
