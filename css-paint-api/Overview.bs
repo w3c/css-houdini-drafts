@@ -190,6 +190,8 @@ When the user agent wants to draw an image of a <<paint()>> for a <var>fragment<
 
         Otherwise the image output should be produced from the |renderingContext| given to the paint method.
 
+        Note: User agents should provide tooling within their debugging tools to show authors a partial output of the image, if an exception is thrown.
+
     10. Set the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| to <a>paint-valid</a>.
 
 Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
