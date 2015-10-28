@@ -280,22 +280,22 @@ For these examples we'll use a fake processor on window.
 
 <pre class='idl'>
 partial interface Window {
-  [SameObject] readonly attribute Processor fakeWorker1;
-  [SameObject] readonly attribute Processor fakeWorker2;
+  [SameObject] readonly attribute Processor fakeProcessor1;
+  [SameObject] readonly attribute Processor fakeProcessor2;
 };
 </pre>
 
 <pre class='idl'>
 callback Function = any (any... arguments);
 
-interface FakeWorkerGlobalScope : ProcessorGlobalScope {
+interface FakeProcessorGlobalScope : ProcessorGlobalScope {
     void registerAnArbitaryClass(DOMString type, Function classConstructor);
 };
 </pre>
 
-Each {{FakeWorkerGlobalScope}} has a map of the <b>registered class constructors</b>.
+Each {{FakeProcessorGlobalScope}} has a map of the <b>registered class constructors</b>.
 
-When the <dfn method for=FakeWorkerGlobalScope>registerAnArbitaryClass(type, classConstructor)</dfn> method is called,
+When the <dfn method for=FakeProcessorGlobalScope>registerAnArbitaryClass(type, classConstructor)</dfn> method is called,
 the user agent will add the <em>classConstructor</em> of <em>type</em> to the map of <b>registered class constructors</b>.
 
 
@@ -303,10 +303,10 @@ Loading scripts into a processor. {#example-single}
 ---------------------------------------------------
 
 <pre class='lang-javascript'>
-window.fakeWorker1.importScripts('script1.js');
-window.fakeWorker1.importScripts('script2.js', 'script3.js');
+window.fakeProcessor1.importScripts('script1.js');
+window.fakeProcessor1.importScripts('script2.js', 'script3.js');
 
-// Assuming no other calls to fakeWorker1 valid script loading orderings are:
+// Assuming no other calls to fakeProcessor1 valid script loading orderings are:
 // 1. 'script1.js', 'script2.js', 'script3.js'
 // 2. 'script2.js', 'script3.js', 'script1.js'
 </pre>
@@ -316,8 +316,8 @@ Loading scripts into multiple processors. {#example-multiple}
 
 <pre class='lang-javascript'>
 Promise.all([
-    window.fakeWorker1.importScripts('script1.js'),
-    window.fakeWorker2.importScripts('script2.js')
+    window.fakeProcessor1.importScripts('script1.js'),
+    window.fakeProcessor2.importScripts('script2.js')
 ]).then(function() {
     // Both scripts now have loaded code, can do a task which relies on this.
 });
@@ -327,7 +327,7 @@ Create a registered class and invoke a method. {#example-class}
 ---------------------------------------------------------------
 
 <pre class='lang-javascript'>
-// Inside FakeWorkerGlobalScope
+// Inside FakeProcessorGlobalScope
 registerAnArbitaryClass('foo', class FooClass {
     process(arg) {
         return !arg;
@@ -339,7 +339,7 @@ When the user agent wants to invoke <b>process</b> on an instance of class with 
     1. Call <a>invoke a method on a class inside a {{Processor}}</a> given <b>process</b> as the |methodPropertyKey| and some |arguments| with the following options:
         - To <a>create a processor global scope</a> the user agent will:
 
-            Return a new {{FakeWorkerGlobalScope}}.
+            Return a new {{FakeProcessorGlobalScope}}.
         - To <a>lookup a class instance on a processor global scope</a> given a |processorGlobalScope|, the user agent will:
             1. Let |classConstructor| be the result of looking up <b>foo</b> on the |processorGlobalScope|'s map of <b>registered class constructors</b>.
             2. Return the result of <a>Construct</a>(|classConstructor|).
