@@ -76,6 +76,17 @@ interface PaintProcessorGlobalScope : ProcessorGlobalScope {
 
 A {{PaintProcessorGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
+<div class='note'>
+    Note: This is how the class should look.
+    <pre class='idl'>
+        callback interface PaintClass {
+            readonly attribute sequence&lt;DOMString&gt; inputProperties;
+            void paint(PaintRenderingContext2d ctx, Geometry geom, StylePropertyMap inputProperties);
+            void overflow(StylePropertyMap inputProperties);
+        };
+    </pre>
+</div>
+
 When the <dfn method for=PaintProcessorGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
     1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     2. If the |name| exists as a key in the <b>name to paint instance map</b>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
