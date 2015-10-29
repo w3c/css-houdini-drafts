@@ -198,6 +198,7 @@ When the user agent wants to draw an image of a <<paint()>> for a <var>fragment<
 
 Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
     For example, they should how a "unresponsive script" dialog or similar.
+    In addition user agents should provide tooling within their debugging tools to show authors how expensive their paint classes are.
 
 Note: The user agent doesn't have produce the image output for a <<paint()>> function on the current frame if it's <b>paint valid flag</b> is <a>paint-invalid</a>.
     For example the fragment may be outside the visible viewport, and not required for display on the output device. 
