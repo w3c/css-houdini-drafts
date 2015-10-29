@@ -202,6 +202,8 @@ Note: The user agent should consider long running paint functions similar to lon
 Note: The user agent doesn't have produce the image output for a <<paint()>> function on the current frame if it's <b>paint valid flag</b> is <a>paint-invalid</a>.
     For example the fragment may be outside the visible viewport, and not required for display on the output device. 
 
+Note: The contents of the image are not designed to be accessible. Authors should communicate any useful information through the standard accessibility APIs.
+
 Issue(w3c/css-houdini-drafts#24): Determine how to side-load images or other data.
 
 Issue: What information should we provide for read-modify-write use-cases?
