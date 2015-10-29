@@ -123,7 +123,7 @@ values for that property are turned into computed values is defined
 fully by the type selected, as described in
 <a section href="#calculation-of-computed-values"></a>.
 
-Note: As defined by [[css3-animations]] and [][css3-transitions]], it is possible to
+Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
 specify animations and transitions that reference custom properties.
 
 When referenced by animations and transitions, custom properties will interpolate
