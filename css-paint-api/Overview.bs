@@ -136,7 +136,12 @@ interface Geometry {
 
 Issue: Create a new interface which uses IDL mixins to share methods with CanvasRenderingContext2d.
 
-When the user agent wants to draw an image of a <<paint()>> for a <var>fragment</var> into its appropriate stacking level (as defined by the property the CSS property it's associated with) it <em>must</em> run the following steps:
+If a <<paint()>> function for a fragment is <a>paint-invalid</a> and the fragment is within the visual viewport,
+then user agent <em>must</em> <a>draw an image</a> for the current frame.
+
+Note: The user agent may choose to <a>draw an image</a> for <<paint()>> functions not within the visual viewport.
+
+When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <var>fragment</var> into its appropriate stacking level (as defined by the property the CSS property it's associated with) it <em>must</em> run the following steps:
     1. If the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| is <a>paint-valid</a> the user agent <em>may</em> use the drawn image from the previous invocation.
         If so it can abort all these steps.
 
@@ -199,9 +204,6 @@ When the user agent wants to draw an image of a <<paint()>> for a <var>fragment<
 Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
     For example, they should how a "unresponsive script" dialog or similar.
     In addition user agents should provide tooling within their debugging tools to show authors how expensive their paint classes are.
-
-Note: The user agent doesn't have produce the image output for a <<paint()>> function on the current frame if it's <b>paint valid flag</b> is <a>paint-invalid</a>.
-    For example the fragment may be outside the visible viewport, and not required for display on the output device. 
 
 Note: The contents of the image are not designed to be accessible. Authors should communicate any useful information through the standard accessibility APIs.
 
