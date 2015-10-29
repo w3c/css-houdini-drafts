@@ -45,7 +45,7 @@ Note: In a future version of the spec, support may be added for defining the cli
 Paint Invalidation {#paint-invalidation}
 ========================================
 
-A <a>document</a> has an associated <b>paint name to dependencies map</b>. Initially it is empty and is populated when {{registerPaint(name, paintCtor)}} is called.
+A <a>document</a> has an associated <b>paint name to input properties map</b>. Initially it is empty and is populated when {{registerPaint(name, paintCtor)}} is called.
 
 Each <<paint()>> function for a fragment has an associated <b>paint valid flag</b>. It may be either <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
 
@@ -54,8 +54,8 @@ When the geometry (as determined by layout) of a <var>fragment</var> changes, ea
 When the computed style for an element changes, the user agent must run the following steps:
     1. For each <<paint()>> function on the element, perform the following substeps:
         1. Let <var>name</var> be the first argument of the <<paint()>> function.
-        2. Let <var>dependencies</var> be the result of performing a lookup in <b>paint name to dependencies map</b> with |name| as the key.
-        3. For each <var>property</var> in |dependencies|, if the |property|'s <a>computed value</a> has changed, set the <b>paint valid flag</b> on the |fragment| to <a>paint-invalid</a>.
+        2. Let <var>inputProperties</var> be the result of performing a lookup in <b>paint name to input properties map</b> with |name| as the key.
+        3. For each <var>property</var> in |inputProperties|, if the |property|'s <a>computed value</a> has changed, set the <b>paint valid flag</b> on the |fragment| to <a>paint-invalid</a>.
 
 [[#drawing-an-image]] results in the <b>paint valid flag</b> for a <<paint()>> function to be set to <a>paint-valid</a>.
 
@@ -83,15 +83,15 @@ When the <dfn method for=PaintProcessorGlobalScope>registerPaint(<var>name</var>
     4. Let <var>prototype</var> be the result of <a>Get</a>(O=|paintCtor|, P="prototype").
     5. If the result of <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="paint")) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     6. If the result of <a>HasProperty</a>(O=|prototype|, P="overflow") and <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="overflow")) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
-    7. Let <var>dependencies</var> be the result of <a>Get</a>(O=|paintCtor|, P="dependencies").
-    8. If the result of <a>IsArray</a>(argument=|dependencies|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
-    9. Add the key-value pair (|name| - |dependencies|) to the <b>paint name to dependencies map</b> of the associated <a>document</a>.
+    7. Let <var>inputProperties</var> be the result of <a>Get</a>(O=|paintCtor|, P="inputProperties").
+    8. If the result of <a>IsArray</a>(argument=|inputProperties|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    9. Add the key-value pair (|name| - |inputProperties|) to the <b>paint name to input properties map</b> of the associated <a>document</a>.
     10. Let <var>paintInstance</var> be the result of <a>Construct</a>(|paintCtor|).
     11. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{PaintProcessorGlobalScope}}.
 
-Note: The list of CSS properties provided by the dependencies getter can either be custom or native CSS properties.
+Note: The list of CSS properties provided by the input properties getter can either be custom or native CSS properties.
 
-Note: The list of dependencies should only be looked up once, the class doesn't have the opportunity to dynamically change its dependencies.
+Note: The list of input properties should only be looked up once, the class doesn't have the opportunity to dynamically change its input properties.
 
 Note: In a future version of the spec, the author may be able to set an option to receive a different type of RenderingContext.
     In particular the author may want a WebGL rendering context to render 3D effects.
@@ -100,7 +100,7 @@ Note: In a future version of the spec, the author may be able to set an option t
 Issue(w3c/css-houdini-drafts#31): Allow author to specify the intrinsic size.
 
 When the <dfn method for=PaintProcessorGlobalScope>unregisterPaint(<var>name</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
-    1. Remove the key-value pair associated with the |name| key in the <b>paint name to dependencies map</b> of the associated <a>document</a>.
+    1. Remove the key-value pair associated with the |name| key in the <b>paint name to input properties map</b> of the associated <a>document</a>.
     2. Remove the key-value pair associated with the |name| key in the <b>name to paint instance map</b> of the {{PaintProcessorGlobalScope}}.
 
 Paint Notation {#paint-notation}
@@ -146,9 +146,9 @@ When the user agent wants to draw an image of a <<paint()>> for a <var>fragment<
 
     3. If no paint class was registered with |name|, the resulting image output will be an <a>invalid image</a> and the user agent must abort all these steps.
 
-    4. Let <var>dependencies</var> be the result of looking up |name| on the associated <a>document</a>'s <b>paint name to dependencies map</b>.
+    4. Let <var>inputProperties</var> be the result of looking up |name| on the associated <a>document</a>'s <b>paint name to input properties map</b>.
 
-    5. Let <var>styleMap</var> be a new {{StylePropertyMap}} populated with <em>only</em> the <a>computed value</a>'s for properties listed in |dependencies|.
+    5. Let <var>styleMap</var> be a new {{StylePropertyMap}} populated with <em>only</em> the <a>computed value</a>'s for properties listed in |inputProperties|.
 
     6. Let <var>overflow</var> be the result <a>invoke a method on a class inside a Processor</a> given "overflow" as the <em>methodPropertyKey</em> and [|styleMap|] as the <em>arguments</em> with the following options:
         - To <a>create a processor global scope</a> the user agent will:
@@ -222,7 +222,7 @@ Example 1: A colored circle. {#example-1}
 <pre class='lang-javascript'>
 // Inside PaintProcessorGlobalScope.
 registerPaint('circle', class {
-    static get dependencies() { return ['--circle-color']; }
+    static get inputProperties() { return ['--circle-color']; }
     paint(ctx, geom, properties) {
         // Change the fill color.
         var color = properties.get('--circle-color');
