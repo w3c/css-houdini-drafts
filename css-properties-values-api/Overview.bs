@@ -55,6 +55,11 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 Accordingly, it is recommended not to use the computed value modification facilities of this
 specification directly for layout, but only to impact cascading in a non-native manner.
 
+[[css-variables]] defines a new <<var()>> function that can be used to
+insert the values of custom properties into other CSS property values. Where
+possible, this mechanism should be preferred above the computed value modification
+facilities of this specification.
+
 Registering custom properties {#registering-custom-properties}
 ==============================================================
 
@@ -362,6 +367,10 @@ registered on the Element have finished applying, in the context of a {{StyleWor
 
 Note: apply hooks are called after transitions/animations so that custom properties
       can be transitioned and still have their effect apply correctly.
+
+Implementations may memoize the result of apply callbacks relative to the
+complete set of inputs provided to apply (that is, the set of attributes on
+{{ElementProxy}}).
 
 This invocation takes place by following these steps for each key <var>name</var>
 in the <a>name map of apply hooks</a>:
