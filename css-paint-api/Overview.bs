@@ -68,13 +68,13 @@ Registering Custom Paint {#registering-custom-paint}
 <pre class='idl'>
 callback VoidFunction = void ();
 
-interface PaintProcessorGlobalScope : ProcessorGlobalScope {
+interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
     void unregisterPaint(DOMString name);
 };
 </pre>
 
-A {{PaintProcessorGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+A {{PaintWorkletGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
 <div class='note'>
     Note: This is how the class should look.
@@ -87,7 +87,7 @@ A {{PaintProcessorGlobalScope}} has a map of <b>name to paint instance map</b>. 
     </pre>
 </div>
 
-When the <dfn method for=PaintProcessorGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
+When the <dfn method for=PaintWorkletGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
     1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     2. If the |name| exists as a key in the <b>name to paint instance map</b>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     3. If the result of <a>IsConstructor</a>(argument=|paintCtor|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
@@ -98,7 +98,7 @@ When the <dfn method for=PaintProcessorGlobalScope>registerPaint(<var>name</var>
     8. If the result of <a>IsArray</a>(argument=|inputProperties|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     9. Add the key-value pair (|name| - |inputProperties|) to the <b>paint name to input properties map</b> of the associated <a>document</a>.
     10. Let <var>paintInstance</var> be the result of <a>Construct</a>(|paintCtor|).
-    11. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{PaintProcessorGlobalScope}}.
+    11. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{PaintWorkletGlobalScope}}.
 
 Note: The list of CSS properties provided by the input properties getter can either be custom or native CSS properties.
 
@@ -110,9 +110,9 @@ Note: In a future version of the spec, the author may be able to set an option t
 
 Issue(w3c/css-houdini-drafts#31): Allow author to specify the intrinsic size.
 
-When the <dfn method for=PaintProcessorGlobalScope>unregisterPaint(<var>name</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
+When the <dfn method for=PaintWorkletGlobalScope>unregisterPaint(<var>name</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
     1. Remove the key-value pair associated with the |name| key in the <b>paint name to input properties map</b> of the associated <a>document</a>.
-    2. Remove the key-value pair associated with the |name| key in the <b>name to paint instance map</b> of the {{PaintProcessorGlobalScope}}.
+    2. Remove the key-value pair associated with the |name| key in the <b>name to paint instance map</b> of the {{PaintWorkletGlobalScope}}.
 
 Paint Notation {#paint-notation}
 ================================
@@ -166,13 +166,13 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
 
     5. Let <var>styleMap</var> be a new {{StylePropertyMap}} populated with <em>only</em> the <a>computed value</a>'s for properties listed in |inputProperties|.
 
-    6. Let <var>overflow</var> be the result <a>invoke a method on a class inside a Processor</a> given "overflow" as the <em>methodPropertyKey</em> and [|styleMap|] as the <em>arguments</em> with the following options:
-        - To <a>create a processor global scope</a> the user agent will:
+    6. Let <var>overflow</var> be the result <a>invoke a method on a class inside a Worklet</a> given "overflow" as the <em>methodPropertyKey</em> and [|styleMap|] as the <em>arguments</em> with the following options:
+        - To <a>create a worklet global scope</a> the user agent will:
 
-            Return a new {{PaintProcessorGlobalScope}}.
-        - To <a>lookup a class instance on a processor global scope</a> given a |processorGlobalScope|, the user agent will:
+            Return a new {{PaintWorkletGlobalScope}}.
+        - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
 
-            Return the result of looking up |name| on the |processorGlobalScope|'s <b>name to paint instance map</b>.
+            Return the result of looking up |name| on the |workletGlobalScope|'s <b>name to paint instance map</b>.
 
         Note: User agents may have to compute overflow before entering their paint phase in order to determine which fragments to paint (overflow changes what could be seen on the output device).
             User agents may opt into running the steps up to this point, to determine overflow, then continuing later to determine the drawn image for the fragments which need painting.
@@ -196,13 +196,13 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
 
         Issue(w3c/css-houdini-drafts#23): Decide geometry information should be in level 1.
 
-    9. To produce the image output, <a>invoke a method on a class inside a Processor</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
-        - To <a>create a processor global scope</a> the user agent will:
+    9. To produce the image output, <a>invoke a method on a class inside a Worklet</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
+        - To <a>create a worklet global scope</a> the user agent will:
 
-            Return a new {{PaintProcessorGlobalScope}}.
-        - To <a>lookup a class instance on a processor global scope</a> given a |processorGlobalScope|, the user agent will:
+            Return a new {{PaintWorkletGlobalScope}}.
+        - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
 
-            Return the result of looking up |name| on the |processorGlobalScope|'s <b>name to paint instance map</b>.
+            Return the result of looking up |name| on the |workletGlobalScope|'s <b>name to paint instance map</b>.
 
         If an exception is <a>thrown</a> the resulting image output will be an <a>invalid image</a>.
 
@@ -234,7 +234,7 @@ Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
 <pre class='lang-javascript'>
-// Inside PaintProcessorGlobalScope.
+// Inside PaintWorkletGlobalScope.
 registerPaint('circle', class {
     static get inputProperties() { return ['--circle-color']; }
     paint(ctx, geom, properties) {

@@ -14,10 +14,9 @@ Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com
 Ignored Terms: boolean, Animatable, Map, Context, isolated worker, SyntaxError,
 Ignored Terms: InvalidModificationError, NotFoundError, StylePropertyMapReadOnly,
-Ignored Terms: processor global scope
-Ignored Terms: Worklet, throw, NotSupportedError, isconstructor, get, iscallable,
-Ignored Terms: construct, name map of inputs, invoke a method on a class inside a worklet
-Ignored Terms: create a worklet global scope, lookup a class instance on a worklet global scope
+Ignored Terms: worklet global scope
+Ignored Terms: throw, NotSupportedError, isconstructor, get, iscallable,
+Ignored Terms: construct, name map of inputs
 Ignored Vars: arguments, methodPropertyKey, inputStyleMap, workletGlobalScope
 Repository: w3c/css-houdini-drafts
 At Risk: the apply hook (<a section href="#the-apply-hook"></a>)
@@ -232,7 +231,7 @@ dictionary ApplyDescriptor {
 
 callback VoidFunction = void ();
 
-interface StyleWorklet : Worklet {
+interface StyleWorklet : WorkletGlobalScope {
   void registerApplyHook(DOMString name, VoidFunction applyCtor, ApplyDescriptor config);
   void unregisterApplyHook(DOMString name);
 };
@@ -252,7 +251,7 @@ The {{ElementProxy}} interface {#the-elementproxy-interface}
 ------------------------------------------------------------
 
 {{ElementProxy}} objects represent the partial state of DOM objects that are
-available to apply hooks running in <a>processor global scope</a>s. They provide
+available to apply hooks running in <a>worklet global scope</a>s. They provide
 the following attributes:
 
 :   inputStyle
