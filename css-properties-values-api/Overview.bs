@@ -274,6 +274,8 @@ the following attributes:
 ::  The pseudo name of the PseudoElement that this ElementProxy proxies, or
     null if this ElementProxy proxies an Element.
 
+Issue(73): Do we need the pseudo attribute on ElementProxy for level 1?
+
 The {{ApplyDescriptor}} dictionary {#the-applydescriptor-dictionary}
 --------------------------------------------------------------------
 
