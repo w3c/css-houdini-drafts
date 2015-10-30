@@ -223,9 +223,6 @@ The apply hook {#the-apply-hook}
 interface ElementProxy {
   readonly attribute StylePropertyMapReadOnly inputStyle;
   readonly attribute StylePropertyMap outputStyle;
-  readonly attribute DOMString? tagName;
-  readonly attribute DOMTokenList classList;
-  readonly attribute DOMString id;
   readonly attribute DOMString? pseudo;
 };
 
@@ -263,13 +260,6 @@ the following attributes:
 ::  The set of styles that the apply hook has registered a dependency on.
 :   outputStyle
 ::  The final result of running this apply hook.
-:   tagName
-::  The tag name of the Element that this ElementProxy proxies, or null if
-    this ElementProxy proxies a PseudoElement.
-:   classList
-::  The list of classes of the Element that this ElementProxy proxies
-:   id
-::  The id of the Element that this ElementProxy proxies
 :   pseudo
 ::  The pseudo name of the PseudoElement that this ElementProxy proxies, or
     null if this ElementProxy proxies an Element.
