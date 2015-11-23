@@ -146,7 +146,11 @@ If this function is called with a name that doesn't match an existing property
 then a {{NotFoundError}} is thrown.
 
 Successful calls to both {{registerProperty()}} and {{unregisterProperty()}}
-trigger a reparse of all parsed CSS.
+trigger a reparse of the specified value of the newly registered or unregistered
+property, followed by an invalidation of the computed style of all {{document}}s
+created on the in-scope {{Window}}.
+
+Issue(63): Phrasing? How do I write this correctly?
 
 Supported syntax strings {#supported-syntax-strings}
 ----------------------------------------------------
