@@ -167,7 +167,7 @@ The following syntax strings are supported:
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
 ::  That string
-:   "&lt;[property-name]>", Where [property-name] is any existing CSS property
+:   "&lt;'[property-name]'>", Where [property-name] is any existing CSS property
     name or any string that matches the <<custom-property-name>> production.
 ::  Any value that parses as a value of the specified property.
 :   Any combination of the preceding, separated by '|'
@@ -192,7 +192,7 @@ For example, the following are all valid syntax strings.
     calc expressions containing a combination of length and percent values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the string "big", or the string "bigger", or the string "BIGGER".
-:   <code>"&lt;background-color>"</code>
+:   <code>"&lt;'background-color'>"</code>
 ::  accepts any value that would be accepted by the 'background-color' property
     (e.g. "#F00", "red", "rgba(10, 10, 10, 0.5)", etc.)
 
