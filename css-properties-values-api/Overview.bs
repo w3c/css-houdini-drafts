@@ -164,7 +164,7 @@ The following syntax strings are supported:
 :   Any string, the contents of which matches the <<ident>> production
 ::  That string
 :   "&lt;[property-name]>", Where [property-name] is any existing CSS property
-    name
+    name or any string that matches the <<custom-property-name>> production.
 ::  Any value that parses as a value of the specified property.
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
