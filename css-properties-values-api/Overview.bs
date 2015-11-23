@@ -209,8 +209,13 @@ described in [[!css3-values]] and [[!css-cascade-4]] respectively. Otherwise:
 
 For &lt;length> values, the computed value is the absolute length expressed in pixels.
 
-For &lt;number>, &lt;percentage>, &lt;custom-ident>, string or "*" values, the
+For &lt;custom-ident>, string or "*" values, the
 computed value is identical to the specified value.
+
+For &lt;number> and &lt;percentage> values which are not calc expressions, the
+computed value is identical to the specified value. Calc expressions that are
+&lt;number> and &lt;percentage> values get reduced during computation to simple
+numbers and percentages respectively.
 
 For values with a syntax that references a CSS property, the computed value
 is defined by that property.
