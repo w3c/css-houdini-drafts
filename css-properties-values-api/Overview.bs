@@ -18,6 +18,7 @@ Ignored Terms: worklet global scope
 Ignored Terms: throw, NotSupportedError, isconstructor, get, iscallable,
 Ignored Terms: construct, name map of inputs
 Ignored Vars: arguments, methodPropertyKey, inputStyleMap, workletGlobalScope
+Ignored Terms: WorkletGlobalContext
 Repository: w3c/css-houdini-drafts
 At Risk: the apply hook (<a section href="#the-apply-hook"></a>)
 </pre>
@@ -256,7 +257,7 @@ dictionary ApplyDescriptor {
 
 callback VoidFunction = void ();
 
-interface StyleWorklet : WorkletGlobalScope {
+interface StyleWorklet : WorkletGlobalContext {
   void registerApplyHook(DOMString name, VoidFunction applyCtor, ApplyDescriptor config);
   void unregisterApplyHook(DOMString name);
 };
