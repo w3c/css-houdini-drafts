@@ -163,6 +163,9 @@ The following syntax strings are supported:
 ::  <<number>> values
 :   "&lt;percentage>"
 ::  Any valid <<percentage>> value
+:   "&lt;length-percentage>"
+::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
+    expression combining <<length>> and <<percentage>> components.
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
@@ -174,6 +177,12 @@ The following syntax strings are supported:
 ::  Any value that matches one of the items in the combination, matched in specified order.
 :   "*"
 ::  Any valid token stream
+
+Note: [[css3-values]] maintains a distinction between properties that accept
+only a length, and properties that accept both a length and a percentage,
+however the distinction doesn't currently cleanly line up with the productions.
+Accordingly, this specification introduces the length-percentage production
+for the purpose of cleanly specifying this distinction.
 
 Regardless of the syntax specified, all custom properties will accept
 <a>CSS-wide keywords</a> as well as ''revert'', and process these values
@@ -188,8 +197,13 @@ For example, the following are all valid syntax strings.
 :   <code>"&lt;length>"</code>
 ::  accepts length values
 :   <code>"&lt;length> | &lt;percentage>"</code>
-::  accepts lengths, or percentages, or length calc expressions, but not
-    calc expressions containing a combination of length and percent values.
+::  accepts lengths, percentages, percentage calc expressions, and length calc
+    expressions, but not calc expressions containing a combination of length
+    and percentage values.
+:   <code>"&lt;length-percentage>"</code>
+::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
+    accept, as well as calc expresssions containing a combination of both length
+    and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the string "big", or the string "bigger", or the string "BIGGER".
 :   <code>"&lt;'background-color'>"</code>
