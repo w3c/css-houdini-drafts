@@ -39,25 +39,24 @@ Issue: is it possible to amalgamate this API with value objects once they're spe
 ============================================
 
 <pre class='idl'>
-enum StyleValueKeyword {"initial", "inherit", "default", "unset"};
+enum StyleValueKeyword {"initial", "inherit", "revert", "unset"};
 
 interface StyleValue {
-  attribute StyleValueKeyword? keywordValue;
   attribute DOMString cssString;
   static (StyleValue or sequence&ltStyleValue>)? parse(DOMString property, DOMString cssText);
+};
+
+[Constructor(StyleValueKeyword)]
+interface KeywordValue : StyleValue {
+  attribute StyleValueKeyword keywordValue;
 };
 </pre>
 
 {{StyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
 
-For a given {{StyleValue}}:
-:   The <dfn attribute for=StyleValue>keywordValue</dfn> attribute
-::  is either set to one of the universal keywords represented in the  
-    {{StyleValueKeyword}} enum, or null if the object has a more specific
-    value.
-:   The <dfn attribute for=StyleValue>cssString</dfn> attribute
-::  provides a normalized representation (see <a section href="#stylevalue-normalization"></a>)
-    of the value.
+The <dfn attribute for=StyleValue>cssString</dfn> attribute provides a normalized
+representation (see <a section href="#stylevalue-normalization"></a>) of the value
+contained by a {{StyleValue}} object.
 
 The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
 method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue> for
@@ -65,6 +64,9 @@ method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequenc
 
 Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
            this or should it be a subclass?
+
+{{KeywordValue}} objects represent {{StyleValue}}s that are set to one of the
+<a>CSS-wide keywords</a> or to ''revert''.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
@@ -111,7 +113,7 @@ When invoked, the <dfn method for=StylePropertyMap>append(DOMString <var>propert
 
 Issue: first need to check whether the property is a valid property.
 
-1.  
+1.
     :   if <var>property</var> is not list-valued
     ::  throw a TypeError
 
@@ -483,7 +485,7 @@ interface PositionValue : StyleValue {
 
 </pre>
 
-{{PositionValue}} objects represent values for properties that take <<position>> 
+{{PositionValue}} objects represent values for properties that take <<position>>
 productions, for example 'background-position'.
 
 The <dfn attribute for=PositionValue>x</dfn> attribute contains the position offset
@@ -500,7 +502,7 @@ for=PositionValue>x</a> and <a attribute for=PositionValue>y</a> values of the
 {{StyleValue}} object.
 
 New {{PositionValue}} objects can only be constructed via pairs of lengths, and
-will only return the direct serialization of these lengths in the 
+will only return the direct serialization of these lengths in the
 <a attribute for=StyleValue>cssString</a> attribute.
 
 <div class='example'>
