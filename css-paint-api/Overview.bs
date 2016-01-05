@@ -24,6 +24,8 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
         url: throw; text: thrown
 urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
     text: reset the rendering context to its default state
+    text: scratch bitmap
+    text: set bitmap dimensions
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: Construct
     text: IsArray
@@ -81,7 +83,7 @@ A {{PaintWorkletGlobalScope}} has a map of <b>name to paint instance map</b>. In
     <pre class='idl'>
         callback interface PaintClass {
             readonly attribute sequence&lt;DOMString&gt; inputProperties;
-            void paint(PaintRenderingContext2d ctx, Geometry geom, StylePropertyMap inputProperties);
+            void paint(PaintRenderingContext2D ctx, Geometry geom, StylePropertyMap inputProperties);
             void overflow(StylePropertyMap inputProperties);
         };
     </pre>
@@ -131,21 +133,69 @@ Issue(w3c/css-houdini-drafts#33): What to do about cursor.
 
 Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
 
+The 2D rendering context {#2d-rendering-context}
+================================================
+
+<pre class='idl'>
+[Exposed=Worklet]
+interface PaintRenderingContext2D {
+};
+PaintRenderingContext2D implements CanvasState;
+PaintRenderingContext2D implements CanvasTransform;
+PaintRenderingContext2D implements CanvasCompositing;
+PaintRenderingContext2D implements CanvasImageSmoothing;
+PaintRenderingContext2D implements CanvasFillStrokeStyles;
+PaintRenderingContext2D implements CanvasShadowStyles;
+PaintRenderingContext2D implements CanvasRect;
+PaintRenderingContext2D implements CanvasDrawPath;
+PaintRenderingContext2D implements CanvasText;
+PaintRenderingContext2D implements CanvasDrawImage;
+PaintRenderingContext2D implements CanvasPathDrawingStyles;
+PaintRenderingContext2D implements CanvasTextDrawingStyles;
+PaintRenderingContext2D implements CanvasPath;
+</pre>
+
+Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderingContext2D}} API.
+    Specifically it doesn't implement the {{CanvasHitRegion}}, {{CanvasImageData}} or
+    {{CanvasUserInterface}} APIs.
+
+A {{PaintRenderingContext2D}} object has a <a>scratch bitmap</a>. This is initialised when the
+object is created. The size of the <a>scratch bitmap</a> is the size of the fragment it is rendering
+plus the size specified by the overflow method.
+
+The logical origin (0,0) is not necessarily placed at the origin of the <a>scratch bitmap</a>. If
+the fragment which is being painted has an associated overflow, the logical origin is placed at
+(overflow-left,overflow-top) of the <a>scratch bitmap</a>.
+
+Issue: Add image explaining origin vs. logical origin.
+
+The size of the <a>scratch bitmap</a> does not necessarily represent the size of the actual bitmap
+that the user agent will use internally or during rendering. For example, if the visual viewport is
+zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
+the coordinate space, so that the resulting rendering is of high quality.
+
+Additionally the user agent may record the sequence of drawing operations which have been applied to
+the <a>scratch bitmap</a> such that the user agent can subsequently draw onto a device bitmap at the
+correct resolution. This also allows user agents to re-use the same output of the <a>scratch
+bitmap</a> repeatably while the visual viewport is being zoomed for example.
+
+When the user agent is to <dfn>create a {{PaintRenderingContext2D}} object</dfn> for a given
+|width|, |height| and |overflowOffset| it <em>must</em> run the following steps:
+    1. Create a new {{PaintRenderingContext2D}}.
+    2. <a>Set bitmap dimensions</a> for the context's <a>scratch bitmap</a> to |width| and |height|.
+    3. Set the logical origin of the <a>scratch bitmap</a> to |overflowOffset|.
+    4. Return the new {{PaintRenderingContext2D}}.
+
 Drawing an image {#drawing-an-image}
 ====================================
 
 <pre class='idl'>
-interface PaintRenderingContext2d {
-    // TODO link to actual CanvasRenderingContext2d.
-};
-
+[Exposed=Worklet]
 interface Geometry {
     readonly attribute double width;
     readonly attribute double height;
 };
 </pre>
-
-Issue: Create a new interface which uses IDL mixins to share methods with CanvasRenderingContext2d.
 
 If a <<paint()>> function for a fragment is <a>paint-invalid</a> and the fragment is within the visual viewport,
 then user agent <em>must</em> <a>draw an image</a> for the current frame.
@@ -177,15 +227,10 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
         Note: User agents may have to compute overflow before entering their paint phase in order to determine which fragments to paint (overflow changes what could be seen on the output device).
             User agents may opt into running the steps up to this point, to determine overflow, then continuing later to determine the drawn image for the fragments which need painting.
 
-    7. Let <var>renderingContext</var> be a new {{PaintRenderingContext2d}}.
-
-        The backing size of the |renderingContext| must be the size of the |fragment| plus the size specified by |overflow|.
-
-        The user agent must ensure to <a>reset the rendering context to its default state</a>.
-
-        The origin of the |renderingContext| must be offset by the left, top size specified by |overflow|.
-
-        Note: (0,0) is the top-left of the |fragment|, (-offsetLeft,-offsetTop) is the top-left of the |overflow|.
+    7. Let <var>renderingContext</var> be the result of <a>create a {{PaintRenderingContext2D}} object</a> given:
+        - "overflowOffset" - The logical offset for the <a>scratch bitmap</a> specified by |overflow|.
+        - "width" - The width of the |fragment| plus the additional width specified by |overflow|.
+        - "height" - The height of the |fragment| plus the additional height specified by |overflow|.
 
         Note: The |renderingContext| must not be re-used between invocations of paint. Implicitly this means that there is no stored data, or state on the |renderingContext| between invocations.
             For example you can't setup a clip on the context, and expect the same clip to be applied next time the paint method is called.
