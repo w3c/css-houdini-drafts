@@ -39,16 +39,9 @@ Issue: is it possible to amalgamate this API with value objects once they're spe
 ============================================
 
 <pre class='idl'>
-enum StyleValueKeyword {"initial", "inherit", "revert", "unset"};
-
 interface StyleValue {
   attribute DOMString cssString;
   static (StyleValue or sequence&ltStyleValue>)? parse(DOMString property, DOMString cssText);
-};
-
-[Constructor(StyleValueKeyword)]
-interface KeywordValue : StyleValue {
-  attribute StyleValueKeyword keywordValue;
 };
 </pre>
 
@@ -59,14 +52,11 @@ representation (see <a section href="#stylevalue-normalization"></a>) of the val
 contained by a {{StyleValue}} object.
 
 The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
-method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue> for
+method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue}}> for
 <var>property</var>, returning null on failure.
 
 Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
            this or should it be a subclass?
-
-{{KeywordValue}} objects represent {{StyleValue}}s that are set to one of the
-<a>CSS-wide keywords</a> or to ''revert''.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
@@ -220,6 +210,19 @@ The value for a given property is the last valid value provided in the string.
 
 {{StyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
+
+{{KeywordValue}} objects {#keywordvalue-objects}
+------------------------------------------------
+
+<pre class='idl'>
+[Constructor(DOMString)]
+interface KeywordValue : StyleValue {
+  attribute DOMString keywordValue;
+};
+</pre>
+
+{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. It is simply a wrapper for a string
+and does not check that it contains a valid keyword.
 
 {{NumberValue}} objects {#numbervalue-objects}
 ----------------------------------------------
@@ -529,6 +532,21 @@ document.querySelector('.example').styleMap.get('background-position').y;
 </pre>
 
 </div>
+
+Mapping of properties to accepted types
+=======================================
+This section provides a table of which types of {{StyleValue}} a given property can accept.
+
+<table>
+<tr>
+<td>
+width
+</td>
+<td>
+{{KeywordValue}} | {{LengthValue}}
+</td>
+</tr>
+</table>
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
