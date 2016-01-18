@@ -43,7 +43,7 @@ enum StyleValueKeyword {"initial", "inherit", "revert", "unset"};
 
 interface StyleValue {
   attribute DOMString cssString;
-  static (StyleValue or sequence&ltStyleValue>)? parse(DOMString property, DOMString cssText);
+  static (StyleValue or sequence&lt;StyleValue>)? parse(DOMString property, DOMString cssText);
 };
 
 [Constructor(StyleValueKeyword)]
@@ -59,7 +59,7 @@ representation (see <a section href="#stylevalue-normalization"></a>) of the val
 contained by a {{StyleValue}} object.
 
 The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
-method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue> for
+method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue}}> for
 <var>property</var>, returning null on failure.
 
 Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
@@ -352,7 +352,7 @@ Issue: What happens if the provided DOMString or LengthValue for (e.g.) a Simple
 
 <pre class='idl'>
 [Constructor(),
- Constructor(sequence&lt;TransformComponent>)]
+ Constructor(sequence&lt;TransformComponent> transforms)]
 interface TransformValue : StyleValue {
   iterable&lt;TransformComponent>;
   Matrix asMatrix();
