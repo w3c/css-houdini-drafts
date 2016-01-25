@@ -221,8 +221,8 @@ interface KeywordValue : StyleValue {
 };
 </pre>
 
-{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. It is simply a wrapper for a string
-and does not check that it contains a valid keyword.
+{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. It is a wrapper for a string
+and does not check that it contains a valid keyword. Property setters will enforce keyword validity.
 
 {{NumberValue}} objects {#numbervalue-objects}
 ----------------------------------------------
