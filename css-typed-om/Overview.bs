@@ -544,7 +544,7 @@ Shorthand properties and values are not supported.
 <thead>
   <tr>
     <th>Property</th>
-    <th>Allowable {{StyleValue}}s</th>
+    <th>Allowable {{StyleValue}} types</th>
   </tr>
 </thead>
 <tbody>
@@ -956,6 +956,8 @@ Shorthand properties and values are not supported.
 </table>
 
 Issue: Spec up ColorValue, URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
+
+Issue: Do we want to make a generic PairValue and QuadValue, or have more specific classes for background-size, border-image-repeat, border-radius-*, border-image-outset, border-image-width?
 
 Issue: BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
 
