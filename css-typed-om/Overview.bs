@@ -41,7 +41,7 @@ Issue: is it possible to amalgamate this API with value objects once they're spe
 <pre class='idl'>
 interface StyleValue {
   attribute DOMString cssString;
-  static (StyleValue or sequence&ltStyleValue>)? parse(DOMString property, DOMString cssText);
+  static (StyleValue or sequence&lt;StyleValue>)? parse(DOMString property, DOMString cssText);
 };
 </pre>
 
@@ -355,7 +355,7 @@ Issue: What happens if the provided DOMString or LengthValue for (e.g.) a Simple
 
 <pre class='idl'>
 [Constructor(),
- Constructor(sequence&lt;TransformComponent>)]
+ Constructor(sequence&lt;TransformComponent> transforms)]
 interface TransformValue : StyleValue {
   iterable&lt;TransformComponent>;
   Matrix asMatrix();
