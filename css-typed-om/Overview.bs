@@ -221,8 +221,9 @@ interface KeywordValue : StyleValue {
 };
 </pre>
 
-{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. It is a wrapper for a string
-and does not check that it contains a valid keyword. Property setters will enforce keyword validity.
+{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. The constructor for {{KeywordValue}}
+should check that they contain valid CSS, but they do not check whether the contained string is a valid
+keyword for a particular property. Property setters are required to enforce keyword validity.
 
 {{NumberValue}} objects {#numbervalue-objects}
 ----------------------------------------------
@@ -536,17 +537,437 @@ document.querySelector('.example').styleMap.get('background-position').y;
 Mapping of properties to accepted types
 =======================================
 This section provides a table of which types of {{StyleValue}} a given property can accept.
+Note that most, but not all properties take {{KeywordValue}}.
+Shorthand properties and values are not supported.
 
-<table>
-<tr>
-<td>
-width
-</td>
-<td>
-{{KeywordValue}} | {{LengthValue}}
-</td>
-</tr>
+<table class=data>
+<thead>
+  <tr>
+    <th>Property</th>
+    <th>Allowable {{StyleValue}}s</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>'align-content'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'align-items'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'align-self'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'alignment-baseline'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'all'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'alt'</td>
+    <td>StringValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-delay'</td>
+    <td>TimeValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-direction'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-fill-mode'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-iteration-count'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-name'</td>
+    <td>CustomIdentValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-play-state'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'animation-timing-function'</td>
+    <td>TransitionTimingFunctionValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'appearance'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-attachment'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-blend-mode'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-clip'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-color'</td>
+    <td>ColorValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-image'</td>
+    <td>URIValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-origin'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-position'</td>
+    <td>{{PositionValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-repeat'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'background-size'</td>
+    <td>PairValue<{{LengthValue}}> (or SizeValue?)| {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'baseline-shift'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-boundary'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-collapse'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-color'</td>
+    <td>ColorValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-top-color' 'border-right-color' 'border-bottom-color' 'border-left-color'</td>
+    <td>ColorValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-image-outset'</td>
+    <td>FourValues<{{LengthValue}}|{{NumberValue}}></td>
+  </tr>
+  <tr>
+    <td>'border-image-repeat'</td>
+    <td>PairValue<{{KeywordValue}}></td>
+  </tr>
+  <tr>
+    <td>'border-image-slice'</td>
+    <td>BorderImageSliceValue</td>
+  </tr>
+  <tr>
+    <td>'border-image-source'</td>
+    <td>URIValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-image-width'</td>
+    <td>FourValues<{{LengthValue}}|{{NumberValue}}|{{KeywordValue}}></td>
+  </tr>
+  <tr>
+    <td>'border-top-style' 'border-right-style' 'border-bottom-style' 'border-left-style'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-top-right-radius' 'border-bottom-right-radius' 'border-bottom-left-radius' 'border-top-left-radius'</td>
+    <td>PairValue<{{LengthValue}}> | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'border-top-width' 'border-right-width' 'border-bottom-width' 'border-left-width'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'bottom'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'caption-side'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'clear'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'clip'</td>
+    <td>ShapeValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'color'</td>
+    <td>ColorValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'content'</td>
+    <td>StringValue | URIValue | CounterValue | AttrValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'counter-increment' 'counter-reset'</td>
+    <td>CounterValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'cue-after' 'cue-before'</td>
+    <td>URIValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'cursor'</td>
+    <td>URIValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'direction'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'display'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'empty-cells'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'float'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'font-family'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'font-size'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'font-style'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'font-variant'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'font-weight'</td>
+    <td>FontWeightValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'height'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'left'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'letter-spacing'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'line-height'</td>
+    <td>{{LengthValue}} | {{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'list-style-image'</td>
+    <td>URIValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'list-style-position'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'list-style-type'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'margin-top' 'margin-right' 'margin-bottom' 'margin-left'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'max-height' 'max-width' 'min-height' 'min-width'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'orphans'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'outline-color'</td>
+    <td>ColorValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'outline-style'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'outline-width'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'overflow'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'padding-top' 'padding-right' 'padding-bottom' 'padding-left'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'page-break-after' 'page-break-before'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'page-break-inside'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'pause-after' 'pause-before'</td>
+    <td>TimeValue | PercentageValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'pitch-range'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'pitch'</td>
+    <td>FrequencyValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'play-during'</td>
+    <td>PlayDuringValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'position'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'quotes'</td>
+    <td>PairValue<StringValue> | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'richness'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'right'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'speak-header'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'speak-numeral'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'speak-punctuation'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'speak'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'speech-rate'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'stress'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'table-layout'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'text-align'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'text-decoration'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'text-indent'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'text-transform'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'top'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'unicode-bidi'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'vertical-align'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'visibility'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'voice-family'</td>
+    <td>VoiceValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'volume'</td>
+    <td>{{NumberValue}} | PercentageValue | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'white-space'</td>
+    <td>{{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'widows'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'width'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'word-spacing'</td>
+    <td>{{LengthValue}} | {{KeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'z-index'</td>
+    <td>{{NumberValue}} | {{KeywordValue}}</td>
+  </tr>
+</tbody>
 </table>
+
+Issue: Spec up ColorValue, URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
+
+Issue: BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
+
+Issue: What do we do for play-during, which takes <uri> [ mix || repeat ]?
+
+Issue: Do we want a pair type for things like quotes which take [<string> <string>]
+
+Issue: Do we need to say that LengthValues must be positive e.g. for border-widths here?
+
+Issue: Do we want a font value class? How about a FontWeightValue (for 100, 200 etc) class?
+
+Issue: Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
