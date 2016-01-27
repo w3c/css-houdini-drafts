@@ -290,6 +290,8 @@ the following attributes:
 
 Issue(73): Do we need the pseudo attribute on ElementProxy for level 1?
 
+Issue(74): Come up with a better name than ElementProxy. This is more of a computation context.
+
 The {{ApplyDescriptor}} dictionary {#the-applydescriptor-dictionary}
 --------------------------------------------------------------------
 
@@ -422,33 +424,31 @@ Examples {#examples}
 Example 1: Polyfill scale, translate, rotate {#example-1}
 ---------------------------------------------------------
 
-This approach prohibits the direct use of the transform property.
-
 <pre class='lang-markup'>
 &lt;script&gt;
-["--scale-x", "--scale-y"].forEach(function(prop){
+["--scale-x", "--scale-y"].forEach(function(name) {
 document.registerProperty({
-    name: prop,
+    name: name,
+    syntax: "&lt;number&gt;",
     inherits: false,
-    initial: 1,
-    syntax: "&lt;number&gt;"
-    });
+    initialValue: "1"
+  });
 });
 
 ["--translate-x", "--translate-y"].forEach(function(name) {
   document.registerProperty({
     name: name,
-    initial: "0px",
+    syntax: "&lt;length&gt;",
     inherits: false,
-    syntax: "&lt;length&gt;"
+    initialValue: "0px"
   });
 });
 
 document.registerProperty({
   name: "--rotate",
-  initial: "0deg",
-  syntax: "&lt;angle&gt;"
-  inherits: false
+  syntax: "&lt;angle&gt;",
+  inherits: false,
+  initialValue: "0deg"
 });
 &lt;/script&gt;
 &lt;style&gt;
@@ -467,15 +467,22 @@ document.registerProperty({
 &lt;/style&gt;
 
 &lt;script&gt;
-this.registerApplyHook({
-    apply: function(el) {
-      el.outputStyle.transform = 'translate(' + el.style.get('--translate-x') + ', ' + el.style.get('--translate-y') +
-                                   ') rotate(' + el.style.get('--rotate') +
-                                   ') scale(' + el.style.get('--scale-x') + ', ' + el.style.get('--scale-y') + ')' +
-                                   el.style.get('transform');
-    },
-    inputProperties: ["--translate-*", "--scale-*", "--rotate", "transform"],
-    outputProperties: ["transform"]
+this.registerApplyHook("transform-properties", class {
+    apply(el) {
+      el.outputStyle.set('transform', new TransformValue(
+        [
+          new Translation(el.inputStyle.get('--translate-x'),
+                          el.inputStyle.get('--translate-y')),
+          new Rotation(el.inputStyle.get('--rotate')),
+          new Scale(el.inputStyle.get('--scale-x'),
+                    el.inputStyle.get('--scale-y'))
+        ].concat(el.inputStyle.get('transform'))));
+    }}, {
+      inputProperties: ["--translate-x", "--translate-y",
+                        "--scale-x", "--scale-y",
+                        "--rotate", "transform"],
+      outputProperties: ["transform"]
+    }
 });
 &lt;/script&gt;
 </pre>
