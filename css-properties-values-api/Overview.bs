@@ -418,6 +418,11 @@ in the <a>name map of apply hooks</a>:
 
 Issue: Need to deal with the output.
 
+Note: Apply hooks run in parallel on a given Element. The output of an apply
+hook is never used as input to another apply hook on the same Element - instead,
+a snapshot of style state is taken, all apply hooks are run with subsets of the
+same input snapshot, then the resulting output is written into the used style.
+
 Examples {#examples}
 ====================
 
