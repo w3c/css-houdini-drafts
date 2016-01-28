@@ -30,17 +30,23 @@ urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: api base url
     text: api url character encoding
+    text: browsing context
     text: code entry-point
     text: create a script
+    text: creation url
     text: document environment
     text: environment settings object
     text: event loop
     text: global object
+    text: https state
     text: incumbent settings object
+    text: microtask queue
+    text: realm execution context
     text: responsible browsing context
     text: responsible document
     text: responsible event loop
     text: script execution environment
+    text: task queues
 urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
     text: in parallel
     text: javascript global environment
@@ -54,6 +60,7 @@ urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: Construct
     text: FunctionCreate
+    text: InitializeHostDefinedRealm
     text: Invoke
     text: NewObjectEnvironment
     text: strict mode code
@@ -68,44 +75,55 @@ Motivations {#motivations}
 
 <em>This section is not normative.</em>
 
-Allowing extension points defined in the <a>document environment</a>
-is difficult, as rendering engines would need to abandon previously held assumptions for what could happen in the middle of a phase.
+Allowing extension points defined in the <a>document environment</a> is difficult, as rendering
+engines would need to abandon previously held assumptions for what could happen in the middle of a
+phase.
 
 For example, during the layout phase the rendering engine assumes that no DOM will be modified.
 
-Additionally defining extension points in the <a>document environment</a>
-would restrict rendering engines to performing work in the same thread as the <a>document environment</a>.
-(Unless rendering engines added complex, high-overhead infrastructure to allow thread-safe APIs in addition to thread joining guarantees).
+Additionally defining extension points in the <a>document environment</a> would restrict rendering
+engines to performing work in the same thread as the <a>document environment</a>. (Unless rendering
+engines added complex, high-overhead infrastructure to allow thread-safe APIs in addition to thread
+joining guarantees).
 
-The worklet is designed to allow such extension points in rendering engines, while keeping guarantees which rendering engines rely currently on.
+The worklet is designed to allow such extension points in rendering engines, while keeping
+guarantees which rendering engines rely currently on.
 
 Worklets are similar to <a>web workers</a> however they:
- - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering engines may run them wherever they choose.
- - Are able to have multiple duplicate instances of the global scope created for the purpose of parallelism.
- - Are not event API based. Instead classes are registered on the global scope, whose methods are to be invoked by the user agent.
+ - Are thread-agnostic. That is, they are not defined to run on a particular thread. Rendering
+    engines may run them wherever they choose.
+ - Are able to have multiple duplicate instances of the global scope created for the purpose of
+    parallelism.
+ - Are not event API based. Instead classes are registered on the global scope, whose methods are to
+    be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
  - Have a lifetime tied to running a method or set of methods on a class.
 
-As worklets have a relatively high overhead, they should be used sparingly. Due to this worklets are expected to be shared between separate scripts.
-This is similar to the <a>document environment</a>.
+As worklets have a relatively high overhead, they should be used sparingly. Due to this worklets are
+expected to be shared between separate scripts. This is similar to the <a>document environment</a>.
 
 Code Idempotency {#code-idempotency}
 ------------------------------------
 
 <em>This section is not normative.</em>
 
-Multiple instances of {{WorkletGlobalScope}} can be created for each {{Worklet}} that they belong to.
-User agents may choose to do this in order to parallelize work over multiple threads, or to move work between threads as required.
+Multiple instances of {{WorkletGlobalScope}} can be created for each {{Worklet}} that they belong
+to. User agents may choose to do this in order to parallelize work over multiple threads, or to move
+work between threads as required.
 
-Additionally different user agents may invoke a method on a class in a different order to other user agents.
+Additionally different user agents may invoke a method on a class in a different order to other user
+agents.
 
-Due to this, in order to prevent this compatibility risk between user agents, authors who register classes on the global scope should make their code idempotent.
-That is, a method or set of methods on a class should produce the same output given a particular input.
+As a result of this, to prevent this compatibility risk between user agents, authors who register
+classes on the global scope should make their code idempotent. That is, a method or set of methods
+on a class should produce the same output given a particular input.
 
-The following techniques should be used in order to encourage authors to write code in an idempotent way:
+The following techniques should be used in order to encourage authors to write code in an idempotent
+way:
  - No reference to the global object, e.g. <a>self</a> on a {{DedicatedWorkerGlobalScope}}.
- - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an anonymous function.
-    This prevents two different scripts sharing state by referencing shared objects on the global scope.
+ - Code is loaded similar to how ES6 Modules are loaded, in <a>strict mode code</a> inside an
+    anonymous function. This prevents two different scripts sharing state by referencing shared
+    objects on the global scope.
  - User agents may choose to always have at least two {{WorkletGlobalScope}}s per {{Worklet}} and
     randomly assign a method or set of methods on a class to a particular global scope.
  - User agents may create and destroy {{WorkletGlobalScope}}s at any time.
@@ -116,63 +134,106 @@ Infrastructure {#infrastructure}
 The Global Scope {#the-global-scope}
 ------------------------------------
 
-The {{WorkletGlobalScope}} object provides a <dfn>worklet global scope</dfn> which represents the global execution context of a {{Worklet}}.
+The {{WorkletGlobalScope}} object provides a <dfn>worklet global scope</dfn> which represents the
+global execution context of a {{Worklet}}.
 
 <pre class='idl'>
 interface WorkletGlobalScope {
+    attribute Console console;
 };
-WorkletGlobalScope implements WindowBase64;
 </pre>
 
-A {{WorkletGlobalScope}} has an associated <a>environment settings object</a> <b>settings object</b>.
+A {{WorkletGlobalScope}} has an associated <a>environment settings object</a>
+<b>settings object</b>.
 
 Note:
-    The {{WorkletGlobalScope}} has a limited global scope when compared to a {{DedicatedWorkerGlobalScope}}.
-    It is expected that other specifications will extend {{WorkletGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
+    The {{WorkletGlobalScope}} has a limited global scope when compared to a
+    {{DedicatedWorkerGlobalScope}}. It is expected that other specifications will extend
+    {{WorkletGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
     will allow authors to register classes for the user agent create and invoke methods on.
 
-Issue(w3c/css-houdini-drafts#15): Add console API to {{WorkletGlobalScope}} when it exists.
+### The event loop ### {#the-event-loop}
 
-### Initializing a WorkletGlobalScope ### {#initializing-a-workletglobalscope}
+Each {{WorkletGlobalScope}} object has a distinct <a>event loop</a>. This <a>event loop</a> has no
+associated <a>browsing context</a>, and only its <a>microtask queue</a> is used (all other <a>task
+queues</a> are not used). The <a>event loop</a> is created by the <a>create a
+WorkletGlobalScope</a> algorithm.
 
-When a user agent is to <dfn>initialize a {{WorkletGlobalScope}}</dfn>, for a given |workletGlobalScope| and |worklet|, it <em>must</em> run the following steps:
-    1. Let |workerEventLoop| be a new <a>event loop</a>.
+### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
-        Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a> specified by the <a>incumbent settings object</a>.
+When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |workletGlobalScopeType|
+and |worklet|, it <em>must</em> run the following steps:
 
-        Let |inheritedAPIBaseURL| be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+    1. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
+        customizations:
 
-        Let |inheritedOrigin| be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+        - For the global object, create a new |workletGlobalScopeType| object. Let
+            |workletGlobalScope| be the created object.
 
-    2. Let |settingsObject| be a new environment settings object whose algorithms are defined as follows:
-        : The <a>script execution environments</a>:
-        :: When the <a>environment settings object</a> is created, for each language supported by the user agent, create an appropriate execution environment as defined by the relevant specification.
-        :: When a <a>script execution environment</a> is needed, return the appropriate one from those created when the <a>environment settings object</a> was created.
+        - Let |realmExecutionContext| be the created JavaScript execution context.
 
-        : The <a>global object</a>:
+        - Do not obtain any source texts for scripts or modules.
+
+    2. Let |settingsObject| be the result of <a>set up a worklet environment settings object</a>
+        with |realmExecutionContext|.
+
+    2. Associate the |settingsObject| with |workletGlobalScope|.
+
+    3. For each |script| in the given |worklet|'s <b>worklet's loaded scripts</b> run the |script|
+        in the |workletGlobalScope|.
+
+### Script settings for worklets ### {#script-settings-for-worklets}
+
+When a user agent is to <dfn>set up a worklet environment settings object</dfn>, given a
+|executionContext|, it must run the following steps:
+    1. Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a>
+        specified by the <a>incumbent settings object</a>.
+
+    2. Let |inheritedOrigin| be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+
+    3. Let |inheritedAPIBaseURL| be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+
+    4. Let |workletEventLoop| be a newly created <a>event loop</a>.
+
+    5. Let |workletGlobalScope| be |executionContext|'s <a>global object</a>.
+
+    6. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are
+        defined as follows:
+
+        : The <a>realm execution context</a>
+        :: Return |executionContext|.
+
+        : The <a>global object</a>
         :: Return |workletGlobalScope|.
 
-        : The <a>responsible browsing context</a>:
-        :: Return |inheritedResponsibleBrowsingContext|.
+        : The <a>responsible browsing context</a>
+        :: Return |inheritedResponsibleBrowsingContext|. 
 
-        : The <a>responsible event loop</a>:
-        :: Return |workerEventLoop|.
+        : The <a>responsible event loop</a>
+        :: Return |workletEventLoop|.
 
-        : The <a>responsible document</a>:
-        :: Not applicable (the responsible event loop is not a browsing context event loop).
+        : The <a>responsible document</a>
+        :: Not applicable (the <a>responsible event loop</a> is not a <a>browsing context</a>
+                <a>event loop</a>).
 
-        : The <a>API URL character encoding</a>:
+        : The <a>API URL character encoding</a>
         :: Return UTF-8.
 
-        : The <a>API base URL</a>:
+        : The <a>API base URL</a>
         :: Return |inheritedAPIBaseURL|.
 
-        : The <a>origin</a> and <a>effective script origin</a>:
+        : The <a>origin</a> and <a>effective script origin</a>
         :: Return |inheritedOrigin|.
 
-    3. Associate the |settingsObject| with |workletGlobalScope|.
+        : The <a>creation URL</a>
+        :: Not applicable.
 
-    4. For each |script| in the given |worklet|'s <b>worklet's loaded scripts</b> run the |script| in the |workletGlobalScope|.
+        : The <a>HTTPS state</a>
+        :: Return |workletGlobalScope|'s <a>HTTPS state</a>.
+
+    7. Return |settingsObject|.
+
+Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
 
 Worklet {#worklet-section}
 --------------------------
@@ -251,19 +312,17 @@ Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean
 Processing Model {#processing-model}
 ------------------------------------
 
-The <a>invoke a method on a class inside a {{Worklet}}</a> has two hooks for algorithm steps that may be customized by any callers:
-    - <dfn export>create a worklet global scope</dfn>
+The <a>invoke a method on a class inside a Worklet</a> has two hooks for algorithm steps that may be customized by any callers:
     - <dfn export>lookup a class instance on a worklet global scope</dfn>
 
-When a user agent is to <dfn export>invoke a method on a class inside a {{Worklet}}</dfn> given a |methodPropertyKey|, some |arguments|, 
-it must run the following steps:
+When a user agent is to <dfn export>invoke a method on a class inside a Worklet</dfn> given a
+|methodPropertyKey|, |workletGlobalScopeType|, some |arguments|, it must run the following steps:
 
     1. Let |workletGlobalScope| be a {{WorkletGlobalScope}} from the list of the <b>worklet's {{WorkletGlobalScope}}s</b>.
 
         If none exist or a new {{WorkletGlobalScope}} is required, the user agent <em>must</em> run the following substeps:
-            1. Let |workletGlobalScope| be the result of <a>create a worklet global scope</a>.
-            2. <a>Initialize a {{WorkletGlobalScope}}</a>, given |workletGlobalScope| and |worklet|.
-            3. Add |workletGlobalScope| to the |worklet|'s list of the <b>worklet's {{WorkletGlobalScope}}s</b>.
+            1. Let |workletGlobalScope| be the result of <a>Create a WorkletGlobalScope</a>, given |workletGlobalScopeType| and |worklet|.
+            2. Add |workletGlobalScope| to the |worklet|'s list of the <b>worklet's {{WorkletGlobalScope}}s</b>.
 
     2. Let |classInstance| be the result of <a>lookup a class instance on a worklet global scope</a> given |workletGlobalScope|.
     3. Let |result| be the result of <a>Invoke</a>(O=|classInstance|, P=|methodPropertyKey|, Arguments=|arguments|).
@@ -355,10 +414,8 @@ registerAnArbitaryClass('foo', class FooClass {
 </pre>
 
 When the user agent wants to invoke <b>process</b> on an instance of class with key <b>foo</b> it will:
-    1. Call <a>invoke a method on a class inside a {{Worklet}}</a> given <b>process</b> as the |methodPropertyKey| and some |arguments| with the following options:
-        - To <a>create a worklet global scope</a> the user agent will:
-
-            Return a new {{FakeWorkletGlobalScope}}.
-        - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
-            1. Let |classConstructor| be the result of looking up <b>foo</b> on the |workletGlobalScope|'s map of <b>registered class constructors</b>.
-            2. Return the result of <a>Construct</a>(|classConstructor|).
+    1. Call <a>invoke a method on a class inside a {{Worklet}}</a> given <b>process</b> as the
+        |methodPropertyKey|, FakeWorkletGlobalScope as |workletGlobalScopeType| and some |arguments| with the following options:
+            - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
+                1. Let |classConstructor| be the result of looking up <b>foo</b> on the |workletGlobalScope|'s map of <b>registered class constructors</b>.
+                2. Return the result of <a>Construct</a>(|classConstructor|).
