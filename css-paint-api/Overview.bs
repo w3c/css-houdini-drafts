@@ -258,7 +258,7 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
     10. Set the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| to <a>paint-valid</a>.
 
 Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
-    For example, they should how a "unresponsive script" dialog or similar.
+    For example, they should show a "unresponsive script" dialog or similar.
     In addition user agents should provide tooling within their debugging tools to show authors how expensive their paint classes are.
 
 Note: The contents of the image are not designed to be accessible. Authors should communicate any useful information through the standard accessibility APIs.
