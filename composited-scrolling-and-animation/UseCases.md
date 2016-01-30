@@ -20,6 +20,14 @@ Video sync
 - Video whose time point is determined as a function of the scroll offset.
 - Must be synced perfectly with scrolling, eg. scrolling down one pixel may advance the video by one frame, and that video frame may move everything up one pixel to counter the scroll.  To the user it must appear as if the content didn't move with the scroll.
 
+Drag and Drop / Drawers
+----
+- The ability to tightly tie the position of an element to touch input.
+
+Performant Effect Libraries
+-----
+- Currently, if a library provides an effect that is driven on the main thread, the performance of that effect depends entirely on the performance of the embedding content. It would be valuable to be able to author a library that is more performance isolated and can bill itself as such.
+
 Gesture Recognition
 ----
 - With the ability to process input on the compositor thread, we would have the ability to write custom gesture recognition.
