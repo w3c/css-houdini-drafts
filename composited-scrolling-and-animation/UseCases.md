@@ -27,20 +27,27 @@ Linked scrollers
 - One example [here](http://stackoverflow.com/questions/19786080/how-to-synchronize-scroll-between-two-elements-with-different-height).  [AV club](http://www.avclub.com/review/weeknd-navigates-trippy-perception-and-pop-reality-224412) also appears to do this.
 - Artificial example [here](http://fiddle.jshell.net/kunknown/VVaEq/2/show/)
 
-Drag and Drop / Drawers
-----
+Drag and Drop
+-----
 - The ability to tightly tie the position of an element to touch input.
+- A common effect is to have other content move to make space for the dragged content as it is moved about.
+
+Drawers
+-----
+- Similar to drag and drop, we would like to tie an element to touch input.
+- If a draw animation is initiated, we would also like to be able to catch the drawer before the animation completes.
+- I.e., we want to be able to immediately interrupt a compositor-driven animation based on input.
 
 Performant Effect Libraries
 -----
 - Currently, if a library provides an effect that is driven on the main thread, the performance of that effect depends entirely on the performance of the embedding content. It would be valuable to be able to author a library that is more performance isolated and can bill itself as such.
 
 Gesture Recognition
-----
+-----
 - With the ability to process input on the compositor thread, we would have the ability to write custom gesture recognition.
 
 Location Tracking
-----
+-----
 - It would be nice to keep track of the location of an element with respect to another element (in particular, a scroll clip), to get an asynchronous, as-accurate-as-possible set of records of the element's location history.
  
 
