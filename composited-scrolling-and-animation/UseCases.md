@@ -20,6 +20,13 @@ Video sync
 - Video whose time point is determined as a function of the scroll offset.
 - Must be synced perfectly with scrolling, eg. scrolling down one pixel may advance the video by one frame, and that video frame may move everything up one pixel to counter the scroll.  To the user it must appear as if the content didn't move with the scroll.
 
+Linked scrollers
+-----
+- Multiple elements are to be scrolled together but possibly at different rates
+- Like parallax except not overlapping, use input may occur on any of the linked elements
+- One example [here](http://stackoverflow.com/questions/19786080/how-to-synchronize-scroll-between-two-elements-with-different-height).  [AV club](http://www.avclub.com/review/weeknd-navigates-trippy-perception-and-pop-reality-224412) also appears to do this.
+- Artificial example [here](http://fiddle.jshell.net/kunknown/VVaEq/2/show/)
+
 Drag and Drop / Drawers
 ----
 - The ability to tightly tie the position of an element to touch input.
