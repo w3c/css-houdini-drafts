@@ -211,8 +211,6 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
 
     7. Let <var>geometry</var> be a new {{Geometry}} initialized to the width and height of the |fragment|.
 
-        Issue(w3c/css-houdini-drafts#23): Decide geometry information should be in level 1.
-
     8. To produce the image output, <a>invoke a method on a class inside a Worklet</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
         - To <a>create a worklet global scope</a> the user agent will:
 
