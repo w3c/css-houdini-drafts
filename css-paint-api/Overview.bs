@@ -72,7 +72,6 @@ callback VoidFunction = void ();
 
 partial interface RenderWorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
-    void unregisterPaint(DOMString name);
 };
 </pre>
 
@@ -111,10 +110,6 @@ Note: In a future version of the spec, the author may be able to set an option t
     There are complexities in setting up a WebGL rendering context to take the {{Geometry}} and {{StylePropertyMap}} as inputs.
 
 Issue(w3c/css-houdini-drafts#31): Allow author to specify the intrinsic size.
-
-When the <dfn method for=RenderWorkletGlobalScope>unregisterPaint(<var>name</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
-    1. Remove the key-value pair associated with the |name| key in the <b>paint name to input properties map</b> of the associated <a>document</a>.
-    2. Remove the key-value pair associated with the |name| key in the <b>name to paint instance map</b> of the {{RenderWorkletGlobalScope}}.
 
 Paint Notation {#paint-notation}
 ================================
@@ -179,7 +174,7 @@ the <a>scratch bitmap</a> such that the user agent can subsequently draw onto a 
 correct resolution. This also allows user agents to re-use the same output of the <a>scratch
 bitmap</a> repeatably while the visual viewport is being zoomed for example.
 
-When the user agent is to <dfn>create a {{PaintRenderingContext2D}} object</dfn> for a given
+When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given
 |width|, |height| and |overflowOffset| it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
     2. <a>Set bitmap dimensions</a> for the context's <a>scratch bitmap</a> to |width| and |height|.
@@ -227,7 +222,7 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
         Note: User agents may have to compute overflow before entering their paint phase in order to determine which fragments to paint (overflow changes what could be seen on the output device).
             User agents may opt into running the steps up to this point, to determine overflow, then continuing later to determine the drawn image for the fragments which need painting.
 
-    7. Let <var>renderingContext</var> be the result of <a>create a {{PaintRenderingContext2D}} object</a> given:
+    7. Let <var>renderingContext</var> be the result of <a>create a PaintRenderingContext2D object</a> given:
         - "overflowOffset" - The logical offset for the <a>scratch bitmap</a> specified by |overflow|.
         - "width" - The width of the |fragment| plus the additional width specified by |overflow|.
         - "height" - The height of the |fragment| plus the additional height specified by |overflow|.
