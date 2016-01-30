@@ -10,6 +10,8 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
 <pre class="anchors">
+urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
+    text: inherit
 urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
     text: effective script origin
     url: #origin-2; text: origin
@@ -150,10 +152,12 @@ WorkletGlobalScope</a> algorithm.
 
 ### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
-When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |workletGlobalScopeType|
-and |worklet|, it <em>must</em> run the following steps:
+When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |worklet|, it
+<em>must</em> run the following steps:
 
-    1. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
+    1. Let |workletGlobalScopeType| be the |worklet|'s <b>worklet global scope type</b>.
+
+    2. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
         customizations:
 
         - For the global object, create a new |workletGlobalScopeType| object. Let
@@ -163,18 +167,19 @@ and |worklet|, it <em>must</em> run the following steps:
 
         - Do not obtain any source texts for scripts or modules.
 
-    2. Let |settingsObject| be the result of <a>set up a worklet environment settings object</a>
+    3. Let |settingsObject| be the result of <a>set up a worklet environment settings object</a>
         with |realmExecutionContext|.
 
-    2. Associate the |settingsObject| with |workletGlobalScope|.
+    4. Associate the |settingsObject| with |workletGlobalScope|.
 
-    3. For each |resolvedModuleURL| in the given |worklet|'s <b>worklet's resolved module URLs</b>,
+    5. For each |resolvedModuleURL| in the given |worklet|'s <b>worklet's resolved module URLs</b>,
         run the following substeps:
         1. Let |script| be the result of <a>fetch a module script tree</a> given
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
             |settingsObject|.
 
-        Issue: Decide if "use-credientials" should be valid for worklets.
+        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
+            fetching resources.
 
         2. <a>Run a module script</a> given |script|.
 
@@ -244,6 +249,11 @@ interface Worklet {
 };
 </pre>
 
+A {{Worklet}} has a <b>worklet global scope type</b>. This is used for creating new
+{{WorkletGlobalScope}} and the type must <a>inherit</a> from {{WorkletGlobalScope}}.
+
+Note: As an example the <b>worklet global scope type</b> might be a {{PaintWorkletGlobalScope}}.
+
 A {{Worklet}} has a list of the <b>worklet's WorkletGlobalScopes</b>. Initially this list is empty;
 it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
@@ -265,7 +275,11 @@ the user agent <em>must</em> run the following steps:
 
     4. Add |resolvedModuleURL| to the list of <b>worklet's resolved module URLs</b>.
 
-    5. For each {{WorkletGlobalScope}} in the <b>worklet's WorkletGlobalScopes</b>, run these
+    5. Ensure that there is at least one {{WorkletGlobalScope}} in the <b>worklet's
+        WorkletGlobalScopes</b>. If not <a>create a WorkletGlobalScope</a> given the current
+        {{Worklet}}.
+
+    6. For each {{WorkletGlobalScope}} in the <b>worklet's WorkletGlobalScopes</b>, run these
         substeps:
         1. Let |settings| be the {{WorkletGlobalScope}}'s associated
             <a>environment settings object</a>.
@@ -273,11 +287,12 @@ the user agent <em>must</em> run the following steps:
         2. Let |script| be the result of <a>fetch a module script tree</a> given
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and |settings|.
 
-        Issue: Decide if "use-credientials" should be valid for worklets.
+        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
+            fetching resources.
 
         3. <a>Run a module script</a> given |script|.
 
-    6. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and
+    7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and
             loaded into the global scopes), resolve |promise|
             <br>Otherwise, reject |promise|.
 
@@ -305,26 +320,6 @@ Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean
 
 Processing Model {#processing-model}
 ------------------------------------
-
-Issue: Split this up.
-
-The <a>invoke a method on a class inside a Worklet</a> has two hooks for algorithm steps that may be customized by any callers:
-    - <dfn export>lookup a class instance on a worklet global scope</dfn>
-
-When a user agent is to <dfn export>invoke a method on a class inside a Worklet</dfn> given a
-|methodPropertyKey|, |workletGlobalScopeType|, some |arguments|, it must run the following steps:
-
-    1. Let |workletGlobalScope| be a {{WorkletGlobalScope}} from the list of the <b>worklet's {{WorkletGlobalScope}}s</b>.
-
-        If none exist or a new {{WorkletGlobalScope}} is required, the user agent <em>must</em> run the following substeps:
-            1. Let |workletGlobalScope| be the result of <a>Create a WorkletGlobalScope</a>, given |workletGlobalScopeType| and |worklet|.
-            2. Add |workletGlobalScope| to the |worklet|'s list of the <b>worklet's {{WorkletGlobalScope}}s</b>.
-
-    2. Let |classInstance| be the result of <a>lookup a class instance on a worklet global scope</a> given |workletGlobalScope|.
-    3. Let |result| be the result of <a>Invoke</a>(O=|classInstance|, P=|methodPropertyKey|, Arguments=|arguments|).
-    4. Return |result|.
-
-Note: It is up to the user agent to select a appropriate {{WorkletGlobalScope}} to invoke the method in.
 
 Examples {#examples}
 ====================
@@ -390,9 +385,4 @@ registerAnArbitaryClass('foo', class FooClass {
 });
 </pre>
 
-When the user agent wants to invoke <b>process</b> on an instance of class with key <b>foo</b> it will:
-    1. Call <a>invoke a method on a class inside a Worklet</a> given <b>process</b> as the
-        |methodPropertyKey|, FakeWorkletGlobalScope as |workletGlobalScopeType| and some |arguments| with the following options:
-            - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
-                1. Let |classConstructor| be the result of looking up <b>foo</b> on the |workletGlobalScope|'s map of <b>registered class constructors</b>.
-                2. Return the result of <a>Construct</a>(|classConstructor|).
+Issue: Add example prose for invoking "process".

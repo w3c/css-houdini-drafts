@@ -70,6 +70,8 @@ Paint Worklet {#paint-worklet}
 The {{paintWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
 which are related to painting.
 
+The {{paintWorklet}}'s <b>worklet global scope type</b> is {{PaintWorkletGlobalScope}}.
+
 <pre class='idl'>
 partial interface Window {
     [SameObject] readonly attribute Worklet paintWorklet;
@@ -223,21 +225,26 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
 
     7. Let <var>geometry</var> be a new {{Geometry}} initialized to the width and height of the |fragment|.
 
-    8. To produce the image output, <a>invoke a method on a class inside a Worklet</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
-        - To <a>create a worklet global scope</a> the user agent will:
+    8. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <b>worklet's
+        WorkletGlobalScopes</b> from the paint {{Worklet}}.
 
-            Return a new {{PaintWorkletGlobalScope}}.
-        - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the paint
+        {{Worklet}} and use that.
 
-            Return the result of looking up |name| on the |workletGlobalScope|'s <b>name to paint instance map</b>.
+        Note: The user agent <em>may</em> use any policy for which {{PaintWorkletGlobalScope}} to
+            select or create.
+
+    9. Let |classInstance| be the result of performing a lookup in <b>name to paint instance map</b>
+        with |name| as the key.
+
+    10. Perform <a>Invoke</a>(O=|classInstance|, P="paint", Arguments=[|renderingContext|,
+            |geometry|, |styleMap|).
+
+    11. The image output should be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the resulting image output will be an <a>invalid image</a>.
 
-        Otherwise the image output should be produced from the |renderingContext| given to the paint method.
-
-        Note: User agents should provide tooling within their debugging tools to show authors a partial output of the image, if an exception is thrown.
-
-    9. Set the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| to <a>paint-valid</a>.
+    12. Set the <b>paint valid flag</b> for the <<paint()>> function on the |fragment| to <a>paint-valid</a>.
 
 Note: The user agent should consider long running paint functions similar to long running script in the main execution context.
     For example, they should show a "unresponsive script" dialog or similar.
