@@ -147,8 +147,8 @@ PaintRenderingContext2D implements CanvasPath;
 </pre>
 
 Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderingContext2D}} API.
-    Specifically it doesn't implement the {{CanvasHitRegion}}, {{CanvasImageData}} or
-    {{CanvasUserInterface}} APIs.
+    Specifically it doesn't implement the {{CanvasHitRegion}}, {{CanvasImageData}},
+    {{CanvasUserInterface}}, {{CanvasText}} or {{CanvasTextDrawingStyles}} APIs.
 
 A {{PaintRenderingContext2D}} object has a <a>scratch bitmap</a>. This is initialised when the
 object is created. The size of the <a>scratch bitmap</a> is the size of the fragment it is
