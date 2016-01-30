@@ -5,6 +5,8 @@ Font Metrics API
 
 Box tree/view object stuff will be great as an underpinning for custom layout, particularly when it's extended to cover line boxes. But the proposals discussed so far lack some information that's needed for layout that depends on font metrics. It's not sufficient to know where the line box is being laid out. You also need to know where the glyphs inside that line box are being drawn.
 
+There are also some parts of layout that are typographically-intensive, like line breaking. Allowing script to substitute its own line breaking would be an excellent extensibility point that's often asked for.
+
 # Examples:
 
 The align-items:baseline feature in flex layout
@@ -19,7 +21,10 @@ Baseline grid
 Math layout
 * needs much much more than the above, including individual glyph advances and bounds.
 
-# Font data versus layout results
+Line breaking
+* needs access to font data, all of the style inputs for text, and layout information (available line lengths, intrusions like floats, etc.)
+
+# Font data versus typographic measurement
 
 I (Alan) initially thought that exposing the actual font data could be a good first step, but conversations I've had have convinced me that there's a better stepping-stone to use. Given raw font metrics, one has to reverse-engineer how the browser will use those metrics in order to determine where baselines, etc. will actually be drawn. Direct access to all of the font information was not sufficient for dropcap.js, because browsers use the font information in slightly different ways - we still had to sample the rendered text in each browser to determine where glyphs were placed.
 
