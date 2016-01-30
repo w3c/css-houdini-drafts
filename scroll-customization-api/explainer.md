@@ -1,4 +1,4 @@
-# Scroll customization explained
+# Scroll customization
 
 Many native mobile applications have [UI effects that interact with scrolling](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md), for example snapping the scroll position to image boundaries in an image carousell.  To do this web developers must [resort](http://cubiq.org/iscroll-5) to re-implementing all of scrolling on top of raw input events. There are four major drawbacks with such an approach:
 - Threaded scrolling is disabled, so any main thread work >16ms will lead to dropped frames.
@@ -10,14 +10,36 @@ The fundamental problem here is that scrolling on the web is a big "magical" bla
 
 ## Threaded scrolling
 
-Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  This proposal builds on [Compositor Worker](https://github.com/ianvollick/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.  In the future we may also want high performance applications to be able to opt-out of threaded scrolling and also use a variant of these APIs from the main JavaScript execution context.
+Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  This proposal builds on [Compositor Worker](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.  In the future we may also want high performance applications to be able to opt-out of threaded scrolling and also use a variant of these APIs from the main JavaScript execution context.
 
-## ScrollIntent - a primitive abstraction
+## ScrollIntent
 
-In order to explain scrolling, we need to introduce an abstraction that sits above raw input (eg. `wheel` and `touchmove` events) but below the effect that scrolling has (changing `scrollTop` and generation of `scroll` events).  `ScrollIntent` represents the user's desire to scroll by a specific number of pixels (as well as additional details about the scroll).  
+In order to explain scrolling, we need to introduce an abstraction that sits above raw input (eg. `wheel` and `touchmove` events) but below the effect that scrolling has (changing `scrollTop` and generation of `scroll` events).  `ScrollIntent` represents the user's desire to scroll by a specific number of pixels (as well as additional details about the scroll such has the phase and velocity).  A `Element` has a new method called `applyScroll` which takes a `ScrollIntent` and applies it, which by default just means updating `scrollTop` and `scrollLeft`.
 
-TODO: Picture showing touch/wheel/keyboard input -> scroll intent -> tagetting logic -> Element::applyScrollIntent -> set scrollTop
+![ScrollIntent](ScrollIntent.png?raw=true)
 
-## Examples
+## Customizing `applyScroll`
+
+The default `applyScroll` behavior can be overridden to do something competely different whenever the user attempts to scroll the element.  For example, to support rotating a 3d carousell using all the native scroll physics and composition, you might use code like this (hypothetical syntax):
+
+Main Thread
+```JavaScript
+var carousel_proxy = new CompositorProxy(carousel, [transform]);
+var worker = new CompositorWorker('carousel.js');
+worker.postMessage(carousel_proxy);
+```
+
+On the CompositorWorker
+```JavaScript
+onmessage = function(e) {
+  var carousel = e.data;
+  carousel.applyScroll = function(scrollIntent) {
+      this.transform.rotateX += scrollIntent.deltaX;
+      scrollIntent.consumeDelta(scrollIntent.deltaX, 0);
+  };
+};
+```
+
+## More examples
 
 TODO
