@@ -173,7 +173,13 @@ onmessage = function(e) {
 
 ### Are we marrying ourselves to implementation details?
 
-Virtually all user agents support (via CSS) accelerated opacity and transform animations, and they’re going to have to support them for the foreseeable future. Threaded scrolling is also increasingly common. By whatever means browsers are currently able to guarantee that things can slide around, scroll and fade in and out efficiently and asynchronously with respect to the main thread, they will continue to do so in the future. That is, we're not tying ourselves to properties that may cease to be possible to update asynchronously, nor are we tying ourselves to the machinery that makes this asynchronous updating possible. It doesn’t, for example, tie us to the idea of a composited layer or a layer tree, concepts that may not be meaningful in all browser implementations. The animated elements might, say, be redrawn by the GPU each frame. But this doesn’t matter. These implementation details are orthogonal to the animation proxy concept.
+In particular, two worries are
+ 1 The subset of layout-free properties we expose to a CompositorWorker won't be valid in the future.
+ 1 We expose browser internals in such a way that it constrains future development.
+ 
+To the first point, virtually all user agents support accelerated opacity and transform animations, as well as threaded scrolling. Since the web relies on the performance characteristics of these properties, it's very unlikely that they will become slow. So the real concern is the ability to add new properties. As long as we choose an extensible API shape that permits simple feature detection, adding support for more properties in the future will be possible.
+
+To the second point, we need not mention browser internals to permit asynchronous updates of layout-free properties. The examples above don’t, for example, tie us to the idea of a composited layer or a layer tree, concepts that may not be meaningful in all browser implementations. The animated elements might, say, be redrawn by the GPU each frame or processed in software. But this doesn’t matter. These implementation details are orthogonal to the CompositorWorker concept.
 
 ### What happens when script runs long?
 
