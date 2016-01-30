@@ -3,11 +3,14 @@ The [Composited Scrolling](https://github.com/w3c/css-houdini-drafts/blob/master
 
 Hidey bars
 ----
-- typically have a different effect depending on the direction of scroll, and depending on whether they are attached to the top or bottom of their scroll area
-- e.g. scrolling down the bar moves with the container, and disappears outside the bounds
+- Similar to a [Scroll header](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/UseCases.md#scroll-header) 
+- Typically have a different effect depending on the direction of scroll, and depending on whether they are attached to the top or bottom of their scroll area
+ - e.g. scrolling down the bar moves with the container, and disappears outside the bounds
 - scrolling up, the bar animates in with a timed animation. It's position is relative to its container at this point.
 - When a scroll operation ends (eg. fingers lifted from touchpad), may animate to either fully shown or fully hidden
 - Advanced: content may “hide” into a smaller version of itself, that is sticky positioned (e.g. iPhone Safari URL bar)
+- Examples:
+ - Top controls in mobile browsers like Chrome for Android and Mobile Safari
 
 Rubber banding
 ----
@@ -15,7 +18,13 @@ Rubber banding
 - after that point, scroll output is a fraction of the input (input * factor -> output)
 - upon release, animate back to limit
 - also should work with a momentum deceleration (if the user has flicked far enough to hit the limits)
-Rubber banding
+
+Snap points
+----
+- Scrolling as normal during the normal scroll phase
+- But when the scroll ends (eg. after finger lift), animates to a well-defined boundary 
+- Example
+ - [CSS Snap points](https://drafts.csswg.org/css-snappoints/), and earlier [IE/Edge implementation](https://msdn.microsoft.com/en-us/library/windows/apps/hh466031.aspx)
 
 Pull to refresh
 ----
@@ -49,13 +58,6 @@ Re-targeting scrolling
 -----
 - A scroll occurring over one point in the document is redirected to cause scrolling somewhere else.
 - Eg. GMail does this in conversation view - scroll on the right hand side (which isn't itself scrollable) and they scroll the conversation.  They do this by listening for wheel events, but this doesn't work for touch.
- 
-Linked scrollers
------
-- Multiple elements are to be scrolled together but possibly at different rates
-- Like parallax except not overlapping, use input may occur on any of the linked elements
-- One example [here](http://stackoverflow.com/questions/19786080/how-to-synchronize-scroll-between-two-elements-with-different-height).  [AV club](http://www.avclub.com/review/weeknd-navigates-trippy-perception-and-pop-reality-224412) also appears to do this.
-- Artificial example [here](http://fiddle.jshell.net/kunknown/VVaEq/2/show/)
  
 Disable scroll chaining
 -----
