@@ -46,14 +46,10 @@ can only impact document layout or paint by being re-incorporated into the value
 of other properties via a var() reference.
 
 This specification extends [[css-variables]], allowing the registration of properties
-that have a value type, an initial value, and a defined inheritance behaviour. This
-specification also provides an additional javascript-mediated means via which custom
-properties can modify the computed value of native properties.
+that have a value type, an initial value, and a defined inheritance behaviour.
 
 This specification is complementary to [[css-paint-api]] and [[css-layout-api]], which
 allow custom properties to directly impact paint and layout behaviours respectively.
-Accordingly, it is recommended not to use the computed value modification facilities of this
-specification directly for layout, but only to impact cascading in a non-native manner.
 
 Registering custom properties {#registering-custom-properties}
 ==============================================================
