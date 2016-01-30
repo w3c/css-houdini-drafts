@@ -20,7 +20,6 @@ Ignored Terms: construct, name map of inputs
 Ignored Vars: arguments, methodPropertyKey, inputStyleMap, workletGlobalScope
 Ignored Terms: WorkletGlobalContext
 Repository: w3c/css-houdini-drafts
-At Risk: the apply hook (<a section href="#the-apply-hook"></a>)
 </pre>
 
 <pre class='biblio'>
@@ -55,11 +54,6 @@ This specification is complementary to [[css-paint-api]] and [[css-layout-api]],
 allow custom properties to directly impact paint and layout behaviours respectively.
 Accordingly, it is recommended not to use the computed value modification facilities of this
 specification directly for layout, but only to impact cascading in a non-native manner.
-
-[[css-variables]] defines a new <<var()>> function that can be used to
-insert the values of custom properties into other CSS property values. Where
-possible, this mechanism should be preferred above the computed value modification
-facilities of this specification.
 
 Registering custom properties {#registering-custom-properties}
 ==============================================================
@@ -147,11 +141,42 @@ If this function is called with a name that doesn't match an existing property
 then a {{NotFoundError}} is thrown.
 
 Successful calls to both {{registerProperty()}} and {{unregisterProperty()}}
-trigger a reparse of the specified value of the newly registered or unregistered
-property, followed by an invalidation of the computed style of all {{document}}s
-created on the in-scope {{Window}}.
+change the set of registered properties. When the set of registered properties
+changes, previously syntactically invalid property values can become valid and vice versa.
+This can change the set of <a>declared values</a> which requires the <a>cascade</a> to
+be recomputed.
 
-Issue(63): Phrasing? How do I write this correctly?
+<div class='example'>
+By default, all custom property declarations that can be parsed as a sequence of tokens
+are valid. Hence, the result of this stylesheet:
+
+<pre class='lang-css'>
+.thing {
+  --my-color: green;
+  --my-color: url("not-a-color"); 
+  color: var(--my-color);
+}
+</pre>
+
+is to set the color property of elements of class "thing" to "inherit".
+The second --my-color declaration overrides the first at parse time (both are valid),
+and the var reference in the color property is found to be invalid at computation time
+(because <code>url("not-a-color")</code> is not a color). At computation time the only
+available fallback is the default value, which in the case of color is "inherit".
+
+if we call:
+
+<pre class='lang-javascript'>
+registerProperty({
+name: "--my-color",
+syntax: "&lt;color>"
+});
+</pre>
+
+then the second --my-color declaration becomes syntactically invalid, which means that
+the cascade uses the first declaration. The color therefore switches to green.
+
+</div>
 
 Supported syntax strings {#supported-syntax-strings}
 ----------------------------------------------------
@@ -167,13 +192,28 @@ The following syntax strings are supported:
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
     expression combining <<length>> and <<percentage>> components.
+:   "&lt;color>"
+::  Any valid <<color>> value
+:   "&lt;image>"
+::  Any valid <<image>> value
+:   "&lt;url>"
+::  Any valid <<url>> value
+:   "&lt;integer>"
+::  Any valid <<integer>> value
+:   "&lt;angle>"
+::  Any valid <<angle>> value
+:   "&lt;time>"
+::  Any valid <<time>> value
+:   "&lt;resolution>"
+::  Any valid <<resolution>> value
+:   "&lt;transform-function>"
+::  Any valie <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
 ::  That string
-:   "&lt;'[property-name]'>", Where [property-name] is any existing CSS property
-    name or any string that matches the <<custom-property-name>> production.
-::  Any value that parses as a value of the specified property.
+:   Any one of the preceding strings, followed by '+'
+::  A list of values of the type specified by the string
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
 :   "*"
@@ -207,9 +247,9 @@ For example, the following are all valid syntax strings.
     and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the string "big", or the string "bigger", or the string "BIGGER".
-:   <code>"&lt;'background-color'>"</code>
-::  accepts any value that would be accepted by the 'background-color' property
     (e.g. "#F00", "red", "rgba(10, 10, 10, 0.5)", etc.)
+:   <code>"&lt;length>+</code>
+::  accepts a list of length values.
 
 </div>
 
@@ -224,7 +264,8 @@ described in [[!css3-values]] and [[!css-cascade-4]] respectively. Otherwise:
 
 For &lt;length> values, the computed value is the absolute length expressed in pixels.
 
-For &lt;custom-ident>, string or "*" values, the
+For &lt;custom-ident>, string, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
+&lt;angle>, &lt;time>, &lt;resolution>, &lt;transform-function> or "*" values, the
 computed value is identical to the specified value.
 
 For &lt;number> and &lt;percentage> values which are not calc expressions, the
@@ -232,196 +273,12 @@ computed value is identical to the specified value. Calc expressions that are
 &lt;number> and &lt;percentage> values get reduced during computation to simple
 numbers and percentages respectively.
 
-For values with a syntax that references a CSS property, the computed value
-is defined by that property.
-
 For values specified by a syntax string that include "|" clauses, the computed
 value is given by applying the calculation rules for the first clause that
 matches to the specified value.
 
-The apply hook {#the-apply-hook}
-================================
-
-<pre class='idl'>
-
-interface ElementProxy {
-  readonly attribute StylePropertyMapReadOnly inputStyle;
-  readonly attribute StylePropertyMap outputStyle;
-  readonly attribute DOMString? pseudo;
-};
-
-dictionary ApplyDescriptor {
-  sequence&lt;DOMString&gt; inputProperties;
-  sequence&lt;DOMString&gt; outputProperties;
-};
-
-callback VoidFunction = void ();
-
-interface StyleWorklet : WorkletGlobalContext {
-  void registerApplyHook(DOMString name, VoidFunction applyCtor, ApplyDescriptor config);
-  void unregisterApplyHook(DOMString name);
-};
-</pre>
-
-<div class='note'>
-The applyCtor is a JavaScript class with the following interface:
-
-<pre class='idl'>
-callback interface ApplyClass {
-  void apply(ElementProxy element);
-};
-</pre>
-</div>
-
-The {{ElementProxy}} interface {#the-elementproxy-interface}
-------------------------------------------------------------
-
-{{ElementProxy}} objects represent the partial state of DOM objects that are
-available to apply hooks running in <a>worklet global scope</a>s. They provide
-the following attributes:
-
-:   inputStyle
-::  The set of styles that the apply hook has registered a dependency on.
-:   outputStyle
-::  The final result of running this apply hook.
-:   pseudo
-::  The pseudo name of the PseudoElement that this ElementProxy proxies, or
-    null if this ElementProxy proxies an Element.
-
-Issue(73): Do we need the pseudo attribute on ElementProxy for level 1?
-
-Issue(74): Come up with a better name than ElementProxy. This is more of a computation context.
-
-The {{ApplyDescriptor}} dictionary {#the-applydescriptor-dictionary}
---------------------------------------------------------------------
-
-:   <dfn dict-member for=ApplyDescriptor>inputProperties</dfn>
-::  The apply function is only called for elements or
-    pseudoelements on which the listed properties all have non-initial values.
-
-Issue(4): It should it be possible to access properties on the parent.
-
-Issue(2): Should this be available only if explicitly requested in inputProperties?
-
-:   <dfn dict-member for=ApplyDescriptor>outputProperties</dfn>
-::  This value defines the properties for which the apply function can modify the used
-    value.
-
-Apply classes {#apply-class-objects}
-------------------------------------
-
-<dfn>Apply classes</dfn> provide apply hook behavior. Each <a>apply class</a>
-must provide an apply function that will be invoked when apply hooks are
-being processed.
-
-The {{StyleWorklet}} interface {#the-styleworklet-interface}
-------------------------------------------------------------
-
-<dfn interface>StyleWorklet</dfn> objects provide the context within which apply hooks
-are invoked. Each {{StyleWorklet}} contains a <dfn>name map of apply hooks</dfn>,
-a <dfn>name map of inputs</dfn>, a <dfn>name map of outputs</dfn>,
-and a <dfn>list of affected output properties</dfn>, all of which are
-initially empty.
-
-The {{registerApplyHook()}} function {#the-registerapplyhook-function}
-----------------------------------------------------------------------
-
-The <dfn method for=StyleWorklet>registerApplyHook(DOMString name, VoidFunction applyCtor, ApplyDescriptor config)</dfn>
- function registers a new apply hook for processing computed style.
-
-When {{registerApplyHook(name, applyCtor, config)}} is called, the user agent must run the following steps:
-
-1.  If |name| is not a valid <<ident>>, <a>throw</a> a {{NotSupportedError}} and abort
-    these steps.
-
-1.  If |name| is a key in the <a>name map of apply hooks</a>, <a>throw</a> a
-    {{NotSupportedError}} and abort these steps.
-
-1.  Let <var>outputProperties</var> be the value of |config|'s
-    {{ApplyDescriptor/outputProperties}}.
-
-1.  If the |outputProperties| contains a property
-    that is in the <a>list of affected output properties</a>, <a>throw</a> a
-    {{NotSupportedError}} and abort these steps.
-
-    Issue(49): This is too inflexible. There’s a strong use case around writing to the
-    same native property for different elements. Maybe throw exception to
-    window.onError in this case?
-
-1.  If the result of <a>IsConstructor</a>(argument=|applyCtor|) is false,
-    <a>throw</a> a {{NotSupportedError}} and abort these steps.
-
-1.  Let <var>prototype</var> be the result of <a>Get</a>(O=|applyCtor|, P="prototype").
-
-1.  If the result of <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="apply"))
-    is false, <a>throw</a> a {{NotSupportedError}} and abort these steps.
-
-1.  Let <var>applyInstance</var> be the result of <a>Construct</a>(|applyCtor|).
-
-1.  Add the key-value pair (|name| - |applyInstance|) to the
-    <a>name map of apply hooks</a> of the {{StyleWorklet}}.
-
-1.  Add each property in |outputProperties| to
-    the <a>list of affected output properties</a> of the {{StyleWorklet}}.
-
-1.  Add the key-value pair (|name| - |outputProperties|) to the
-    <a>name map of outputs</a> of the {{StyleWorklet}}.
-
-1.  Let <var>inputProperties</var> be the value of |config|'s
-    {{ApplyDescriptor/inputProperties}}.
-
-1.  Add the key-value pair (|name| - |inputProperties|) to the
-    <a>name map of inputs</a> of the {{StyleWorklet}}.
-
-Issue: This is one instance per apply hook. Do we want one instance per invocation?
-
-Invoking apply hooks {#invoking-apply-hooks}
---------------------------------------------
-
-Each time style is recomputed for an Element, each registered ApplyDescriptor/applyHook
-for which any of the matching {{ApplyDescriptor/inputProperties}} changes as a result of
-that recomputation is invoked. This invocation happens after any transitions or animations
-registered on the Element have finished applying, in the context of a {{StyleWorklet}}.
-
-Note: apply hooks are called after transitions/animations so that custom properties
-      can be transitioned and still have their effect apply correctly.
-
-Implementations may memoize the result of apply callbacks relative to the
-complete set of inputs provided to apply (that is, the set of attributes on
-{{ElementProxy}}).
-
-This invocation takes place by following these steps for each key <var>name</var>
-in the <a>name map of apply hooks</a>:
-
-1.  Let <var>inputs</var> be the result of looking up <var>name</var> on the
-    {{StyleWorklet}}'s <a>name map of inputs</a>.
-
-1.  Let <var>inputStyleMap</var> be a new {{StylePropertyMapReadOnly}} populated
-    with only the <a>computed value</a>s for properties listed in |inputs|.
-
-1.  Let <var>proxy</var> be a new {{ElementProxy}}.
-
-    Issue: Need to fill out the ElementProxy.
-
-1.  <a>invoke a method on a class inside a Worklet</a> given "apply" as the
-    <var>methodPropertyKey</var> and [|proxy|] as the <var>arguments</var> with
-    the following options:
-
-    *   To <a>create a worklet global scope</a> the user agent will return a new
-        {{StyleWorklet}}
-    *   To <a>lookup a class instance on a worklet global scope</a> given a
-        <var>workletGlobalScope</var> the user agent will return the result of
-        looking up <var>name</var> on the <var>workletGlobalScope</var>'s
-        <a>name map of apply hooks</a>.
-
-    If an exception is thrown then abort these steps.
-
-Issue: Need to deal with the output.
-
-Note: Apply hooks run in parallel on a given Element. The output of an apply
-hook is never used as input to another apply hook on the same Element - instead,
-a snapshot of style state is taken, all apply hooks are run with subsets of the
-same input snapshot, then the resulting output is written into the used style.
+For list values, the computed value is a list of the computed values of the
+primitives in the list.
 
 Examples {#examples}
 ====================
@@ -431,63 +288,26 @@ Example 1: Polyfill scale, translate, rotate {#example-1}
 
 <pre class='lang-markup'>
 &lt;script&gt;
-["--scale-x", "--scale-y"].forEach(function(name) {
 document.registerProperty({
-    name: name,
-    syntax: "&lt;number&gt;",
-    inherits: false,
-    initialValue: "1"
-  });
-});
-
-["--translate-x", "--translate-y"].forEach(function(name) {
-  document.registerProperty({
-    name: name,
-    syntax: "&lt;length&gt;",
-    inherits: false,
-    initialValue: "0px"
-  });
-});
-
-document.registerProperty({
-  name: "--rotate",
-  syntax: "&lt;angle&gt;",
+  name: "--stop-color",
+  syntax: "&lt;color&gt;",
   inherits: false,
-  initialValue: "0deg"
+  initialValue: "rgba(0,0,0,0)"
 });
 &lt;/script&gt;
+
 &lt;style&gt;
 
-#myElement {
-    --translate-x: 5px;
-    --translate-y: 10px;
-    --rotate: 10deg;
-    --scale-x: 25;
-    --scale-y: 25;
+.button {
+  --stop-color: red;
+  background: linear-gradient(var(--stop-color), black);
+  transition: --stop-color 1s;
 }
 
-.foobar {
-    --rotate: 20deg;
+.button:hover {
+  --stop-color: green;
 }
+
 &lt;/style&gt;
 
-&lt;script&gt;
-this.registerApplyHook("transform-properties", class {
-    apply(el) {
-      el.outputStyle.set('transform', new TransformValue(
-        [
-          new Translation(el.inputStyle.get('--translate-x'),
-                          el.inputStyle.get('--translate-y')),
-          new Rotation(el.inputStyle.get('--rotate')),
-          new Scale(el.inputStyle.get('--scale-x'),
-                    el.inputStyle.get('--scale-y'))
-        ].concat(el.inputStyle.get('transform'))));
-    }}, {
-      inputProperties: ["--translate-x", "--translate-y",
-                        "--scale-x", "--scale-y",
-                        "--rotate", "transform"],
-      outputProperties: ["transform"]
-    }
-});
-&lt;/script&gt;
 </pre>
