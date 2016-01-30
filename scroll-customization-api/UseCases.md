@@ -1,4 +1,5 @@
 
+The [https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/UseCases.md](Composited Scrolling) use cases include effects that respond to and are synchronized with scroll position.  Below are additional use cases which require more control over exactly how scrolling behaves.
 
 Hidey bars
 ----
@@ -7,15 +8,6 @@ Hidey bars
 - scrolling up, the bar animates in with a timed animation. It's position is relative to its container at this point.
 - When a scroll operation ends (eg. fingers lifted from touchpad), may animate to either fully shown or fully hidden
 - Advanced: content may “hide” into a smaller version of itself, that is sticky positioned (e.g. iPhone Safari URL bar)
-
-Scroll header
-----
-- A header at the top of the document
-- When approaching scrollTop=0 header smoothly animates into a more substantial one. Eg. images, opacity, text size animate with scroll position.
-- May also only be shown when scrolling down (like hidey bars)
-- Examples:
-  - The top bar on [Twitter user pages](https://twitter.com/LEGO_Group)
-  - Polymer's [core-scroll-header-panel](http://polymer.github.io/core-scroll-header-panel/components/core-scroll-header-panel/demos/demo9.html) and [paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html)
 
 Rubber banding
 ----
@@ -46,17 +38,6 @@ This means the effect has a number of inputs and outputs.
 input: the scroll value, the limit of the rubber band
 output: the final scroll position, control over the refresh drawing animation, the ability to move the content by a certain amount, the ability to cancel the effect
 
-Parallax
------
-- the position of elements on the page is related to the scroll position of their container (or maybe another container)
-- not a direct link between scroll offset and position. Rather it is some factor, possibly with damping or a curve.
-- postion is the most common output, but it could also be opacity or a filter effect such as blur (or really any rendering property)
-
-Video sync
------
-- Video whose time point is determined as a function of the scroll offset.
-- Must be synced perfectly with scrolling, eg. scrolling down one pixel may advance the video by one frame, and that video frame may move everything up one pixel to counter the scroll.  To the user it must appear as if the content didn't move with the scroll.
- 
 Custom scrollers
 -----
 - Rather than just translate the content on scroll, do something flashier like a 3D transform
