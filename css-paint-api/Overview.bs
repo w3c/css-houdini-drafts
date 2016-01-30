@@ -141,10 +141,8 @@ PaintRenderingContext2D implements CanvasFillStrokeStyles;
 PaintRenderingContext2D implements CanvasShadowStyles;
 PaintRenderingContext2D implements CanvasRect;
 PaintRenderingContext2D implements CanvasDrawPath;
-PaintRenderingContext2D implements CanvasText;
 PaintRenderingContext2D implements CanvasDrawImage;
 PaintRenderingContext2D implements CanvasPathDrawingStyles;
-PaintRenderingContext2D implements CanvasTextDrawingStyles;
 PaintRenderingContext2D implements CanvasPath;
 </pre>
 
