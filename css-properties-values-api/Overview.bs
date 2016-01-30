@@ -5,7 +5,7 @@ Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 Shortname: css-properties-values-api
 Level: 1
-Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and a default value.
+Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
 Editor: Tab Atkins, jackalmage@gmail.com
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com
