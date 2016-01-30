@@ -19,5 +19,12 @@ Video sync
 -----
 - Video whose time point is determined as a function of the scroll offset.
 - Must be synced perfectly with scrolling, eg. scrolling down one pixel may advance the video by one frame, and that video frame may move everything up one pixel to counter the scroll.  To the user it must appear as if the content didn't move with the scroll.
+
+Gesture Recognition
+----
+- With the ability to process input on the compositor thread, we would have the ability to write custom gesture recognition.
+
+Location Tracking
+- It would be nice to keep track of the location of an element with respect to another element (in particular, a scroll clip), to get an asynchronous, as-accurate-as-possible set of records of the element's location history.
  
 
