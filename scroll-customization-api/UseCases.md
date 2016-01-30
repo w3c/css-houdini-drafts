@@ -9,6 +9,7 @@ Hidey bars
 - scrolling up, the bar animates in with a timed animation. It's position is relative to its container at this point.
 - When a scroll operation ends (eg. fingers lifted from touchpad), may animate to either fully shown or fully hidden
 - Advanced: content may “hide” into a smaller version of itself, that is sticky positioned (e.g. iPhone Safari URL bar)
+- Advanced: may resize the contents after showing / hiding (eg. so that contents scrollbar stops below the header, and elements can be reliably position:fixed to the top of the contents). 
 - Examples:
  - Top controls in mobile browsers like Chrome for Android and Mobile Safari
 
