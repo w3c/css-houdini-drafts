@@ -64,6 +64,8 @@ existing and proposed browser features to be implemented as polyfills.
 
 ## Examples
 
+The following examples are written to an API shape that is likely to change in the future. The goal here is to cleary articulate the concepts, not to propose final syntax.
+
 ### Example 1. Hello, World!
 
 Here we create a trivial, time-based animation.
