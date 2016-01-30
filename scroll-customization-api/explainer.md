@@ -8,9 +8,11 @@ Many native mobile applications have [UI effects that interact with scrolling](h
 
 The fundamental problem here is that scrolling on the web is a big "magical" black-box.  In other UI frameworks scrolling is usually implemented as a library (with extensibility points) on top of primitives.  The goal of the Houdini Scroll Customization proposal is to break open this black box to make scrolling on the web [extensible](https://extensiblewebmanifesto.org/).
 
-## Threaded scrolling
+## Supporting Threaded scrolling
 
-Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  This proposal builds on [Compositor Worker](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.  In the future we may also want high performance applications to be able to opt-out of threaded scrolling and also use a variant of these APIs from the main JavaScript execution context.
+Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  We want to allow arbitrary scroll effects to be written using JavaScript that runs every scroll frame. This proposal builds on [Compositor Worker](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.
+
+In the future we also want high performance applications to be able to opt-out of threaded scrolling and use a variant of these APIs from the main JavaScript execution context.  The details of how to permit such customization without risking poor performance are complex and controversial and so are not yet covered as part of this proposal.  But regardless of the thread in which it's executing, the mental model for scroll customization is the same.
 
 ## ScrollIntent
 
