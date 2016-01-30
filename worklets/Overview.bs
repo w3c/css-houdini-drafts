@@ -326,25 +326,6 @@ When a user agent is to <dfn export>invoke a method on a class inside a Worklet<
 
 Note: It is up to the user agent to select a appropriate {{WorkletGlobalScope}} to invoke the method in.
 
-Rendering Worklet {#rendering-worklet}
---------------------------------------
-
-The {{renderWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
-which are related to rendering.
-
-<pre class='idl'>
-partial interface Window {
-    [SameObject] readonly attribute Worklet renderWorklet;
-};
-</pre>
-
-The {{RenderWorkletGlobalScope}} is the global execution context of the {{renderWorklet}}.
-
-<pre class='idl'>
-interface RenderWorkletGlobalScope : WorkletGlobalScope {
-};
-</pre>
-
 Examples {#examples}
 ====================
 

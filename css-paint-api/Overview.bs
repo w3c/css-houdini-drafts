@@ -64,18 +64,32 @@ When the computed style for an element changes, the user agent must run the foll
 Note: In a future version of the spec, support may be added for partial invalidation.
     The user agent will be able to specify a region of the rendering context which needs to be re-painted by the paint class.
 
-Registering Custom Paint {#registering-custom-paint}
-====================================================
+Paint Worklet {#paint-worklet}
+==============================
+
+The {{paintWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
+which are related to painting.
+
+<pre class='idl'>
+partial interface Window {
+    [SameObject] readonly attribute Worklet paintWorklet;
+};
+</pre>
+
+The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
 
 <pre class='idl'>
 callback VoidFunction = void ();
 
-partial interface RenderWorkletGlobalScope {
+interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
 };
 </pre>
 
-The {{RenderWorkletGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+Registering Custom Paint {#registering-custom-paint}
+====================================================
+
+The {{PaintWorkletGlobalScope}} has a map of <b>name to paint instance map</b>. Initially this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
 <div class='note'>
     Note: This is how the class should look.
@@ -87,7 +101,7 @@ The {{RenderWorkletGlobalScope}} has a map of <b>name to paint instance map</b>.
     </pre>
 </div>
 
-When the <dfn method for=RenderWorkletGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
+When the <dfn method for=PaintWorkletGlobalScope>registerPaint(<var>name</var>, <var>paintCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:
     1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     2. If the |name| exists as a key in the <b>name to paint instance map</b>, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     3. If the result of <a>IsConstructor</a>(argument=|paintCtor|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
@@ -97,7 +111,7 @@ When the <dfn method for=RenderWorkletGlobalScope>registerPaint(<var>name</var>,
     7. If the result of <a>IsArray</a>(argument=|inputProperties|) is false, <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
     8. Add the key-value pair (|name| - |inputProperties|) to the <b>paint name to input properties map</b> of the associated <a>document</a>.
     9. Let <var>paintInstance</var> be the result of <a>Construct</a>(|paintCtor|).
-    10. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{RenderWorkletGlobalScope}}.
+    10. Add the key-value pair (|name| - |paintInstance|) to the <b>name to paint instance map</b> of the {{PaintWorkletGlobalScope}}.
 
 Note: The list of CSS properties provided by the input properties getter can either be custom or native CSS properties.
 
@@ -212,7 +226,7 @@ When the user agent wants to <dfn>draw an image</dfn> of a <<paint()>> for a <va
     8. To produce the image output, <a>invoke a method on a class inside a Worklet</a> given "paint" as the <em>methodPropertyKey</em> and [|renderingContext|, |geometry|, |styleMap|] as the <em>arguments</em> with the following options:
         - To <a>create a worklet global scope</a> the user agent will:
 
-            Return a new {{RenderWorkletGlobalScope}}.
+            Return a new {{PaintWorkletGlobalScope}}.
         - To <a>lookup a class instance on a worklet global scope</a> given a |workletGlobalScope|, the user agent will:
 
             Return the result of looking up |name| on the |workletGlobalScope|'s <b>name to paint instance map</b>.
@@ -247,7 +261,7 @@ Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
 <pre class='lang-javascript'>
-// Inside RenderWorkletGlobalScope.
+// Inside PaintWorkletGlobalScope.
 registerPaint('circle', class {
     static get inputProperties() { return ['--circle-color']; }
     paint(ctx, geom, properties) {
