@@ -40,8 +40,7 @@ and consistent browser implementations to get these new "acclerated" effects.
 ## Goal
 
 Allow new accelerated, input/time-based effects to be authored in script.
-Address
-[this](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md) list of use cases.
+Address at least [this](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/UseCases.md) list of use cases as well as supporting [these scroll customization use cases](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md).
 
 ## High level approach
 
