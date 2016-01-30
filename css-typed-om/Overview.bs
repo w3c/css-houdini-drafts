@@ -40,14 +40,14 @@ Issue: is it possible to amalgamate this API with value objects once they're spe
 
 <pre class='idl'>
 interface StyleValue {
-  attribute DOMString cssString;
+  attribute DOMString cssText;
   static (StyleValue or sequence&lt;StyleValue>)? parse(DOMString property, DOMString cssText);
 };
 </pre>
 
 {{StyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
 
-The <dfn attribute for=StyleValue>cssString</dfn> attribute provides a normalized
+The <dfn attribute for=StyleValue>cssText</dfn> attribute provides a normalized
 representation (see <a section href="#stylevalue-normalization"></a>) of the value
 contained by a {{StyleValue}} object.
 
@@ -229,7 +229,7 @@ keyword for a particular property. Property setters are required to enforce keyw
 ----------------------------------------------
 
 <pre class='idl'>
-[Constructor(double), Constructor(DOMString cssString)]
+[Constructor(double), Constructor(DOMString cssText)]
 interface NumberValue : StyleValue {
   attribute double value;
 };
@@ -303,12 +303,12 @@ interface LengthValue : StyleValue {
   LengthValue subtract(LengthValue value); // can throw
   LengthValue multiply(double value); // can throw
   LengthValue divide(double value); // can throw
-  static LengthValue parse(DOMString cssString);
+  static LengthValue parse(DOMString cssText);
   static LengthValue fromValue(double value, LengthType type);
   static LengthValue fromDictionary(CalcDictionary dictionary);
 };
 
-[Constructor(DOMString cssString),
+[Constructor(DOMString cssText),
  Constructor(LengthValue),
  Constructor(CalcDictionary)
 ]
@@ -332,7 +332,7 @@ interface CalcLength : LengthValue {
 };
 
 // lengths that are *just* keywords don't become SimpleLengths or CalcLengths.
-[Constructor(DOMString cssString),
+[Constructor(DOMString cssText),
  Constructor(LengthValue),
  Constructor(double value, LengthType type)]
 interface SimpleLength : LengthValue {
@@ -364,7 +364,7 @@ interface TransformValue : StyleValue {
 };
 
 interface TransformComponent {
-  readonly attribute DOMString cssString;
+  readonly attribute DOMString cssText;
   boolean is2DComponent();
   Matrix asMatrix();
 };
@@ -500,14 +500,14 @@ from the top edge of the container, expressed as a length.
 
 Note that <<position>> productions accept a complicated combination of keywords
 and values. When specified as such in a stylesheet or via the untyped CSSOM,
-the <a attribute for=StyleValue>cssString</a> attribute will contain the specified
+the <a attribute for=StyleValue>cssText</a> attribute will contain the specified
 string. However, this string is normalized as two Lengths into the <a attribute
 for=PositionValue>x</a> and <a attribute for=PositionValue>y</a> values of the
 {{StyleValue}} object.
 
 New {{PositionValue}} objects can only be constructed via pairs of lengths, and
 will only return the direct serialization of these lengths in the
-<a attribute for=StyleValue>cssString</a> attribute.
+<a attribute for=StyleValue>cssText</a> attribute.
 
 <div class='example'>
 
@@ -523,7 +523,7 @@ Will produce the following behavior:
 
 <pre class='lang-javascript'>
 // "center bottom 10px"
-document.querySelector('.example').styleMap.get('background-position').cssString;
+document.querySelector('.example').styleMap.get('background-position').cssText;
 
 // 50% - as a SimpleLength
 document.querySelector('.example').styleMap.get('background-position').x;
