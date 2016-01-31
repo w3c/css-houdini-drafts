@@ -42,10 +42,6 @@ Performant Effect Libraries
 -----
 - Currently, if a library provides an effect that is driven on the main thread, the performance of that effect depends entirely on the performance of the embedding content. It would be valuable to be able to author a library that is more performance isolated and can bill itself as such.
 
-Gesture Recognition
------
-- With the ability to process input on the compositor thread, we would have the ability to write custom gesture recognition.
-
 Element Location Tracking
 -----
 - It would be nice to keep track of the location of an element with respect to another element (in particular, a scroll clip), to get an asynchronous, as-accurate-as-possible set of records of the element's location history.
