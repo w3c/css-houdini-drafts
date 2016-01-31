@@ -88,7 +88,8 @@ Worklets are similar to <a>web workers</a> however they:
  - Are not event API based. Instead classes are registered on the global scope, whose methods are to
     be invoked by the user agent.
  - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
- - Have a lifetime tied to running a method or set of methods on a class.
+ - Have a lifetime for the global scope which is defined by subsequent specifications or user
+    agents. They aren't tied to the lifetime of the document.
 
 As worklets have a relatively high overhead, they should be used sparingly. Due to this worklets are
 expected to be shared between separate scripts. This is similar to the <a>document environment</a>.
@@ -134,8 +135,7 @@ interface WorkletGlobalScope {
 };
 </pre>
 
-A {{WorkletGlobalScope}} has an associated <a>environment settings object</a>
-<b>settings object</b>.
+A {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
 
 Note:
     The {{WorkletGlobalScope}} has a limited global scope when compared to a
@@ -155,7 +155,7 @@ WorkletGlobalScope</a> algorithm.
 When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |worklet|, it
 <em>must</em> run the following steps:
 
-    1. Let |workletGlobalScopeType| be the |worklet|'s <b>worklet global scope type</b>.
+    1. Let |workletGlobalScopeType| be the |worklet|'s <a>worklet global scope type</a>.
 
     2. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
         customizations:
@@ -172,7 +172,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
     4. Associate the |settingsObject| with |workletGlobalScope|.
 
-    5. For each |resolvedModuleURL| in the given |worklet|'s <b>worklet's resolved module URLs</b>,
+    5. For each |resolvedModuleURL| in the given |worklet|'s <a>worklet's resolved module URLs</a>,
         run the following substeps:
         1. Let |script| be the result of <a>fetch a module script tree</a> given
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
@@ -249,77 +249,79 @@ interface Worklet {
 };
 </pre>
 
-A {{Worklet}} has a <b>worklet global scope type</b>. This is used for creating new
+A {{Worklet}} has a <dfn export>worklet global scope type</dfn>. This is used for creating new
 {{WorkletGlobalScope}} and the type must <a>inherit</a> from {{WorkletGlobalScope}}.
 
-Note: As an example the <b>worklet global scope type</b> might be a {{PaintWorkletGlobalScope}}.
+Note: As an example the <a>worklet global scope type</a> might be a {{PaintWorkletGlobalScope}}.
 
-A {{Worklet}} has a list of the <b>worklet's WorkletGlobalScopes</b>. Initially this list is empty;
-it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
+A {{Worklet}} has a list of the <dfn export>worklet's WorkletGlobalScopes</dfn>. Initially this list
+is empty; it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
-A {{Worklet}} has a list of the <b>worklet's resolved module URLs</b>. Initially this list is empty; it is
-populated when module scripts resolved.
+A {{Worklet}} has a list of the <dfn>worklet's resolved module URLs</dfn>. Initially this list is
+empty; it is populated when module scripts resolved.
 
-When the <dfn method for=Worklet>import(moduleURL)</dfn> method is called on a {{Worklet}} object,
+When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
- 1. Let |promise| be <a>a new promise</a>.
+    1. Let |promise| be <a>a new promise</a>.
 
- 2. Run the following steps <a>in parallel</a>:
-    1. If there are no arguments, return without doing anything. Abort these steps.
+    2. Run the following steps <a>in parallel</a>:
+        1. If there are no arguments, return without doing anything. Abort these steps.
 
-    2. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
-        <a>API base URL</a> specified by the <a>entry settings object</a> when the method was
-        invoked.
+        2. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
+            <a>API base URL</a> specified by the <a>entry settings object</a> when the method was
+            invoked.
 
-    3. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these steps.
+        3. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these
+            steps.
 
-    4. Add |resolvedModuleURL| to the list of <b>worklet's resolved module URLs</b>.
+        4. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
 
-    5. Ensure that there is at least one {{WorkletGlobalScope}} in the <b>worklet's
-        WorkletGlobalScopes</b>. If not <a>create a WorkletGlobalScope</a> given the current
-        {{Worklet}}.
+        5. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
+            WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
+            {{Worklet}}.
 
-    6. For each {{WorkletGlobalScope}} in the <b>worklet's WorkletGlobalScopes</b>, run these
-        substeps:
-        1. Let |settings| be the {{WorkletGlobalScope}}'s associated
-            <a>environment settings object</a>.
+        6. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
+            substeps:
+            1. Let |settings| be the {{WorkletGlobalScope}}'s associated <a>environment settings
+                object</a>.
 
-        2. Let |script| be the result of <a>fetch a module script tree</a> given
-            |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and |settings|.
+            2. Let |script| be the result of <a>fetch a module script tree</a> given
+                |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
+                |settings|.
 
-        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
-            fetching resources.
+            Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
+                fetching resources.
 
-        3. <a>Run a module script</a> given |script|.
+            3. <a>Run a module script</a> given |script|.
 
-    7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed and
-            loaded into the global scopes), resolve |promise|
-            <br>Otherwise, reject |promise|.
+        7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
+                and loaded into the global scopes), resolve |promise|.
+                <br>Otherwise, reject |promise|.
 
- 3. Return |promise|.
+        Note: Specifically, if a script fails to parse or fails to load over the network, it should
+            reject the promise; if the script throws an error while first evaluating the promise
+            should resolve as a classes may have been registered correctly.
 
-Issue(w3c/css-houdini-drafts#51): What should happen when a script throws an exception while executing for the first time?
+    3. Return |promise|.
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{WorkletGlobalScope}} declaratively.
-
-Issue: TODO write initialization for Worklet.
 
 Lifetime of the Worklet {#lifetime-of-the-worklet}
 --------------------------------------------------
 
 The lifetime of a {{Worklet}} is tied to the object it belongs to, for example the {{Window}}.
 
-The lifetime of a {{WorkletGlobalScope}} is tied to the execution lifetime of a method or set of
-methods on a class, not to the lifetime of the {{Worklet}} object.
+The lifetime of a {{WorkletGlobalScope}} should be defined by subsequent specifications which
+inherit from {{WorkletGlobalScope}}.
 
-The user agent <em>may</em> terminate a {{WorkletGlobalScope}} at any time it has no callbacks to
-handle or detects abnormal operation such as infinite loops and callbacks exceeding imposed time
-limits.
+Subsequent specifications <em>may</em> define that a {{WorkletGlobalScope}} can be terminated at any
+time particularly if there are no pending operations, or detects abnormal operation such as infinite
+loops and callbacks exceeding imposed time limits.
 
-Issue(w3c/css-houdini-drafts#53): Worth adding dispose to classes to allow clean-up?
+Security Considerations {#security-considerations}
+==================================================
 
-Processing Model {#processing-model}
-------------------------------------
+Issue(w3c/css-houdini-drafts#92): Need to decide if to allow worklets for unsecure context, etc.
 
 Examples {#examples}
 ====================
@@ -343,11 +345,11 @@ interface FakeWorkletGlobalScope : WorkletGlobalScope {
 };
 </pre>
 
-Each {{FakeWorkletGlobalScope}} has a map of the <b>registered class constructors</b>.
+Each {{FakeWorkletGlobalScope}} has a map of the <dfn>registered class constructors map</dfn>.
 
-When the <dfn method for=FakeWorkletGlobalScope>registerAnArbitaryClass(type, classConstructor)</dfn> method is called,
-the user agent will add the <em>classConstructor</em> of <em>type</em> to the map of <b>registered class constructors</b>.
-
+When the <dfn method for=FakeWorkletGlobalScope>
+registerAnArbitaryClass(|type|, |classConstructor|)</dfn> method is called, the user agent will add
+the |classConstructor| of |type| to the map of <a>registered class constructors map</a>.
 
 Loading scripts into a worklet. {#example-single}
 -------------------------------------------------
@@ -378,11 +380,28 @@ Create a registered class and invoke a method. {#example-class}
 
 <pre class='lang-javascript'>
 // Inside FakeWorkletGlobalScope
-registerAnArbitaryClass('foo', class FooClass {
+registerAnArbitaryClass('key', class FooClass {
     process(arg) {
         return !arg;
     }
 });
 </pre>
 
-Issue: Add example prose for invoking "process".
+As an example, if the user agent wants to invoke "process" on a new class instance, the user agent
+could follow the following steps:
+    1. Let |workletGlobalScope| be a {{FakeWorkletGlobalScope}} from the list of <a>worklet's
+        WorkletGlobalScopes</a> from the fake {{Worklet}}.
+
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the fake
+        {{Worklet}} and use that.
+
+    2. Let |classCtor| be the result of performing a lookup in <a>registered class constructors
+        map</a> with "key" as the key.
+
+    3. Let |classInstance| be the result of <a>Construct</a>(|classCtor|).
+
+    4. Let |result| be the result of <a>Invoke</a>(O=|classInstance|, P="process",
+        Arguments=["true"]).
+
+    5. Return |result|.
+
