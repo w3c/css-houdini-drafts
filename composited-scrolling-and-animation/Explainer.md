@@ -174,8 +174,8 @@ onmessage = function(e) {
 ### Are we marrying ourselves to implementation details?
 
 In particular, two worries are
- 1 The subset of layout-free properties we expose to a CompositorWorker won't be valid in the future.
- 1 We expose browser internals in such a way that it constrains future development.
+ 1. The subset of layout-free properties we expose to a CompositorWorker won't be valid in the future.
+ 2. We expose browser internals in such a way that it constrains future development.
  
 To the first point, virtually all user agents support accelerated opacity and transform animations, as well as threaded scrolling. Since the web relies on the performance characteristics of these properties, it's very unlikely that they will become slow. So the real concern is the ability to add new properties. As long as we choose an extensible API shape that permits simple feature detection, adding support for more properties in the future will be possible.
 
