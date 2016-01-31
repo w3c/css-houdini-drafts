@@ -13,3 +13,450 @@ Editor: Shane Stephens, shanestephens@google.com
 Editor: Robert O'Callahan, robert@ocallahan.org
 Editor: Rossen Atanassov, rossen.atanassov@microsoft.com
 </pre>
+
+<pre class="link-defaults">
+spec:css-break-3; type:dfn; text:fragment
+</pre>
+
+Introduction {#intro}
+=====================
+
+The layout stage of CSS is responsible for generating and positioning <a>fragments</a> from a tree
+of <a>boxes</a>.
+
+This specification describes an API which allows developers to layout a <a>box</a> in response to
+computed style and <a>box</a> tree changes.
+
+Layout Invalidation {#layout-invalidation}
+==========================================
+
+<div class='issue'>
+TODO, list all the ways that layout can be invalidated, namely:
+    - Computed style change.
+    - Child computed style change.
+    - Child add/remove change.
+    - etc.
+</div>
+
+Registering A Layout {#registering-a-layout}
+============================================
+
+<pre class='idl'>
+callback VoidFunction = void ();
+
+partial interface RenderWorkletGlobalScope {
+    void registerLayout(DOMString name, VoidFunction layoutCtor);
+};
+</pre>
+
+The {{RenderWorkletGlobalScope}} has a map of <b>name to layout constructor map</b>. Initially this
+map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+
+Issue: Write full register algorithm, and checks required.
+
+<div class='note'>
+    This is what the shape of the class should be:
+    <pre class='idl'>
+        callback interface LayoutClass {
+            readonly attribute sequence&lt;DOMString> inputProperties;
+            readonly attribute sequence&lt;DOMString> childInputProperties;
+
+            LayoutResult layout(
+                    ConstraintSpace space,
+                    sequence&lt;Box> children,
+                    StylePropertyMap styleMap,
+                    BreakToken break);
+            void childrenChange(/*
+                    added children,
+                    removed children,
+                    idx updated children,
+                    similar to Array.observe */);
+        };
+    </pre>
+</div>
+
+Layout Notation {#layout-notation}
+==================================
+
+<pre class='prod'>
+    <dfn>layout()</dfn> = layout( <<ident>> )
+    <dfn>inline-layout()</dfn> = inline-layout( <<ident>> )
+</pre>
+
+The <<layout()>> and <<inline-layout()>> function is an additional notation to be supported by the ''display'' property.
+
+Issue: Resolve this with css-display-3 once required.
+
+Layout {#layout}
+================
+
+Concepts {#layout-concepts}
+---------------------------
+
+<pre class='idl'>
+[Constructor(), Constructor(ConstraintSpace)]
+interface ConstraintSpace {
+    attribute double? width;
+    attribute double? height;
+
+    readonly attribute sequence&lt;ExclusionArea> exclusions;
+
+    // This is probably wrong.
+    void addExclusion(Fragment fragment);
+    void addExclusion(ExclusionArea rect);
+};
+
+interface ExclusionArea {
+};
+
+[Constructor(double width, double height, double x, double y)]
+interface ExclusionRect : ExclusionArea {
+    readonly attribute double width;
+    readonly attribute double height;
+    readonly attribute double x;
+    readonly attribute double y;
+};
+</pre>
+
+A {{ConstraintSpace}} represents the available space to perform the current layout in.
+
+The {{ConstraintSpace}} has {{ConstraintSpace/width}} and {{ConstraintSpace/height}} attributes,
+which if defined specify the dimensions in which the layout can perform it's layout. If the
+{{ConstraintSpace/width}} or {{ConstraintSpace/height}} are null, the layout can assume that it has
+an infinite space to perform it's layout in that direction.
+
+The {{ConstraintSpace}} has a list of {{exclusions}} which specify which areas the layout should not
+position children within.
+
+A {{ExclusionRect}} represents an rectangular area in which any placed fragments should not
+intersect with.
+
+Issue: More types of exclusions than just Rects? What about shapes? v2?
+
+<pre class='idl'>
+interface Box {
+    readonly attribute StylePropertyMap styleMap;
+    Fragment doLayout(ConstraintSpace space, OpaqueBreakToken breakToken);
+};
+</pre>
+
+A {{Box}} represents a <a>box</a>. {{Box}}es are passed to the current layout as children of the
+current layout. It is the current layout's responsibility to generate {{Fragment}}s from the child
+{{Box}}es.
+
+<pre class='idl'>
+interface Fragment {
+    readonly attribute double width;
+    readonly attribute double height;
+
+    readonly attribute double minContent;
+    readonly attribute double maxContent;
+
+    readonly attribute sequence&lt;Fragment> unpositionedFragments;
+
+    attribute double x;
+    attribute double y;
+
+    readonly attribute OpaqueBreakToken? breakToken;
+
+    readonly attribute double baseline;
+};
+</pre>
+
+A {{Fragment}} represents a <a>fragment</a>. It is the result of performing
+<<doLayout(ConstraintSpace, OpaqueBreakToken)>> on a {{Box}}.
+
+The {{Fragment}} has {{Fragment/width}} and {{Fragment/height}} attributes, which are set by the
+respective {{Box}}'s layout algorithm. They cannot be changed. If the current layout wishes a
+different {{Fragment/width}} or {{Fragment/height}} the author must perform {{doLayout()}} again
+with a different {{ConstraintSpace}} in order to get a different result.
+
+The {{Fragment}} has {{Fragment/minContent}} and {{Fragment/maxContent}} attributes, which are set
+by the respective {{Box}}'s layout algorithm. They cannot be changed.
+
+The {{Fragment}} has a list of {{Fragment/unpositionedFragments}}. These are fragments which the
+containing fragment could not position itself, and should be positioned by either the current
+layout, or a parent layout.
+
+The author inside the current layout can position the {{Fragment}} by setting it's {{Fragment/x}}
+and {{Fragment/y}}. The resulting position and size of the fragment <em>must</em> not intersect with
+any of the {{exclusions}} listed in the current layout's {{ConstraintSpace}}.
+
+The {{Fragment}}'s {{Fragment/breakToken}} specifies where the {{Box}} last fragmented.
+
+The {{Fragment}}'s {{Fragment/baseline}} specifies where the baseline is positioned.
+
+<pre class='idl'>
+interface OpaqueBreakToken {
+};
+
+[Constructor(OpaqueBreakTokenchildFragmentBreakToken, Box childBox)]
+interface BreakToken : OpaqueBreakToken {
+    readonly attribute OpaqueBreakToken childFragmentBreakToken;
+    readonly attribute Box childBox;
+};
+</pre>
+
+A {{OpaqueBreakToken}} represents a continuation token that may be given as an argument to
+{{doLayout()}} to produce the next {{Fragment}} for that box.
+
+A {{BreakToken}} is used in a {{LayoutResult}} to indicate where the current layout last broke.
+
+Performing layout {#performing-layout}
+--------------------------------------
+
+<pre class='idl'>
+dictionary LayoutResult {
+    double minContent;
+    double maxContent;
+    double width;
+    double height;
+    sequence&lt;Fragment> fragments;
+    sequence&lt;Fragment> unpositionedFragments;
+    BreakToken breakToken;
+    double baseline;
+};
+</pre>
+
+{{LayoutClass/layout()}} is invoked by the user agent when <a>generate a layout</a> for a <a>box</a>.
+
+The user agent passes in:
+  - The current children for the <a>box</a>, with only {{LayoutClass/childInputProperties}} on
+    {{Box/styleMap}}
+  - The available space defined by a {{ConstraintSpace}}
+  - The computed style of the <a>box</a>, with only {{LayoutClass/inputProperties}}
+  - The {{BreakToken}} if any, for where the <a>box</a> was last fragmented.
+
+The author defined code should produce a {{LayoutResult}}.
+
+The {{LayoutResult}} consists of:
+ - A {{LayoutResult/minContent}} which represents the fragment's <a>min-content inline-size
+    contribution</a>.
+ - A {{LayoutResult/maxContent}} which represents the fragment's <a>max-content inline-size
+    contribution</a>.
+ - A {{LayoutResult/width}} which represents the fragment's resulting width.
+ - A {{LayoutResult/height}} which represents the fragment's resulting height.
+ - A list of {{LayoutResult/fragments}} which represents the fragment's direct child fragments.
+ - A list of {{LayoutResult/unpositionedFragments}} which represents the fragment's children which
+    should be positioned by a parent fragment.
+ - A {{LayoutResult/breakToken}} which represents where the current layout's box last broke.
+ - A {{LayoutResult/baseline}} which represents the baseline of the fragment.
+
+Issue: Write the following into the algorithm.
+
+If any {{Fragment}}s appear in both the list of {{LayoutResult/fragments}} or the list of
+{{LayoutResult/unpositionedFragments}} the user agent should throw an error.
+
+The user agent should check that a consistent set of {{Fragment}}s generated from a {{Box}} is
+returned in either the list of {{LayoutResult/fragments}} or {{LayoutResult/unpositionedFragments}}.
+(Consistent being that a {{Fragment/breakToken}} from one {{Fragment}} was used to generate another
+{{Fragment}} in the set).
+
+If any {{Fragment}}s appear more than once, the user agent should throw an error.
+
+When the user agent wants to <dfn>generate a layout</dfn> of a <<layout()>> or <<inline-layout()>>
+for a <var>box</var> it <em>must</em> run the following steps:
+
+Issue: TODO specify these steps.
+
+Overflow {#overflow}
+--------------------
+
+Overflow is determined if the resulting {{LayoutResult/width}} or {{LayoutResult/height}} exceed the
+space available given by the current {{ConstraintSpace}}.
+
+Overflow is <em>not</em> triggered if the list of returned {{LayoutResult/fragments}} exceed or are
+placed outside the space available given by the {{ConstraintSpace}}.
+
+If the user agent requires displaying a scroll-bar with a non-zero width the user agent
+<em>must</em> call layout again with a different {{ConstraintSpace}} reflecting this consumption of
+space. If, the subsequent layout doesn't produce an overflow, the user-agent can display an
+un-scrollable scroll-bar.
+
+Note: Under this scheme the layout may be called at least three times, for example; once for the
+    initial layout, second time for the overflow in the vertical direction, and a third time if it
+    overflows in the horizontal direction. Pray that we never overflow in the z-direction.
+
+Issue: This may be completely the wrong way to do this. Should fragments be responsible for deciding
+    if they have scrollbars or not? (I don't think so, but wanted to put this out there). Might also
+    be better for an early return to be possible for this case. I.e. "Hey I'm going to overflow!
+    Give me a new constraint space!".
+
+Examples {#examples}
+====================
+
+Example 1: A simple block layout {#example-1}
+---------------------------------------------
+
+<pre class='lang-javascript'>
+// Inside RenderWorkletGlobalScope
+
+// Note this is meant to be similar (*not* the same) as a block layout.
+// Everything is done in 'width' & 'height' for easy reading.
+registerLayout('simple-flow', class {
+    static get inputProperties() { return ['width', 'height'] }
+    static get childrenInputProperties() { return ['x', 'y', 'position'] }
+
+    layout(children, constraintSpace, styleMap, breakToken) {
+        const absoluteChildren = [];
+        const fixedChildren = [];
+        const fragments = [];
+
+        // Resolve our width using the available width in 'constraintSpace', and
+        // our computed width property.
+        let width = resolveWidth(constraintSpace, styleMap.get('width'));
+
+        // Create a new constraint space for our children to consume.
+        let childConstraintSpace = new ConstraintSpace(constraintSpace);
+        childConstraintSpace.width = width;
+
+        // Track the used height, min and max content.
+        let height = 0;
+        let minContent = 0;
+        let maxContent = 0;
+
+        for (let child of children) {
+            // Check if the child is out of flow positioned.
+            const childPosition = child.styleMap.get('position');
+
+            if (childPosition == 'absolute') {
+                absoluteChildren.push(child);
+                continue;
+            }
+
+            if (childPosition == 'fixed') {
+                fixedChildren.push(child);
+                continue;
+            }
+
+            // Layout the in flow child.
+            const childFragment = child.doLayout(childConstraintSpace);
+
+            // Position the child.
+            childFragment.x = 0;
+            childFragment.y = height;
+
+            // Update our current height, min and max content.
+            height += childFragment.height;
+            minContent = Math.max(childFragment.minContent, minContent);
+            maxContent = Math.max(childFragment.maxContent, maxContent);
+        }
+
+        // Resolve the height.
+        height = resolveHeight(constraintSpace, styleMap.get('height'), height);
+
+        return {
+            minContent: minContent,
+            maxContent: maxContent,
+            width: width,
+            height: height,
+            fragments: fragments,
+            unPositionedChildren: absoluteChildren.concat(fixedChildren),
+            breakToken: null
+        };
+    }
+});
+</pre>
+
+<pre class='lang-markup'>
+&lt;div id="myElement"&gt;
+    &lt;div&gt;
+        CSS is awesome.
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+#myElement {
+    display: layout('simple-flow');
+}
+&lt;/style&gt;
+</pre>
+
+Example 2: A simple line layout {#example-2}
+--------------------------------------------
+
+<pre class='lang-javascript'>
+// Inside RenderWorkletGlobalScope
+
+// Note this is meant to be similar (*not* the same) as a inline layout.
+// Everything is done in 'width' & 'height' for easy reading.
+registerLayout('simple-inline-flow', class {
+    static get inputProperties() { return ['width', 'height'] }
+    static get childrenInputProperties() { return [] }
+
+    layout(children, constraintSpace, styleMap, breakToken) {
+        // Resolve our width using the available width in 'constraintSpace', and
+        // our computed width property.
+        const width = resolveWidth(constraintSpace, styleMap.get('width'));
+        const fragments = [];
+        let height = 0;
+
+        // TODO compute these.
+        let minContent = 0;
+        let maxContent = 0;
+
+        let childFragment = null;
+        let lineFragments = [];
+        let lineHeight = 0;
+        let remainingLineWidth = width; // NOTE: should be helper on constraint space?
+
+        const childIter = chidlren.values();
+        let child = childIter.next().value;
+        let breakToken = null;
+
+        while (child) {
+            // Create a new constraint space for the child, with all the current
+            // positioned children.
+            const childConstraintSpace = new ConstraintSpace(constraintSpace);
+            childConstraintSpace.addExclusion(new ExclusionRect(width, height, 0, 0));
+            childConstraintSpace.addExclusions(lineFragments);
+
+            // Perform layout on the child.
+            childFragment = child.doLayout(childConstraintSpace, breakToken);
+            fragments.push(childFragment);
+
+            // Check if we need to position the fragment on the next line.
+            if (childFragment.width > remainingLineWidth) {
+                // Need to start a new line.
+                lineFragments = [];
+                height += lineHeight;
+                lineHeight = 0;
+                remainingLineWidth = width;
+            }
+
+            // Position the fragment horizontally.
+            childFragment.x = width - remainingLineWidth;
+
+            lineFragments.push(childFragment);
+            lineHeight = Math.max(lineHeight, childFragment.height);
+            remainingLineWidth -= childFragment.width;
+
+            // Update the line fragments positions, based on the new lineHeight.
+            for (let frag of lineFragments) {
+                frag.y = lineHeight - frag.height;
+            }
+
+            // Step to the next child if required.
+            if (childFragment.breakToken) {
+                breakToken = childFragment.breakToken;
+            } else {
+                child = childIter.next().value;
+                breakToken = null;
+            }
+        }
+
+        // Resolve the height.
+        height = resolveHeight(constraintSpace, styleMap.get('height'), height);
+
+        return {
+            minContent: minContent,
+            maxContent: maxContent,
+            width: width,
+            height: height,
+            fragments: fragments,
+            unpositionedFragments: [],
+            breakToken: null
+        };
+    }
+});
+</pre>
