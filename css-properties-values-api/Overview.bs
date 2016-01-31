@@ -124,7 +124,7 @@ specify animations and transitions that reference custom properties.
 When referenced by animations and transitions, custom properties will interpolate
 in a manner defined by their types.
 If the start and end of an interpolation have matching types, then they
-will interpolate as specified in [[!css3-animations]] or the corresponding property.
+will interpolate as specified in [[!css3-animations]].
 Otherwise, the interpolation falls back to the default 50% flip described in
 [[!css3-animations]].
 
