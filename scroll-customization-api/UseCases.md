@@ -33,6 +33,7 @@ This is one of the more tricky effects.
 
 - Implemented with a rubber band effect
 - Allows drawing into the background of the container, with fixed position, giving the illusion of it being in the negative margin of the scrolling object
+ - Often the effect is coupled to the scroll position (eg. a circle that rotates in proportion to the scroll position).  There's a wide variety of different effects here.
 - Has a threshold in the rubber band, at which point the refresh "commits". This typically triggers another animation, where the content stays where it was (its rubber-band limit) and a progress spinner is drawn in the margin. Do we consider this as if the scroll has ended and the content has moved down?
 - Once the page has the refreshed data, it adds it to the DOM (causing another scroll). Or if there wasn't any data, the content animates back to the top of the container.
 - Can transition into and out-of the overscroll effect without lifting the finger
