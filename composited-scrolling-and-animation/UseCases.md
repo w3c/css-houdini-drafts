@@ -46,7 +46,7 @@ Gesture Recognition
 -----
 - With the ability to process input on the compositor thread, we would have the ability to write custom gesture recognition.
 
-Location Tracking
+Element Location Tracking
 -----
 - It would be nice to keep track of the location of an element with respect to another element (in particular, a scroll clip), to get an asynchronous, as-accurate-as-possible set of records of the element's location history.
  
