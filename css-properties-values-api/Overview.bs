@@ -218,7 +218,7 @@ The following syntax strings are supported:
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
-::  That string
+::  That identifier
 :   Any one of the preceding strings, followed by '+'
 ::  A list of values of the type specified by the string
 :   Any combination of the preceding, separated by '|'
@@ -253,7 +253,7 @@ For example, the following are all valid syntax strings.
     accept, as well as calc expresssions containing a combination of both length
     and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
-::  accepts the string "big", or the string "bigger", or the string "BIGGER".
+::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
 :   <code>"&lt;length>+"</code>
 ::  accepts a list of length values.
 
@@ -278,7 +278,7 @@ For &lt;length-percentage> values, the computed value is one of the following:
 *   otherwise, the computed value is a calc expression containing an absolute
     length expressed in pixels, and a percentage value.
 
-For &lt;custom-ident>, string, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
+For &lt;custom-ident>, ident, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
 &lt;angle>, &lt;time>, &lt;resolution>, &lt;transform-function> or "*" values, the
 computed value is identical to the specified value.
 
