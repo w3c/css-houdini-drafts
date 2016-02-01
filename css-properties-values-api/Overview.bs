@@ -119,7 +119,20 @@ not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
 throw a {{SyntaxError}}. If no {{PropertyDescriptor/initialValue}} is provided and the
 {{PropertyDescriptor/syntax}} is '*', then a special initial value used. This initial
 value must be considered parseable by {{registerProperty()}} but invalid at computed
-value time.
+value time. Initial values that are not computationally idempotent must also cause 
+{{registerProperty()}} to throw a {{SyntaxError}}.
+
+<div class='example'>
+For example, "3cm" is a computationally idempotent length, and hence valid as an initial value.
+However, "3em" is not (depending on the environment, 3em could compute to
+multiple different values). Additionally, "var(--foo)" is not computationally idempotent. 
+</div>
+
+Issue: define computational idempotency.
+
+Issue(121): Is computational idempotency the right thing to do here? We could also just
+resolve any relative values once (against all the other initial values) and use 
+that. OR! We could allow specified values and just fix our engines...
 
 When a custom property is registered with a given type, the process via which specified
 values for that property are turned into computed values is defined
@@ -288,6 +301,10 @@ If the start and end of an interpolation have matching types, then they
 will interpolate as specified in [[!css3-animations]].
 Otherwise, the interpolation falls back to the default 50% flip described in
 [[!css3-animations]].
+
+Issue: Intermediate interpolated results of animations on custom properties must
+be able to generate a token stream representing their value. We should ensure that
+this is standard across implementations to avoid interop issues.
 
 Conditional Rules {#conditional-rules}
 --------------------------------------
