@@ -33,6 +33,11 @@ Repository: w3c/css-houdini-drafts
 }
 </pre>
 
+<pre class='link-defaults'>
+spec:css-transforms-1; type:type; text:<transform-function>
+spec:css-conditional-3; type:method; text:supports(property, value)
+</pre>
+
 Introduction {#intro}
 =====================
 
@@ -57,7 +62,7 @@ Registering custom properties {#registering-custom-properties}
 <pre class='idl'>
 dictionary PropertyDescriptor {
   required DOMString name;
-           DOMString syntax       = '*';
+           DOMString syntax       = "*";
            boolean   inherits     = false;
            DOMString initialValue;
 };
@@ -120,16 +125,6 @@ When a custom property is registered with a given type, the process via which sp
 values for that property are turned into computed values is defined
 fully by the type selected, as described in
 <a section href="#calculation-of-computed-values"></a>.
-
-Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
-specify animations and transitions that reference custom properties.
-
-When referenced by animations and transitions, custom properties will interpolate
-in a manner defined by their types.
-If the start and end of an interpolation have matching types, then they
-will interpolate as specified in [[!css3-animations]].
-Otherwise, the interpolation falls back to the default 50% flip described in
-[[!css3-animations]].
 
 If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
 then an {{InvalidModificationError}} is thrown and the re-registration fails.
@@ -277,6 +272,34 @@ matches to the specified value.
 
 For list values, the computed value is a list of the computed values of the
 primitives in the list.
+
+Behavior of Custom Properties {#behavior-of-custom-properties}
+==============================================================
+
+Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
+----------------------------------------------------------------------------------
+
+Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
+specify animations and transitions that reference custom properties.
+
+When referenced by animations and transitions, custom properties interpolate
+in a manner defined by their types.
+If the start and end of an interpolation have matching types, then they
+will interpolate as specified in [[!css3-animations]].
+Otherwise, the interpolation falls back to the default 50% flip described in
+[[!css3-animations]].
+
+Conditional Rules {#conditional-rules}
+--------------------------------------
+
+@supports rules and the <a method for=CSS>supports()</a> method behave as specified
+in [[!css-variables]].
+
+Note: In other words, for the purpose of determining whether a value is
+supported by a given custom property, the type registered for the custom property is
+ignored and any value consisting of at least one token is considered valid.
+
+Issue(118): should @supports pay attention to type when considering custom properties?
 
 Examples {#examples}
 ====================
