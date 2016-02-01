@@ -56,10 +56,10 @@ Registering custom properties {#registering-custom-properties}
 
 <pre class='idl'>
 dictionary PropertyDescriptor {
-  DOMString name;
-  DOMString syntax;
-  boolean   inherits;
-  DOMString initialValue;
+  required DOMString name;
+           DOMString syntax       = '*';
+           boolean   inherits     = false;
+           DOMString initialValue;
 };
 
 partial interface CSS {
@@ -85,7 +85,7 @@ following members:
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
 
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
-::  The initial value of this custom property.
+::  The initial value of this custom property. 
 
 The {{registerProperty()}} function {#the-registerproperty-function}
 --------------------------------------------------------------------
@@ -111,7 +111,10 @@ Note: in future levels we anticipate supporting more sophisticated parse strings
 
 Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
-throw a {{SyntaxError}}.
+throw a {{SyntaxError}}. If no {{PropertyDescriptor/initialValue}} is provided and the
+{{PropertyDescriptor/syntax}} is '*', then a special initial value used. This initial
+value must be considered parseable by {{registerProperty()}} but invalid at computed
+value time.
 
 When a custom property is registered with a given type, the process via which specified
 values for that property are turned into computed values is defined
