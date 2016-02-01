@@ -343,28 +343,6 @@ Examples {#examples}
 Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
-<pre class='lang-javascript'>
-// Inside PaintWorkletGlobalScope.
-registerPaint('circle', class {
-    static get inputProperties() { return ['--circle-color']; }
-    paint(ctx, geom, properties) {
-        // Change the fill color.
-        var color = properties.get('--circle-color');
-        ctx.fillStyle = color;
-
-        // Determine the center point and radius.
-        var x = geom.width / 2;
-        var y = geom.height / 2;
-        var radius = Math.min(x, y);
-
-        // Draw the circle \o/
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-        ctx.fill();
-    }
-});
-</pre>
-
 <pre class='lang-markup'>
 &lt;div id="myElement"&gt;
     CSS is awesome.
@@ -378,8 +356,75 @@ registerPaint('circle', class {
 &lt;/style&gt;
 </pre>
 
+<pre class='lang-javascript'>
+// Inside PaintWorkletGlobalScope.
+registerPaint('circle', class {
+    static get inputProperties() { return ['--circle-color']; }
+    paint(ctx, geom, properties) {
+        // Change the fill color.
+        const color = properties.get('--circle-color');
+        ctx.fillStyle = color;
+
+        // Determine the center point and radius.
+        const x = geom.width / 2;
+        const y = geom.height / 2;
+        const radius = Math.min(x, y);
+
+        // Draw the circle \o/
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+        ctx.fill();
+    }
+});
+</pre>
+
+Example 2: Image placeholder. {#example-2}
+------------------------------------------
+
+It is possible for an author to use paint to draw a placeholder image while an image is being
+loaded.
+
+<pre class='lang-markup'>
+&lt;div id="myElement"&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+#myElement {
+    --image: url('#someUrlWhichIsLoading');
+    background-image: paint(image-with-placeholder);
+}
+&lt;/style&gt;
+
+&lt;script&gt;
+document.registerProperty({
+    name: '--image',
+    syntax: '&lt;image&gt;'
+});
+&lt;/script&gt;
+</pre>
+
+<pre class='lang-javascript'>
+// Inside PaintWorkletGlobalScope.
+registerPaint('circle', class {
+    static get inputProperties() { return ['--image']; }
+    paint(ctx, geom, properties) {
+        // This relies on a TypedOM image object which doesn't exist yet.
+        const img = properties.get('--image');
+        if (img.loaded) {
+            // The image is loaded! Draw the image.
+            ctx.drawImage(img.data, 0, 0, geom.width, geom.height);
+        } else if (img.invalid) {
+            // The image is invalid (e.g. it didn't load), draw a sad face.
+            drawSadFace(ctx);
+        } else {
+            // The image is loading, draw some mountains.
+            drawMountains(ctx);
+        }
+    }
+});
+</pre>
+
+Example 3: Conic-gradient {#example-3}
+--------------------------------------
+
 Issue: Add conic-gradient as a use case.
-
-Issue: Add image with placeholder as a use case. E.g. mountainy-thingy.
-
-Issue: Add image url with var() input to custom paint as a use case.
