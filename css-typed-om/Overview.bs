@@ -359,14 +359,14 @@ Issue: What happens if the provided DOMString or LengthValue for (e.g.) a Simple
  Constructor(sequence&lt;TransformComponent> transforms)]
 interface TransformValue : StyleValue {
   iterable&lt;TransformComponent>;
-  Matrix asMatrix();
-  boolean is2D();
+  readonly attribute boolean is2D;
+  readonly attribute DOMMatrixReadOnly matrix;
 };
 
 interface TransformComponent {
   readonly attribute DOMString cssText;
-  boolean is2DComponent();
-  Matrix asMatrix();
+  readonly attribute boolean is2D;
+  readonly attribute DOMMatrixReadOnly matrix;
 };
 
 [Constructor(LengthValue x, LengthValue y),
@@ -405,36 +405,19 @@ interface Perspective : TransformComponent {
   readonly attribute LengthValue length;
 };
 
-[Constructor(double a, double b, double c, double d, double e, double f),
- Constructor(double a, double b, double c, double d,
-             double e, double f, double g, double h,
-             double i, double j, double k, double l,
-             double m, double n, double o, double p)]
+[Constructor(DOMMatrixReadOnly matrix)]
 interface Matrix : TransformComponent {
-  readonly attribute double a;
-  readonly attribute double b;
-  readonly attribute double c;
-  readonly attribute double d;
-  readonly attribute double e;
-  readonly attribute double f;
-  readonly attribute double g;
-  readonly attribute double h;
-  readonly attribute double i;
-  readonly attribute double j;
-  readonly attribute double k;
-  readonly attribute double l;
-  readonly attribute double m;
-  readonly attribute double n;
-  readonly attribute double o;
-  readonly attribute double p;
 };
 </pre>
+
 
 {{TransformValue}} objects represent values for the 'transform' property. A
 {{TransformValue}} represents a list of {{TransformComponent}}s.
 
-The <dfn method for=TransformComponent>is2DComponent()</dfn> method returns
-true if the component on which it is invoked represents a 2D transform function,
+{{TransformComponent}} objects have the following properties:
+
+The <dfn attribute for=TransformComponent>is2D</dfn> attribute is 
+true if the component represents a 2D transform function,
 and false otherwise. The transform function which the component represents is
 stored in string form in the <dfn attribute for=TransformComponent>cssText</dfn>
 attribute.
@@ -456,19 +439,23 @@ its <code>cssText</code> attribute. However, newly constructed {{TransformValue}
 will always generate <code>cssText</code> according to the following rules:
 *   {{Skew}} will always serialize to skew(ax, ay)
 *   {{Perspective}} will always serialize to perspective(length)
-*   {{Translation}}, {{Rotation}}, {{Scale}} and {{Matrix}} each have two
+*   {{Translation}}, {{Rotation}}, and {{Scale}} each have two
     constructors. In each case, the constructor with fewer arguments constructs
-    a {{TransformComponent}} for which <a>is2DComponent()</a> will return true,
+    a {{TransformComponent}} for which {{TransformComponent/is2D}} will be true,
     with <code>cssText</code> employing the 2D version of the relevant transform
-    function (translate, rotate, scale, matrix). The constructor with more
+    function (translate, rotate, scale). The constructor with more
     arguments constructs a {{TransformComponent}} for which
-    <a>is2DComponent()</a> will return false, with <code>cssText</code>
+    {{TransformComponent/is2D}} will be false, with <code>cssText</code>
     employing the 3D version of the relevant transform function (translate3d,
-    rotate3d, scale3d, matrix3d).
+    rotate3d, scale3d).
+*   {{Matrix}} objects are constructed around a {{DOMMatrixReadOnly}}, and
+    well serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
+    {{DOMMatrixReadOnly/is2D}} attribute is false, and a matrix3d function
+    otherwise.
 
-<dfn method for=TransformValue>is2D()</dfn> returns true if the <a>is2DComponent()</a>
-method of every {{TransformComponent}} referenced by the {{TransformValue}} returns true,
-and false otherwise.
+<dfn attribute for=TransformValue>is2D</dfn> is true if the {{TransformComponent/is2D}}
+attribute of every {{TransformComponent}} referenced by the {{TransformValue}} 
+returns true, and false otherwise.
 
 Issue: Need to add a section for each of the other primitive types.
 
