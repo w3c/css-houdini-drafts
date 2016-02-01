@@ -283,7 +283,7 @@ Example 1: Using custom properties to add animation behavior {#example-1}
 
 <pre class='lang-markup'>
 &lt;script&gt;
-document.registerProperty({
+CSS.registerProperty({
   name: "--stop-color",
   syntax: "&lt;color&gt;",
   inherits: false,
