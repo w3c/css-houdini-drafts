@@ -138,7 +138,8 @@ The <<paint()>> function is an additional notation to be supported by the <<imag
     <pre>background-image: paint(my_logo);</pre>
 </div>
 
-Issue(w3c/css-houdini-drafts#33): What to do about cursor.
+For the 'cursor' property, the <<paint()>> function should be treated as an <a>invalid image</a> and
+fallback to the next supported <<image>>.
 
 Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
 
