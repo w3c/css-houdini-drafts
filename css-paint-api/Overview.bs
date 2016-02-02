@@ -435,3 +435,38 @@ Example 3: Conic-gradient {#example-3}
 --------------------------------------
 
 Issue: Add conic-gradient as a use case.
+
+Example 4: Different color based on geometry {#example-4}
+---------------------------------------------------------
+
+<pre class='lang-markup'>
+&lt;h1&gt;
+Heading 1
+&lt;/h1&gt;
+&lt;h1&gt;
+Another heading
+&lt;/h1&gt;
+
+&lt;style&gt;
+h1 {
+    background-image: paint(heading-color);
+}
+&lt;/style&gt;
+</pre>
+
+<pre class='lang-javascript'>
+// Inside PaintWorkletGlobalScope.
+registerPaint('heading-color', class {
+    static get inputProperties() { return []; }
+    paint(ctx, geom, properties) {
+        // Select a color based on the width and height of the image.
+        const width = geom.width;
+        const height = geom.height;
+        const color = colorArray[(width * height) % colorArray.length];
+
+        // Draw just a solid image.
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, width, height);
+    }
+});
+</pre>
