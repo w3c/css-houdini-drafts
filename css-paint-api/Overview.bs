@@ -222,6 +222,10 @@ When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for
     2. <a>Set bitmap dimensions</a> for the context's <a>scratch bitmap</a> to |width| and |height|.
     3. Return the new {{PaintRenderingContext2D}}.
 
+Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
+    algorithm, as it invokes <a>reset the rendering context to its default state</a> and clears the
+    <a>scratch bitmap</a>.
+
 Drawing an image {#drawing-an-image}
 ====================================
 
