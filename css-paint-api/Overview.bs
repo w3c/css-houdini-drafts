@@ -176,7 +176,10 @@ The <<paint()>> function is an additional notation to be supported by the <<imag
 For the 'cursor' property, the <<paint()>> function should be treated as an <a>invalid image</a> and
 fallback to the next supported <<image>>.
 
-Issue: How do we do things like conic-gradient? I.e. paint functions which accept arguments as inputs?
+Issue(w3c/css-houdini-drafts): Support additional arbitrary arguments for the paint function. This
+    is difficult to specify, as you need to define a sane grammar. A better way would be to expose a
+    token stream which you can parse into Typed OM objects. This would allow a full arbitrary set of
+    function arguments, and be future proof.
 
 The 2D rendering context {#2d-rendering-context}
 ================================================
