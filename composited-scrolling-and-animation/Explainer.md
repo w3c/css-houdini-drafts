@@ -21,21 +21,20 @@ both for user agents and developers of large sites composed of disparate, 3rd
 party components not under the author's control. The result is a lot of janky
 pages.
 
-Why can't we update CSS properties from another thread? Updating CSS properties
-could effect a style recalc or a layout and those operations must happen on the
-main thread. That said, there are certain 'layout-free' properties that can be
-modified without these side effects. These properties include transform,
-opacity, background color, background position, etc. Updating the scroll offset
-is also layout-free. Clearly identifying these layout-free properties and
-allowing them to be animated from a separate scheduling domain would provide a
-simple and powerful way to achieve smooth animations.
+Updating CSS properties could effect a style recalc or a layout and those
+operations happen on the main thread in most user agents making them poor
+candidates for asynchronous update. That said, there are certain properties that
+can be modified asynchronously by all user agents today. These properties include
+transform, opacity, and scroll offset. Clearly identifying these 'accelerated'
+properties and allowing them to be animated from a separate scheduling domain
+would provide a simple and powerful way to achieve smooth animations.
 
 Indeed, all major browsers have had the ability to asynchronously update
-layout-free properties for years. Some examples include WebAnimations, CSS
-animations, and transitions involving layout-free properties as well as
+accelerated properties for years. Some examples include WebAnimations, CSS
+animations, and transitions involving accelerated properties as well as
 compositor driven scrolling. A few new approaches are in the works such as
 position:sticky and snap points, but it's unfortunate to have to wait for specs
-and consistent browser implementations to get these new "acclerated" effects.
+and consistent browser implementations to realize these effects.
 
 ## Goal
 
@@ -47,7 +46,7 @@ Address at least [this](https://github.com/w3c/css-houdini-drafts/blob/master/co
  - Introduce CompositorWorker whose global scope exposes requestAnimationFrame
    which runs at the rate of threaded scrolling and animation.
  - Allow DOM elements to be wrapped in a CompositorProxy which may be sent to a
-   CompositorWorker and which exposes a limited set of layout-free properties
+   CompositorWorker and which exposes a limited set of accelerated properties
    and input events.
 
 ## A tiny, but expressive kernel
@@ -174,12 +173,12 @@ onmessage = function(e) {
 ### Are we marrying ourselves to implementation details?
 
 In particular, two worries are
- 1. The subset of layout-free properties we expose to a CompositorWorker won't be valid in the future.
+ 1. The subset of accelerated properties we expose to a CompositorWorker won't be valid in the future.
  2. We expose browser internals in such a way that it constrains future development.
  
 To the first point, virtually all user agents support accelerated opacity and transform animations, as well as threaded scrolling. Since the web relies on the performance characteristics of these properties, it's very unlikely that they will become slow. So the real concern is the ability to add new properties. As long as we choose an extensible API shape that permits simple feature detection, adding support for more properties in the future will be possible.
 
-To the second point, we need not mention browser internals to permit asynchronous updates of layout-free properties. The examples above don’t, for example, tie us to the idea of a composited layer or a layer tree, concepts that may not be meaningful in all browser implementations. The animated elements might, say, be redrawn by the GPU each frame or processed in software. But this doesn’t matter. These implementation details are orthogonal to the CompositorWorker concept.
+To the second point, we need not mention browser internals to permit asynchronous updates of accelerated properties. The examples above don’t, for example, tie us to the idea of a composited layer or a layer tree, concepts that may not be meaningful in all browser implementations. The animated elements might, say, be redrawn by the GPU each frame or processed in software. But this doesn’t matter. These implementation details are orthogonal to the CompositorWorker concept.
 
 ### What happens when script runs long?
 
