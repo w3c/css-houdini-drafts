@@ -130,6 +130,7 @@ The {{WorkletGlobalScope}} object provides a <dfn>worklet global scope</dfn> whi
 global execution context of a {{Worklet}}.
 
 <pre class='idl'>
+[Exposed=Worklet]
 interface WorkletGlobalScope {
     attribute Console console;
 };
@@ -340,6 +341,7 @@ partial interface Window {
 <pre class='idl'>
 callback Function = any (any... arguments);
 
+[Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
 interface FakeWorkletGlobalScope : WorkletGlobalScope {
     void registerAnArbitaryClass(DOMString type, Function classConstructor);
 };

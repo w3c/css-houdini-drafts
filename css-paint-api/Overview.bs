@@ -97,6 +97,7 @@ The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWo
 <pre class='idl'>
 callback VoidFunction = void ();
 
+[Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
 interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
 };
@@ -185,7 +186,7 @@ The 2D rendering context {#2d-rendering-context}
 ================================================
 
 <pre class='idl'>
-[Exposed=Worklet]
+[Exposed=PaintWorklet]
 interface PaintRenderingContext2D {
 };
 PaintRenderingContext2D implements CanvasState;
@@ -265,7 +266,7 @@ The {{Geometry}} object represents the geometry of the image that the author sho
 the <a>concrete object size</a> given by the user agent.
 
 <pre class='idl'>
-[Exposed=Worklet]
+[Exposed=PaintWorklet]
 interface Geometry {
     readonly attribute double width;
     readonly attribute double height;
