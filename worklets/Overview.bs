@@ -266,22 +266,20 @@ the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
     2. Run the following steps <a>in parallel</a>:
-        1. If there are no arguments, return without doing anything. Abort these steps.
-
-        2. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
+        1. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
             <a>API base URL</a> specified by the <a>entry settings object</a> when the method was
             invoked.
 
-        3. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these
+        2. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these
             steps.
 
-        4. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
+        3. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
 
-        5. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
+        4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
             WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
             {{Worklet}}.
 
-        6. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
+        5. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
             substeps:
             1. Let |settings| be the {{WorkletGlobalScope}}'s associated <a>environment settings
                 object</a>.
@@ -295,7 +293,7 @@ the user agent <em>must</em> run the following steps:
 
             3. <a>Run a module script</a> given |script|.
 
-        7. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
+        6. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
                 and loaded into the global scopes), resolve |promise|.
                 <br>Otherwise, reject |promise|.
 
