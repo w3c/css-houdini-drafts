@@ -128,7 +128,7 @@ an infinite space to perform it's layout in that direction.
 The {{ConstraintSpace}} has a list of {{exclusions}} which specify which areas the layout should not
 position children within.
 
-A {{ExclusionRect}} represents an rectangular area in which any placed fragments should not
+A {{ExclusionRect}} represents a rectangular area in which any placed fragments should not
 intersect with.
 
 Issue: More types of exclusions than just Rects? What about shapes? v2?
