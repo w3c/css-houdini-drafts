@@ -33,3 +33,27 @@ Instead, we could expose how these font metrics are used by the browser, giving 
 There's another argument that people want direct access to font data to enable their own text layout routines to draw on a canvas or invoke in a custom paint routine. That's a fine use case, but I think it's probably a lower priority than allowing measurement of text laid out by the browser. Math layout will require actual font data, but how that data is used will depend on the layout measures above. So we should eventually get to the point of exposing raw font data, but either after or at the same time as exposing at least some of the layout results.
 
 There is also an argument that exposing information on higher-level constructs can result in a dead-end, since the underlying complexities of font selection, shaping, line-breaking, et.al. might not be taken into account in either aggregating or choosing what to sample for something as high-level as an element (or even a line box). That's certainly a risk, but if that risk is considered I think it will be possible to come up with a small set of useful high-level APIs without having to wait for agreement on how to standardize lower-level text layout constructs.
+
+# Four kinds of Font Data
+
+We discussed four different areas that seemed to qualify as 'font metrics' during the F2F in Sydney, in January 2016. These are:
+
+1. What font(s) are being used? This is complicated because multiple fonts can be used per paragraph, per line,
+   per word, and even per glyph. The fonts should be exposed in the form of handles with complete font information, and
+   (for web fonts) a handle to the raw font data. dbaron & eae are going to own this area and propose an API.
+
+1. Browsers make use of some font information for layout (including multiple different baselines). In order to do this,
+   sometimes baseline information must be synthesized from the available data. However, this information is a small
+   subset of all possible data that could conceivably be synthesized about fonts. Area 2 pertains solely to information
+   that is already available in fonts, or that must be synthesized by browsers in order to successfully layout text.
+   This information should be exposed by browsers on a font-by-font basis. stevez & astearns are going to own this
+   area and propose an API.
+
+1. Fonts carry more metrics than browsers use. Often these metrics are buggy or incorrect. Nevertheless, access to the
+   raw metrics is useful. While we recognize that this is an area of interest, we decided to defer work on this for now,
+   given that the raw data is already going to be accessible via area 1, and that there are existing JS parsers for multiple
+   kinds of font.
+
+1. Font geometry and metrics that browsers don't already used could conceivably be synthesized by browsers. However, in order
+   to do so, we'd need to standardize the algorithms used to perform these syntheses. As a result, we decided to defer working
+   on this area for now.
