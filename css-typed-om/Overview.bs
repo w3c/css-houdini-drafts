@@ -371,6 +371,8 @@ initialised using the RGB cubic-coordinate system, which specifies a red, green 
 component. These are specified as doubleegers between 0 and 255. An alpha component may also be
 specified in the constructor as a double between 0 and 1.
 
+Issue: Do we want to support other color systems, e.g. HSL?
+
 
 {{TransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
