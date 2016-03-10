@@ -366,8 +366,8 @@ interface ColorValue : StyleValue{
 
 </pre>
 
-{{ColorValue}} objects represent values of the 'color' CSS data type. {{ColorValue}}s can only
-be initialised using the RGB cubic-coordinate system, which specifies a red, green and blue
+{{ColorValue}} objects represent values of the 'color' CSS data type. {{ColorValue}}s are
+initialised using the RGB cubic-coordinate system, which specifies a red, green and blue
 component. These are specified as doubleegers between 0 and 255. An alpha component may also be
 specified in the constructor as a double between 0 and 1.
 
