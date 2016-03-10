@@ -351,6 +351,27 @@ Issue: There are now 3 ways of creating Length values -
 
 Issue: What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
+{{ColorValue}} objects {#colorvalue-objects}
+---------------------------------------------
+<pre class='idl'>
+
+[Constructor(double r, double g, double b),
+ Constructor(double r, double g, double b, double a)]
+interface ColorValue : StyleValue{
+  readonly attribute double r;
+  readonly attribute double g;
+  readonly attribute double b;
+  readonly attribute double? a;
+};
+
+</pre>
+
+{{ColorValue}} objects represent values of the 'color' CSS data type. {{ColorValue}}s can only
+be initialised using the RGB cubic-coordinate system, which specifies a red, green and blue
+component. These are specified as doubleegers between 0 and 255. An alpha component may also be
+specified in the constructor as a double between 0 and 1.
+
+
 {{TransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
 
