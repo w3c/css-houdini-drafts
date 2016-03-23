@@ -128,24 +128,24 @@ used, or the user agent needs to reclaim memory.
 
 When the <dfn method for=PaintWorkletGlobalScope>registerPaint(|name|, |paintCtor|)</dfn> method is
 called, the user agent <em>must</em> run the following steps:
-    1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>NotSupportedError</a> and abort all
-        these steps.
+    1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>TypeError</a> and abort all these
+        steps.
 
     2. If the |name| exists as a key in the <a>paint name to constructor map</a>, <a>throw</a> a
         <a>NotSupportedError</a> and abort all these steps.
 
     3. If the result of <a>IsConstructor</a>(argument=|paintCtor|) is false, <a>throw</a> a
-        <a>NotSupportedError</a> and abort all these steps.
+        <a>TypeError</a> and abort all these steps.
 
     4. Let |prototype| be the result of <a>Get</a>(O=|paintCtor|, P="prototype").
 
     5. If the result of <a>IsCallable</a>(argument=<a>Get</a>(O=|prototype|, P="paint")) is false,
-        <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+        <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
     6. Let |inputProperties| be the result of <a>Get</a>(O=|paintCtor|, P="inputProperties").
 
-    7. If the result of <a>IsArray</a>(argument=|inputProperties|) is false, <a>throw</a> a
-        <a>NotSupportedError</a> and abort all these steps.
+    7. If |inputProperties| is not undefined, and the result of <a>IsArray</a>(argument=
+        |inputProperties|) is false, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
     8. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
