@@ -336,8 +336,6 @@ interface SimpleLength : LengthValue {
 };
 </pre>
 
-Issue(165): do we want an enum of length keywords too?
-
 Issue(167): write long descriptions of all of this
 
 Issue(168): There are now 3 ways of creating Length values -
