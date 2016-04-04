@@ -242,8 +242,6 @@ interface NumberValue : StyleValue {
 and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
-Issue(162): Is this the behaviour we want for out-of-range (as opposed to incorrectly typed) values?
-
 <div class='example'>
 The following code is valid
 
