@@ -159,10 +159,8 @@ partial interface Document {
 <dfn method for=Document>getComputedStyleMap(Element, optional DOMString?)</dfn>
 method.
 
-The <a>property model</a> for <a>computed StylePropertyMap</a> objects contains
-an entry for every valid CSS property supported by the User Agent.
-
-Issue(154): better wording here and below - the property model is initialized to contain these things.
+When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
+objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
 Issue(156): need to describe what values are here too.
 
@@ -185,7 +183,8 @@ partial interface CSSStyleRule {
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-The <a>property model</a> for <a>specified StylePropertyMap</a> objects contains
+When constructed, the <a>property model</a> for <a>specified StylePropertyMap</a>
+objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
 the last valid value provided by the {{CSSStyleRule}} object.
@@ -204,7 +203,8 @@ partial interface Element {
 directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
 attribute of {{Element}} objects.
 
-The <a>property model</a> for <a>inline StylePropertyMap</a> objects contains an
+When constructed, the <a>property model</a> for <a>inline StylePropertyMap</a> objects
+is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
 The value for a given property is the last valid value provided in the string.
