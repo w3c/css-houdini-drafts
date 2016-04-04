@@ -8,12 +8,24 @@ Level: 1
 Abstract:
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
+Ignored Vars: type
 </pre>
 
 <pre class=link-defaults>
 spec: dom-ls; type:interface; text:Document;
 spec: dom-ls; type:interface; text:Element;
-spec:css-transforms-1; type:property; text:transform
+spec:css-transforms-1; type:property; text:transform;
+spec:css-color-3; type:property; text:color;
+spec:css-speech-1; type:property; text:cue-after;
+spec:css-speech-1; type:property; text:cue-before;
+spec:css-speech-1; type:property; text:pause-after;
+spec:css-speech-1; type:property; text:pause-before;
+spec:css-speech-1; type:property; text:speak;
+spec:css-speech-1; type:property; text:voice-family;
+spec:css21; type:property; text:max-height;
+spec:css21; type:property; text:max-width;
+spec:css21; type:property; text:min-height;
+spec:css21; type:property; text:min-width;
 </pre>
 
 Introduction {#intro}
@@ -551,8 +563,8 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 </div>
 
-Mapping of properties to accepted types
-=======================================
+Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
+==================================================================================
 This section provides a table of which types of {{StyleValue}} a given property can accept.
 Note that most, but not all properties take {{KeywordValue}}.
 Shorthand properties and values are not supported.
