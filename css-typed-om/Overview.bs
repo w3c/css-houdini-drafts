@@ -339,10 +339,6 @@ interface SimpleLength : LengthValue {
 
 Issue(167): write long descriptions of all of this
 
-Issue(168): There are now 3 ways of creating Length values -
-       StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
-       Is this too much?
-
 Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
 {{TransformValue}} objects {#transformvalue-objects}
