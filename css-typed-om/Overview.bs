@@ -32,7 +32,7 @@ Some particular considerations:
     treated as a number without first explicitly casting it to a {{SimpleLength}}, as calc
     expressions and keywords are also valid lengths.
 
-Issue: is it possible to amalgamate this API with value objects once they're specced by
+Issue(138): is it possible to amalgamate this API with value objects once they're specced by
        TC39?
 
 {{StyleValue}} objects {#stylevalue-objects}
@@ -75,7 +75,7 @@ interface StylePropertyMap {
 };
 </pre>
 
-Issue: I don't think we can use maplike here because this is a multimap :(
+Issue(139): I don't think we can use maplike here because this is a multimap :(
 
 A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
 which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
@@ -96,12 +96,12 @@ future without breaking code that relies on calling
 <a method for=StylePropertyMap>set()</a> for those properties.
 </div>
 
-Issue: this is different to the other multimaps on the platform because append/set take
+Issue(141): this is different to the other multimaps on the platform because append/set take
        sequences.
 
 When invoked, the <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or sequence&lt;StyleValue> or DOMString) <var>value</var>)</dfn> method follows the following steps:
 
-Issue: first need to check whether the property is a valid property.
+Issue(143): first need to check whether the property is a valid property.
 
 1.
     :   if <var>property</var> is not list-valued
@@ -134,13 +134,13 @@ Issue: first need to check whether the property is a valid property.
     ::  concatenate <var>value</var> onto the end of the entry in the <a>property model</a>
 
 
-Issue: should refactor out value type-checking, as it'll be needed by the rest of the setters too
+Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
-Issue: need a robust description of what "a type that <var>property</var> can't accept" means.
+Issue(147): need a robust description of what "a type that <var>property</var> can't accept" means.
 
-Issue: add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
+Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
-Issue: describe that these are not live objects
+Issue(149): describe that these are not live objects
 
 Computed {{StylePropertyMap}} objects {#computed-stylepropertymap-objects}
 --------------------------------------------------------------------------
@@ -159,17 +159,19 @@ method.
 The <a>property model</a> for <a>computed StylePropertyMap</a> objects contains
 an entry for every valid CSS property supported by the User Agent.
 
-Issue: add a StylePropertyMapReadOnly and make getComputedStyleMap return that.
+Issue(151): add a StylePropertyMapReadOnly and make getComputedStyleMap return that.
 
-Issue: better wording here and below - the property model is initialized to contain these things.
+Issue(154): better wording here and below - the property model is initialized to contain these things.
 
-Issue: need to describe what values are here too.
+Issue(156): need to describe what values are here too.
 
 Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
       not resolved style. In this regard it provides different values than those
       in objects returned by getComputedStyle.
 
-Issue: do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
+Issue(157): do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
+
+Issue(160): Put SameObject on maps.
 
 Specified {{StylePropertyMap}} objects {#specified-stylepropertymap-objects}
 ----------------------------------------------------------------------------
@@ -241,7 +243,7 @@ interface NumberValue : StyleValue {
 and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
-Issue: Is this the behaviour we want for out-of-range (as opposed to incorrectly typed) values?
+Issue(162): Is this the behaviour we want for out-of-range (as opposed to incorrectly typed) values?
 
 <div class='example'>
 The following code is valid
@@ -262,10 +264,10 @@ After execution, the value of <code>opacity</code> is 1 ('opacity' is range-rest
 and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
 </div>
 
-Issue: where does a description of parsing values go? For example, where do we indicate that
+Issue(140): where does a description of parsing values go? For example, where do we indicate that
        calc(4 + 8) will create a {{NumberValue}} with a value of 12?
 
-Issue: do we actually want to collapse calc values down to their minimum representations? I assume
+Issue(164): do we actually want to collapse calc values down to their minimum representations? I assume
        so, given that this is what the old CSSOM is now specified to do.
 
 {{LengthValue}} objects {#lengthvalue-objects}
@@ -341,15 +343,15 @@ interface SimpleLength : LengthValue {
 };
 </pre>
 
-Issue: do we want an enum of length keywords too?
+Issue(165): do we want an enum of length keywords too?
 
-Issue: write long descriptions of all of this
+Issue(167): write long descriptions of all of this
 
-Issue: There are now 3 ways of creating Length values -
+Issue(168): There are now 3 ways of creating Length values -
        StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
        Is this too much?
 
-Issue: What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
+Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
 {{TransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
@@ -416,7 +418,7 @@ interface Matrix : TransformComponent {
 
 {{TransformComponent}} objects have the following properties:
 
-The <dfn attribute for=TransformComponent>is2D</dfn> attribute is 
+The <dfn attribute for=TransformComponent>is2D</dfn> attribute is
 true if the component represents a 2D transform function,
 and false otherwise. The transform function which the component represents is
 stored in string form in the <dfn attribute for=TransformComponent>cssText</dfn>
@@ -454,14 +456,12 @@ will always generate <code>cssText</code> according to the following rules:
     otherwise.
 
 <dfn attribute for=TransformValue>is2D</dfn> is true if the {{TransformComponent/is2D}}
-attribute of every {{TransformComponent}} referenced by the {{TransformValue}} 
+attribute of every {{TransformComponent}} referenced by the {{TransformValue}}
 returns true, and false otherwise.
 
-Issue: Need to add a section for each of the other primitive types.
+Issue(163): Need to add a section describing unions of types.
 
-Issue: Need to add a section describing unions of types.
-
-Issue: Need to add a section describing shorthands.
+Issue(161): Need to add a section describing shorthands.
 
 {{PositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
@@ -942,23 +942,25 @@ Shorthand properties and values are not supported.
 </tbody>
 </table>
 
-Issue: Spec up ColorValue, URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
+Issue(159): Spec up ColorValue
 
-Issue: Do we want to make a generic PairValue and QuadValue, or have more specific classes for background-size, border-image-repeat, border-radius-*, border-image-outset, border-image-width?
+Issue(158): Spec up URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
 
-Issue: BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
+Issue(155): Do we want to make a generic PairValue and QuadValue, or have more specific classes for background-size, border-image-repeat, border-radius-*, border-image-outset, border-image-width?
 
-Issue: What do we do for play-during, which takes <uri> [ mix || repeat ]?
+Issue(153): BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
 
-Issue: Do we want a pair type for things like quotes which take [<string> <string>]
+Issue(152): What do we do for play-during, which takes <uri> [ mix || repeat ]?
 
-Issue: Do we need to say that LengthValues must be positive e.g. for border-widths here?
+Issue(150): Do we want a pair type for things like quotes which take [<string> <string>]
 
-Issue: Do we want a font value class? How about a FontWeightValue (for 100, 200 etc) class?
+Issue(146): Do we need to say that LengthValues must be positive e.g. for border-widths here?
 
-Issue: Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
+Issue(142): Do we want a font value class? How about a FontWeightValue (for 100, 200 etc) class?
+
+Issue(144): Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
 
-Issue: write me
+Issue(140): write me
