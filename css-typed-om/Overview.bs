@@ -12,8 +12,8 @@ Ignored Vars: type
 </pre>
 
 <pre class=link-defaults>
-spec: dom-ls; type:interface; text:Document;
-spec: dom-ls; type:interface; text:Element;
+spec:dom; type:interface; text:Document
+spec:dom; type:interface; text:Element;
 spec:css-transforms-1; type:property; text:transform;
 spec:css-color-3; type:property; text:color;
 spec:css-speech-1; type:property; text:cue-after;
@@ -26,6 +26,10 @@ spec:css21; type:property; text:max-height;
 spec:css21; type:property; text:max-width;
 spec:css21; type:property; text:min-height;
 spec:css21; type:property; text:min-width;
+spec:css-tables-3; type:property; text:border-collapse;
+spec:css-tables-3; type:property; text:caption-side;
+spec:css-tables-3; type:property; text:empty-cells;
+spec:css-tables-3; type:property; text:table-layout;
 </pre>
 
 Introduction {#intro}
@@ -167,7 +171,7 @@ partial interface Document {
 </pre>
 
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
-{{Element}} or {{PseudoElement}}, and are accessed by calling the
+{{Element}} or pseudo element, and are accessed by calling the
 <dfn method for=Document>getComputedStyleMap(Element, optional DOMString?)</dfn>
 method.
 
@@ -600,10 +604,6 @@ Shorthand properties and values are not supported.
     <td>{{KeywordValue}}</td>
   </tr>
   <tr>
-    <td>'alt'</td>
-    <td>StringValue | {{KeywordValue}}</td>
-  </tr>
-  <tr>
     <td>'animation-delay'</td>
     <td>TimeValue | {{KeywordValue}}</td>
   </tr>
@@ -992,3 +992,14 @@ Issue(159): Spec up ColorValue
 ========================================================
 
 Issue(140): write me
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+==================================================
+
+There are no known privacy issues introduced by these features.
+
