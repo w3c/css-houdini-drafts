@@ -294,9 +294,9 @@ dictionary CalcDictionary {
 };
 
 interface LengthValue : StyleValue {
-  LengthValue add(LengthValue value); // can throw SyntaxError
-  LengthValue subtract(LengthValue value); // can throw SyntaxError
-  LengthValue multiply(double value); // can throw SyntaxError
+  LengthValue add(LengthValue value);
+  LengthValue subtract(LengthValue value);
+  LengthValue multiply(double value);
   LengthValue divide(double value); // can throw SyntaxError
   static LengthValue parse(DOMString cssText); // can throw SyntaxError
   static LengthValue fromValue(double value, LengthType type);
@@ -337,9 +337,7 @@ interface SimpleLength : LengthValue {
 </pre>
 
 If the provided DOMString or {{LengthValue}} is invalid the relevant function throws a SyntaxError. 
-
-For e.g. add, subtract, multiply and divide will throw a SyntaxError if they are called on or passed a LengthValue that is not a SimpleLength or CalcLength. parse will throw a SyntaxError if the DOMString it is passed doesn't represent a valid length.
-
+For e.g. divide will throw a SyntaxError if you attempt to divide by 0, parse will throw a SyntaxError if the DOMString it is passed doesn't represent a valid length.
 
 Issue(165): do we want an enum of length keywords too?
 
