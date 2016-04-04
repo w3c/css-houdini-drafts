@@ -60,12 +60,12 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 
 <pre class='idl'>
 interface StylePropertyMap {
-  void append(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
+  void append(DOMString property, (StyleValue or DOMString)... values);
   void delete(DOMString property);
   StyleValue? get(DOMString property);
   sequence&lt;StyleValue> getAll(DOMString property);
   boolean has(DOMString property);
-  void set(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
+  void set(DOMString property, (StyleValue or DOMString)... values);
   iterable&lt;DOMString, (StyleValue or sequence&lt;StyleValue> or DOMString)>;
   sequence&lt;DOMString> getProperties();
   stringifier;
@@ -91,10 +91,9 @@ future without breaking code that relies on calling
 <a method for=StylePropertyMap>set()</a> for those properties.
 </div>
 
-Issue(141): this is different to the other multimaps on the platform because append/set take
-       sequences.
-
-When invoked, the <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or sequence&lt;StyleValue> or DOMString) <var>value</var>)</dfn> method follows the following steps:
+When invoked, the
+<dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or DOMString)... <var>values</var>)</dfn>
+method follows the following steps:
 
 Issue(143): first need to check whether the property is a valid property.
 
@@ -107,26 +106,19 @@ Issue(143): first need to check whether the property is a valid property.
     ::  initialize an empty sequence in the <a>property model</a> for <var>property</var>
 
 1.
-    :   if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
+    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
     ::  throw a TypeError
 
 1.
-    :   if <var>value</var> is a sequence&lt;{{StyleValue}}>, and it contains a {{StyleValue}} that has a type
-        that <var>property</var> can't accept
-    ::  throw a TypeError
-
-1.
-    :   if <var>value</var> is a DOMString
+    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a DOMString
     ::  set <var>value</var> to the result of invoking <a method for=StyleValue>parse()</a>, providing <var>property</var>
         and <var>value</var> as inputs.
 
 1.
-    :   if <var>value</var> is null
+    :   if any <var>value</var> in <var>values</var> is null
     ::  throw a TypeError
-    :   else, if <var>value</var> is a StyleValue
-    ::  append <var>value</var> to the entry in the <a>property model</a>
-    :   else, if <var>value</var> is a sequence&lt;StyleValue>
-    ::  concatenate <var>value</var> onto the end of the entry in the <a>property model</a>
+    :   else
+    ::  concatenate <var>values</var> onto the end of the entry in the <a>property model</a>
 
 
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
