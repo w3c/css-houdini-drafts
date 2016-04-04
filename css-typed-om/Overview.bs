@@ -294,13 +294,13 @@ dictionary CalcDictionary {
 };
 
 interface LengthValue : StyleValue {
-  LengthValue add(LengthValue value); // can throw
-  LengthValue subtract(LengthValue value); // can throw
-  LengthValue multiply(double value); // can throw
-  LengthValue divide(double value); // can throw
-  static LengthValue parse(DOMString cssText);
-  static LengthValue fromValue(double value, LengthType type);
-  static LengthValue fromDictionary(CalcDictionary dictionary);
+  LengthValue add(LengthValue value); // can throw SyntaxError
+  LengthValue subtract(LengthValue value); // can throw SyntaxError
+  LengthValue multiply(double value); // can throw SyntaxError
+  LengthValue divide(double value); // can throw SyntaxError
+  static LengthValue parse(DOMString cssText); // can throw SyntaxError
+  static LengthValue fromValue(double value, LengthType type); // can throw SyntaxError
+  static LengthValue fromDictionary(CalcDictionary dictionary); // can throw SyntaxError
 };
 
 [Constructor(DOMString cssText),
@@ -336,6 +336,8 @@ interface SimpleLength : LengthValue {
 };
 </pre>
 
+If the provided DOMString or {{LengthValue}} is invalid the relevant function throws a SyntaxError.
+
 Issue(165): do we want an enum of length keywords too?
 
 Issue(167): write long descriptions of all of this
@@ -343,8 +345,6 @@ Issue(167): write long descriptions of all of this
 Issue(168): There are now 3 ways of creating Length values -
        StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
        Is this too much?
-
-Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
 {{TransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
