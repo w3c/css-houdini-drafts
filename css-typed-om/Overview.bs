@@ -297,8 +297,8 @@ interface LengthValue : StyleValue {
   LengthValue add(LengthValue value);
   LengthValue subtract(LengthValue value);
   LengthValue multiply(double value);
-  LengthValue divide(double value); // can throw SyntaxError
-  static LengthValue parse(DOMString cssText); // can throw SyntaxError
+  LengthValue divide(double value);
+  static LengthValue parse(DOMString cssText);
   static LengthValue fromValue(double value, LengthType type);
   static LengthValue fromDictionary(CalcDictionary dictionary);
 };
@@ -335,9 +335,6 @@ interface SimpleLength : LengthValue {
   readonly attribute LengthType type;
 };
 </pre>
-
-If the provided DOMString or {{LengthValue}} is invalid the relevant function throws a SyntaxError. 
-For e.g. divide will throw a SyntaxError if you attempt to divide by 0, parse will throw a SyntaxError if the DOMString it is passed doesn't represent a valid length.
 
 Issue(165): do we want an enum of length keywords too?
 
