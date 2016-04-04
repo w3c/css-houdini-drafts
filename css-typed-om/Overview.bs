@@ -383,11 +383,11 @@ The following methods are defined for {{LengthValue}} objects:
 ::  Divides the length represented by the object by the provided <var>value</var>,
     and returns the result as a new {{LengthValue}}. This will construct
     a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
-    if the object is a {{CalcLength}}.
+    if the object is a {{CalcLength}}. The function can throw a DivideByZerError if value given is 0.
 
 :   <dfn method for=LengthValue>parse(DOMString cssText)</dfn>
 ::  Parses the provided <var>cssText</var> as a length value. Will return a
-    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise.
+    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise. The function can throw a SyntaxError if the DOMString it is passed doesn't represent a valid length.
 
 :   <dfn method for=LengthValue>fromValue(double value, LengthType type)</dfn>
 ::  Constructs a {{SimpleLength}} with the given <var>value</var> and unit
