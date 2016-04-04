@@ -52,8 +52,21 @@ The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <v
 method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue}}> for
 <var>property</var>, returning null on failure.
 
-Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
-           this or should it be a subclass?
+{{TokenStreamValue}} objects {#tokenstreamvalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+interface TokenStreamValue : StyleValue {
+  iterable<(DOMString or VariableReferenceValue)>;
+};
+
+interface VariableReferenceValue {
+  attribute string variable;
+  attribute TokenStreamValue fallback;
+};
+</pre>
+
+{{TokenStreamValue}} objects represent unsupported values and values that reference custom properties. They represent a list of string fragments and variable references.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
