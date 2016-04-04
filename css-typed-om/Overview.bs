@@ -72,8 +72,6 @@ interface StylePropertyMap {
 };
 </pre>
 
-Issue(139): I don't think we can use maplike here because this is a multimap :(
-
 A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
 which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
 is initialized differently depending on where the {{StyleValue}} is used
