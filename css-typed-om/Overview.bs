@@ -44,76 +44,76 @@ Some particular considerations:
 *   retrieved JavaScript representations of CSS values are not mutable - instead updates
     must explicitly be set using the API.
 *   objects are organized for consistency rather than ease of access. For example, even
-    though lengths are often numeric pixel values, a specified {{LengthValue}} can't be
-    treated as a number without first explicitly casting it to a {{SimpleLength}}, as calc
+    though lengths are often numeric pixel values, a specified {{CSSLengthValue}} can't be
+    treated as a number without first explicitly casting it to a {{CSSSimpleLength}}, as calc
     expressions and keywords are also valid lengths.
 
-{{StyleValue}} objects {#stylevalue-objects}
+{{CSSStyleValue}} objects {#stylevalue-objects}
 ============================================
 
 <pre class='idl'>
-interface StyleValue {
+interface CSSStyleValue {
   attribute DOMString cssText;
-  static (StyleValue or sequence&lt;StyleValue>)? parse(DOMString property, DOMString cssText);
+  static (CSSStyleValue or sequence&lt;CSSStyleValue>)? parse(DOMString property, DOMString cssText);
 };
 </pre>
 
-{{StyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
 
-The <dfn attribute for=StyleValue>cssText</dfn> attribute provides a normalized
+The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute provides a normalized
 representation (see <a section href="#stylevalue-normalization"></a>) of the value
-contained by a {{StyleValue}} object.
+contained by a {{CSSStyleValue}} object.
 
-The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
-method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue}}> for
+The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
+method attempts to parse <var>cssText</var> as a valid {{CSSStyleValue}} or sequence&lt;{{CSSStyleValue}}> for
 <var>property</var>, returning null on failure.
 
-{{TokenStreamValue}} objects {#tokenstreamvalue-objects}
+{{CSSTokenStreamValue}} objects {#tokenstreamvalue-objects}
 ----------------------------------------------
 
 <pre class='idl'>
-interface TokenStreamValue : StyleValue {
-  iterable<(DOMString or VariableReferenceValue)>;
+interface CSSTokenStreamValue : CSSStyleValue {
+  iterable<(DOMString or CSSVariableReferenceValue)>;
 };
 
-interface VariableReferenceValue {
+interface CSSVariableReferenceValue {
   attribute DOMString variable;
-  attribute TokenStreamValue fallback;
+  attribute CSSTokenStreamValue fallback;
 };
 </pre>
 
-{{TokenStreamValue}} objects represent unsupported values and values that reference custom properties. They represent a list of string fragments and variable references.
+{{CSSTokenStreamValue}} objects represent unsupported values and values that reference custom properties. They represent a list of string fragments and variable references.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <pre class='idl'>
 interface StylePropertyMapReadOnly {
-  StyleValue? get(DOMString property);
-  sequence&lt;StyleValue> getAll(DOMString property);
+  CSSStyleValue? get(DOMString property);
+  sequence&lt;CSSStyleValue> getAll(DOMString property);
   boolean has(DOMString property);
-  iterable&lt;DOMString, (StyleValue or sequence&lt;StyleValue> or DOMString)>;
+  iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue> or DOMString)>;
   sequence&lt;DOMString> getProperties();
   stringifier;
 };
 
 interface StylePropertyMap : StylePropertyMapReadOnly {
-  void append(DOMString property, (StyleValue or DOMString)... values);
+  void append(DOMString property, (CSSStyleValue or DOMString)... values);
   void delete(DOMString property);
-  void set(DOMString property, (StyleValue or DOMString)... values);
+  void set(DOMString property, (CSSStyleValue or DOMString)... values);
 };
 </pre>
 
 A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn>,
-which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
-is initialized differently depending on where the {{StyleValue}} is used
+which is a list of property - sequence&lt;{{CSSStyleValue}}> pairs. This list
+is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
 <a section href="#computed-stylepropertymapreadonly-objects"></a>,
 <a section href="#specified-stylepropertymap-objects"></a>, and
 <a section href="#inline-stylepropertymap-objects"></a>).
 
 <div class='note'>
-The sequence of {{StyleValue}}s associated with a property do
+The sequence of {{CSSStyleValue}}s associated with a property do
 not represent multiple successive definitions of that property's value.
 Instead, sequences represent values associated with list-valued properties.
 
@@ -124,7 +124,7 @@ future without breaking code that relies on calling
 </div>
 
 When invoked, the
-<dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or DOMString)... <var>values</var>)</dfn>
+<dfn method for=StylePropertyMap>append(DOMString <var>property</var> (CSSStyleValue or DOMString)... <var>values</var>)</dfn>
 method follows the following steps:
 
 Issue(143): first need to check whether the property is a valid property.
@@ -138,12 +138,12 @@ Issue(143): first need to check whether the property is a valid property.
     ::  initialize an empty sequence in the <a>property model</a> for <var>property</var>
 
 1.
-    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
+    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a {{CSSStyleValue}}, and its type is a type that <var>property</var> can't accept
     ::  throw a TypeError
 
 1.
     :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a DOMString
-    ::  set <var>value</var> to the result of invoking <a method for=StyleValue>parse()</a>, providing <var>property</var>
+    ::  set <var>value</var> to the result of invoking <a method for=CSSStyleValue>parse()</a>, providing <var>property</var>
         and <var>value</var> as inputs.
 
 1.
@@ -223,36 +223,36 @@ entry for each property that is paired with at least one valid value in the stri
 representing the style attribute for the Element that the object is associated with.
 The value for a given property is the last valid value provided in the string.
 
-{{StyleValue}} subclasses {#stylevalue-subclasses}
+{{CSSStyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
 
-{{KeywordValue}} objects {#keywordvalue-objects}
+{{CSSKeywordValue}} objects {#keywordvalue-objects}
 ------------------------------------------------
 
 <pre class='idl'>
 [Constructor(DOMString)]
-interface KeywordValue : StyleValue {
+interface CSSKeywordValue : CSSStyleValue {
   attribute DOMString keywordValue;
 };
 </pre>
 
-{{KeywordValue}} objects represent {{StyleValue}}s that are keywords. The constructor for {{KeywordValue}}
+{{CSSKeywordValue}} objects represent {{CSSStyleValue}}s that are keywords. The constructor for {{CSSKeywordValue}}
 should check that they contain valid CSS, but they do not check whether the contained string is a valid
 keyword for a particular property. Property setters are required to enforce keyword validity.
 
-{{NumberValue}} objects {#numbervalue-objects}
+{{CSSNumberValue}} objects {#numbervalue-objects}
 ----------------------------------------------
 
 <pre class='idl'>
 [Constructor(double), Constructor(DOMString cssText)]
-interface NumberValue : StyleValue {
+interface CSSNumberValue : CSSStyleValue {
   attribute double value;
 };
 </pre>
 
-{{NumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
+{{CSSNumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
 
-{{NumberValue}} objects are not range-restricted. Any valid number can be represented by a {{NumberValue}},
+{{CSSNumberValue}} objects are not range-restricted. Any valid number can be represented by a {{CSSNumberValue}},
 and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
@@ -260,8 +260,8 @@ and that value will not be clamped, rounded, or rejected when set on a <a>specif
 The following code is valid
 
 <pre class='lang-javascript'>
-  myElement.styleMap.set("opacity", new NumberValue(3));
-  myElement.styleMap.set("z-index", new NumberValue(15.4));
+  myElement.styleMap.set("opacity", new CSSNumberValue(3));
+  myElement.styleMap.set("z-index", new CSSNumberValue(15.4));
 
   console.log(myElement.styleMap.get("opacity").value); // 3
   console.log(myElement.styleMap.get("z-index").value); // 15.4
@@ -276,9 +276,9 @@ and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer v
 </div>
 
 Issue(140): where does a description of parsing values go? For example, where do we indicate that
-       calc(4 + 8) will create a {{NumberValue}} with a value of 12?
+       calc(4 + 8) will create a {{CSSNumberValue}} with a value of 12?
 
-{{LengthValue}} objects {#lengthvalue-objects}
+{{CSSLengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
 
 <pre class='idl'>
@@ -289,7 +289,7 @@ enum LengthType {
   "cm", "mm", "q", "in", "pc", "pt"
 };
 
-dictionary CalcDictionary {
+dictionary CSSCalcDictionary {
   double? px = null;
   double? percent = null;
   double? em = null;
@@ -308,21 +308,21 @@ dictionary CalcDictionary {
   double? pt = null;
 };
 
-interface LengthValue : StyleValue {
-  LengthValue add(LengthValue value);
-  LengthValue subtract(LengthValue value);
-  LengthValue multiply(double value);
-  LengthValue divide(double value);
-  static LengthValue parse(DOMString cssText);
-  static LengthValue fromValue(double value, LengthType type);
-  static LengthValue fromDictionary(CalcDictionary dictionary);
+interface CSSLengthValue : CSSStyleValue {
+  CSSLengthValue add(CSSLengthValue value);
+  CSSLengthValue subtract(CSSLengthValue value);
+  CSSLengthValue multiply(double value);
+  CSSLengthValue divide(double value);
+  static CSSLengthValue parse(DOMString cssText);
+  static CSSLengthValue fromValue(double value, LengthType type);
+  static CSSLengthValue fromDictionary(CSSCalcDictionary dictionary);
 };
 
 [Constructor(DOMString cssText),
- Constructor(LengthValue),
- Constructor(CalcDictionary)
+ Constructor(CSSLengthValue),
+ Constructor(CSSCalcDictionary)
 ]
-interface CalcLength : LengthValue {
+interface CSSCalcLength : CSSLengthValue {
   attribute double? px;
   attribute double? percent;
   attribute double? em;
@@ -341,97 +341,97 @@ interface CalcLength : LengthValue {
   attribute double? pt;
 };
 
-// lengths that are *just* keywords don't become SimpleLengths or CalcLengths.
-// Instead they are represented as KeywordValue objects.
+// lengths that are *just* keywords don't become CSSSimpleLengths or CSSCalcLengths.
+// Instead they are represented as CSSKeywordValue objects.
 [Constructor(DOMString cssText),
- Constructor(LengthValue),
+ Constructor(CSSLengthValue),
  Constructor(double value, LengthType type)]
-interface SimpleLength : LengthValue {
+interface CSSSimpleLength : CSSLengthValue {
   attribute double value;
   readonly attribute LengthType type;
 };
 </pre>
 
-{{LengthValue}} objects represent lengths:
+{{CSSLengthValue}} objects represent lengths:
 
-*   {{SimpleLength}} objects represent lengths that contain a single unit type (for example "42px").
-*   {{CalcLength}} objects represent lengths that contain multiple units (for example
+*   {{CSSSimpleLength}} objects represent lengths that contain a single unit type (for example "42px").
+*   {{CSSCalcLength}} objects represent lengths that contain multiple units (for example
     "calc(56em + 10%)").
 
-{{LengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{LengthValue}},
+{{CSSLengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{CSSLengthValue}},
 that value will be accepted unaltered when set on a <a>specified StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
 Note that lengths which incorporate variable references will instead be represented as
-{{TokenStreamValue}} objects, and keywords as {{KeywordValue}} objects.
+{{CSSTokenStreamValue}} objects, and keywords as {{CSSKeywordValue}} objects.
 
-The following methods are defined for {{LengthValue}} objects:
+The following methods are defined for {{CSSLengthValue}} objects:
 
-:   <dfn method for=LengthValue>add(LengthValue value)</dfn>
+:   <dfn method for=CSSLengthValue>add(CSSLengthValue value)</dfn>
 ::  Adds the provided <var>value</var> to the length represented by the object,
-    and returns the result as a new {{LengthValue}}. This will construct
-    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    and returns the result as a new {{CSSLengthValue}}. This will construct
+    a {{CSSSimpleLength}} or {{CSSCalcLength}} depending on whether the result can
     be expressed in terms of a single unit.
 
-:   <dfn method for=LengthValue>subtract(LengthValue value)</dfn>
+:   <dfn method for=CSSLengthValue>subtract(CSSLengthValue value)</dfn>
 ::  Subtracts the provided <var>value</var> from the length represented by the object,
-    and returns the result as a new {{LengthValue}}. This will construct
-    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    and returns the result as a new {{CSSLengthValue}}. This will construct
+    a {{CSSSimpleLength}} or {{CSSCalcLength}} depending on whether the result can
     be expressed in terms of a single unit.
 
-:   <dfn method for=LengthValue>multiply(double value)</dfn>
+:   <dfn method for=CSSLengthValue>multiply(double value)</dfn>
 ::  Multiplies the length represented by the object by the provided <var>value</var>,
-    and returns the result as a new {{LengthValue}}. This will construct
-    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
-    if the object is a {{CalcLength}}.
+    and returns the result as a new {{CSSLengthValue}}. This will construct
+    a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
+    if the object is a {{CSSCalcLength}}.
 
-:   <dfn method for=LengthValue>divide(double value)</dfn>
+:   <dfn method for=CSSLengthValue>divide(double value)</dfn>
 ::  Divides the length represented by the object by the provided <var>value</var>,
-    and returns the result as a new {{LengthValue}}. This will construct
-    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
-    if the object is a {{CalcLength}}. The function will throw a {{DivideByZeroError}} when the value given is 0.
+    and returns the result as a new {{CSSLengthValue}}. This will construct
+    a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
+    if the object is a {{CSSCalcLength}}. The function will throw a {{DivideByZeroError}} when the value given is 0.
 
-:   <dfn method for=LengthValue>parse(DOMString cssText)</dfn>
+:   <dfn method for=CSSLengthValue>parse(DOMString cssText)</dfn>
 ::  Parses the provided <var>cssText</var> as a length value. Will return a
-    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
+    {{CSSSimpleLength}} when possible, or a {{CSSCalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
 
-:   <dfn method for=LengthValue>fromValue(double value, LengthType type)</dfn>
-::  Constructs a {{SimpleLength}} with the given <var>value</var> and unit
+:   <dfn method for=CSSLengthValue>fromValue(double value, LengthType type)</dfn>
+::  Constructs a {{CSSSimpleLength}} with the given <var>value</var> and unit
     <var>type</var>.
 
-:   <dfn method for=LengthValue>fromDictionary(CalcDictionary dictionary)</dfn>
-::  Constructs a {{CalcLength}} with units and values as defined by the provided
+:   <dfn method for=CSSLengthValue>fromDictionary(CSSCalcDictionary dictionary)</dfn>
+::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
     dictionary.
 
-{{TransformValue}} objects {#transformvalue-objects}
+{{CSSTransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
 
 <pre class='idl'>
 [Constructor(),
- Constructor(sequence&lt;TransformComponent> transforms)]
-interface TransformValue : StyleValue {
-  iterable&lt;TransformComponent>;
+ Constructor(sequence&lt;CSSTransformComponent> transforms)]
+interface CSSTransformValue : CSSStyleValue {
+  iterable&lt;CSSTransformComponent>;
   readonly attribute boolean is2D;
   readonly attribute DOMMatrixReadOnly matrix;
 };
 
-interface TransformComponent {
+interface CSSTransformComponent {
   readonly attribute DOMString cssText;
   readonly attribute boolean is2D;
   readonly attribute DOMMatrixReadOnly matrix;
 };
 
-[Constructor(LengthValue x, LengthValue y),
- Constructor(LengthValue x, LengthValue y, LengthValue z)]
-interface Translation : TransformComponent {
-  readonly attribute LengthValue x;
-  readonly attribute LengthValue y;
-  readonly attribute LengthValue z;
+[Constructor(CSSLengthValue x, CSSLengthValue y),
+ Constructor(CSSLengthValue x, CSSLengthValue y, CSSLengthValue z)]
+interface CSSTranslation : CSSTransformComponent {
+  readonly attribute CSSLengthValue x;
+  readonly attribute CSSLengthValue y;
+  readonly attribute CSSLengthValue z;
 };
 
 [Constructor(double angle),
  Constructor(double angle, double x, double y, double z)]
-interface Rotation : TransformComponent {
+interface CSSRotation : CSSTransformComponent {
   readonly attribute double angle;
   readonly attribute double x;
   readonly attribute double y;
@@ -440,43 +440,43 @@ interface Rotation : TransformComponent {
 
 [Constructor(double x, double y),
  Constructor(double x, double y, double z)]
-interface Scale : TransformComponent {
+interface CSSScale : CSSTransformComponent {
   readonly attribute double x;
   readonly attribute double y;
   readonly attribute double z;
 };
 
 [Constructor(double ax, double ay)]
-interface Skew : TransformComponent {
+interface CSSSkew : CSSTransformComponent {
   readonly attribute double ax;
   readonly attribute double ay;
 };
 
-[Constructor(LengthValue length)]
-interface Perspective : TransformComponent {
-  readonly attribute LengthValue length;
+[Constructor(CSSLengthValue length)]
+interface CSSPerspective : CSSTransformComponent {
+  readonly attribute CSSLengthValue length;
 };
 
 [Constructor(DOMMatrixReadOnly matrix)]
-interface Matrix : TransformComponent {
+interface CSSMatrix : CSSTransformComponent {
 };
 </pre>
 
 
-{{TransformValue}} objects represent values for the 'transform' property. A
-{{TransformValue}} represents a list of {{TransformComponent}}s.
+{{CSSTransformValue}} objects represent values for the 'transform' property. A
+{{CSSTransformValue}} represents a list of {{CSSTransformComponent}}s.
 
-{{TransformComponent}} objects have the following properties:
+{{CSSTransformComponent}} objects have the following properties:
 
-The <dfn attribute for=TransformComponent>is2D</dfn> attribute is
+The <dfn attribute for=CSSTransformComponent>is2D</dfn> attribute is
 true if the component represents a 2D transform function,
 and false otherwise. The transform function which the component represents is
-stored in string form in the <dfn attribute for=TransformComponent>cssText</dfn>
+stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</dfn>
 attribute.
 
 <div class=note>
-Each {{TransformComponent}} can correspond to one of a number of underlying
-transform functions. For example, a {{Translation}} with an x value of "10px"
+Each {{CSSTransformComponent}} can correspond to one of a number of underlying
+transform functions. For example, a {{CSSTranslation}} with an x value of "10px"
 and y &amp; z values of 0 could be:
 *   translate(10px)
 *   translate(10px, 0)
@@ -485,62 +485,62 @@ and y &amp; z values of 0 could be:
 
 </div>
 
-When a {{TransformValue}} is read from a {{StylePropertyMap}}, each
-{{TransformComponent}} will maintain the relevant transform function in
-its <code>cssText</code> attribute. However, newly constructed {{TransformValue}}s
+When a {{CSSTransformValue}} is read from a {{StylePropertyMap}}, each
+{{CSSTransformComponent}} will maintain the relevant transform function in
+its <code>cssText</code> attribute. However, newly constructed {{CSSTransformValue}}s
 will always generate <code>cssText</code> according to the following rules:
-*   {{Skew}} will always serialize to skew(ax, ay)
-*   {{Perspective}} will always serialize to perspective(length)
-*   {{Translation}}, {{Rotation}}, and {{Scale}} each have two
+*   {{CSSSkew}} will always serialize to skew(ax, ay)
+*   {{CSSPerspective}} will always serialize to perspective(length)
+*   {{CSSTranslation}}, {{CSSRotation}}, and {{CSSScale}} each have two
     constructors. In each case, the constructor with fewer arguments constructs
-    a {{TransformComponent}} for which {{TransformComponent/is2D}} will be true,
+    a {{CSSTransformComponent}} for which {{CSSTransformComponent/is2D}} will be true,
     with <code>cssText</code> employing the 2D version of the relevant transform
     function (translate, rotate, scale). The constructor with more
-    arguments constructs a {{TransformComponent}} for which
-    {{TransformComponent/is2D}} will be false, with <code>cssText</code>
+    arguments constructs a {{CSSTransformComponent}} for which
+    {{CSSTransformComponent/is2D}} will be false, with <code>cssText</code>
     employing the 3D version of the relevant transform function (translate3d,
     rotate3d, scale3d).
-*   {{Matrix}} objects are constructed around a {{DOMMatrixReadOnly}}, and
+*   {{CSSMatrix}} objects are constructed around a {{DOMMatrixReadOnly}}, and
     well serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
     {{DOMMatrixReadOnly/is2D}} attribute is false, and a matrix3d function
     otherwise.
 
-<dfn attribute for=TransformValue>is2D</dfn> is true if the {{TransformComponent/is2D}}
-attribute of every {{TransformComponent}} referenced by the {{TransformValue}}
+<dfn attribute for=CSSTransformValue>is2D</dfn> is true if the {{CSSTransformComponent/is2D}}
+attribute of every {{CSSTransformComponent}} referenced by the {{CSSTransformValue}}
 returns true, and false otherwise.
 
-{{PositionValue}} objects {#positionvalue-objects}
+{{CSSPositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
 
 <pre class='idl'>
 
-[Constructor(LengthValue x, LengthValue y)]
-interface PositionValue : StyleValue {
-  readonly attribute LengthValue x;
-  readonly attribute LengthValue y;
+[Constructor(CSSLengthValue x, CSSLengthValue y)]
+interface CSSPositionValue : CSSStyleValue {
+  readonly attribute CSSLengthValue x;
+  readonly attribute CSSLengthValue y;
 };
 
 </pre>
 
-{{PositionValue}} objects represent values for properties that take <<position>>
+{{CSSPositionValue}} objects represent values for properties that take <<position>>
 productions, for example 'background-position'.
 
-The <dfn attribute for=PositionValue>x</dfn> attribute contains the position offset
+The <dfn attribute for=CSSPositionValue>x</dfn> attribute contains the position offset
 from the left edge of the container, expressed as a length.
 
-The <dfn attribute for=PositionValue>y</dfn> attribute contains the position offset
+The <dfn attribute for=CSSPositionValue>y</dfn> attribute contains the position offset
 from the top edge of the container, expressed as a length.
 
 Note that <<position>> productions accept a complicated combination of keywords
 and values. When specified as such in a stylesheet or via the untyped CSSOM,
-the <a attribute for=StyleValue>cssText</a> attribute will contain the specified
+the <a attribute for=CSSStyleValue>cssText</a> attribute will contain the specified
 string. However, this string is normalized as two Lengths into the <a attribute
-for=PositionValue>x</a> and <a attribute for=PositionValue>y</a> values of the
-{{StyleValue}} object.
+for=CSSPositionValue>x</a> and <a attribute for=CSSPositionValue>y</a> values of the
+{{CSSStyleValue}} object.
 
-New {{PositionValue}} objects can only be constructed via pairs of lengths, and
+New {{CSSPositionValue}} objects can only be constructed via pairs of lengths, and
 will only return the direct serialization of these lengths in the
-<a attribute for=StyleValue>cssText</a> attribute.
+<a attribute for=CSSStyleValue>cssText</a> attribute.
 
 <div class='example'>
 
@@ -558,10 +558,10 @@ Will produce the following behavior:
 // "center bottom 10px"
 document.querySelector('.example').styleMap.get('background-position').cssText;
 
-// 50% - as a SimpleLength
+// 50% - as a CSSSimpleLength
 document.querySelector('.example').styleMap.get('background-position').x;
 
-// calc(100% - 10px) - as a CalcLength
+// calc(100% - 10px) - as a CSSCalcLength
 document.querySelector('.example').styleMap.get('background-position').y;
 </pre>
 
@@ -569,133 +569,133 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
 ==================================================================================
-This section provides a table of which types of {{StyleValue}} a given property can accept.
-Note that most, but not all properties take {{KeywordValue}}.
+This section provides a table of which types of {{CSSStyleValue}} a given property can accept.
+Note that most, but not all properties take {{CSSKeywordValue}}.
 Shorthand properties and values are not supported.
 
 <table class=data>
 <thead>
   <tr>
     <th>Property</th>
-    <th>Allowable {{StyleValue}} types</th>
+    <th>Allowable {{CSSStyleValue}} types</th>
   </tr>
 </thead>
 <tbody>
   <tr>
     <td>'align-content'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'align-items'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'align-self'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'alignment-baseline'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'all'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-delay'</td>
-    <td>TimeValue | {{KeywordValue}}</td>
+    <td>TimeValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-direction'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-fill-mode'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-iteration-count'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-name'</td>
-    <td>CustomIdentValue | {{KeywordValue}}</td>
+    <td>CustomIdentValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-play-state'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'animation-timing-function'</td>
-    <td>TransitionTimingFunctionValue | {{KeywordValue}}</td>
+    <td>TransitionTimingFunctionValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'appearance'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-attachment'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-blend-mode'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-clip'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-color'</td>
-    <td>ColorValue | {{KeywordValue}}</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-image'</td>
-    <td>URIValue | {{KeywordValue}}</td>
+    <td>URIValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-origin'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-position'</td>
-    <td>{{PositionValue}} | {{KeywordValue}}</td>
+    <td>{{CSSPositionValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-repeat'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'background-size'</td>
-    <td>PairValue<{{LengthValue}}> (or SizeValue?)| {{KeywordValue}}</td>
+    <td>PairValue<{{CSSLengthValue}}> (or SizeValue?)| {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'baseline-shift'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-boundary'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-collapse'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-color'</td>
-    <td>ColorValue | {{KeywordValue}}</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-top-color' 'border-right-color' 'border-bottom-color' 'border-left-color'</td>
-    <td>ColorValue | {{KeywordValue}}</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-image-outset'</td>
-    <td>FourValues<{{LengthValue}}|{{NumberValue}}></td>
+    <td>FourValues<{{CSSLengthValue}}|{{CSSNumberValue}}></td>
   </tr>
   <tr>
     <td>'border-image-repeat'</td>
-    <td>PairValue<{{KeywordValue}}></td>
+    <td>PairValue<{{CSSKeywordValue}}></td>
   </tr>
   <tr>
     <td>'border-image-slice'</td>
@@ -703,290 +703,290 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'border-image-source'</td>
-    <td>URIValue | {{KeywordValue}}</td>
+    <td>URIValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-image-width'</td>
-    <td>FourValues<{{LengthValue}}|{{NumberValue}}|{{KeywordValue}}></td>
+    <td>FourValues<{{CSSLengthValue}}|{{CSSNumberValue}}|{{CSSKeywordValue}}></td>
   </tr>
   <tr>
     <td>'border-top-style' 'border-right-style' 'border-bottom-style' 'border-left-style'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-top-right-radius' 'border-bottom-right-radius' 'border-bottom-left-radius' 'border-top-left-radius'</td>
-    <td>PairValue<{{LengthValue}}> | {{KeywordValue}}</td>
+    <td>PairValue<{{CSSLengthValue}}> | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'border-top-width' 'border-right-width' 'border-bottom-width' 'border-left-width'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'bottom'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'caption-side'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'clear'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'clip'</td>
-    <td>ShapeValue | {{KeywordValue}}</td>
+    <td>ShapeValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'color'</td>
-    <td>ColorValue | {{KeywordValue}}</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'content'</td>
-    <td>StringValue | URIValue | CounterValue | AttrValue | {{KeywordValue}}</td>
+    <td>StringValue | URIValue | CounterValue | AttrValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'counter-increment' 'counter-reset'</td>
-    <td>CounterValue | {{KeywordValue}}</td>
+    <td>CounterValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'cue-after' 'cue-before'</td>
-    <td>URIValue | {{KeywordValue}}</td>
+    <td>URIValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'cursor'</td>
-    <td>URIValue | {{KeywordValue}}</td>
+    <td>URIValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'direction'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'display'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'empty-cells'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'float'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'font-family'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'font-size'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'font-style'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'font-variant'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'font-weight'</td>
-    <td>FontWeightValue | {{KeywordValue}}</td>
+    <td>FontWeightValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'height'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'left'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'letter-spacing'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'line-height'</td>
-    <td>{{LengthValue}} | {{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'list-style-image'</td>
-    <td>URIValue | {{KeywordValue}}</td>
+    <td>URIValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'list-style-position'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'list-style-type'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'margin-top' 'margin-right' 'margin-bottom' 'margin-left'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'max-height' 'max-width' 'min-height' 'min-width'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'orphans'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'outline-color'</td>
-    <td>ColorValue | {{KeywordValue}}</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'outline-style'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'outline-width'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'overflow'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'padding-top' 'padding-right' 'padding-bottom' 'padding-left'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'page-break-after' 'page-break-before'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'page-break-inside'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'pause-after' 'pause-before'</td>
-    <td>TimeValue | PercentageValue | {{KeywordValue}}</td>
+    <td>TimeValue | PercentageValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'pitch-range'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'pitch'</td>
-    <td>FrequencyValue | {{KeywordValue}}</td>
+    <td>FrequencyValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'play-during'</td>
-    <td>PlayDuringValue | {{KeywordValue}}</td>
+    <td>PlayDuringValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'position'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'quotes'</td>
-    <td>PairValue<StringValue> | {{KeywordValue}}</td>
+    <td>PairValue<StringValue> | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'richness'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'right'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'speak-header'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'speak-numeral'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'speak-punctuation'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'speak'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'speech-rate'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'stress'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'table-layout'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'text-align'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'text-decoration'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'text-indent'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'text-transform'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'top'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'unicode-bidi'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'vertical-align'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'visibility'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'voice-family'</td>
-    <td>VoiceValue | {{KeywordValue}}</td>
+    <td>VoiceValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'volume'</td>
-    <td>{{NumberValue}} | PercentageValue | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | PercentageValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'white-space'</td>
-    <td>{{KeywordValue}}</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'widows'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'width'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'word-spacing'</td>
-    <td>{{LengthValue}} | {{KeywordValue}}</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'z-index'</td>
-    <td>{{NumberValue}} | {{KeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
 </tbody>
 </table>
 
 Issue(159): Spec up ColorValue
 
-{{StyleValue}} normalization {#stylevalue-normalization}
+{{CSSStyleValue}} normalization {#stylevalue-normalization}
 ========================================================
 
 Issue(140): write me
