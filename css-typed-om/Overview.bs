@@ -260,9 +260,6 @@ and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer v
 Issue(140): where does a description of parsing values go? For example, where do we indicate that
        calc(4 + 8) will create a {{NumberValue}} with a value of 12?
 
-Issue(164): do we actually want to collapse calc values down to their minimum representations? I assume
-       so, given that this is what the old CSSOM is now specified to do.
-
 {{LengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
 
