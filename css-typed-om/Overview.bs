@@ -180,14 +180,12 @@ Note: The StylePropertyMap returned by getComputedStyleMap represents computed s
       not resolved style. In this regard it provides different values than those
       in objects returned by getComputedStyle.
 
-Issue(160): Put SameObject on maps.
-
 Specified {{StylePropertyMap}} objects {#specified-stylepropertymap-objects}
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-  readonly attribute StylePropertyMap styleMap;
+  [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
@@ -207,7 +205,7 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface Element {
-  readonly attribute StylePropertyMap styleMap;
+  [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
