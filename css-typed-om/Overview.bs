@@ -11,6 +11,11 @@ Repository: w3c/css-houdini-drafts
 Ignored Vars: type
 </pre>
 
+<pre class=anchors>
+urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec: ecma-262
+    text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
+</pre>
+
 <pre class=link-defaults>
 spec:dom; type:interface; text:Document
 spec:dom; type:interface; text:Element;
@@ -389,7 +394,7 @@ The following methods are defined for {{CSSLengthValue}} objects:
 ::  Divides the length represented by the object by the provided <var>value</var>,
     and returns the result as a new {{CSSLengthValue}}. This will construct
     a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
-    if the object is a {{CSSCalcLength}}. The function will throw a {{DivideByZeroError}} when the value given is 0.
+    if the object is a {{CSSCalcLength}}. The function will throw a <a>RangeError</a> when the value given is 0.
 
 :   <dfn method for=CSSLengthValue>parse(DOMString cssText)</dfn>
 ::  Parses the provided <var>cssText</var> as a length value. Will return a
