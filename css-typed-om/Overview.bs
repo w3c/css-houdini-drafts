@@ -32,9 +32,6 @@ Some particular considerations:
     treated as a number without first explicitly casting it to a {{SimpleLength}}, as calc
     expressions and keywords are also valid lengths.
 
-Issue(138): is it possible to amalgamate this API with value objects once they're specced by
-       TC39?
-
 {{StyleValue}} objects {#stylevalue-objects}
 ============================================
 
