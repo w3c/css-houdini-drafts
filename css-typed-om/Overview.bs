@@ -59,24 +59,27 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <pre class='idl'>
-interface StylePropertyMap {
-  void append(DOMString property, (StyleValue or DOMString)... values);
-  void delete(DOMString property);
+interface StylePropertyMapReadOnly {
   StyleValue? get(DOMString property);
   sequence&lt;StyleValue> getAll(DOMString property);
   boolean has(DOMString property);
-  void set(DOMString property, (StyleValue or DOMString)... values);
   iterable&lt;DOMString, (StyleValue or sequence&lt;StyleValue> or DOMString)>;
   sequence&lt;DOMString> getProperties();
   stringifier;
 };
+
+interface StylePropertyMap : StylePropertyMapReadOnly {
+  void append(DOMString property, (StyleValue or DOMString)... values);
+  void delete(DOMString property);
+  void set(DOMString property, (StyleValue or DOMString)... values);
+};
 </pre>
 
-A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
+A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn>,
 which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
 is initialized differently depending on where the {{StyleValue}} is used
 (see
-<a section href="#computed-stylepropertymap-objects"></a>,
+<a section href="#computed-stylepropertymapreadonly-objects"></a>,
 <a section href="#specified-stylepropertymap-objects"></a>, and
 <a section href="#inline-stylepropertymap-objects"></a>).
 
@@ -87,7 +90,7 @@ Instead, sequences represent values associated with list-valued properties.
 
 This approach allows single-valued properties to become list-valued in the
 future without breaking code that relies on calling
-<a method for=StylePropertyMap>get()</a> and/or
+<a method for=StylePropertyMapReadOnly>get()</a> and/or
 <a method for=StylePropertyMap>set()</a> for those properties.
 </div>
 
@@ -129,12 +132,12 @@ Issue(148): add detailed descriptions of the rest of the methods on {{StylePrope
 
 Issue(149): describe that these are not live objects
 
-Computed {{StylePropertyMap}} objects {#computed-stylepropertymap-objects}
+Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
 
 <pre class='idl'>
 partial interface Document {
-  StylePropertyMap getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+  StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
 
@@ -145,8 +148,6 @@ method.
 
 The <a>property model</a> for <a>computed StylePropertyMap</a> objects contains
 an entry for every valid CSS property supported by the User Agent.
-
-Issue(151): add a StylePropertyMapReadOnly and make getComputedStyleMap return that.
 
 Issue(154): better wording here and below - the property model is initialized to contain these things.
 
