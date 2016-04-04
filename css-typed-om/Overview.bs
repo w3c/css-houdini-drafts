@@ -408,6 +408,28 @@ The following methods are defined for {{CSSLengthValue}} objects:
 ::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
     dictionary.
 
+{{CSSAngleValue}} objects {#anglevalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+enum CSSAngleUnit {
+  "deg", "rad", "grad", "turn"
+};
+
+[Constructor(double value, CSSAngleUnit unit)]
+interface CSSAngleValue : CSSStyleValue {
+  readonly attribute double degrees;
+  readonly attribute double radians;
+  readonly attribute double gradians;
+  readonly attribute double turns;
+};
+</pre>
+
+{{CSSAngleValue}} objects represent CSS angles. Once constructed, a
+CSSAngleValue provides attributes that reflect the size of the angle in each of the
+CSS angle units represented by the {{CSSAngleUnit}} enum. 
+
+
 {{CSSTransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
 
@@ -434,8 +456,10 @@ interface CSSTranslation : CSSTransformComponent {
   readonly attribute CSSLengthValue z;
 };
 
-[Constructor(double angle),
- Constructor(double angle, double x, double y, double z)]
+[Constructor(double degrees),
+ Constructor(CSSAngleValue angle),
+ Constructor(double degrees, double x, double y, double z),
+ Constructor(CSSAngleValue angle, double x, double y, double z)]
 interface CSSRotation : CSSTransformComponent {
   readonly attribute double angle;
   readonly attribute double x;
@@ -488,6 +512,17 @@ and y &amp; z values of 0 could be:
 *   translateX(10px)
 *   translate3d(10px, 0, 0)
 
+</div>
+
+When a {{CSSRotation}} is constructed with a double (as opposed to a 
+{{CSSAngleValue}}), the angle is taken to be in degrees.
+
+<div class=note>
+The following two CSSRotations are equivalent:
+<pre class='lang-javascript'>
+    CSSRotation(angle);
+    CSSRotation(CSSAngleValue(angle, "deg"));
+</pre>
 </div>
 
 When a {{CSSTransformValue}} is read from a {{StylePropertyMap}}, each
