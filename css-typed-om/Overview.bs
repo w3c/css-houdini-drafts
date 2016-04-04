@@ -61,7 +61,7 @@ interface TokenStreamValue : StyleValue {
 };
 
 interface VariableReferenceValue {
-  attribute string variable;
+  attribute DOMString variable;
   attribute TokenStreamValue fallback;
 };
 </pre>
@@ -328,6 +328,7 @@ interface CalcLength : LengthValue {
 };
 
 // lengths that are *just* keywords don't become SimpleLengths or CalcLengths.
+// Instead they are represented as KeywordValue objects.
 [Constructor(DOMString cssText),
  Constructor(LengthValue),
  Constructor(double value, LengthType type)]
@@ -337,7 +338,52 @@ interface SimpleLength : LengthValue {
 };
 </pre>
 
-Issue(167): write long descriptions of all of this
+{{LengthValue}} objects represent lengths:
+
+*   {{SimpleLength}} objects represent lengths that contain a single unit type (for example "42px").
+*   {{CalcLength}} objects represent lengths that contain multiple units (for example
+    "calc(56em + 10%)").
+
+Note that lengths which incorporate variable references will instead be represented as
+{{TokenStreamValue}} objects, and keywords as {{KeywordValue}} objects.
+
+The following methods are defined for {{LengthValue}} objects:
+
+:   <dfn method for=LengthValue>add(LengthValue value)</dfn>
+::  Adds the provided <var>value</var> to the length represented by the object,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    be expressed in terms of a single unit.
+
+:   <dfn method for=LengthValue>subtract(LengthValue value)</dfn>
+::  Subtracts the provided <var>value</var> from the length represented by the object,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    be expressed in terms of a single unit.
+
+:   <dfn method for=LengthValue>multiply(double value)</dfn>
+::  Multiplies the length represented by the object by the provided <var>value</var>,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
+    if the object is a {{CalcLength}}.
+
+:   <dfn method for=LengthValue>divide(double value)</dfn>
+::  Divides the length represented by the object by the provided <var>value</var>,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
+    if the object is a {{CalcLength}}.
+
+:   <dfn method for=LengthValue>parse(DOMString cssText)</dfn>
+::  Parses the provided <var>cssText</var> as a length value. Will return a
+    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise.
+
+:   <dfn method for=LengthValue>fromValue(double value, LengthType type)</dfn>
+::  Constructs a {{SimpleLength}} with the given <var>value</var> and unit
+    <var>type</var>.
+
+:   <dfn method for=LengthValue>fromDictionary(CalcDictionary dictionary)</dfn>
+::  Constructs a {{CalcLength}} with units and values as defined by the provided
+    dictionary.
 
 Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
