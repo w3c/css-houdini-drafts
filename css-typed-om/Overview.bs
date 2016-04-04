@@ -169,8 +169,6 @@ Note: The StylePropertyMap returned by getComputedStyleMap represents computed s
       not resolved style. In this regard it provides different values than those
       in objects returned by getComputedStyle.
 
-Issue(157): do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
-
 Issue(160): Put SameObject on maps.
 
 Specified {{StylePropertyMap}} objects {#specified-stylepropertymap-objects}
@@ -458,10 +456,6 @@ will always generate <code>cssText</code> according to the following rules:
 <dfn attribute for=TransformValue>is2D</dfn> is true if the {{TransformComponent/is2D}}
 attribute of every {{TransformComponent}} referenced by the {{TransformValue}}
 returns true, and false otherwise.
-
-Issue(163): Need to add a section describing unions of types.
-
-Issue(161): Need to add a section describing shorthands.
 
 {{PositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
@@ -944,21 +938,7 @@ Shorthand properties and values are not supported.
 
 Issue(159): Spec up ColorValue
 
-Issue(158): Spec up URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
-
-Issue(155): Do we want to make a generic PairValue and QuadValue, or have more specific classes for background-size, border-image-repeat, border-radius-*, border-image-outset, border-image-width?
-
-Issue(153): BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
-
-Issue(152): What do we do for play-during, which takes <uri> [ mix || repeat ]?
-
-Issue(150): Do we want a pair type for things like quotes which take [<string> <string>]
-
 Issue(146): Do we need to say that LengthValues must be positive e.g. for border-widths here?
-
-Issue(142): Do we want a font value class? How about a FontWeightValue (for 100, 200 etc) class?
-
-Issue(144): Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
