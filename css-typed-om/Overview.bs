@@ -356,6 +356,10 @@ interface SimpleLength : LengthValue {
 *   {{CalcLength}} objects represent lengths that contain multiple units (for example
     "calc(56em + 10%)").
 
+{{LengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{LengthValue}},
+that value will be accepted unaltered when set on a <a>specified StylePropertyMap</a> or
+<a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
+
 Note that lengths which incorporate variable references will instead be represented as
 {{TokenStreamValue}} objects, and keywords as {{KeywordValue}} objects.
 
@@ -985,10 +989,6 @@ Shorthand properties and values are not supported.
 </table>
 
 Issue(159): Spec up ColorValue
-
-{{LengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{LengthValue}},
-that value will be accepted unaltered when set on a <a>specified StylePropertyMap</a> or
-<a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
 {{StyleValue}} normalization {#stylevalue-normalization}
 ========================================================
