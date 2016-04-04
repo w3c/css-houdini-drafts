@@ -8,12 +8,24 @@ Level: 1
 Abstract:
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
+Ignored Vars: type
 </pre>
 
 <pre class=link-defaults>
 spec: dom-ls; type:interface; text:Document;
 spec: dom-ls; type:interface; text:Element;
-spec:css-transforms-1; type:property; text:transform
+spec:css-transforms-1; type:property; text:transform;
+spec:css-color-3; type:property; text:color;
+spec:css-speech-1; type:property; text:cue-after;
+spec:css-speech-1; type:property; text:cue-before;
+spec:css-speech-1; type:property; text:pause-after;
+spec:css-speech-1; type:property; text:pause-before;
+spec:css-speech-1; type:property; text:speak;
+spec:css-speech-1; type:property; text:voice-family;
+spec:css21; type:property; text:max-height;
+spec:css21; type:property; text:max-width;
+spec:css21; type:property; text:min-height;
+spec:css21; type:property; text:min-width;
 </pre>
 
 Introduction {#intro}
@@ -52,31 +64,47 @@ The <dfn method for=StyleValue>parse(DOMString <var>property</var>, DOMString <v
 method attempts to parse <var>cssText</var> as a valid {{StyleValue}} or sequence&lt;{{StyleValue}}> for
 <var>property</var>, returning null on failure.
 
-Issue(41): Need to add a section describing values that reference custom properties. Should StyleValue handle
-           this or should it be a subclass?
+{{TokenStreamValue}} objects {#tokenstreamvalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+interface TokenStreamValue : StyleValue {
+  iterable<(DOMString or VariableReferenceValue)>;
+};
+
+interface VariableReferenceValue {
+  attribute DOMString variable;
+  attribute TokenStreamValue fallback;
+};
+</pre>
+
+{{TokenStreamValue}} objects represent unsupported values and values that reference custom properties. They represent a list of string fragments and variable references.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <pre class='idl'>
-interface StylePropertyMap {
-  void append(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
-  void delete(DOMString property);
+interface StylePropertyMapReadOnly {
   StyleValue? get(DOMString property);
   sequence&lt;StyleValue> getAll(DOMString property);
   boolean has(DOMString property);
-  void set(DOMString property, (StyleValue or sequence&lt;StyleValue> or DOMString) value);
   iterable&lt;DOMString, (StyleValue or sequence&lt;StyleValue> or DOMString)>;
   sequence&lt;DOMString> getProperties();
   stringifier;
 };
+
+interface StylePropertyMap : StylePropertyMapReadOnly {
+  void append(DOMString property, (StyleValue or DOMString)... values);
+  void delete(DOMString property);
+  void set(DOMString property, (StyleValue or DOMString)... values);
+};
 </pre>
 
-A {{StylePropertyMap}} object has an associated <dfn>property model</dfn>,
+A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn>,
 which is a list of property - sequence&lt;{{StyleValue}}> pairs. This list
 is initialized differently depending on where the {{StyleValue}} is used
 (see
-<a section href="#computed-stylepropertymap-objects"></a>,
+<a section href="#computed-stylepropertymapreadonly-objects"></a>,
 <a section href="#specified-stylepropertymap-objects"></a>, and
 <a section href="#inline-stylepropertymap-objects"></a>).
 
@@ -87,14 +115,13 @@ Instead, sequences represent values associated with list-valued properties.
 
 This approach allows single-valued properties to become list-valued in the
 future without breaking code that relies on calling
-<a method for=StylePropertyMap>get()</a> and/or
+<a method for=StylePropertyMapReadOnly>get()</a> and/or
 <a method for=StylePropertyMap>set()</a> for those properties.
 </div>
 
-Issue(141): this is different to the other multimaps on the platform because append/set take
-       sequences.
-
-When invoked, the <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or sequence&lt;StyleValue> or DOMString) <var>value</var>)</dfn> method follows the following steps:
+When invoked, the
+<dfn method for=StylePropertyMap>append(DOMString <var>property</var> (StyleValue or DOMString)... <var>values</var>)</dfn>
+method follows the following steps:
 
 Issue(143): first need to check whether the property is a valid property.
 
@@ -107,26 +134,19 @@ Issue(143): first need to check whether the property is a valid property.
     ::  initialize an empty sequence in the <a>property model</a> for <var>property</var>
 
 1.
-    :   if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
+    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a {{StyleValue}}, and its type is a type that <var>property</var> can't accept
     ::  throw a TypeError
 
 1.
-    :   if <var>value</var> is a sequence&lt;{{StyleValue}}>, and it contains a {{StyleValue}} that has a type
-        that <var>property</var> can't accept
-    ::  throw a TypeError
-
-1.
-    :   if <var>value</var> is a DOMString
+    :   for each <var>value</var> in <var>values</var>, if <var>value</var> is a DOMString
     ::  set <var>value</var> to the result of invoking <a method for=StyleValue>parse()</a>, providing <var>property</var>
         and <var>value</var> as inputs.
 
 1.
-    :   if <var>value</var> is null
+    :   if any <var>value</var> in <var>values</var> is null
     ::  throw a TypeError
-    :   else, if <var>value</var> is a StyleValue
-    ::  append <var>value</var> to the entry in the <a>property model</a>
-    :   else, if <var>value</var> is a sequence&lt;StyleValue>
-    ::  concatenate <var>value</var> onto the end of the entry in the <a>property model</a>
+    :   else
+    ::  concatenate <var>values</var> onto the end of the entry in the <a>property model</a>
 
 
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
@@ -137,12 +157,12 @@ Issue(148): add detailed descriptions of the rest of the methods on {{StylePrope
 
 Issue(149): describe that these are not live objects
 
-Computed {{StylePropertyMap}} objects {#computed-stylepropertymap-objects}
+Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
 
 <pre class='idl'>
 partial interface Document {
-  StylePropertyMap getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+  StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
 
@@ -151,12 +171,8 @@ partial interface Document {
 <dfn method for=Document>getComputedStyleMap(Element, optional DOMString?)</dfn>
 method.
 
-The <a>property model</a> for <a>computed StylePropertyMap</a> objects contains
-an entry for every valid CSS property supported by the User Agent.
-
-Issue(151): add a StylePropertyMapReadOnly and make getComputedStyleMap return that.
-
-Issue(154): better wording here and below - the property model is initialized to contain these things.
+When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
+objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
 Issue(156): need to describe what values are here too.
 
@@ -179,7 +195,8 @@ partial interface CSSStyleRule {
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-The <a>property model</a> for <a>specified StylePropertyMap</a> objects contains
+When constructed, the <a>property model</a> for <a>specified StylePropertyMap</a>
+objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
 the last valid value provided by the {{CSSStyleRule}} object.
@@ -198,7 +215,8 @@ partial interface Element {
 directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
 attribute of {{Element}} objects.
 
-The <a>property model</a> for <a>inline StylePropertyMap</a> objects contains an
+When constructed, the <a>property model</a> for <a>inline StylePropertyMap</a> objects
+is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
 The value for a given property is the last valid value provided in the string.
@@ -236,8 +254,6 @@ interface NumberValue : StyleValue {
 and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
-Issue(162): Is this the behaviour we want for out-of-range (as opposed to incorrectly typed) values?
-
 <div class='example'>
 The following code is valid
 
@@ -259,9 +275,6 @@ and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer v
 
 Issue(140): where does a description of parsing values go? For example, where do we indicate that
        calc(4 + 8) will create a {{NumberValue}} with a value of 12?
-
-Issue(164): do we actually want to collapse calc values down to their minimum representations? I assume
-       so, given that this is what the old CSSOM is now specified to do.
 
 {{LengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
@@ -327,6 +340,7 @@ interface CalcLength : LengthValue {
 };
 
 // lengths that are *just* keywords don't become SimpleLengths or CalcLengths.
+// Instead they are represented as KeywordValue objects.
 [Constructor(DOMString cssText),
  Constructor(LengthValue),
  Constructor(double value, LengthType type)]
@@ -336,13 +350,52 @@ interface SimpleLength : LengthValue {
 };
 </pre>
 
-Issue(165): do we want an enum of length keywords too?
+{{LengthValue}} objects represent lengths:
 
-Issue(167): write long descriptions of all of this
+*   {{SimpleLength}} objects represent lengths that contain a single unit type (for example "42px").
+*   {{CalcLength}} objects represent lengths that contain multiple units (for example
+    "calc(56em + 10%)").
 
-Issue(168): There are now 3 ways of creating Length values -
-       StyleValue.parse, CalcLength/SimpleLength constructors, and LengthValue.parse / fromValue / fromDictionary.
-       Is this too much?
+Note that lengths which incorporate variable references will instead be represented as
+{{TokenStreamValue}} objects, and keywords as {{KeywordValue}} objects.
+
+The following methods are defined for {{LengthValue}} objects:
+
+:   <dfn method for=LengthValue>add(LengthValue value)</dfn>
+::  Adds the provided <var>value</var> to the length represented by the object,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    be expressed in terms of a single unit.
+
+:   <dfn method for=LengthValue>subtract(LengthValue value)</dfn>
+::  Subtracts the provided <var>value</var> from the length represented by the object,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} or {{CalcLength}} depending on whether the result can
+    be expressed in terms of a single unit.
+
+:   <dfn method for=LengthValue>multiply(double value)</dfn>
+::  Multiplies the length represented by the object by the provided <var>value</var>,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
+    if the object is a {{CalcLength}}.
+
+:   <dfn method for=LengthValue>divide(double value)</dfn>
+::  Divides the length represented by the object by the provided <var>value</var>,
+    and returns the result as a new {{LengthValue}}. This will construct
+    a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
+    if the object is a {{CalcLength}}.
+
+:   <dfn method for=LengthValue>parse(DOMString cssText)</dfn>
+::  Parses the provided <var>cssText</var> as a length value. Will return a
+    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise.
+
+:   <dfn method for=LengthValue>fromValue(double value, LengthType type)</dfn>
+::  Constructs a {{SimpleLength}} with the given <var>value</var> and unit
+    <var>type</var>.
+
+:   <dfn method for=LengthValue>fromDictionary(CalcDictionary dictionary)</dfn>
+::  Constructs a {{CalcLength}} with units and values as defined by the provided
+    dictionary.
 
 Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
@@ -510,8 +563,8 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 </div>
 
-Mapping of properties to accepted types
-=======================================
+Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
+==================================================================================
 This section provides a table of which types of {{StyleValue}} a given property can accept.
 Note that most, but not all properties take {{KeywordValue}}.
 Shorthand properties and values are not supported.
