@@ -309,10 +309,10 @@ dictionary CalcDictionary {
 };
 
 interface LengthValue : StyleValue {
-  LengthValue add(LengthValue value); // can throw
-  LengthValue subtract(LengthValue value); // can throw
-  LengthValue multiply(double value); // can throw
-  LengthValue divide(double value); // can throw
+  LengthValue add(LengthValue value);
+  LengthValue subtract(LengthValue value);
+  LengthValue multiply(double value);
+  LengthValue divide(double value);
   static LengthValue parse(DOMString cssText);
   static LengthValue fromValue(double value, LengthType type);
   static LengthValue fromDictionary(CalcDictionary dictionary);
@@ -389,11 +389,11 @@ The following methods are defined for {{LengthValue}} objects:
 ::  Divides the length represented by the object by the provided <var>value</var>,
     and returns the result as a new {{LengthValue}}. This will construct
     a {{SimpleLength}} if the object is a {{SimpleLength}}, or a {{CalcLength}}
-    if the object is a {{CalcLength}}.
+    if the object is a {{CalcLength}}. The function will throw a {{DivideByZeroError}} when the value given is 0.
 
 :   <dfn method for=LengthValue>parse(DOMString cssText)</dfn>
 ::  Parses the provided <var>cssText</var> as a length value. Will return a
-    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise.
+    {{SimpleLength}} when possible, or a {{CalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
 
 :   <dfn method for=LengthValue>fromValue(double value, LengthType type)</dfn>
 ::  Constructs a {{SimpleLength}} with the given <var>value</var> and unit
@@ -402,8 +402,6 @@ The following methods are defined for {{LengthValue}} objects:
 :   <dfn method for=LengthValue>fromDictionary(CalcDictionary dictionary)</dfn>
 ::  Constructs a {{CalcLength}} with units and values as defined by the provided
     dictionary.
-
-Issue(166): What happens if the provided DOMString or LengthValue for (e.g.) a SimpleLength is invalid?
 
 {{TransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
