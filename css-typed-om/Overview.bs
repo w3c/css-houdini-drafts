@@ -35,6 +35,7 @@ spec:css-tables-3; type:property; text:border-collapse;
 spec:css-tables-3; type:property; text:caption-side;
 spec:css-tables-3; type:property; text:empty-cells;
 spec:css-tables-3; type:property; text:table-layout;
+spec:css-position-3; type:value; for:left; text:auto
 </pre>
 
 Introduction {#intro}
@@ -1090,6 +1091,11 @@ If the provided value can tokenize as a <<number-token>>, then
 a {{CSSNumberValue}} is constructed with the <a attribute for=CSSNumberValue>value</a>
 attribute set to the number parsed from the <<number-token>>.
 
+Otherwise, if the provided value can be parsed as a calc expression with a
+<a spec='css-values-3'>resolved type</a> of <<number>>, then the expression is solved and
+a {{CSSNumberValue}} is constructed with the <a attribute for=CSSNumberValue>value</a>
+attribute set to the result.
+
 Otherwise, normalization fails.
 
 Issue(140): finish me
@@ -1107,4 +1113,48 @@ There are no known privacy issues introduced by these features.
 Appendix A: Computed {{CSSStyleValue}} objects {#computed-stylevalue-objects}
 =============================================================================
 
-Issue(156): write me
+This appendix describes the restrictions on {{CSSStyleValue}} objects that
+appear as computed values (i.e. as a value stored on computed 
+{{StylePropertyMapReadOnly}} objects).
+
+Computed {{CSSTokenStreamValue}} objects {#computed-tokenstreamvalue-objects}
+-----------------------------------------------------------------------------
+
+Custom property references are resolved as part of style computation. Accordingly,
+computed {{CSSTokenStreamValue}} objects will not contain {{CSSVariableReferenceValue}} objects.
+As a result, only a single {{DOMString}} will appear in the sequence contained by
+computed {{CSSTokenStreamValue}} objects.
+
+Furthermore, values that at specified value time contained custom property references
+are renormalized after computation.
+
+<div class='example'>
+
+Consider an element "e" with an inline style that specifies a width of <pre>var(--baz)</pre>.
+
+Assuming that the custom property --baz contains the value "42px", running the following code:
+
+<pre class='lang-javascript'>
+var a = e.styleMap.get('width');
+var b = getComputedStyleMap(e).get('width');
+</pre>
+
+Will result in "a" containing a {{CSSTokenStreamValue}} with a single {{CSSVariableReferenceValue}}
+in its sequence, and "b" containing a {{CSSSimpleLength}} representing 42px.
+
+</div>
+
+Computed {{CSSKeywordValue}} objects {#computed-keywordvalue-objects}
+---------------------------------------------------------------------
+
+During computation, {{CSSKeywordValue}} objects are either left unaltered (e.g. ''auto'' 
+values for lengths that participate in layout) or resolved to a relevant value
+and renormalized (e.g. the color ''red'').
+
+Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
+------------------------------------------------------------------
+
+During computation, {{CSSNumberValue}} objects are range-restricted as appropriate
+to the relevant property, but otherwise left unaltered.
+
+Issue(156): Finish me.
