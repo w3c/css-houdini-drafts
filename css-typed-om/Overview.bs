@@ -170,14 +170,14 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface Document {
+partial interface Window {
   StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
 
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
-<dfn method for=Document>getComputedStyleMap(Element, optional DOMString?)</dfn>
+<dfn method for=Window>getComputedStyleMap(Element, optional DOMString?)</dfn>
 method.
 
 When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
