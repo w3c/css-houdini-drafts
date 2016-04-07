@@ -318,9 +318,9 @@ interface CSSLengthValue : CSSStyleValue {
   CSSLengthValue subtract(CSSLengthValue value);
   CSSLengthValue multiply(double value);
   CSSLengthValue divide(double value);
-  static CSSLengthValue parse(DOMString cssText);
-  static CSSLengthValue fromValue(double value, LengthType type);
-  static CSSLengthValue fromDictionary(CSSCalcDictionary dictionary);
+  static CSSLengthValue from(DOMString cssText);
+  static CSSLengthValue from(double value, LengthType type);
+  static CSSLengthValue from(CSSCalcDictionary dictionary);
 };
 
 [Constructor(DOMString cssText),
@@ -396,15 +396,15 @@ The following methods are defined for {{CSSLengthValue}} objects:
     a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
     if the object is a {{CSSCalcLength}}. The function will throw a <a>RangeError</a> when the value given is 0.
 
-:   <dfn method for=CSSLengthValue>parse(DOMString cssText)</dfn>
+:   <dfn method for=CSSLengthValue>from(DOMString cssText)</dfn>
 ::  Parses the provided <var>cssText</var> as a length value. Will return a
     {{CSSSimpleLength}} when possible, or a {{CSSCalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
 
-:   <dfn method for=CSSLengthValue>fromValue(double value, LengthType type)</dfn>
+:   <dfn method for=CSSLengthValue>from(double value, LengthType type)</dfn>
 ::  Constructs a {{CSSSimpleLength}} with the given <var>value</var> and unit
     <var>type</var>.
 
-:   <dfn method for=CSSLengthValue>fromDictionary(CSSCalcDictionary dictionary)</dfn>
+:   <dfn method for=CSSLengthValue>from(CSSCalcDictionary dictionary)</dfn>
 ::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
     dictionary.
 
