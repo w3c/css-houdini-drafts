@@ -295,22 +295,22 @@ enum LengthType {
 };
 
 dictionary CSSCalcDictionary {
-  double? px = null;
-  double? percent = null;
-  double? em = null;
-  double? ex = null;
-  double? ch = null;
-  double? rem = null;
-  double? vw = null;
-  double? vh = null;
-  double? vmin = null;
-  double? vmax = null;
-  double? cm = null;
-  double? mm = null;
-  double? q = null;
-  double? in = null;
-  double? pc = null;
-  double? pt = null;
+  double px;
+  double percent;
+  double em;
+  double ex;
+  double ch;
+  double rem;
+  double vw;
+  double vh;
+  double vmin;
+  double vmax;
+  double cm;
+  double mm;
+  double q;
+  double in;
+  double pc;
+  double pt;
 };
 
 interface CSSLengthValue : CSSStyleValue {
