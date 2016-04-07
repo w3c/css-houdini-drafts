@@ -183,8 +183,6 @@ method.
 When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
-Issue(156): need to describe what values are here too.
-
 Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
       not resolved style. In this regard it provides different values than those
       in objects returned by getComputedStyle.
@@ -847,7 +845,7 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'line-height'</td>
-    <td>{{CSSLengthValue}} | {{CSSNumberValue}} | {{CSSKeywordValue}}</td>
+    <td>{{CSSNumberValue}} | {{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'list-style-image'</td>
@@ -1027,9 +1025,74 @@ Shorthand properties and values are not supported.
 Issue(159): Spec up ColorValue
 
 {{CSSStyleValue}} normalization {#stylevalue-normalization}
-========================================================
+===========================================================
 
-Issue(140): write me
+This section describes how normalized {{CSSStyleValue}} objects are
+constructed from CSS DOMString values.
+
+Strings are normalized by resulting CSSStyleValue subclass. To 
+determine which subclass to use, the CSS property that the string
+is a value for is used to look up the table in
+<a section href='#mapping-of-properties-to-accepted-types'></a>. The normalization
+procedure defined by each of the CSSStyleValue subclasses listed for that property in
+turn, falling back to the next subclass in the list if the current one
+fails to normalize.
+
+If all listed subclasses fail, then the value is normalized as a
+{{CSSTokenStreamValue}}.
+
+{{CSSTokenStreamValue}} normalization {#tokenstreamvalue-normalization}
+-----------------------------------------------------------------------
+
+Values which contain custom property references, as well as values
+for unsupported CSS properties, are tokenized then split into runs of
+tokens separated by custom property references.
+
+The token runs are serialized, while each custom property reference
+is represented by a {{CSSVariableReferenceValue}}.
+
+<div class='example'>
+
+The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
+is converted into a {{CSSTokenStreamValue}} that contains a sequence with:
+*   the string "calc(42px + "
+*   a {{CSSVariableReferenceValue}} with:
+    *   <a attribute for=CSSVariableReferenceValue>variable</a> "--foo"
+    *   <a attribute for=CSSVariableReferenceValue>fallback</a> a 
+        {{CSSTokenStreamValue}} with a single-valued sequence containing " 15em"
+*   the string " + "
+*   a {{CSSVariableReferenceValue}} with:
+    *   <a attribute for=CSSVariableReferenceValue>variable</a> "--bar"
+    *   <a attribute for=CSSVariableReferenceValue>fallback</a> a {{CSSTokenStreamValue}}
+        with a sequence containing:
+        *   the string " "
+        *   a {{CSSVariableReferenceValue}} with
+            *   <a attribute for=CSSVariableReferenceValue>variable</a> "--far"
+            *   <a attribute for=CSSVariableReferenceValue>fallback</a> undefined
+        *   the string " + 15px"
+*   the string ")"
+
+</div>
+
+{{CSSKeywordValue}} normalization {#keywordvalue-normalization}
+---------------------------------------------------------------
+
+If the provided value can tokenize as an <<ident-token>>, then
+a {{CSSKeywordValue}} is constructed with the provided value
+as the <a attribute for=CSSKeywordValue>keywordValue</a> attribute.
+
+Otherwise, normalization fails.
+
+{{CSSNumberValue}} normalization {#numbervalue-normalization}
+-------------------------------------------------------------
+
+If the provided value can tokenize as a <<number-token>>, then
+a {{CSSNumberValue}} is constructed with the <a attribute for=CSSNumberValue>value</a>
+attribute set to the number parsed from the <<number-token>>.
+
+Otherwise, normalization fails.
+
+Issue(140): finish me
 
 Security Considerations {#security-considerations}
 ==================================================
@@ -1041,3 +1104,7 @@ Privacy Considerations {#privacy-considerations}
 
 There are no known privacy issues introduced by these features.
 
+Appendix A: Computed {{CSSStyleValue}} objects {#computed-stylevalue-objects}
+=============================================================================
+
+Issue(156): write me
