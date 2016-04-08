@@ -8,7 +8,7 @@ Level: 1
 Abstract:
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
-Ignored Vars: type
+Ignored Vars: type, unit
 </pre>
 
 <pre class=anchors>
@@ -426,7 +426,7 @@ interface CSSAngleValue : CSSStyleValue {
 
 {{CSSAngleValue}} objects represent CSS angles. Once constructed, a
 CSSAngleValue provides attributes that reflect the size of the angle in each of the
-CSS angle units represented by the {{CSSAngleUnit}} enum. 
+CSS angle units represented by the {{CSSAngleUnit}} enum.
 
 
 {{CSSTransformValue}} objects {#transformvalue-objects}
@@ -513,7 +513,7 @@ and y &amp; z values of 0 could be:
 
 </div>
 
-When a {{CSSRotation}} is constructed with a double (as opposed to a 
+When a {{CSSRotation}} is constructed with a double (as opposed to a
 {{CSSAngleValue}}), the angle is taken to be in degrees.
 
 <div class=note>
@@ -1031,7 +1031,7 @@ Issue(159): Spec up ColorValue
 This section describes how normalized {{CSSStyleValue}} objects are
 constructed from CSS DOMString values.
 
-Strings are normalized by resulting CSSStyleValue subclass. To 
+Strings are normalized by resulting CSSStyleValue subclass. To
 determine which subclass to use, the CSS property that the string
 is a value for is used to look up the table in
 <a section href='#mapping-of-properties-to-accepted-types'></a>. The normalization
@@ -1059,7 +1059,7 @@ is converted into a {{CSSTokenStreamValue}} that contains a sequence with:
 *   the string "calc(42px + "
 *   a {{CSSVariableReferenceValue}} with:
     *   <a attribute for=CSSVariableReferenceValue>variable</a> "--foo"
-    *   <a attribute for=CSSVariableReferenceValue>fallback</a> a 
+    *   <a attribute for=CSSVariableReferenceValue>fallback</a> a
         {{CSSTokenStreamValue}} with a single-valued sequence containing " 15em"
 *   the string " + "
 *   a {{CSSVariableReferenceValue}} with:
@@ -1098,6 +1098,41 @@ attribute set to the result.
 
 Otherwise, normalization fails.
 
+{{CSSLengthValue}} normalization {#lengthvalue-normalization}
+-------------------------------------------------------------
+
+If the provided value matches the <<length>> production or the <<percentage>>
+production then a {{CSSSimpleLength}} is constructed with the <a attribute for=CSSSimpleLength>value</a>
+attribute set to the number part of the length, and the <a attribute for=CSSSimpleLength>type</a>
+set to the unit.
+
+Otherwise, if the provided value can be parsed as a calc expression with a
+<a spec='css-values-3'>resolved type</a> of <<length>> or <<percentage>>, then
+a {{CSSCalcLength}} is constructed with each unit that is mentioned in the
+calc expression reflected as the matching attribute set to the appropriate
+value.
+
+<div class='example'>
+A length of <code>calc(42px + 15% - 42px)</code> will normalize to a
+{{CSSCalcLength}} with both the <a attribute for=CSSCalcLength>px</a> and
+the <a attribute for=CSSCalcLength>percent</a> attributes set (to 0 and 15
+respectively). Even though the two pixel lengths cancel each other, the fact
+that pixels are mentioned in the expression means that they're represented
+in the normalized object.
+</div>
+
+Otherwise, normalization fails.
+
+{{CSSAngleValue}} normalization {#anglevalue-normalization}
+-----------------------------------------------------------
+
+If the provided value matches the <<angle>> production then a {{CSSAngleValue}}
+is constructed using the <a>CSSAngleValue(double value, CSSAngleUnit unit)</a>
+constructor, with <var>value</var> set to the number part of the angle,
+and <var>unit</var> set to the unit.
+
+Otherwise, normalization fails.
+
 Issue(140): finish me
 
 Security Considerations {#security-considerations}
@@ -1114,7 +1149,7 @@ Appendix A: Computed {{CSSStyleValue}} objects {#computed-stylevalue-objects}
 =============================================================================
 
 This appendix describes the restrictions on {{CSSStyleValue}} objects that
-appear as computed values (i.e. as a value stored on computed 
+appear as computed values (i.e. as a value stored on computed
 {{StylePropertyMapReadOnly}} objects).
 
 Computed {{CSSTokenStreamValue}} objects {#computed-tokenstreamvalue-objects}
@@ -1130,7 +1165,7 @@ are renormalized after computation.
 
 <div class='example'>
 
-Consider an element "e" with an inline style that specifies a width of <pre>var(--baz)</pre>.
+Consider an element "e" with an inline style that specifies a width of <code>var(--baz)</code>.
 
 Assuming that the custom property --baz contains the value "42px", running the following code:
 
@@ -1147,7 +1182,7 @@ in its sequence, and "b" containing a {{CSSSimpleLength}} representing 42px.
 Computed {{CSSKeywordValue}} objects {#computed-keywordvalue-objects}
 ---------------------------------------------------------------------
 
-During computation, {{CSSKeywordValue}} objects are either left unaltered (e.g. ''auto'' 
+During computation, {{CSSKeywordValue}} objects are either left unaltered (e.g. ''auto''
 values for lengths that participate in layout) or resolved to a relevant value
 and renormalized (e.g. the color ''red'').
 
