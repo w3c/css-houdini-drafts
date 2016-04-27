@@ -1276,7 +1276,38 @@ and renormalized (e.g. the color ''red'').
 Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
 ------------------------------------------------------------------
 
-During computation, {{CSSNumberValue}} objects are range-restricted as appropriate
-to the relevant property, but otherwise left unaltered.
+During computation, {{CSSNumberValue}} objects are range-restricted or rounded as
+appropriate to the relevant property, but otherwise left unaltered (see the example
+in <a section href='#numbervalue-objects'></a>).
 
-Issue(156): Finish me.
+Computed {{CSSLengthValue}} objects {#computed-lengthvalue-objects}
+-------------------------------------------------------------------
+
+During computation, {{CSSLengthValue}} objects are reduced to combinations of 
+pixel and percentage values by the standard length computation process described 
+as part of the <<length>> type. Lengths may then be further range-restricted as appropriate
+(for example, 'border-left-width' requires non-negative lengths).
+
+Note that lengths combining percentage and pixel units can't in general be
+range restricted (e.g. is 100px - 50% greater or less than zero?).
+
+Computed {{CSSAngleValue}} objects {#computed-anglevalue-objects}
+----------------------------------------------------------------
+
+{{CSSAngleValue}} objects are not modified during computation.
+
+Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
+-------------------------------------------------------------------------
+
+During computation, any {{CSSLengthValue}} objects referenced by a {{CSSTransformComponent}}
+(e.g. the <a attribute for=CSSTranslation>x</a> attribute of a {{CSSTranslation}}) are
+computed according to <a section href='#computed-lengthvalue-objects'></a>, but the
+{{CSSTransformValue}} object is otherwise left unaltered.
+
+Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
+-----------------------------------------------------------------------
+
+During computation, both the <a attribute for=CSSPositionValue>x</a> and 
+<a attribute for=CSSPositionValue>y</a> components of a {{CSSPositionValue}} are 
+computed according to <a section href='#computed-lengthvalue-objects'></a>.
+
