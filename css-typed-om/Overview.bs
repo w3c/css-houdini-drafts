@@ -35,7 +35,9 @@ spec:css-tables-3; type:property; text:border-collapse;
 spec:css-tables-3; type:property; text:caption-side;
 spec:css-tables-3; type:property; text:empty-cells;
 spec:css-tables-3; type:property; text:table-layout;
-spec:css-position-3; type:value; for:left; text:auto
+spec:css-position-3; type:value; for:left; text:auto;
+spec:css-transforms-1; type:type; text:<transform-list>;
+spec:css-transforms-1; type:type; text:<transform-function>;
 </pre>
 
 Introduction {#intro}
@@ -1133,7 +1135,92 @@ and <var>unit</var> set to the unit.
 
 Otherwise, normalization fails.
 
-Issue(140): finish me
+{{CSSTransformValue}} normalization {#transformvalue-normalization}
+-------------------------------------------------------------------
+
+If the provided value matches the <<transform-list>> production then a {{CSSTransformComponent}}
+is constructed for each matching <<transform-function>> in the production, and a {{CSSTransformValue}}
+is constructed around the resulting sequence.
+
+Otherwise, if the provided value is "none", an empty string, or a string containing only whitespace,
+then a {{CSSTransformValue}} is constructed around an empty sequence.
+
+Otherwise, normalization fails.
+
+{{CSSPositionValue}} normalization {#positionvalue-normalization}
+-----------------------------------------------------------------
+
+If the provided value matches the <<position>> production, then a {{CSSPositionValue}} is constructed
+with <var>x</var> and <var>y</var> components determined via the following process. If this process, or
+any sub-process referenced by this process fails, then normalization as a whole fails. 
+
+1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSSimpleLength}} value representing 50%.
+1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow 
+    the procedure outlined in <a section href="#from-single-keyword"></a> with <var>value</var> given
+    by the provided value and a horizontal <var>bias</var>.
+1.  Otherwise, if the provided value consists of a combination of two keywords, then:
+ 
+    1.  follow the procedure outlined in <a section href='#from-single-keyword'></a> with <var>value</var> given by the
+        first keyword and an auto <var>bias</var>.
+    1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+    1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
+
+1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and 
+    calc expressions, then follow the procedure outlined in <a section href="#from-single-keyword"></a> with
+    <var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
+    procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
+1.  Otherwise:
+
+    1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
+        the procedure outlined in <a section href="#from-keyword-and-length"></a> with <var>keyword</var> set to the
+        keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
+    1.  otherwise, follow the procedure outlined in <a section href="from-single-keyword"></a> with <var>value</var>
+        set to the first component of the provided value and an auto <var>bias</var>.
+    1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+    1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow 
+        the procedure outlined in
+        <a section href="from-single-keyword"></a> with <var>value</var> set to the keyword and the existing
+        <var>bias</var>.
+    1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or 
+        calc expression, follow the procedure outlined in <a section href="from-keyword-and-length"></a> with
+        <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
+        the existing <var>bias</var>.
+    1.  Otherwise, the process fails.
+
+<h4 id='from-single-keyword'>Determining <var>x</var> or <var>y</var> from a single value</h4>
+
+The following process sets a value for either <var>x</var> or <var>y</var>, depending on an input <var>value</var>
+and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
+
+1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
+    {{CSSSimpleLength}} value representing 0% and <var>bias</var> to horizontal and exit this process.
+1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a 
+    {{CSSSimpleLength}} value representing 100% and <var>bias</var> to horizontal and exit this process.
+1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
+    {{CSSSimpleLength}} value representing 0% and <var>bias</var> to vertical and exit this process.
+1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
+    {{CSSSimpleLength}} value representing 100% and <var>bias</var> to vertical and exit this process.
+1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
+    normalizing the value according to <a section href="#lengthvalue-normalization"></a>. If <var>bias</var> is vertical,
+    set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
+    horizontal. Exit this process.
+1.  If <var>value</var> is not the keyword "center", then this process fails.
+
+<h4 id='from-keyword-and-length'>Determining <var>x</var> or <var>y</var> from a keyword and a length</h4>
+
+The following process sets a value for either <var>x</var> or<var>y</var>, depending on an input <var>keyword</var>,
+<var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and 
+<var>length</var>.
+
+1.  follow the procedure outlined in <a section href='#from-single-keyword'></a> with <var>value</var> given by 
+    <var>keyword</var>, using the provided <var>bias</var>
+1.  let <var>adjustment</var> be the result of normalizing <var>length</var> according to
+    <a section href="#lengthvalue-normalization"></a>.
+1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
+    <var>adjustment</var> from a zero length.
+1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
+    adding <var>adjustment</var> to it.
+
 
 Security Considerations {#security-considerations}
 ==================================================
