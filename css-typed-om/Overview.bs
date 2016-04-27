@@ -1179,10 +1179,10 @@ any sub-process referenced by this process fails, then normalization as a whole 
     1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
     1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow 
         the procedure outlined in
-        <a section href="from-single-keyword"></a> with <var>value</var> set to the keyword and the existing
+        <a section href="#from-single-keyword"></a> with <var>value</var> set to the keyword and the existing
         <var>bias</var>.
     1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or 
-        calc expression, follow the procedure outlined in <a section href="from-keyword-and-length"></a> with
+        calc expression, follow the procedure outlined in <a section href="#from-keyword-and-length"></a> with
         <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
         the existing <var>bias</var>.
     1.  Otherwise, the process fails.
