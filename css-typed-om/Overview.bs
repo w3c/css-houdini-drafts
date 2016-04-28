@@ -66,7 +66,8 @@ interface CSSStyleValue {
 };
 </pre>
 
-{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API. Unsupported values
+are also represented as {{CSSStyleValue}} objects.
 
 The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute provides a normalized
 representation (see <a section href="#stylevalue-normalization"></a>) of the value
@@ -90,7 +91,7 @@ interface CSSVariableReferenceValue {
 };
 </pre>
 
-{{CSSTokenStreamValue}} objects represent unsupported values and values that reference custom properties. They represent a list of string fragments and variable references.
+{{CSSTokenStreamValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
@@ -1041,14 +1042,14 @@ procedure defined by each of the CSSStyleValue subclasses listed for that proper
 turn, falling back to the next subclass in the list if the current one
 fails to normalize.
 
-If all listed subclasses fail, then the value is normalized as a
-{{CSSTokenStreamValue}}.
+If all listed subclasses fail, then the value is normalized as a raw
+{{CSSStyleValue}}, with the <a attribute for=CSSStyleValue>cssText</a> attribute
+set to the input value.
 
 {{CSSTokenStreamValue}} normalization {#tokenstreamvalue-normalization}
 -----------------------------------------------------------------------
 
-Values which contain custom property references, as well as values
-for unsupported CSS properties, are tokenized then split into runs of
+Values which contain custom property references are tokenized then split into runs of
 tokens separated by custom property references.
 
 The token runs are serialized, while each custom property reference
