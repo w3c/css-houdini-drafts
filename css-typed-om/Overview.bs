@@ -9,6 +9,7 @@ Abstract:
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
+Ignored Terms: Drawable
 </pre>
 
 <pre class=anchors>
@@ -609,6 +610,44 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 </div>
 
+{{CSSImageValue}} objects {#image-objects}
+-------------------------------------
+
+<pre class='idl'>
+
+enum CSSImageState {"ready", "pending", "invalid"};
+
+interface CSSImageValue : CSSStyleValue {
+  readonly attribute CSSImageState state;
+  readonly attribute Drawable? drawable;
+};
+
+interface CSSURLImageValue : CSSImageValue {
+  readonly attribute DOMString url;
+};
+
+</pre>
+
+{{CSSImageValue}} objects represent values for properties that take <<image>> productions,
+for example 'background-image', 'list-style-image', and 'border-image-source'.
+
+The <a attribute for=CSSImageValue>state</a> attribute is set to "pending" if the image requires
+network data that has not yet been fetched, to "invalid" if an error means that the image can't be
+rendered, and to "ready" otherwise.
+
+The <a attribute for=CSSImageValue>drawable</a> attribute is null if <a attribute for=CSSImageValue>state</a>
+is "pending" or "invalid". Otherwise, the {{Drawable}} can be used to render image data via the canvas
+API.
+
+Issue: clean up the above wording once Drawables are a thing.
+
+{{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
+objects, the <a attribute for=CSSURLImageValue>url</a> attribute contains the URL that contains the image.
+
+Issue: We should add a promise that waits for the {{CSSImageState}} to become ready, but
+this should probably be deferred until we have cancellable promises.
+
+
 Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
 ==================================================================================
 This section provides a table of which types of {{CSSStyleValue}} a given property can accept.
@@ -693,7 +732,7 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'background-image'</td>
-    <td>URIValue | {{CSSKeywordValue}}</td>
+    <td>{{CSSImageValue}}</td>
   </tr>
   <tr>
     <td>'background-origin'</td>
@@ -745,7 +784,7 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'border-image-source'</td>
-    <td>URIValue | {{CSSKeywordValue}}</td>
+    <td>{{CSSImageValue}}</td>
   </tr>
   <tr>
     <td>'border-image-width'</td>
@@ -853,7 +892,7 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'list-style-image'</td>
-    <td>URIValue | {{CSSKeywordValue}}</td>
+    <td>{{CSSImageValue}}</td>
   </tr>
   <tr>
     <td>'list-style-position'</td>
@@ -1222,6 +1261,22 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
     adding <var>adjustment</var> to it.
 
+{{CSSImageValue}} normalization {#imagevalue-normalization}
+-----------------------------------------------------------
+
+Image references are normalized by determining whether the reference is invalid
+(in which case <a attribute for=CSSImageValue>state</a> is set to "invalid") or
+requires network data (in which case <a attribute for=CSSImageValue>state</a>
+is set to "pending"). If data is not required and the reference is valid then
+<a attribute for=CSSImageValue>state</a> is set to "ready" and the 
+<a attribute for=CSSImageValue>drawable</a> attribute is provided with a 
+{{Drawable}} representing the image.
+
+If <a attribute for=CSSImageValue>state</a> is set to "pending" then the image
+reference is reevaluated once the pending data becomes available, according to the
+same rules referenced above.
+
+Normalization does not fail for {{CSSImageValue}} objects.
 
 Security Considerations {#security-considerations}
 ==================================================
@@ -1312,3 +1367,7 @@ During computation, both the <a attribute for=CSSPositionValue>x</a> and
 <a attribute for=CSSPositionValue>y</a> components of a {{CSSPositionValue}} are 
 computed according to <a section href='#computed-lengthvalue-objects'></a>.
 
+Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
+-----------------------------------------------------------------
+
+{{CSSImageValue}} objects are not modified during computation.
