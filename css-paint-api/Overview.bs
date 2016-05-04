@@ -26,6 +26,7 @@ urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
     text: reset the rendering context to its default state
     text: scratch bitmap
     text: set bitmap dimensions
+    url: concept-canvas-alpha; text: alpha
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -35,6 +36,8 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: HasProperty
     url: get-o-p; text: Get
     url: terms-and-definitions-function; text: function
+    urlPrefix: native-error-types-used-in-this-standard-
+        text: TypeError
 </pre>
 
 Introduction {#intro}
@@ -263,6 +266,9 @@ The size of the <a>scratch bitmap</a> does not necessarily represent the size of
 that the user agent will use internally or during rendering. For example, if the visual viewport is
 zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
 the coordinate space, so that the resulting rendering is of high quality.
+
+The {{PaintRenderingContext2D}} object should have its <a>alpha</a> flag set to true. That is the
+rendering context is initially fully transparent.
 
 Additionally the user agent may record the sequence of drawing operations which have been applied to
 the <a>scratch bitmap</a> such that the user agent can subsequently draw onto a device bitmap at the
