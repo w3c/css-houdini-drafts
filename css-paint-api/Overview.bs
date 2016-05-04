@@ -155,20 +155,24 @@ called, the user agent <em>must</em> run the following steps:
     4. If |inputProperties| is not undefined, and the result of <a>IsArray</a>(argument=
         |inputProperties|) is false, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-        1. Let |len| be the result of <a>ToLength</a>(<a>Get</a>(O=|inputProperties|, P="length")).
+        If |inputProperties| is undefined, let |inputProperties| be a new empty array.
 
-        2. Let |idx| be 0.
+    5. For each |item| in |inputProperties| perform the following substeps:
 
-        3. Repeat while |idx| < |len|
+        1. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a>
+            and abort all these steps.
 
-            1. Let |item| be the result of <a>Get</a>(O=|inputProperties|, |idx|).
+        2. If |item| is a vendor <a>prefixed</a> property, |item| <em>must</em> be removed from
+            |inputProperties| and the user agent <em>should</em> provide a warning to the author.
 
-            2. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a>
-                and abort all these steps.
+        Note: The list of CSS properties provided by the input properties getter can either be
+            custom or native CSS properties.
 
-            3. TODO prefixed behaviour
+        Note: The list of CSS properties may contain shorthands.
 
-       If |inputProperties| is undefined, let |inputProperties| be a new empty array.
+        Note: In order for a paint image class to be forwards compatible, the list of CSS properties
+            can also contains currently invalid properties for the user agent. For example
+            <code>margin-bikeshed-property</code>.
 
     5. If the result of <a>IsConstructor</a>(argument=|paintCtor|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
@@ -197,8 +201,6 @@ called, the user agent <em>must</em> run the following steps:
     11. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
         definition map</a> of the associated <a>document</a>.
 
-Note: The list of CSS properties provided by the input properties getter can either be custom or
-    native CSS properties.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
     opportunity to dynamically change its input properties.
