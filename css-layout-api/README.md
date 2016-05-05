@@ -173,7 +173,7 @@ interface LayoutOpportunity {
 Here is a cute little gif which shows the layout opportunities for a `ConstraintSpace` with two
 exclusions.
 
-![layout opportunities](https://raw.githubusercontent.com/w3c/css-houdini-drafts/blob/master/images/layout_opp.gif)
+![layout opportunities](https://raw.githubusercontent.com/w3c/css-houdini-drafts/master/images/layout_opp.gif)
 
 The layoutOpportunities generator will return a series of max-rects for a given constraint space.
 These are ordered by `inlineStart`, `inlineSize` then `blockStart`.
