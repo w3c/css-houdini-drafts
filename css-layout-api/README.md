@@ -12,6 +12,8 @@ With the CSS Layout API, authors could write their own layouts which implement
  - Masonary layouts
  - Line spacing + snapping
 
+This document aims to give a high level overview to the Layout API.
+
 ### Concepts
 
 ##### The `Box`
@@ -96,7 +98,16 @@ registerLayout('really-basic-block', class {
 
         for (let child of children) {
             let fragment = yield child.doLayout(constraintSpace);
+            
+            // Position the new fragment.
+            fragment.inlineStart = 0;
+            fragment.blockStart = blockSize;
             blockSize += fragment.blockSize;
+            
+            // Add it as an exclusion to the constraintSpace
+            constraintSpace.addExclusion(fragment, 'block-end');
+            
+            // Update the running totals for our size.
             inlineSize = Math.max(inlineSize, fragment.inlineSize);
             childFragments.push(fragment);
         }
@@ -111,5 +122,43 @@ registerLayout('really-basic-block', class {
 ```
 
 The first thing to notice about the API is that the layout method on the class returns a generator.
+This is to allow two things:
+ 1. User agents implementing parallel layout.
+ 2. User agents implementing asynchronous layout.
+
+A user agent could implement the logic driving the author defined layout as:
+
+```js
+function performLayout(constraintSpace, box) {
+  // Get the author defined layout instance.
+  const layoutInstance = getLayoutInstanceForBox(box);
+  
+  // Access the generator returned by *layout();
+  const layoutGenerator = layoutInstance.layout(constraintSpace, box.children, box.styleMap);
+  
+  // Loop through all of the fragment requests.
+  let fragmentRequestObj = layoutGenerator.next();
+  while (!fragmentRequestObj.done) {
+    const fragmentRequest = [];
+    const fragmentResult = [];
+    
+    // Coorce fragmentRequestObj into an array.
+    if (fragmentRequestObj.value.length) {
+      fragmentRequest.push(...fragmentRequestObject.value);
+    } else {
+      fragmentRequest.push(fragmentRequestObject.value);
+    }
+    
+    // Request the next fragment.
+    fragmentRequestObj = layoutGenerator.next(
+      fragmentResult.length == 1 : fragmentResult[0] : fragmentResult);
+  }
+  
+  // The last value from the generator should be the final return value.
+  const fragmentDict = fragmentRequest.value;
+  return new Fragment(fragmentDict);
+}
+```
+
 
 TODO finish writing this.
