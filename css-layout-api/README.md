@@ -85,6 +85,102 @@ interface Fragment {
 };
 ```
 
+#### The `ConstraintSpace`
+
+A `ConstraintSpace` is a 2D representation of the layout space given to a layout. A constraint space
+has:
+ - A `inlineSize` and `blockSize`. If present, these describe a fixed width in which the layout can
+    produce a `Fragment`. The layout should produce a `Fragment` which fits inside these bounds. If
+    it exceeds these bounds, the `Fragment` may be paint clipped, etc, as determined by its parent.
+
+ - A `inlineScrollOffset` and `blockScrollOffset`. If present, these describe that if the resulting
+    `Fragment` exceeds these offsets, it must call `willInlineScroll()` / `willBlockScroll()`. This
+    will result in the constraint space being updated (and also reset to its initial state?). These
+    methods will potentially change the `inlineSize` or `blockSize` to allow room for a scrollbar.
+
+ - A `inlineFragmentOffset` and `blockFragmentingOffset`. If present, these describe that if the
+   resulting `Fragment` must fragment at this particular point.
+
+ - A list of exclusions. Described more in-depth below.
+
+The `ConstraintSpace` is represented as:
+
+```webidl
+partial interface ConstraintSpace {
+    readonly attribute double? inlineSize;
+    readonly attribute double? blockSize;
+
+    readonly attribute double? inlineScrollOffset;
+    readonly attribute double? blockScrollOffset;
+
+    readonly attribute double? inlineFragmentOffset; // Is inline fragment offset needed?
+    readonly attribute double? blockFragmentOffset;
+
+    void willInlineScroll();
+    void willBlockScroll();
+};
+```
+
+This may be better represented as:
+
+```webidl
+partial interface ConstraintSpace {
+    readonly attribute ExtentConstraint inlineConstraint;
+    readonly attribute ExtentConstraint inlineConstraint;
+
+    void willInlineScroll();
+    void willBlockScroll();
+};
+
+enum ExtentConstraintType = 'fixed' | 'scroll' | 'fragment';
+
+interface ExtentConstraint {
+  readonly attribute ExtentConstraintType type;
+  readonly attribute double offset;
+};
+```
+
+ Actually this doesn't really work? As you can have an inlineSize, which also can overflow.
+
+Exclusions can be added to the constraint space which children should avoid. E.g.
+
+```webidl
+partial interface ConstraintSpace {
+    void addExclusion(Fragment fragment, optional FlowEnum flow);
+    void addExclusion(Exclusion fragment, optional FlowEnum flow);
+};
+```
+
+The author can iterate through the available space via the `layoutOpportunities()` api.
+
+```webidl
+partial interface ConstraintSpace {
+    Generator<LayoutOpportunity> layoutOpportunities();
+};
+
+interface LayoutOpportunity {
+    readonly attribute double inlineSize;
+    readonly attribute double blockSize;
+
+    readonly attribute double inlineStart;
+    readonly attribute double blockStart;
+
+    readonly attribute double inlineEnd;
+    readonly attribute double blockEnd;
+}
+```
+
+Here is a cute little gif which shows the layout opportunities for a `ConstraintSpace` with two
+exclusions.
+
+![layout opportunities](https://raw.githubusercontent.com/w3c/css-houdini-drafts/blob/master/images/layout_opp.gif)
+
+The layoutOpportunities generator will return a series of max-rects for a given constraint space.
+These are ordered by `inlineStart`, `inlineSize` then `blockStart`.
+
+ How do we represent non-rect exclusions? Initial thought is to always jump by `1em` of author
+ specified amount.
+
 ### Performing Layout
 
 The Layout API is best described with a simple dummy example:
@@ -126,7 +222,15 @@ This is to allow two things:
  1. User agents implementing parallel layout.
  2. User agents implementing asynchronous layout.
 
-A user agent could implement the logic driving the author defined layout as:
+The generator returns a `FragmentRequest`. Inside of the authors layout funciton, this object is
+completely opaque. This is a token for the user-agent to perform layout _at some stage_ for the
+particular box it was generated for.
+
+When a `FragmentRequest` is returned from the generator, the user-agent needs to produce a
+`Fragment` for it, and return it via. the generator `next()` call.
+
+As a concrete example, the user agent could implement the logic driving the author defined layout
+as:
 
 ```js
 function performLayout(constraintSpace, box) {
@@ -159,6 +263,3 @@ function performLayout(constraintSpace, box) {
   return new Fragment(fragmentDict);
 }
 ```
-
-
-TODO finish writing this.
