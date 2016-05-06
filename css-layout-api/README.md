@@ -149,6 +149,18 @@ Exclusions can be added to the constraint space which children should avoid. E.g
 partial interface ConstraintSpace {
     void addExclusion(Fragment fragment, optional FlowEnum flow);
     void addExclusion(Exclusion fragment, optional FlowEnum flow);
+    readonly attribute sequence<Exclusion> exclusions;
+};
+
+dictionary Exclusion {
+    double inlineSize;
+    double blockSize;
+
+    double inlineStart;
+    double blockStart;
+
+    double inlineEnd;
+    double blockEnd;
 };
 ```
 
@@ -179,9 +191,38 @@ exclusions.
 The layoutOpportunities generator will return a series of max-rects for a given constraint space.
 These are ordered by `inlineStart`, `inlineSize` then `blockStart`.
 
-| How do we represent non-rect exclusions? Initial thought is to always jump by `1em` of author
- specified amount. |
+| How do we represent non-rect exclusions? Initial thought is to always jump by `1em` of author |
+| specified amount. |
 | --- |
+
+###### Advanced exclusions
+
+Not everything in CSS avoids all exclusions. For example:
+
+![inline text avoiding floats](https://raw.githubusercontent.com/w3c/css-houdini-drafts/master/images/exclusions_1.png)
+
+The green block-level element doesn't avoid the intruding floats, but its inline-level children do.
+
+Should authors be able to annotate exclusions with a tag, then just `LayoutOpportunities` based on
+those tags? For example:
+
+```webidl
+partial interface ConstraintSpace {
+  void addExclusion(Fragment exclusion, optional FlowEnum flow, optional sequence<DOMString> tags);
+
+  // calling layoutOpportunities(['left']), only provides layout opportunities which avoids
+  // exclusions tagged with left.
+  Generator<LayoutOpportunity> layoutOpportunities(optional sequence<DOMString> tags);
+};
+```
+
+#### Breaking and `BreakToken`s
+
+TODO write about how break tokens work.
+
+#### Pseudo-classes and style overrides
+
+TODO write about options for `::first-letter`, `::first-line`, and `flex-grow`y things should work.
 
 ### Performing Layout
 
