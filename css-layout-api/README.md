@@ -140,7 +140,8 @@ interface ExtentConstraint {
 };
 ```
 
- Actually this doesn't really work? As you can have an inlineSize, which also can overflow.
+| Actually this doesn't really work? As you can have an inlineSize, which also can overflow. |
+| --- |
 
 Exclusions can be added to the constraint space which children should avoid. E.g.
 
@@ -178,8 +179,9 @@ exclusions.
 The layoutOpportunities generator will return a series of max-rects for a given constraint space.
 These are ordered by `inlineStart`, `inlineSize` then `blockStart`.
 
- How do we represent non-rect exclusions? Initial thought is to always jump by `1em` of author
- specified amount.
+| How do we represent non-rect exclusions? Initial thought is to always jump by `1em` of author
+ specified amount. |
+| --- |
 
 ### Performing Layout
 
@@ -251,6 +253,10 @@ function performLayout(constraintSpace, box) {
       fragmentRequest.push(...fragmentRequestObject.value);
     } else {
       fragmentRequest.push(fragmentRequestObject.value);
+    }
+
+    for (let i = 0; i < fragmentRequest.length; i++) {
+      fragmentResult.push(performLayout(fragmentRequest[i]));
     }
     
     // Request the next fragment.
