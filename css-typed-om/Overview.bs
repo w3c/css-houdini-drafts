@@ -610,18 +610,51 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 </div>
 
-{{CSSImageValue}} objects {#image-objects}
--------------------------------------
+{{CSSResourceValue}} objects {#resourcevalue-objects}
+-----------------------------------------------------
 
 <pre class='idl'>
 
-enum CSSImageState {"ready", "pending", "invalid"};
+enum CSSResourceState {"unloaded", "loading", "loaded", "error"};
 
-interface CSSImageValue : CSSStyleValue {
-  readonly attribute CSSImageState state;
-  readonly attribute Drawable? drawable;
+interface CSSResourceValue {
+  readonly attribute CSSResourceState state;
 };
 
+</pre>
+
+{{CSSResourceValue}} objects represent CSS values that may require an asynchronous network fetch
+before being usable.
+
+A {{CSSResourceValue}} is in one of the following states, as reflected in the value of the
+<a attribute for=CSSResourceValue>state</a> attribute:
+
+:   ''unloaded''
+::  The resource is not ready and is not actively being fetched
+:   ''loading''
+::  The resource is not ready, but is in the process of being fetched
+:   ''loaded''
+::  The resource is ready for rendering
+:   ''error''
+::  The resource can't be fetched, or the fetched resource is invalid
+
+<div class='example'>
+For example, images that match the <<url>> production can be used immediately, but will not result
+in a visual change until the image data is fetched. {{CSSResourceValue}} objects represent this by
+providing values that track loaded state via the {{CSSResourceState}} enum.
+</div>
+
+{{CSSImageValue}} objects {#imagevalue-objects}
+-----------------------------------------------
+
+<pre class='idl'>
+
+interface CSSImageValue : CSSResourceValue {
+  readonly attribute double intrinsicWidth;
+  readonly attribute double intrinsicHeight;
+};
+
+[Constructor(DOMString url)]
 interface CSSURLImageValue : CSSImageValue {
   readonly attribute DOMString url;
 };
@@ -631,22 +664,33 @@ interface CSSURLImageValue : CSSImageValue {
 {{CSSImageValue}} objects represent values for properties that take <<image>> productions,
 for example 'background-image', 'list-style-image', and 'border-image-source'.
 
-The <a attribute for=CSSImageValue>state</a> attribute is set to "pending" if the image requires
-network data that has not yet been fetched, to "invalid" if an error means that the image can't be
-rendered, and to "ready" otherwise.
+{{CSSImageValue}} objects that do not require network data (for example linear and radial gradients)
+are initialized with <a attribute for=CSSResourceValue>state</a> ''loaded''.
 
-The <a attribute for=CSSImageValue>drawable</a> attribute is null if <a attribute for=CSSImageValue>state</a>
-is "pending" or "invalid". Otherwise, the {{Drawable}} can be used to render image data via the canvas
-API.
+If <a attribute for=CSSResourceValue>state</a> is ''unloaded'', ''loading'', or ''error'', then
+<a attribute for=CSSImageValue>intrinsicWidth</a> and <a attribute for=CSSImageValue>intrinsicHeight</a>
+are 0. Otherwise, the attributes are set to the intrinsic width and height of the referenced image.
 
-Issue: clean up the above wording once Drawables are a thing.
+Issue: Does the loading lifecycle need to be described here?
 
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
-objects, the <a attribute for=CSSURLImageValue>url</a> attribute contains the URL that contains the image.
+objects, the <a attribute for=CSSURLImageValue>url</a> attribute contains the URL that references the image.
 
-Issue: We should add a promise that waits for the {{CSSImageState}} to become ready, but
-this should probably be deferred until we have cancellable promises.
+{{CSSFontFaceValue}} objects {#fontfacevalue-objects}
+-----------------------------------------------------
 
+<pre class='idl'>
+
+[Constructor(DOMString fontFaceName)]
+interface CSSFontFaceValue : CSSResourceValue {
+  readonly attribute DOMString fontFaceName;
+};
+
+</pre>
+
+{{CSSFontFaceValue}} objects represent font faces that can be used to render text. As
+font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
+of {{CSSResourceValue}}.
 
 Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
 ==================================================================================
@@ -1261,22 +1305,20 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
     adding <var>adjustment</var> to it.
 
-{{CSSImageValue}} normalization {#imagevalue-normalization}
------------------------------------------------------------
+{{CSSResourceValue}} normalization {#resourcevalue-normalization}
+--------------------------------------------------------------
 
-Image references are normalized by determining whether the reference is invalid
-(in which case <a attribute for=CSSImageValue>state</a> is set to "invalid") or
-requires network data (in which case <a attribute for=CSSImageValue>state</a>
-is set to "pending"). If data is not required and the reference is valid then
-<a attribute for=CSSImageValue>state</a> is set to "ready" and the 
-<a attribute for=CSSImageValue>drawable</a> attribute is provided with a 
-{{Drawable}} representing the image.
+Resource references are normalized by determining whether the reference is invalid
+(in which case <a attribute for=CSSResourceValue>state</a> is set to ''error'') or
+requires network data (in which case <a attribute for=CSSResourceValue>state</a>
+is set to ''loading''). If data is not required and the reference is valid then
+<a attribute for=CSSResourceValue>state</a> is set to ''loaded''.
 
-If <a attribute for=CSSImageValue>state</a> is set to "pending" then the image
+If <a attribute for=CSSResourceValue>state</a> is set to ''loading'' then the image
 reference is reevaluated once the pending data becomes available, according to the
 same rules referenced above.
 
-Normalization does not fail for {{CSSImageValue}} objects.
+Normalization does not fail for {{CSSResourceValue}} objects.
 
 Security Considerations {#security-considerations}
 ==================================================
