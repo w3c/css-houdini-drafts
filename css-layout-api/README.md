@@ -310,3 +310,99 @@ function performLayout(constraintSpace, box) {
   return new Fragment(fragmentDict);
 }
 ```
+
+### Example layout algorithms
+
+```js
+// 'multicol' does a simple multi-column layout.
+registerLayout('multicol', class {
+    *layout(constraintSpace, children, styleMap, opt_breakToken) {
+        const inlineSize = resolveInlineSize(constraintSpace, styleMap);
+
+        // Try and decide the number of size of columns.
+        const columnCountValue = styleMap.get('column-count');
+        const columnInlineSizeValue = styleMap.get('column-width');
+
+        let columnCount = 1;
+        let columnInlineSize = inlineSize;
+
+        if (columnCountValue) {
+          columnCount = columnCountValue.value;
+        }
+
+        if (columnInlineSizeValue) {
+          columnInlineSize = resolveSize(columnInlineSizeValue, inlineSize);
+        }
+
+        if (constraintSpace.inlineScrollOffset &&
+            columnInlineSize * columnCount > constraintSpace.inlineScrollOffset) {
+          // NOTE: under this condition, we need to start again to re-resolve lengths?
+          constraintSpace.willInlineScroll();
+          return; // Or just continue here?
+        }
+
+        // Create a constraint space which is just the inlineSize of the column.
+        const colConstraintSpace = new ConstraintSpace({
+            inlineSize: columnInlineSize
+        });
+
+        // Perform layout on all the children, taking into account the children
+        // which may fragment in the inline direction.
+        const childFragments = [];
+        let childBlockSize = 0;
+        let layoutOpp;
+        for (let child of children) {
+            let breakToken;
+            do {
+                const fragment = yield child.doLayout(colConstraintSpace, breakToken);
+                breakToken = fragment.breakToken;
+
+                const gen = colConstraintSpace.layoutOpportunities();
+
+                layoutOpp = gen.next().value;
+                if (layoutOpp.inlineSize < fragment.inlineSize()) {
+                    layoutOpp = gen.next().value;
+                }
+
+                fragment.inlineStart = opp.inlineStart;
+                fragment.blockStart = opp.blockStart;
+                colConstraintSpace.addExclusion(fragment, 'inline-flow');
+
+                childFragments.push(fragment);
+            } while (breakToken);
+        }
+
+        // FIXME: This might be wrong.
+        const childBlockSize =
+            colConstraintSpace.layoutOpportunities().next().value.blockStart;
+
+        // Next, a clever person would nicely balance the columns, we are going
+        // to do something really simple. :)
+        const columnBlockSize = Math.ceil(childBlockSize / columnCount);
+        const columnGap = resolveSize(styleMap.get('column-gap'), inlineSize);
+        let size = 0;
+        let columnNum = 0;
+        let columnEndOffset = 0;
+        for (let fragment of childFragments) {
+            if (size && fragment.blockSize + size > columnBlockSize) {
+                size = 0;
+                columnNum++;
+                columnEndOffset += size;
+            }
+
+            fragment.inlineStart += columnNum * (columnGap + columnInlineSize);
+            fragment.blockStart -= columnEndOffset;
+            size = Math.max(size, fragment.blockStart + fragment.blockSize);
+        }
+
+        const blockSize =
+            resolveBlockSize(constraintSpace, styleMap, columnBlockSize);
+
+        return {
+            inlineSize: inlineSize,
+            blockSize: blockSize,
+            fragments: childFragments,
+        };
+    }
+});
+```
