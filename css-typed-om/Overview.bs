@@ -1413,3 +1413,8 @@ Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
 -----------------------------------------------------------------
 
 {{CSSImageValue}} objects are not modified during computation.
+
+Computed {{CSSFontValue}} objects {#computed-fontvalue-objects}
+---------------------------------------------------------------
+
+{{CSSFontValue}} objects are not modified during computation.
