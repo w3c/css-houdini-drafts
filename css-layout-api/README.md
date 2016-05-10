@@ -220,9 +220,117 @@ partial interface ConstraintSpace {
 
 TODO write about how break tokens work.
 
-#### Pseudo-classes and style overrides
+#### Pseudo-elements and style overrides
 
-TODO write about options for `::first-letter`, `::first-line`, and `flex-grow`y things should work.
+`::first-letter` and `::first-line` are a little bit special in terms of CSS; they aren't really
+elements just a different style applied to a fragment(s).
+
+In order to handle these do we allow override styles when performing layout on a child? For example:
+```webidl
+partial interface Box {
+    FragmentRequest doLayout(ConstraintSpace space, OpaqueBreakToken breakToken, Object overrideStyles);
+}
+```
+
+```js
+registerLayout('handle-first-line', class {
+    *layout(constraintSpace, children, styleMap, opt_breakToken) {
+        // ...
+
+        let child = children[i];
+        let fragment = yield child.doLayout(childConstraintSpace, breakToken, {
+            // This would be queried from styleMap?
+            // This would only allow computed-style values?
+            fontSize: new CSSLengthValue({px: 18}),
+        });
+
+        // ...
+    }
+});
+```
+
+TODO: These is a problem with the above example?
+
+Similarly we have a class of CSS layout algorithms which _force_ a particular style on their
+children, (flex & grid). Do we handle these in a similar way? For example:
+
+```js
+registerLayout('kinda-like-flex', class {
+    *layout(constraintSpace, children, styleMap, opt_breakToken) {
+        // ...
+
+        let child = children[i];
+        let fragment = yield child.doLayout(childConstraintSpace, breakToken, {
+            inlineSize: 180, // Only accepts numbers in px.
+        });
+
+        // ...
+
+    }
+});
+```
+
+We need something like this, needs to be here, or on the constraintSpace somehow.
+
+#### Utility functions
+
+We need a set of utility function which do things like resolve a computed-inline-size against
+another length etc. These functions will probably become clear over-time from internal
+implementations and people writing algorithms against this API but for starters we'll probably need:
+
+```webidl
+[NoInterfaceObject]
+interface LayoutUtilities {
+    // Resolves the inline-size according to an algorithm to be defined in the spec. This doesn't
+    // limit authors to having their own layout units and resolving the lengths differently. This is
+    // just a helper.
+    number resolveInlineSize(ConstraintSpace constraintSpace, StylePropertyMapReadonly styleMap);
+
+    // Resolves the size against a different length.
+    number resolveSize(CSSValue property, number size);
+
+    // Resolves the size against a different length for the minimum amount.
+    number resolveMinimumSize(CSSValue property, number size);
+}
+```
+
+This is just some basic ones, we'll need more.
+
+#### Flags!
+
+We need to indicate to the engine when we want a particular layout behaviour placed on us. For
+example if we are a:
+ - formatting context
+ - should "blockify" children (like flex, grid)
+ - magically handle abs-pos
+
+TODO there are probably others here.
+
+For example if we should establish a formatting context, implicitly this means that the
+constraintSpace we are given cannot have any pre-defined exclusions.
+
+We need to decide on the defaults here, and if we allow changing the default.
+
+A simple API proposal:
+```js
+registerLayout('weee!', class {
+    static formattingContext = false; // default is true?
+    static handleAbsPos = false; // default is true?
+    static blockifyChildren = true; // default is false?
+
+    *layout() {
+        // etc.
+    }
+});
+```
+
+#### Adding and removing children
+
+We need a callback for when child boxes are added / removed. Rendering engines today have
+optimizations in place for when this occurs; for example in grid, the user agent will place its
+children into a "Tracks" data structure for layout.
+
+TODO: add API proposal here.
 
 ### Performing Layout
 
@@ -372,7 +480,8 @@ registerLayout('multicol', class {
             } while (breakToken);
         }
 
-        // FIXME: This might be wrong.
+        // FIXME: This might be wrong, need a helper method on constraintSpace which returns the max
+        // blockEnd of all the exclusions.
         const childBlockSize =
             colConstraintSpace.layoutOpportunities().next().value.blockStart;
 
