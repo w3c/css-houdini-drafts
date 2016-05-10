@@ -85,6 +85,15 @@ interface Fragment {
 };
 ```
 
+One important thing to note is that you can't change the `inlineSize` or `blockSize` of a fragment
+once have received it from a child layout. The _only_ thing you can change is it's position (with
+`inlineStart` or `blockStart`) relative to the parent.
+
+See below for a description of baselines.
+
+The `unpositionedBoxes` attribute is a list of `Box`es which couldn't be positioned by the child.
+The current layout can choose to layout and position these, or it can pass them up to it's parent.
+
 #### The `ConstraintSpace`
 
 A `ConstraintSpace` is a 2D representation of the layout space given to a layout. A constraint space
@@ -331,6 +340,10 @@ optimizations in place for when this occurs; for example in grid, the user agent
 children into a "Tracks" data structure for layout.
 
 TODO: add API proposal here.
+
+#### Baselines
+
+TODO: add explaination why we need a more powerful API than just offset here.
 
 ### Performing Layout
 
