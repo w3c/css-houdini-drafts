@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
-Status: DREAM
+Status: FPWD
+Date: 2016-05-17
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om
