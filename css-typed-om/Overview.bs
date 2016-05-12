@@ -5,7 +5,7 @@ Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om
 Level: 1
-Abstract:
+Abstract: Converting CSSOM value strings into meaningfully typed JavaScript representations and back can incur a significant performance overhead. This specification exposes CSS values as typed JavaScript objects to facilitate their performant manipulation.
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
@@ -1008,7 +1008,7 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'quotes'</td>
-    <td>PairValue<StringValue> | {{CSSKeywordValue}}</td>
+    <td>PairValue&lt;StringValue&gt; | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'richness'</td>
