@@ -86,13 +86,13 @@ interface Fragment {
 ```
 
 One important thing to note is that you can't change the `inlineSize` or `blockSize` of a fragment
-once have received it from a child layout. The _only_ thing you can change is it's position (with
+once have received it from a child layout. The _only_ thing you can change is its position (with
 `inlineStart` or `blockStart`) relative to the parent.
 
 See below for a description of baselines.
 
 The `unpositionedBoxes` attribute is a list of `Box`es which couldn't be positioned by the child.
-The current layout can choose to layout and position these, or it can pass them up to it's parent.
+The current layout can choose to layout and position these, or it can pass them up to its parent.
 
 #### The `ConstraintSpace`
 
