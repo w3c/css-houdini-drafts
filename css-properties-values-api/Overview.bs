@@ -36,6 +36,7 @@ Repository: w3c/css-houdini-drafts
 <pre class='link-defaults'>
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:css-conditional-3; type:method; text:supports(property, value)
+spec:cssom-1; type:interface; text:CSS
 </pre>
 
 Introduction {#intro}
@@ -357,3 +358,13 @@ CSS.registerProperty({
 &lt;/style&gt;
 
 </pre>
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+==================================================
+
+There are no known privacy issues introduced by these features.
