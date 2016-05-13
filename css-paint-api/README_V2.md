@@ -1,5 +1,11 @@
 ```js
 registerPainter('something', class extends ElementPainter {
+  visualOverflow(geometry, styleMap) {
+    return {
+      // Size of overflow.
+    };
+  }
+  
   drawBackground(ctx, geometry, styleMap) {
     ctx.save();
     ctx.globalAlpha = 0.5; // Local to just the background layer, are there other canvas ctx params which 
