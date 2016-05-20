@@ -1,7 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
 Status: FPWD
-Date: 2016-05-17
+Date: 2016-05-24
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om
@@ -1259,7 +1259,7 @@ any sub-process referenced by this process fails, then normalization as a whole 
     1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
         the procedure outlined in <a section href="#from-keyword-and-length"></a> with <var>keyword</var> set to the
         keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
-    1.  otherwise, follow the procedure outlined in <a section href="from-single-keyword"></a> with <var>value</var>
+    1.  otherwise, follow the procedure outlined in <a section href="#from-single-keyword"></a> with <var>value</var>
         set to the first component of the provided value and an auto <var>bias</var>.
     1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
     1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow 
