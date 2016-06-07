@@ -302,7 +302,7 @@ Note: The user agent may choose to <a>draw a paint image</a> for <<paint()>> fun
             element.styleMap.set('--custom-prop-invalidates-paint', 42);
         });
     </pre>
-    And the <code>element</code> is inside the visual viewport, the user agent <em>msut</em> <a>draw
+    And the <code>element</code> is inside the visual viewport, the user agent <em>must</em> <a>draw
     a paint image</a> and display the result on the current frame.
 </div>
 
