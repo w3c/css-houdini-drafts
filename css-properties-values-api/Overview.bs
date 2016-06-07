@@ -214,7 +214,7 @@ The following syntax strings are supported:
 :   "&lt;resolution>"
 ::  Any valid <<resolution>> value
 :   "&lt;transform-function>"
-::  Any valie <<transform-function>> value
+::  Any valid <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
@@ -250,7 +250,7 @@ For example, the following are all valid syntax strings.
     and percentage values.
 :   <code>"&lt;length-percentage>"</code>
 ::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-    accept, as well as calc expresssions containing a combination of both length
+    accept, as well as calc expressions containing a combination of both length
     and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
