@@ -68,8 +68,8 @@ dictionary PropertyDescriptor {
 };
 
 partial interface CSS {
-  void registerProperty(PropertyDescriptor descriptor);
-  void unregisterProperty(DOMString name);
+  static void registerProperty(PropertyDescriptor descriptor);
+  static void unregisterProperty(DOMString name);
 };
 </pre>
 
