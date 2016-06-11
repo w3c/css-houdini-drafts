@@ -92,7 +92,7 @@ interface StylePropertyMapReadOnly {
 	CSSStyleValue? get(DOMString property);
 	sequence&lt;CSSStyleValue> getAll(DOMString property);
 	boolean has(DOMString property);
-	iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue> or DOMString)>;
+	iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue>)>;
 	sequence&lt;DOMString> getProperties();
 	stringifier;
 };
