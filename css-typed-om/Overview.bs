@@ -1455,7 +1455,7 @@ represented by a {{CSSStyleValue}}.
 Computed {{CSSKeywordValue}} objects {#computed-keywordvalue-objects}
 ---------------------------------------------------------------------
 
-During computation, {{CSSKeywordValue}} objects are either left unaltered (e.g. ''auto''
+During computation, {{CSSKeywordValue}} objects are either as specified (e.g. ''auto''
 values for lengths that participate in layout) or resolved to a relevant value
 and renormalized (e.g. the color ''red'').
 
@@ -1463,7 +1463,7 @@ Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
 ------------------------------------------------------------------
 
 During computation, {{CSSNumberValue}} objects are range-restricted or rounded as
-appropriate to the relevant property, but otherwise left unaltered (see the example
+appropriate to the relevant property, but otherwise as specified (see the example
 in <a section href='#numbervalue-objects'></a>).
 
 Computed {{CSSLengthValue}} objects {#computed-lengthvalue-objects}
@@ -1480,7 +1480,7 @@ range restricted (e.g. is 100px - 50% greater or less than zero?).
 Computed {{CSSAngleValue}} objects {#computed-anglevalue-objects}
 ----------------------------------------------------------------
 
-{{CSSAngleValue}} objects are not modified during computation.
+Computed {{CSSAngleValue}} objects are as specified.
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
@@ -1488,7 +1488,7 @@ Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 During computation, any {{CSSLengthValue}} objects referenced by a {{CSSTransformComponent}}
 (e.g. the {{CSSTranslation/x}} attribute of a {{CSSTranslation}}) are
 computed according to <a section href='#computed-lengthvalue-objects'></a>, but the
-{{CSSTransformValue}} object is otherwise left unaltered.
+{{CSSTransformValue}} object is otherwise as specified.
 
 Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
 -----------------------------------------------------------------------
@@ -1500,9 +1500,9 @@ computed according to <a section href='#computed-lengthvalue-objects'></a>.
 Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
 -----------------------------------------------------------------
 
-{{CSSImageValue}} objects are not modified during computation.
+Computed {{CSSImageValue}} objects are as specified.
 
 Computed {{CSSFontFaceValue}} objects {#computed-fontfacevalue-objects}
 ---------------------------------------------------------------
 
-{{CSSFontFaceValue}} objects are not modified during computation.
+Computed {{CSSFontFaceValue}} objects are as specified.
