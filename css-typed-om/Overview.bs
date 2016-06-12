@@ -1,9 +1,9 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
-Status: FPWD
-Date: 2016-05-24
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
+Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
 Shortname: css-typed-om
 Level: 1
 Abstract: Converting CSSOM value strings into meaningfully typed JavaScript representations and back can incur a significant performance overhead. This specification exposes CSS values as typed JavaScript objects to facilitate their performant manipulation.
