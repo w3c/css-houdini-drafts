@@ -1,8 +1,9 @@
 <pre class='metadata'>
 Title:  Worklets Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/worklets/
+Previous Version: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Shortname: worklets
 Level: 1
 Abstract:  This specification defines an API for running scripts in stages of the rendering pipeline independent of the main javascript execution environment.
