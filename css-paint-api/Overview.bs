@@ -166,9 +166,6 @@ called, the user agent <em>must</em> run the following steps:
         1. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a>
             and abort all these steps.
 
-        2. If |item| is a vendor <a>prefixed</a> property, |item| <em>must</em> be removed from
-            |inputProperties| and the user agent <em>should</em> provide a warning to the author.
-
         Note: The list of CSS properties provided by the input properties getter can either be
             custom or native CSS properties.
 
