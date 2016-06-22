@@ -398,8 +398,8 @@ following steps:
     10. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    11. Perform <a>Invoke</a>(|paintInstance|, "paint", [|renderingContext|, |paintSize|,
-        |styleMap|]).
+    11. Perform <a>Invoke</a>(|paintInstance|, "paint", «|renderingContext|, |paintSize|,
+        |styleMap|»).
 
     12. The image output is to be produced from the |renderingContext| given to the method.
 
