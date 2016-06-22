@@ -28,9 +28,10 @@ urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
     text: output bitmap
     text: set bitmap dimensions
     url: concept-canvas-alpha; text: alpha
-urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
+urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
+    text: Invoke
     text: IsArray
     text: IsCallable
     text: IsConstructor
@@ -398,7 +399,7 @@ following steps:
         |concreteObjectSize|.
 
     11. Perform <a>Invoke</a>(|paintInstance|, "paint", [|renderingContext|, |paintSize|,
-        |styleMap|).
+        |styleMap|]).
 
     12. The image output is to be produced from the |renderingContext| given to the method.
 
