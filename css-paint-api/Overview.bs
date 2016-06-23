@@ -184,10 +184,12 @@ called, the user agent <em>must</em> run the following steps:
     7. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    8. If the result of <a>IsCallable</a>(<a>Get</a>(|prototype|, "paint")) is false, <a>throw</a> a
-        <a>TypeError</a> and abort all these steps.
+    8. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    9. Let |definition| be a new <a>paint image definition</a> with:
+    9. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
+
+    10. Let |definition| be a new <a>paint image definition</a> with:
 
         - <a>paint image name</a> being |name|
  
@@ -197,10 +199,10 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>class constructor valid flag</a> being true
     
-    10. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
+    11. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
 
-    11. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
+    12. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
         definition map</a> of the associated <a>document</a>.
 
 
