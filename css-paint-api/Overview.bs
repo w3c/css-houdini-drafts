@@ -20,9 +20,11 @@ spec:css-break-3; type:dfn; text:fragment
 urlPrefix: https://heycam.github.io/webidl/; type: dfn;
     text: NotSupportedError
     urlPrefix: #dfn-;
+        text: callback this value
         text: exception
         text: throw
         url: throw; text: thrown
+    url: es-invoking-callback-functions; text: Invoke
 urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
     text: reset the rendering context to its default state
     text: output bitmap
@@ -31,7 +33,6 @@ urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
-    text: Invoke
     text: IsArray
     text: IsCallable
     text: IsConstructor
@@ -400,14 +401,16 @@ following steps:
     10. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    11. Perform <a>Invoke</a>(|paintInstance|, "paint", «|renderingContext|, |paintSize|,
-        |styleMap|»).
+    11. Let |paintFunction| be |definition|'s <a>paint function</a>.
 
-    12. The image output is to be produced from the |renderingContext| given to the method.
+    12. <a>Invoke</a> |paintFunction| with arguments «|renderingContext|, |paintSize|, |styleMap|»,
+        and with |paintInstance| as the <a>callback this value</a>.
+
+    13. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
 
-    13. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
+    14. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
 
 Note: The user agent <em>should</em> consider long running paint functions similar to long running
     script in the main execution context. For example, they <em>should</em> show a "unresponsive
