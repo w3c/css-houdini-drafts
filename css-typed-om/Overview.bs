@@ -736,6 +736,10 @@ Shorthand properties and values are not supported.
     <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'animation-duration'</td>
+    <td>TimeValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'animation-fill-mode'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
@@ -852,6 +856,18 @@ Shorthand properties and values are not supported.
     <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'break-after'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'break-before'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'break-inside'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'caption-side'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
@@ -866,6 +882,38 @@ Shorthand properties and values are not supported.
   <tr>
     <td>'color'</td>
     <td>ColorValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-count'</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-fill'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-gap'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-color'</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-style'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-width'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-span'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-width'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'content'</td>
