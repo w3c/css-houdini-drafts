@@ -764,6 +764,10 @@ Shorthand properties and values are not supported.
     <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'back'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'background-attachment'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
@@ -1040,6 +1044,14 @@ Shorthand properties and values are not supported.
     <td>TimeValue | PercentageValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'perspective'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'perspective-origin'</td>
+    <td>{{CSSPositionValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'pitch-range'</td>
     <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
@@ -1114,6 +1126,18 @@ Shorthand properties and values are not supported.
   <tr>
     <td>'top'</td>
     <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform'</td>
+    <td>{{CSSTransformValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform-box'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform-origin'</td>
+    <td>TransformOriginValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'unicode-bidi'</td>
