@@ -462,13 +462,13 @@ interface CSSTranslation : CSSTransformComponent {
 
 [Constructor(double degrees),
  Constructor(CSSAngleValue angle),
- Constructor(double degrees, double x, double y, double z),
- Constructor(CSSAngleValue angle, double x, double y, double z)]
+ Constructor(double x, double y, double z, double degrees),
+ Constructor(double x, double y, double z, CSSAngleValue angle)]
 interface CSSRotation : CSSTransformComponent {
-  readonly attribute double angle;
   readonly attribute double x;
   readonly attribute double y;
   readonly attribute double z;
+  readonly attribute double angle;
 };
 
 [Constructor(double x, double y),
