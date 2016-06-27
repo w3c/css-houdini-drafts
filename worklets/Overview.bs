@@ -12,6 +12,8 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
+    text: DOMException
+    text: SyntaxError
     text: inherit
 urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
     urlPrefix: #concept-;
@@ -28,6 +30,7 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: api url character encoding
     text: browsing context
     text: code entry-point
+    text: current settings object
     text: creation url
     text: document environment
     text: entry settings object
@@ -39,6 +42,7 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: incumbent settings object
     text: microtask queue
     text: module script
+    text: perform the request
     text: realm execution context
     text: responsible browsing context
     text: responsible document
@@ -265,22 +269,22 @@ is empty; it is populated when the user agent chooses to create its {{WorkletGlo
 A {{Worklet}} has a list of the <dfn>worklet's resolved module URLs</dfn>. Initially this list is
 empty; it is populated when module scripts resolved.
 
-A {{Worklet}} has a <dfn>fetched modules map</dfn>. This is a map of <a>fetch</a> requests to values
-that are a <a>fetch</a> responses. Access to this map should be thread-safe.
+A {{Worklet}} has a <dfn>module responses map</dfn>. This is a map of module URLs to values that are
+a <a>fetch</a> responses. Access to this map should be thread-safe.
 
-The <a>fetched modules map</a> exists to ensure that {{WorkletGlobalScope}}s created at different
-times contain the same set of scripts and have the same behaviour. The creation of additional
-{{WorkletGlobalScope}}s should be transparent to the author.
+The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s created at different
+times contain the same set of script source text and have the same behaviour. The creation of
+additional {{WorkletGlobalScope}}s should be transparent to the author.
 
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
-    2. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
-        <a>API base URL</a> specified by the <a>entry settings object</a> when the method was
-        invoked.
+    2. Let |resolvedModuleURL| be the result of <a>parsing</a> the |moduleURL| argument relative to
+        the <a>settings object</a> of <b>this</b>.
 
-    3. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these steps.
+    3. If this fails, reject |promise| with a "<a>SyntaxError</a>" <a>DOMException</a> and abort
+        these steps.
 
     4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
         WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
@@ -290,7 +294,7 @@ the user agent <em>must</em> run the following steps:
 
     5. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
 
-    6. Let |outsideSettings| be the <a>incumbent settings object</a>.
+    6. Let |outsideSettings| be the <a>current settings object</a>.
 
     7. Run the following steps <a>in parallel</a>:
 
@@ -304,26 +308,28 @@ the user agent <em>must</em> run the following steps:
                 (as no cryptographic nonce is present for worklets), "not parser-inserted",
                 "script", |outsideSettings|, and |insideSettings|.
 
-                - custom fetch hook, given |request|:
+                To <a>perform the request</a> given |request|, perform the following steps:
 
-                    1. Let |cache| be the current {{Worklet}}'s <a>fetched modules map</a>.
+                    1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
 
-                    2. If |cache| contains an entry with key |request| whose value is "fetching",
-                        wait (<a>in parallel</a>) until that entry's value changes, then proceed to
-                        the next step.
+                    2. Let |url| be |request|'s <a >url</a>.
 
-                    3. If |cache| contains an entry with key |request|, asynchronously complete this
+                    3. If |cache| contains an entry with key |url| whose value is "fetching", wait
+                        (<a>in parallel</a>) until that entry's value changes, then proceed to the
+                        next step.
+
+                    4. If |cache| contains an entry with key |url|, asynchronously complete this
                         algorithm with that entry's value, and abort these steps.
 
-                    4. Create an entry in |cache| with key |request| and value "fetching".
+                    5. Create an entry in |cache| with key |url| and value "fetching".
 
-                    5. <a>Fetch</a> |request|.
+                    6. <a>Fetch</a> |request|.
 
-                    6. Let |response| be the result of <a>fetch</a> when it asynchronously
+                    7. Let |response| be the result of <a>fetch</a> when it asynchronously
                         completes.
 
-                    7. Set the value of the entry in |cache| whose key is |request| to |response|,
-                        and asynchronously complete this algorithm with |response|.
+                    8. Set the value of the entry in |cache| whose key is |url| to |response|, and
+                        asynchronously complete this algorithm with |response|.
 
             3. Let |script| be the result of <a>fetch a module script tree</a> when it
                 asynchronously completes.
