@@ -33,7 +33,6 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: current settings object
     text: creation url
     text: document environment
-    text: entry settings object
     text: environment settings object
     text: event loop
     text: fetch a module script tree
@@ -44,6 +43,7 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: module script
     text: perform the request
     text: realm execution context
+    text: relevant settings object
     text: responsible browsing context
     text: responsible document
     text: responsible event loop
@@ -282,7 +282,7 @@ the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
     2. Let |resolvedModuleURL| be the result of <a>parsing</a> the |moduleURL| argument relative to
-        the <a>settings object</a> of <b>this</b>.
+        the <a>relevant settings object</a> of <b>this</b>.
 
     3. If this fails, reject |promise| with a "<a>SyntaxError</a>" <a>DOMException</a> and abort
         these steps.
