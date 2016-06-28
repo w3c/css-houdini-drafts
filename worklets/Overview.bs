@@ -181,16 +181,19 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
     4. Associate the |settingsObject| with |workletGlobalScope|.
 
-    5. For each |resolvedModuleURL| in the given |worklet|'s <a>worklet's resolved module URLs</a>,
+    5. For each |entry| in the given |worklet|'s <a>module responses map</a> (in insertion order),
         run the following substeps:
-        1. Let |script| be the result of <a>fetch a module script tree</a> given
+
+        1. Let |resolvedModuleURL| be |entry|'s key.
+
+        2. Let |script| be the result of <a>fetch a module script tree</a> given
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
             |settingsObject|.
 
         Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
             fetching resources.
 
-        2. <a>Run a module script</a> given |script|.
+        3. <a>Run a module script</a> given |script|.
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
@@ -266,11 +269,9 @@ Note: As an example the <a>worklet global scope type</a> might be a {{PaintWorkl
 A {{Worklet}} has a list of the <dfn export>worklet's WorkletGlobalScopes</dfn>. Initially this list
 is empty; it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
-A {{Worklet}} has a list of the <dfn>worklet's resolved module URLs</dfn>. Initially this list is
-empty; it is populated when module scripts resolved.
-
-A {{Worklet}} has a <dfn>module responses map</dfn>. This is a map of module URLs to values that are
-a <a>fetch</a> responses. Access to this map should be thread-safe.
+A {{Worklet}} has a <dfn>module responses map</dfn>. This is a ordered map of module URLs to values
+that are a <a>fetch</a> responses. The map's entries are ordered based on their insertion order.
+Access to this map should be thread-safe.
 
 The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s created at different
 times contain the same set of script source text and have the same behaviour. The creation of
@@ -292,11 +293,9 @@ the user agent <em>must</em> run the following steps:
 
         The user-agent may also create additional {{WorkletGlobalScope}}s at this time.
 
-    5. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
+    5. Let |outsideSettings| be the <a>current settings object</a>.
 
-    6. Let |outsideSettings| be the <a>current settings object</a>.
-
-    7. Run the following steps <a>in parallel</a>:
+    6. Run the following steps <a>in parallel</a>:
 
         1. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
             substeps:
@@ -344,7 +343,7 @@ the user agent <em>must</em> run the following steps:
             reject the promise; if the script throws an error while first evaluating the promise
             should resolve as a classes may have been registered correctly.
 
-    8. Return |promise|.
+    7. Return |promise|.
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlobalScope}}
     declaratively.
