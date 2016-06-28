@@ -736,6 +736,10 @@ Shorthand properties and values are not supported.
     <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'animation-duration'</td>
+    <td>TimeValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'animation-fill-mode'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
@@ -757,6 +761,10 @@ Shorthand properties and values are not supported.
   </tr>
   <tr>
     <td>'appearance'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'backface-visibility'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
@@ -852,6 +860,18 @@ Shorthand properties and values are not supported.
     <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'break-after'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'break-before'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'break-inside'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'caption-side'</td>
     <td>{{CSSKeywordValue}}</td>
   </tr>
@@ -866,6 +886,38 @@ Shorthand properties and values are not supported.
   <tr>
     <td>'color'</td>
     <td>ColorValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-count'</td>
+    <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-fill'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-gap'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-color'</td>
+    <td>ColorValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-style'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-rule-width'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-span'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'column-width'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'content'</td>
@@ -992,6 +1044,14 @@ Shorthand properties and values are not supported.
     <td>TimeValue | PercentageValue | {{CSSKeywordValue}}</td>
   </tr>
   <tr>
+    <td>'perspective'</td>
+    <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'perspective-origin'</td>
+    <td>{{CSSPositionValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
     <td>'pitch-range'</td>
     <td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
   </tr>
@@ -1066,6 +1126,22 @@ Shorthand properties and values are not supported.
   <tr>
     <td>'top'</td>
     <td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform'</td>
+    <td>{{CSSTransformValue}} | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform-box'</td>
+    <td>{{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform-origin'</td>
+    <td>TransformOriginValue | {{CSSKeywordValue}}</td>
+  </tr>
+  <tr>
+    <td>'transform-style'</td>
+    <td>{{CSSKeywordValue}}</td>
   </tr>
   <tr>
     <td>'unicode-bidi'</td>
