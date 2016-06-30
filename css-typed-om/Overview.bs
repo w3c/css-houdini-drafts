@@ -616,7 +616,7 @@ document.querySelector('.example').styleMap.get('background-position').y;
 <pre class='idl'>
 enum CSSResourceState {"unloaded", "loading", "loaded", "error"};
 
-interface CSSResourceValue {
+interface CSSResourceValue : CSSStyleValue {
 	readonly attribute CSSResourceState state;
 };
 
