@@ -30,7 +30,6 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: api url character encoding
     text: browsing context
     text: code entry-point
-    text: current settings object
     text: creation url
     text: document environment
     text: environment settings object
@@ -293,7 +292,7 @@ the user agent <em>must</em> run the following steps:
 
         The user-agent may also create additional {{WorkletGlobalScope}}s at this time.
 
-    5. Let |outsideSettings| be the <a>current settings object</a>.
+    5. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
 
     6. Run the following steps <a>in parallel</a>:
 
