@@ -79,22 +79,6 @@ The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString
 method attempts to parse <var>cssText</var> as a valid {{CSSStyleValue}} or sequence&lt;{{CSSStyleValue}}> for
 <var>property</var>, returning null on failure.
 
-{{CSSTokenStreamValue}} objects {#tokenstreamvalue-objects}
-----------------------------------------------
-
-<pre class='idl'>
-interface CSSTokenStreamValue : CSSStyleValue {
-	iterable<(DOMString or CSSVariableReferenceValue)>;
-};
-
-interface CSSVariableReferenceValue {
-	attribute DOMString variable;
-	attribute CSSTokenStreamValue fallback;
-};
-</pre>
-
-{{CSSTokenStreamValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
-
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
@@ -234,6 +218,22 @@ The value for a given property is the last valid value provided in the string.
 {{CSSStyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
 
+{{CSSTokenStreamValue}} objects {#tokenstreamvalue-objects}
+----------------------------------------------
+
+<pre class='idl'>
+interface CSSTokenStreamValue : CSSStyleValue {
+	iterable<(DOMString or CSSVariableReferenceValue)>;
+};
+
+interface CSSVariableReferenceValue {
+	readonly attribute DOMString variable;
+	readonly attribute CSSTokenStreamValue fallback;
+};
+</pre>
+
+{{CSSTokenStreamValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
+
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
 ------------------------------------------------
 
@@ -254,7 +254,7 @@ keyword for a particular property. Property setters are required to enforce keyw
 <pre class='idl'>
 [Constructor(double), Constructor(DOMString cssText)]
 interface CSSNumberValue : CSSStyleValue {
-	attribute double value;
+	readonly attribute double value;
 };
 </pre>
 
@@ -331,22 +331,22 @@ interface CSSLengthValue : CSSStyleValue {
  Constructor(CSSCalcDictionary)
 ]
 interface CSSCalcLength : CSSLengthValue {
-	attribute double? px;
-	attribute double? percent;
-	attribute double? em;
-	attribute double? ex;
-	attribute double? ch;
-	attribute double? rem;
-	attribute double? vw;
-	attribute double? vh;
-	attribute double? vmin;
-	attribute double? vmax;
-	attribute double? cm;
-	attribute double? mm;
-	attribute double? q;
-	attribute double? in;
-	attribute double? pc;
-	attribute double? pt;
+	readonly attribute double? px;
+	readonly attribute double? percent;
+	readonly attribute double? em;
+	readonly attribute double? ex;
+	readonly attribute double? ch;
+	readonly attribute double? rem;
+	readonly attribute double? vw;
+	readonly attribute double? vh;
+	readonly attribute double? vmin;
+	readonly attribute double? vmax;
+	readonly attribute double? cm;
+	readonly attribute double? mm;
+	readonly attribute double? q;
+	readonly attribute double? in;
+	readonly attribute double? pc;
+	readonly attribute double? pt;
 };
 
 // lengths that are *just* keywords don't become CSSSimpleLengths or CSSCalcLengths.
@@ -355,7 +355,7 @@ interface CSSCalcLength : CSSLengthValue {
  Constructor(CSSLengthValue),
  Constructor(double value, LengthType type)]
 interface CSSSimpleLength : CSSLengthValue {
-	attribute double value;
+	readonly attribute double value;
 	readonly attribute LengthType type;
 };
 </pre>
