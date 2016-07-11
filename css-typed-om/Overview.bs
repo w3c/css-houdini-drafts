@@ -361,7 +361,7 @@ interface ColorValue : StyleValue{
   readonly attribute double r;
   readonly attribute double g;
   readonly attribute double b;
-  readonly attribute double? a;
+  readonly attribute double a;
 };
 
 </pre>
