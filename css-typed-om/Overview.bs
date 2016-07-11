@@ -240,7 +240,7 @@ interface CSSVariableReferenceValue {
 <pre class='idl'>
 [Constructor(DOMString)]
 interface CSSKeywordValue : CSSStyleValue {
-	attribute DOMString keywordValue;
+	readonly attribute DOMString keywordValue;
 };
 </pre>
 
