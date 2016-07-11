@@ -109,9 +109,7 @@ interface Fragment {
 
     readonly attribute double dominantBaseline;
     readonly attribute double alphabeticBaseline;
-    readonly attribute double textTopBaseline;
-    readonly attribute double textBottomBaseline;
-    readonly attribute double textCenterBaseline;
+    readonly attribute double centerBaseline;
 
     readonly attribute Object data;
 };
@@ -189,9 +187,12 @@ The {{Fragment}}'s {{Fragment/breakToken}} specifies where the {{Box}} last frag
 <a>current layout</a> requires a different {{Fragment/breakToken}} the author must perform
 <<doLayout()>> again with different arguments.
 
-The {{Fragment}}'s {{Fragment/dominantBaseline}}, {{Fragment/alphabeticBaseline}},
-{{textTopBaseline}}, {{textCenterBaseline}}, and {{Fragment/textBottomBaseline}} attributes specify
-where all the baselines for the {{Fragment}} are positioned. They cannot be changed.
+The {{Fragment}}'s {{Fragment/dominantBaseline}}, {{Fragment/alphabeticBaseline}}, and
+{{Fragment/centerBaseline}} attributes specify where all the baselines for the {{Fragment}} are
+positioned. They cannot be changed.
+
+The {{Fragment}}'s {{Fragment/data}} attribute is used by the author to pass arbitary data between
+the <a>child layout</a> and <a>current layout</a>. The data is <a>structured cloned</a>.
 
 Constraint Spaces {#constraint-spaces}
 --------------------------------------
@@ -428,16 +429,11 @@ partial interface ConstraintSpace {
     Exclusion getLastExclusion(optional ExclusionOptions options);
 };
 
-enum ExclusionTag { "exclusion", "float" };
-
-enum ExclusionType {
-    "none",
-    "inline-flow", "inline-start", "inline-end", "inline-both",
-    "block-flow", "block-start", "block-end", "block-both"
-};
+enum ExclusionTag { "fragment", "exclusion", "float" };
+enum ExclusionType { "none", "inline-flow", "inline-start", "inline-end", "inline-both" };
 
 dictionary ExclusionOptions {
-    ExclusionTag tag = "exclusion";
+    ExclusionTag tag = "fragment";
     ExclusionType type = "none"; // default to "inline-flow" instead?
 };
 
@@ -566,10 +562,10 @@ dictionary BreakTokenOptions {
     Object data = null;
 };
 
-enum BreakType { "none", "line-word", "line-hyphen", "column", "page", "region" };
+enum BreakType { "none", "line", "column", "page", "region" };
 </pre>
 
-Issue: The {{BreakType}}s are probably completely wrong.
+Issue(w3c/css-houdini-drafts#258): What type of {{BreakType}}s are needed?
 
 A {{Box}} can produce multiple {{Fragment}}s. A {{Box}} may fragment in the block direction if a
 {{ConstraintSpace/blockFragmentationOffset}} is present in the {{ConstraintSpace}}. It may fragment
