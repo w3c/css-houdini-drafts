@@ -1,0 +1,33 @@
+<pre class='metadata'>
+Title:  CSS Typed OM Level 2
+Status: DREAM
+Group: houdini
+ED: https://drafts.css-houdini.org/css-typed-om-1/
+Shortname: css-typed-om-2
+Level: 2
+Abstract:
+Editor: Shane Stephens, shanestephens@google.com
+Repository: w3c/css-houdini-drafts
+</pre>
+
+Issue(157): do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
+
+Issue(163): Need to add a section describing unions of types.
+
+Issue(161): Need to add a section describing shorthands.
+
+Issue(158): Spec up URIValue, ShapeValue, StringValue, CounterValue, TimeValue, PercentageValue, FrequencyValue, VoiceValue, CustomIdentValue, TransitionTimingFunctionValue. What is attr(<identifier>) in other specs?
+
+Issue(155): Do we want to make a generic PairValue and QuadValue, or have more specific classes for background-size, border-image-repeat, border-radius-*, border-image-outset, border-image-width?
+
+Issue(153): BorderImageSliceValue represents [<number> | <percentage>]{1,4} && fill?
+
+Issue(152): What do we do for play-during, which takes <uri> [ mix || repeat ]?
+
+Issue(150): Do we want a pair type for things like quotes which take [<string> <string>]
+
+Issue(142): Do we want a font value class? How about a FontWeightValue (for 100, 200 etc) class?
+
+Issue(144): Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
+
+Issue(136): Need an array-buffer custom property type.
