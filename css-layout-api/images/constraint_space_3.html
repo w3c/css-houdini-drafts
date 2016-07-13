@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+    body {
+      --width: 120px;
+      --height: 100px;
+
+      border: solid 1px;
+      height: calc(var(--height) + 40px);
+      width: calc(var(--width) + 40px);
+      position: absolute;
+    }
+
+    div {
+      border: 2px solid #2196F3;
+      border-bottom-style: dashed;
+      height: var(--height);
+      width: var(--width);
+      margin: 20px;
+      box-sizing: border-box;
+      border-right-style: dashed;
+    }
+
+    span {
+      position: absolute;
+      top: 0;
+      font-family: sans-serif;
+      font-size: 10px;
+      background-color: white;
+      padding: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div style="
+  "></div>
+  <span style="translate: 67px 13px;">120px</span>
+  <span style="translate: 6px 62px;">100px</span>
+  <span style="translate: 54px 102px;">scrollTrigger</span>
+  <span style="translate: 78px 62px;">scrollTrigger</span>
+</body>
+</html>

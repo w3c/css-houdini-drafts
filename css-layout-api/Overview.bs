@@ -44,12 +44,9 @@ Layout Boxes {#layout-boxes}
 <pre class='idl'>
 interface Box {
     readonly attribute ComputedStylePropertyMapReadOnly styleMap;
-    FragmentRequestToken doLayout(ConstraintSpace space, ChildBreakToken breakToken);
+    FragmentRequestToken doLayout(DerivedConstraintSpace space, ChildBreakToken breakToken);
 };
 </pre>
-
-Issue(w3c/css-houdini-drafts#254): We may want a different name for the {{Box}} concept. In this
-    context box has no layout information only style.
 
 A {{Box}} represents a CSS generated <a>box</a> before any layout has occurred. (The box will have a
 computed value of 'display' that is not ''none''). The {{Box}} does not contain any layout
@@ -182,10 +179,10 @@ registerLayout('block-like', class {
 
 The {{Fragment}}'s {{Fragment/breakToken}} specifies where the {{Box}} last fragmented. If the
 {{Fragment/breakToken}} is null the {{Box}} cannot produce any more {{Fragment}}s. The
-{{Fragment/breakToken}} can be passed to the <<doLayout()>> function to produce the next
+{{Fragment/breakToken}} can be passed to the {{Box/doLayout()}} function to produce the next
 {{Fragment}} for a particular {{Box}}. The {{Fragment/breakToken}} cannot be changed. If the
 <a>current layout</a> requires a different {{Fragment/breakToken}} the author must perform
-<<doLayout()>> again with different arguments.
+{{Box/doLayout()}} again with different arguments.
 
 The {{Fragment}}'s {{Fragment/dominantBaseline}}, {{Fragment/alphabeticBaseline}}, and
 {{Fragment/centerBaseline}} attributes specify where all the baselines for the {{Fragment}} are
@@ -212,10 +209,10 @@ interface ConstraintSpace {
     readonly attribute double inlinePercentResolutionSize;
     readonly attribute double blockPercentResolutionSize;
 
-    readonly attribute double? inlineScrollTriggerOffset;
-    readonly attribute double? blockScrollTriggerOffset;
+    readonly attribute boolean inlineScrollTrigger;
+    readonly attribute boolean blockScrollTrigger;
 
-    readonly attribute double? blockFragmentationOffset;
+    readonly attribute boolean blockFragmentation;
     readonly attribute BlockFragmentationType blockFragmentationType;
 };
 
@@ -229,10 +226,10 @@ dictionary ConstraintSpaceOptions {
     double inlinePercentResolutionSize = null;
     double blockPercentResolutionSize = null;
 
-    double inlineScrollTriggerOffset = null;
-    double blockScrollTriggerOffset = null;
+    boolean inlineScrollTrigger = false;
+    boolean blockScrollTrigger = false;
 
-    double blockFragmentationOffset = null;
+    double blockFragmentation = false;
     BlockFragmentationType blockFragmentationType = "none";
 };
 
@@ -313,11 +310,11 @@ The {{ConstraintSpace}} has {{ConstraintSpace/inlinePercentResolutionSize}} and
 {{ConstraintSpace/blockPercentResolutionSize}} attributes. These represent the size that a layout
 percentages should be resolved against while performing layout.
 
-The {{ConstraintSpace}} has {{ConstraintSpace/inlineScrollTriggerOffset}} and
-{{ConstraintSpace/blockScrollTriggerOffset}} attributes. The <a>current layout</a> can use this
+The {{ConstraintSpace}} has {{ConstraintSpace/inlineScrollTrigger}} and
+{{ConstraintSpace/blockScrollTrigger}} attributes. The <a>current layout</a> can use this
 information to early opt-out of a layout if it knows it will require additional space for a scroll
-bar in that direction. If either the {{ConstraintSpace/inlineScrollTriggerOffset}} or
-{{ConstraintSpace/blockScrollTriggerOffset}} attributes are null the <a>current layout</a> can
+bar in that direction. If either the {{ConstraintSpace/inlineScrollTrigger}} or
+{{ConstraintSpace/blockScrollTrigger}} attributes are null the <a>current layout</a> can
 assume it does not need to report to the parent layout that it will require a scroll bar in that
 direction.
 
@@ -343,26 +340,49 @@ provided to a <a>current layout</a>.
             <td>
                 <pre>
                     ConstraintSpace {
-                        inlineSize = 100,
-                        blockSize = 100,
-                        blockScrollTriggerOffset = 100
+                        inlineSize = 120
+                        blockSize = 120
                     }
                 </pre>
             </td>
             <td>
                 <pre>
                     ConstraintSpace {
-                        inlineSize = 100,
-                        blockSize = 100,
-                        blockScrollTriggerOffset = 100
+                        inlineSize = 120
+                        blockSize = 100
+                        blockScrollTrigger = true
                     }
                 </pre>
             </td>
         </tr>
         <tr>
+            <td><img style="height: 50%; text-align: center;" src="images/constraint_space_1.png"></img></td>
+            <td><img style="height: 50%; text-align: center;" src="images/constraint_space_2.png"></img></td>
+        </tr>
+        <tr>
             <td>
-            TODO add image.
+                <pre>
+                    ConstraintSpace {
+                        inlineSize = 140
+                        blockSize = 100
+                        inlineScrollTrigger = true
+                        blockScrollTrigger = true
+                    }
+                </pre>
             </td>
+            <td>
+                <pre>
+                    ConstraintSpace {
+                        inlineSize = 140
+                        blockSize = 100
+                        blockFragmentation = true
+                    }
+                </pre>
+            </td>
+        </tr>
+        <tr>
+            <td><img style="height: 50%; text-align: center;" src="images/constraint_space_3.png"></img></td>
+            <td><img style="height: 50%; text-align: center;" src="images/constraint_space_4.png"></img></td>
         </tr>
     </tbody>
 </table>
@@ -391,8 +411,7 @@ registerLayout('block-like-with-scroll', class {
 
             // Early opt-out of layout algorithm if we triggered a scroll in the
             // block direction.
-            if (space.blockScrollTriggerOffset != null &&
-                space.blockScrollTriggerOffset < blockOffset) {
+            if (space.blockScrollTrigger && space.blockSize < blockOffset) {
                 return {blockScrollTriggered: true};
             }
         }
@@ -410,9 +429,9 @@ registerLayout('block-like-with-scroll', class {
 </pre>
 </div>
 
-The {{ConstraintSpace}} has {{ConstraintSpace/blockFragmentationOffset}} and
+The {{ConstraintSpace}} has {{ConstraintSpace/blockFragmentation}} and
 {{ConstraintSpace/blockFragmentationType}} attributes. The <a>current layout</a> should produce a
-{{Fragment}} which fragments at this offset if possible.
+{{Fragment}} which fragments at the {{ConstraintSpace/blockSize}} if possible.
 
 The <a>current layout</a> may choose not to fragment a child {{Box}} based on the
 {{ConstraintSpace/blockFragmentationType}} if the child has a property like ''break-inside:
@@ -426,15 +445,16 @@ partial interface ConstraintSpace {
     void addExclusion(Exclusion exclusion, optional ExclusionOptions options);
 
     sequence&lt;Exclusion> getExclusions(optional ExclusionOptions options);
-    Exclusion getLastExclusion(optional ExclusionOptions options);
 };
 
-enum ExclusionTag { "fragment", "exclusion", "float" };
+enum ExclusionTag { "fragment", "exclusion", "float-left", "float-right" };
 enum ExclusionType { "none", "inline-flow", "inline-start", "inline-end", "inline-both" };
+enum ExclusionBox { "none", "border", "margin" };
 
 dictionary ExclusionOptions {
     ExclusionTag tag = "fragment";
     ExclusionType type = "none"; // default to "inline-flow" instead?
+    ExclusionBox box = "none"; // TODO needed?
 };
 
 interface Exclusion {
@@ -562,14 +582,14 @@ dictionary BreakTokenOptions {
     Object data = null;
 };
 
-enum BreakType { "none", "line", "column", "page", "region" };
+enum BreakType { "none", "inline", "inline-hyphen", "column", "page", "region" };
 </pre>
 
 Issue(w3c/css-houdini-drafts#258): What type of {{BreakType}}s are needed?
 
 A {{Box}} can produce multiple {{Fragment}}s. A {{Box}} may fragment in the block direction if a
-{{ConstraintSpace/blockFragmentationOffset}} is present in the {{ConstraintSpace}}. It may fragment
-in the inline direction if it is an inline layout.
+{{ConstraintSpace/blockFragmentation}} is true. It may fragment in the inline direction if it is an
+inline layout.
 
 A subsequent {{Fragment}} is produced by using the previous {{Fragment}}'s {{Fragment/breakToken}}.
 This tells the <a>child layout</a> to produce a {{Fragment}} starting at the point encoded in the
