@@ -16,6 +16,9 @@ Editor: Rossen Atanassov, rossen.atanassov@microsoft.com
 
 <pre class="link-defaults">
 spec:css-break-3; type:dfn; text:fragment
+spec:css-display-3; type:dfn; text:box
+spec:css-display-3; type:value; for:display; text:none
+spec:dom; type:dfn; text:element
 </pre>
 
 Introduction {#intro}
@@ -43,7 +46,7 @@ Layout Boxes {#layout-boxes}
 
 <pre class='idl'>
 interface Box {
-    readonly attribute ComputedStylePropertyMapReadOnly styleMap;
+    readonly attribute StylePropertyMapReadOnly styleMap;
     FragmentRequestToken doLayout(DerivedConstraintSpace space, ChildBreakToken breakToken);
 };
 </pre>
@@ -674,6 +677,78 @@ TODO, list all the ways that layout can be invalidated, namely:
 
 Layout Engine {#layout-engine}
 ==============================
+
+<pre class="idl">
+interface FragmentRequestToken {
+  // Has internal slots:
+  // [[box]] - The box to generate the fragment for.
+  // [[constraintSpace]] - The constraint space to perform layout in.
+  // [[breakToken]] - The break token to resume the layout with.
+};
+</pre>
+
+The layout method on the author supplied layout class is a generator function instead of a regular
+javascript function. This is for user-agents to be able to support asyncronous and parallel layout
+engines.
+
+When an author invokes the {{Box/doLayout()}} method on a {{Box}} the user-agent doesn't
+synchronously generate a {{Fragment}} to return to the author's code. Instead it returns a
+{{FragmentRequestToken}}. This is a completely opaque object to the author but contains internal
+slots which encapsulates the {{Box/doLayout()}} method call.
+
+When a {{FragmentRequestToken}}(s) are yielded from a layout generator object the user-agent's
+layout engine may run the algorithm asynchronously with other work, and/or on a different thread of
+execution. When {{Fragment}}(s) have been produced by the engine, the user-agent will 'tick' the
+generator object with the resulting {{Fragment}}(s).
+
+Issue: Write algorithm "<dfn>generate a fragment</dfn>" which encapsulates this.
+
+<div class="example">
+An example layout engine written in javascript is shown below.
+
+<pre class="lang-javascript">
+class LayoutEngine {
+  // This function takes the root of the Box-tree, a ConstraintSpace, and a
+  //  BreakToken to (if paginating for printing for example) and generates a
+  // Fragment.
+  layoutEntry(rootBox, rootPageConstraintSpace, breakToken) {
+    return layoutFragment({
+      box: rootBox,
+      constraintSpace: rootPageConstraintSpace,
+      breakToken: breakToken,
+    });
+  }
+
+  // This function takes a FragmentRequestToken and calls the appropriate layout
+  // algorithm to generate the a Fragment.
+  layoutFragment(fragmentRequest) {
+    const box = fragmentRequest.box;
+    const algorithm = selectLayoutAlgorithmForBox(box);
+    const fragmentRequestGenerator = algorithm.layout(
+        fragmentRequest.constraintSpace,
+        box.children,
+        box.styleMap,
+        fragmentRequest.breakToken);
+
+    let nextFragmentRequest = fragmentRequestGenerator.next();
+
+    while (!nextFragmentRequest.done) {
+      // A user-agent may decide to perform layout to generate the fragments in
+      // parallel on separate threads. This example performs them synchronously
+      // in order.
+      let fragments = nextFragmentRequest.value.map(layoutFragment);
+
+      // A user-agent may decide to yield for other work (garbage collection for
+      // example) before resuming this layout work. This example just performs
+      // layout synchronously without any ability to yield.
+      nextFragmentRequest = fragmentRequestGenerator.next(fragments);
+    }
+
+    return nextFragmentRequest.value; // Return the final Fragment.
+  }
+}
+</pre>
+</div>
 
 TODO explain parallel layout + {{FragmentRequestToken}}, etc.
 
