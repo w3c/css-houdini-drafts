@@ -185,14 +185,13 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
         1. Let |resolvedModuleURL| be |entry|'s key.
 
-        2. Let |script| be the result of <a>fetch a module script tree</a> given
-            |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
-            |settingsObject|.
+        2. <a>Fetch a module worklet script tree</a> given |resolvedModuleURL|, |outsideSettings|,
+            and |settingsObject|.
 
-        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
-            fetching resources.
+        3. Let |script| be the result of <a>fetch a module worklet script tree</a> when it
+            asynchronously completes.
 
-        3. <a>Run a module script</a> given |script|.
+        4. <a>Run a module script</a> given |script|.
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
@@ -246,6 +245,41 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
     7. Return |settingsObject|.
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
+
+### Fetching a module worklet script tree ### {#fetching-a-module-worklet-script-tree}
+
+When a user agent is to <dfn>fetch a module worklet script tree</dfn>, given |resolvedModuleURL|,
+|outsideSettings|, and |insideSettings| it must run the following steps:
+
+    1. <a>Fetch a module script tree</a> given |resolvedModuleURL|, |outsideSettings|, "script" the
+        empty string (as no cryptographic nonce is present for worklets), "not parser-inserted", "omit",
+        and |insideSettings|.
+
+        To <a>perform the fetch</a> given |request|, perform the following steps:
+
+            1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
+
+            2. Let |url| be |request|'s <a >url</a>.
+
+            3. If |cache| contains an entry with key |url| whose value is "fetching", wait
+                (<a>in parallel</a>) until that entry's value changes, then proceed to the
+                next step.
+
+            4. If |cache| contains an entry with key |url|, asynchronously complete this
+                algorithm with that entry's value, and abort these steps.
+
+            5. Create an entry in |cache| with key |url| and value "fetching".
+
+            6. <a>Fetch</a> |request|.
+
+            7. Let |response| be the result of <a>fetch</a> when it asynchronously
+                completes.
+
+            8. Set the value of the entry in |cache| whose key is |url| to |response|, and
+                asynchronously complete this algorithm with |response|.
+
+    2. Asynchronously complete this algorithm with the result of <a>fetch a module script tree</a>
+        when it completes.
 
 Worklet {#worklet-section}
 --------------------------
@@ -302,34 +336,10 @@ the user agent <em>must</em> run the following steps:
             1. Let |insideSettings| be the {{WorkletGlobalScope}}'s associated <a>environment
                 settings object</a>.
 
-            2. <a>Fetch a module script tree</a> given |resolvedModuleURL|, "omit", the empty string
-                (as no cryptographic nonce is present for worklets), "not parser-inserted",
-                "script", |outsideSettings|, and |insideSettings|.
+            2. <a>Fetch a module worklet script tree</a> given |resolvedModuleURL|,
+                |outsideSettings|, and |settingsObject|.
 
-                To <a>perform the request</a> given |request|, perform the following steps:
-
-                    1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
-
-                    2. Let |url| be |request|'s <a >url</a>.
-
-                    3. If |cache| contains an entry with key |url| whose value is "fetching", wait
-                        (<a>in parallel</a>) until that entry's value changes, then proceed to the
-                        next step.
-
-                    4. If |cache| contains an entry with key |url|, asynchronously complete this
-                        algorithm with that entry's value, and abort these steps.
-
-                    5. Create an entry in |cache| with key |url| and value "fetching".
-
-                    6. <a>Fetch</a> |request|.
-
-                    7. Let |response| be the result of <a>fetch</a> when it asynchronously
-                        completes.
-
-                    8. Set the value of the entry in |cache| whose key is |url| to |response|, and
-                        asynchronously complete this algorithm with |response|.
-
-            3. Let |script| be the result of <a>fetch a module script tree</a> when it
+            3. Let |script| be the result of <a>fetch a module worklet script tree</a> when it
                 asynchronously completes.
 
             4. <a>Run a module script</a> given |script|.
