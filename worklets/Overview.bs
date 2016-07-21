@@ -18,6 +18,7 @@ urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
 urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
     urlPrefix: #concept-;
         text: fetch
+        url: request-url; text: url;
 urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
     text: effective script origin
     url: #origin-2; text: origin
@@ -180,18 +181,16 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
     4. Associate the |settingsObject| with |workletGlobalScope|.
 
-    5. For each |entry| in the given |worklet|'s <a>module responses map</a> (in insertion order),
-        run the following substeps:
+    5. For each |resolvedModuleURL| in the given |worklet|'s <a>top level module url list</a> (in
+        insertion order), run the following substeps:
 
-        1. Let |resolvedModuleURL| be |entry|'s key.
+        1. <a>Fetch a module worklet script tree</a> given |worklet|, |resolvedModuleURL|,
+            |outsideSettings|, and |settingsObject|.
 
-        2. <a>Fetch a module worklet script tree</a> given |resolvedModuleURL|, |outsideSettings|,
-            and |settingsObject|.
-
-        3. Let |script| be the result of <a>fetch a module worklet script tree</a> when it
+        2. Let |script| be the result of <a>fetch a module worklet script tree</a> when it
             asynchronously completes.
 
-        4. <a>Run a module script</a> given |script|.
+        3. <a>Run a module script</a> given |script|.
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
@@ -248,18 +247,18 @@ Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-u
 
 ### Fetching a module worklet script tree ### {#fetching-a-module-worklet-script-tree}
 
-When a user agent is to <dfn>fetch a module worklet script tree</dfn>, given |resolvedModuleURL|,
-|outsideSettings|, and |insideSettings| it must run the following steps:
+When a user agent is to <dfn>fetch a module worklet script tree</dfn>, given |worklet|,
+ |resolvedModuleURL|, |outsideSettings|, and |insideSettings|, it must run the following steps:
 
-    1. <a>Fetch a module script tree</a> given |resolvedModuleURL|, |outsideSettings|, "script" the
-        empty string (as no cryptographic nonce is present for worklets), "not parser-inserted", "omit",
-        and |insideSettings|.
+    1. <a>Fetch a module worker script tree</a> given |resolvedModuleURL|, |outsideSettings|,
+        "script", "omit", and |insideSettings|.
 
-        To <a>perform the fetch</a> given |request|, perform the following steps:
+        To <a>perform the fetch</a> given |request|, and the |isTopLevel| flag, perform the
+            following steps:
 
-            1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
+            1. Let |cache| be |worklet|'s <a>module responses map</a>.
 
-            2. Let |url| be |request|'s <a >url</a>.
+            2. Let |url| be |request|'s <a>url</a>.
 
             3. If |cache| contains an entry with key |url| whose value is "fetching", wait
                 (<a>in parallel</a>) until that entry's value changes, then proceed to the
@@ -275,11 +274,14 @@ When a user agent is to <dfn>fetch a module worklet script tree</dfn>, given |re
             7. Let |response| be the result of <a>fetch</a> when it asynchronously
                 completes.
 
-            8. Set the value of the entry in |cache| whose key is |url| to |response|, and
+            8. If |isTopLevel| is set, append |resolvedModuleURL| the |worklet|'s <a>top level
+                module url list</a>
+
+            9. Set the value of the entry in |cache| whose key is |url| to |response|, and
                 asynchronously complete this algorithm with |response|.
 
-    2. Asynchronously complete this algorithm with the result of <a>fetch a module script tree</a>
-        when it completes.
+    2. Asynchronously complete this algorithm with the result of <a>fetch a module worker script
+        tree</a> when it completes.
 
 Worklet {#worklet-section}
 --------------------------
@@ -302,13 +304,17 @@ Note: As an example the <a>worklet global scope type</a> might be a {{PaintWorkl
 A {{Worklet}} has a list of the <dfn export>worklet's WorkletGlobalScopes</dfn>. Initially this list
 is empty; it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
-A {{Worklet}} has a <dfn>module responses map</dfn>. This is a ordered map of module URLs to values
-that are a <a>fetch</a> responses. The map's entries are ordered based on their insertion order.
-Access to this map should be thread-safe.
+A {{Worklet}} has a <dfn>module responses map</dfn>. This is a map of module URLs to values that are
+a <a>fetch</a> responses. Access to this map should be thread-safe.
 
-The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s created at different
-times contain the same set of script source text and have the same behaviour. The creation of
-additional {{WorkletGlobalScope}}s should be transparent to the author.
+A {{Worklet}} has a <dfn>top level module url list</dfn>. This is a ordered list of module URLs. The
+list's entries are ordered based on their insertion order. Access to this list should be
+thread-safe.
+
+The <a>module responses map</a> and <a>top level module url list</a> exists to ensure that
+{{WorkletGlobalScope}}s created at different times contain the same set of script source text and
+have the same behaviour. The creation of additional {{WorkletGlobalScope}}s should be transparent to
+the author.
 
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
@@ -336,8 +342,8 @@ the user agent <em>must</em> run the following steps:
             1. Let |insideSettings| be the {{WorkletGlobalScope}}'s associated <a>environment
                 settings object</a>.
 
-            2. <a>Fetch a module worklet script tree</a> given |resolvedModuleURL|,
-                |outsideSettings|, and |settingsObject|.
+            2. <a>Fetch a module worklet script tree</a> given the current {{Worklet}},
+                |resolvedModuleURL|, |outsideSettings|, and |settingsObject|.
 
             3. Let |script| be the result of <a>fetch a module worklet script tree</a> when it
                 asynchronously completes.
