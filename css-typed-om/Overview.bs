@@ -478,7 +478,8 @@ interface CSSScale : CSSTransformComponent {
 	readonly attribute double z;
 };
 
-[Constructor(double ax, double ay)]
+[Constructor(double dx, double dy),
+ Constructor(CSSAngleValue ax, CSSAngleValue ay)]
 interface CSSSkew : CSSTransformComponent {
 	readonly attribute double ax;
 	readonly attribute double ay;
@@ -518,13 +519,20 @@ and y &amp; z values of 0 could be:
 </div>
 
 When a {{CSSRotation}} is constructed with a double (as opposed to a
-{{CSSAngleValue}}), the angle is taken to be in degrees.
+{{CSSAngleValue}}), the angle is taken to be in degrees. Likewise, when
+{{CSSSkew}} is constructed with doubles, both arguments are taken to be angles
+in degrees.
 
 <div class=note>
 The following two CSSRotations are equivalent:
 <pre class='lang-javascript'>
 		CSSRotation(angle);
 		CSSRotation(CSSAngleValue(angle, "deg"));
+</pre>
+Likewise, the following two CSSSkews are equivalent:
+<pre class='lang-javascript'>
+    CSSSkew(ax, ay);
+    CSSSkew(CSSAngleValue(ax, "deg"), CSSAngleValue(ay, "deg"));
 </pre>
 </div>
 
