@@ -467,7 +467,7 @@ interface CSSRotation : CSSTransformComponent {
 	readonly attribute double x;
 	readonly attribute double y;
 	readonly attribute double z;
-	readonly attribute double angle;
+	readonly attribute CSSAngleValue angle;
 };
 
 [Constructor(double x, double y),
@@ -481,8 +481,8 @@ interface CSSScale : CSSTransformComponent {
 [Constructor(double dx, double dy),
  Constructor(CSSAngleValue ax, CSSAngleValue ay)]
 interface CSSSkew : CSSTransformComponent {
-	readonly attribute double ax;
-	readonly attribute double ay;
+	readonly attribute CSSAngleValue ax;
+	readonly attribute CSSAngleValue ay;
 };
 
 [Constructor(CSSLengthValue length)]
