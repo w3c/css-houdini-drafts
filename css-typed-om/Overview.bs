@@ -10,7 +10,7 @@ Abstract: Converting CSSOM value strings into meaningfully typed JavaScript repr
 Editor: Shane Stephens, shanestephens@google.com
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
-Ignored Terms: Drawable
+Ignored Terms: Drawable, paint image definition
 </pre>
 
 <pre class=anchors>
@@ -40,6 +40,11 @@ spec:css-tables-3; type:property; text:table-layout;
 spec:css-position-3; type:value; for:left; text:auto;
 spec:css-transforms-1; type:type; text:<transform-list>;
 spec:css-transforms-1; type:type; text:<transform-function>;
+spec:css-transforms-1; type:property; text:backface-visibility;
+spec:css-transforms-1; type:property; text:perspective;
+spec:css-transforms-1; type:property; text:perspective-origin;
+spec:css-transforms-1; type:property; text:transform-origin;
+spec:css-transforms-1; type:property; text:transform-style;
 </pre>
 
 Introduction {#intro}
@@ -636,13 +641,13 @@ before being usable.
 A {{CSSResourceValue}} is in one of the following states, as reflected in the value of the
 {{CSSResourceValue/state}} attribute:
 
-:   {{"unloaded"}}
+:   "unloaded"
 ::  The resource is not ready and is not actively being fetched
-:   {{"loading"}}
+:   "loading"
 ::  The resource is not ready, but is in the process of being fetched
-:   {{"loaded"}}
+:   "loaded"
 ::  The resource is ready for rendering
-:   {{"error"}}
+:   "error"
 ::  The resource can't be fetched, or the fetched resource is invalid
 
 <div class='example'>
@@ -673,9 +678,9 @@ interface CSSURLImageValue : CSSImageValue {
 for example 'background-image', 'list-style-image', and 'border-image-source'.
 
 {{CSSImageValue}} objects that do not require network data (for example linear and radial gradients)
-are initialized with {{CSSResourceValue/state}} {{"loaded"}}.
+are initialized with {{CSSResourceValue/state}} "loaded".
 
-If the {{CSSImageValue}}'s {{CSSResourceValue/state}} is {{"loaded"}},
+If the {{CSSImageValue}}'s {{CSSResourceValue/state}} is "loaded",
 and the resource has an intrinsic width, height, or aspect ratio,
 then {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}}, and {{CSSImageValue/intrinsicRatio}} must reflect the resource's corresponding value.
 In all other cases, the attributes must be <code>null</code>.
@@ -697,8 +702,11 @@ interface CSSFontFaceValue : CSSResourceValue {
 
 </pre>
 
-{{CSSFontFaceValue}} objects represent font faces that can be used to render text. As
-font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
+{{CSSFontFaceValue}} objects are opaque representations of the contents of
+@font-face rules. They are used to pass font information into <a>paint image definition</a>s,
+via <a>custom properties</a>.
+
+As font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
 of {{CSSResourceValue}}.
 
 Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
