@@ -118,7 +118,7 @@ Note: in future levels we anticipate supporting more sophisticated parse strings
 Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
 throw a {{SyntaxError}}. If no {{PropertyDescriptor/initialValue}} is provided and the
-{{PropertyDescriptor/syntax}} is '*', then a special initial value used. This initial
+{{PropertyDescriptor/syntax}} is '*', then a special initial value is used. This initial
 value must be considered parseable by {{registerProperty()}} but invalid at computed
 value time. Initial values that are not computationally idempotent must also cause
 {{registerProperty()}} to throw a {{SyntaxError}}.
