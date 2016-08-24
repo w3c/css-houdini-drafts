@@ -153,6 +153,13 @@ Issue(143): first need to check whether the property is a valid property.
 	::  concatenate <var>values</var> onto the end of the entry in the <a>property model</a>
 
 
+The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the properties listed in
+the <a>property model</a>. This list of properties is sorted in the following manner:
+
+*   normal properties are sorted alphabetically.
+*   custom properties are sorted by increasing code point order.
+*   custom properties are sorted after normal properties.
+
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
 Issue(147): need a robust description of what "a type that <var>property</var> can't accept" means.
