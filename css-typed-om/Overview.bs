@@ -309,7 +309,7 @@ enum LengthType {
 	"cm", "mm", "q", "in", "pc", "pt"
 };
 
-dictionary CSSCalcDictionary {
+dictionary CSSLengthCalcDictionary {
 	double px;
 	double percent;
 	double em;
@@ -335,12 +335,12 @@ interface CSSLengthValue : CSSStyleValue {
 	CSSLengthValue divide(double value);
 	static CSSLengthValue from(DOMString cssText);
 	static CSSLengthValue from(double value, LengthType type);
-	static CSSLengthValue from(CSSCalcDictionary dictionary);
+	static CSSLengthValue from(CSSLengthCalcDictionary dictionary);
 };
 
 [Constructor(DOMString cssText),
  Constructor(CSSLengthValue),
- Constructor(CSSCalcDictionary)
+ Constructor(CSSLengthCalcDictionary)
 ]
 interface CSSCalcLength : CSSLengthValue {
 	readonly attribute double? px;
@@ -419,7 +419,7 @@ The following methods are defined for {{CSSLengthValue}} objects:
 ::  Constructs a {{CSSSimpleLength}} with the given <var>value</var> and unit
 	<var>type</var>.
 
-:   <dfn method for=CSSLengthValue>from(CSSCalcDictionary dictionary)</dfn>
+:   <dfn method for=CSSLengthValue>from(CSSLengthCalcDictionary dictionary)</dfn>
 ::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
 	dictionary.
 
