@@ -230,21 +230,21 @@ The value for a given property is the last valid value provided in the string.
 {{CSSStyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
 
-{{CSSTokenStreamValue}} objects {#tokenstreamvalue-objects}
+{{CSSUnparsedValue}} objects {#unparsedvalue-objects}
 ----------------------------------------------
 
 <pre class='idl'>
-interface CSSTokenStreamValue : CSSStyleValue {
+interface CSSUnparsedValue : CSSStyleValue {
 	iterable<(DOMString or CSSVariableReferenceValue)>;
 };
 
 interface CSSVariableReferenceValue {
 	readonly attribute DOMString variable;
-	readonly attribute CSSTokenStreamValue fallback;
+	readonly attribute CSSUnparsedValue fallback;
 };
 </pre>
 
-{{CSSTokenStreamValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
+{{CSSUnparsedValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
 
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
 ------------------------------------------------
@@ -383,7 +383,7 @@ that value will be accepted unaltered when set on a <a>specified StylePropertyMa
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
 Note that lengths which incorporate variable references will instead be represented as
-{{CSSTokenStreamValue}} objects, and keywords as {{CSSKeywordValue}} objects.
+{{CSSUnparsedValue}} objects, and keywords as {{CSSKeywordValue}} objects.
 
 The following methods are defined for {{CSSLengthValue}} objects:
 
@@ -1208,7 +1208,7 @@ If all listed subclasses fail, then the value is normalized as a raw
 {{CSSStyleValue}}, with the {{CSSStyleValue/cssText}} attribute
 set to the input value.
 
-{{CSSTokenStreamValue}} normalization {#tokenstreamvalue-normalization}
+{{CSSUnparsedValue}} normalization {#unparsedvalue-normalization}
 -----------------------------------------------------------------------
 
 Values which contain custom property references are tokenized then split into runs of
@@ -1220,16 +1220,16 @@ is represented by a {{CSSVariableReferenceValue}}.
 <div class='example'>
 
 The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
-is converted into a {{CSSTokenStreamValue}} that contains a sequence with:
+is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 *   the string "calc(42px + "
 *   a {{CSSVariableReferenceValue}} with:
 		*   {{CSSVariableReferenceValue/variable}} "--foo"
 		*   {{CSSVariableReferenceValue/fallback}} a
-				{{CSSTokenStreamValue}} with a single-valued sequence containing " 15em"
+				{{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
 *   the string " + "
 *   a {{CSSVariableReferenceValue}} with:
 		*   {{CSSVariableReferenceValue/variable}} "--bar"
-		*   {{CSSVariableReferenceValue/fallback}} a {{CSSTokenStreamValue}}
+		*   {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
 				with a sequence containing:
 				*   the string " "
 				*   a {{CSSVariableReferenceValue}} with
@@ -1416,13 +1416,13 @@ This appendix describes the restrictions on {{CSSStyleValue}} objects that
 appear as computed values (i.e. as a value stored on computed
 {{StylePropertyMapReadOnly}} objects).
 
-Computed {{CSSTokenStreamValue}} objects {#computed-tokenstreamvalue-objects}
+Computed {{CSSUnparsedValue}} objects {#computed-unparsedvalue-objects}
 -----------------------------------------------------------------------------
 
 Custom property references are resolved as part of style computation. Accordingly,
-computed {{CSSTokenStreamValue}} objects will not contain {{CSSVariableReferenceValue}} objects.
+computed {{CSSUnparsedValue}} objects will not contain {{CSSVariableReferenceValue}} objects.
 As a result, only a single {{DOMString}} will appear in the sequence contained by
-computed {{CSSTokenStreamValue}} objects.
+computed {{CSSUnparsedValue}} objects.
 
 Furthermore, values that at specified value time contained custom property references
 are renormalized after computation.
@@ -1438,7 +1438,7 @@ var a = e.styleMap.get('width');
 var b = getComputedStyleMap(e).get('width');
 </pre>
 
-Will result in "a" containing a {{CSSTokenStreamValue}} with a single {{CSSVariableReferenceValue}}
+Will result in "a" containing a {{CSSUnparsedValue}} with a single {{CSSVariableReferenceValue}}
 in its sequence, and "b" containing a {{CSSSimpleLength}} representing 42px.
 
 </div>
