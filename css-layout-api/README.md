@@ -29,7 +29,7 @@ A `Box` refers to a CSS box, that is a node that has some sort of style. This ca
 
  - A `TextNode` with some style.
 
-This is effectively the DOM tree but with some extra things. One important thing to node is that a
+This is effectively the DOM tree but with some extra things. One important thing to note is that a
 `Box` doesn't have any layout information, it is the _input_ to layout.
 
 For the layout API specifically a box is represented like:
