@@ -11,10 +11,6 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
 <pre class="anchors">
-urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
-    text: DOMException
-    text: SyntaxError
-    text: inherit
 urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
     urlPrefix: #concept-;
         text: fetch
@@ -63,6 +59,10 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: InitializeHostDefinedRealm
     text: Invoke
     text: strict mode code
+</pre>
+<pre class="link-defaults">
+spec:url; type:dfn; text:url; for:url
+spec:webidl; type:dfn; for:interface; text:inherit
 </pre>
 
 Introduction {#intro}
@@ -283,7 +283,7 @@ the user agent <em>must</em> run the following steps:
     2. Let |resolvedModuleURL| be the result of <a>parsing</a> the |moduleURL| argument relative to
         the <a>relevant settings object</a> of <b>this</b>.
 
-    3. If this fails, reject |promise| with a "<a>SyntaxError</a>" <a>DOMException</a> and abort
+    3. If this fails, reject |promise| with a "<a>SyntaxError</a>" {{DOMException}} and abort
         these steps.
 
     4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
@@ -379,8 +379,6 @@ partial interface Window {
 </pre>
 
 <pre class='idl'>
-callback Function = any (any... arguments);
-
 [Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
 interface FakeWorkletGlobalScope : WorkletGlobalScope {
     void registerAnArbitaryClass(DOMString type, Function classConstructor);
