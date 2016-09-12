@@ -335,7 +335,7 @@ interface CSSLengthValue : CSSStyleValue {
 	CSSLengthValue divide(double value);
 	static CSSLengthValue from(DOMString cssText);
 	static CSSLengthValue from(double value, LengthType type);
-	static CSSLengthValue from(CSSLengthCalcDictionary dictionary);
+	static CSSLengthValue from(optional CSSLengthCalcDictionary dictionary);
 };
 
 [Constructor(DOMString cssText),
