@@ -273,9 +273,6 @@ After execution, the value of <code>opacity</code> is 1 ('opacity' is range-rest
 and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
 </div>
 
-Issue(140): where does a description of parsing values go? For example, where do we indicate that
-       calc(4 + 8) will create a {{NumberValue}} with a value of 12?
-
 {{LengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
 
