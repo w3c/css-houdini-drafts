@@ -25,12 +25,12 @@ Repository: w3c/css-houdini-drafts
 
 <pre class='biblio'>
 {
-  "css-paint-api": {
-    "title": "CSS Painting API"
-  },
-  "css-layout-api": {
-    "title": "CSS Layout API"
-  }
+	"css-paint-api": {
+		"title": "CSS Painting API"
+	},
+	"css-layout-api": {
+		"title": "CSS Layout API"
+	}
 }
 </pre>
 
@@ -62,15 +62,15 @@ Registering custom properties {#registering-custom-properties}
 
 <pre class='idl'>
 dictionary PropertyDescriptor {
-  required DOMString name;
-           DOMString syntax       = "*";
-           boolean   inherits     = false;
-           DOMString initialValue;
+	required DOMString name;
+	         DOMString syntax       = "*";
+	         boolean   inherits     = false;
+	         DOMString initialValue;
 };
 
 partial interface CSS {
-  static void registerProperty(PropertyDescriptor descriptor);
-  static void unregisterProperty(DOMString name);
+	static void registerProperty(PropertyDescriptor descriptor);
+	static void unregisterProperty(DOMString name);
 };
 </pre>
 
@@ -160,9 +160,9 @@ are valid. Hence, the result of this stylesheet:
 
 <pre class='lang-css'>
 .thing {
-  --my-color: green;
-  --my-color: url("not-a-color");
-  color: var(--my-color);
+	--my-color: green;
+	--my-color: url("not-a-color");
+	color: var(--my-color);
 }
 </pre>
 
@@ -199,7 +199,7 @@ The following syntax strings are supported:
 ::  Any valid <<percentage>> value
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
-    expression combining <<length>> and <<percentage>> components.
+	expression combining <<length>> and <<percentage>> components.
 :   "&lt;color>"
 ::  Any valid <<color>> value
 :   "&lt;image>"
@@ -247,12 +247,12 @@ For example, the following are all valid syntax strings.
 ::  accepts length values
 :   <code>"&lt;length> | &lt;percentage>"</code>
 ::  accepts lengths, percentages, percentage calc expressions, and length calc
-    expressions, but not calc expressions containing a combination of length
-    and percentage values.
+	expressions, but not calc expressions containing a combination of length
+	and percentage values.
 :   <code>"&lt;length-percentage>"</code>
 ::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-    accept, as well as calc expressions containing a combination of both length
-    and percentage values.
+	accept, as well as calc expressions containing a combination of both length
+	and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
 :   <code>"&lt;length>+"</code>
@@ -273,11 +273,11 @@ For &lt;length> values, the computed value is the absolute length expressed in p
 
 For &lt;length-percentage> values, the computed value is one of the following:
 *   if the specified value contains only length units, the computed value is the absolute length
-    expressed in pixels.
+	expressed in pixels.
 *   if the specified value contains only percentages, the computed value is a
-    simple percentage.
+	simple percentage.
 *   otherwise, the computed value is a calc expression containing an absolute
-    length expressed in pixels, and a percentage value.
+	length expressed in pixels, and a percentage value.
 
 For &lt;custom-ident>, ident, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
 &lt;angle>, &lt;time>, &lt;resolution>, &lt;transform-function> or "*" values, the
@@ -336,23 +336,23 @@ Example 1: Using custom properties to add animation behavior {#example-1}
 <pre class='lang-markup'>
 &lt;script&gt;
 CSS.registerProperty({
-  name: "--stop-color",
-  syntax: "&lt;color&gt;",
-  inherits: false,
-  initialValue: "rgba(0,0,0,0)"
+	name: "--stop-color",
+	syntax: "&lt;color&gt;",
+	inherits: false,
+	initialValue: "rgba(0,0,0,0)"
 });
 &lt;/script&gt;
 
 &lt;style&gt;
 
 .button {
-  --stop-color: red;
-  background: linear-gradient(var(--stop-color), black);
-  transition: --stop-color 1s;
+	--stop-color: red;
+	background: linear-gradient(var(--stop-color), black);
+	transition: --stop-color 1s;
 }
 
 .button:hover {
-  --stop-color: green;
+	--stop-color: green;
 }
 
 &lt;/style&gt;
