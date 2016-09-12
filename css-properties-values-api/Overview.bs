@@ -1,8 +1,9 @@
 <pre class='metadata'>
 Title:  CSS Properties and Values API Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
+Previous Version: http://www.w3.org/TR/2016/WD-css-properties-values-api-1-20160607/
 Shortname: css-properties-values-api
 Level: 1
 Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
@@ -35,7 +36,7 @@ Repository: w3c/css-houdini-drafts
 
 <pre class='link-defaults'>
 spec:css-transforms-1; type:type; text:<transform-function>
-spec:css-conditional-3; type:method; text:supports(property, value)
+spec:cssom-1; type:interface; text:CSS
 </pre>
 
 Introduction {#intro}
@@ -68,8 +69,8 @@ dictionary PropertyDescriptor {
 };
 
 partial interface CSS {
-  void registerProperty(PropertyDescriptor descriptor);
-  void unregisterProperty(DOMString name);
+  static void registerProperty(PropertyDescriptor descriptor);
+  static void unregisterProperty(DOMString name);
 };
 </pre>
 
@@ -90,7 +91,7 @@ following members:
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
 
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
-::  The initial value of this custom property. 
+::  The initial value of this custom property.
 
 The {{registerProperty()}} function {#the-registerproperty-function}
 --------------------------------------------------------------------
@@ -117,21 +118,21 @@ Note: in future levels we anticipate supporting more sophisticated parse strings
 Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
 not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
 throw a {{SyntaxError}}. If no {{PropertyDescriptor/initialValue}} is provided and the
-{{PropertyDescriptor/syntax}} is '*', then a special initial value used. This initial
+{{PropertyDescriptor/syntax}} is '*', then a special initial value is used. This initial
 value must be considered parseable by {{registerProperty()}} but invalid at computed
-value time. Initial values that are not computationally idempotent must also cause 
+value time. Initial values that are not computationally idempotent must also cause
 {{registerProperty()}} to throw a {{SyntaxError}}.
 
 <div class='example'>
 For example, "3cm" is a computationally idempotent length, and hence valid as an initial value.
 However, "3em" is not (depending on the environment, 3em could compute to
-multiple different values). Additionally, "var(--foo)" is not computationally idempotent. 
+multiple different values). Additionally, "var(--foo)" is not computationally idempotent.
 </div>
 
 Issue: define computational idempotency.
 
 Issue(121): Is computational idempotency the right thing to do here? We could also just
-resolve any relative values once (against all the other initial values) and use 
+resolve any relative values once (against all the other initial values) and use
 that. OR! We could allow specified values and just fix our engines...
 
 When a custom property is registered with a given type, the process via which specified
@@ -160,7 +161,7 @@ are valid. Hence, the result of this stylesheet:
 <pre class='lang-css'>
 .thing {
   --my-color: green;
-  --my-color: url("not-a-color"); 
+  --my-color: url("not-a-color");
   color: var(--my-color);
 }
 </pre>
@@ -214,7 +215,7 @@ The following syntax strings are supported:
 :   "&lt;resolution>"
 ::  Any valid <<resolution>> value
 :   "&lt;transform-function>"
-::  Any valie <<transform-function>> value
+::  Any valid <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any string, the contents of which matches the <<ident>> production
@@ -250,7 +251,7 @@ For example, the following are all valid syntax strings.
     and percentage values.
 :   <code>"&lt;length-percentage>"</code>
 ::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-    accept, as well as calc expresssions containing a combination of both length
+    accept, as well as calc expressions containing a combination of both length
     and percentage values.
 :   <code>"big | bigger | BIGGER"</code>
 ::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
@@ -317,7 +318,7 @@ this is standard across implementations to avoid interop issues.
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
-@supports rules and the <a method for=CSS>supports()</a> method behave as specified
+''@supports'' rules and the {{CSS/supports(conditionText)}} method behave as specified
 in [[!css-variables]].
 
 Note: In other words, for the purpose of determining whether a value is
@@ -357,3 +358,13 @@ CSS.registerProperty({
 &lt;/style&gt;
 
 </pre>
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+==================================================
+
+There are no known privacy issues introduced by these features.

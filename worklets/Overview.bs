@@ -1,8 +1,9 @@
 <pre class='metadata'>
 Title:  Worklets Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/worklets/
+Previous Version: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Shortname: worklets
 Level: 1
 Abstract:  This specification defines an API for running scripts in stages of the rendering pipeline independent of the main javascript execution environment.
@@ -11,7 +12,12 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
+    text: DOMException
+    text: SyntaxError
     text: inherit
+urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
+    urlPrefix: #concept-;
+        text: fetch
 urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
     text: effective script origin
     url: #origin-2; text: origin
@@ -26,7 +32,6 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: code entry-point
     text: creation url
     text: document environment
-    text: entry settings object
     text: environment settings object
     text: event loop
     text: fetch a module script tree
@@ -35,7 +40,9 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: incumbent settings object
     text: microtask queue
     text: module script
+    text: perform the request
     text: realm execution context
+    text: relevant settings object
     text: responsible browsing context
     text: responsible document
     text: responsible event loop
@@ -173,16 +180,19 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
     4. Associate the |settingsObject| with |workletGlobalScope|.
 
-    5. For each |resolvedModuleURL| in the given |worklet|'s <a>worklet's resolved module URLs</a>,
+    5. For each |entry| in the given |worklet|'s <a>module responses map</a> (in insertion order),
         run the following substeps:
-        1. Let |script| be the result of <a>fetch a module script tree</a> given
+
+        1. Let |resolvedModuleURL| be |entry|'s key.
+
+        2. Let |script| be the result of <a>fetch a module script tree</a> given
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
             |settingsObject|.
 
         Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
             fetching resources.
 
-        2. <a>Run a module script</a> given |script|.
+        3. <a>Run a module script</a> given |script|.
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
@@ -246,7 +256,7 @@ The {{Worklet}} object provides the capability to import module scripts into its
 
 <pre class='idl'>
 interface Worklet {
-    [NewObject] Promise&lt;void> import(DOMString moduleURL);
+    [NewObject] Promise&lt;void> import(USVString moduleURL);
 };
 </pre>
 
@@ -258,42 +268,73 @@ Note: As an example the <a>worklet global scope type</a> might be a {{PaintWorkl
 A {{Worklet}} has a list of the <dfn export>worklet's WorkletGlobalScopes</dfn>. Initially this list
 is empty; it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
-A {{Worklet}} has a list of the <dfn>worklet's resolved module URLs</dfn>. Initially this list is
-empty; it is populated when module scripts resolved.
+A {{Worklet}} has a <dfn>module responses map</dfn>. This is a ordered map of module URLs to values
+that are a <a>fetch</a> responses. The map's entries are ordered based on their insertion order.
+Access to this map should be thread-safe.
+
+The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s created at different
+times contain the same set of script source text and have the same behaviour. The creation of
+additional {{WorkletGlobalScope}}s should be transparent to the author.
 
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
-    2. Run the following steps <a>in parallel</a>:
-        1. Let |resolvedModuleURL| be the result of <a>resolving</a> the |moduleURL| relative to the
-            <a>API base URL</a> specified by the <a>entry settings object</a> when the method was
-            invoked.
+    2. Let |resolvedModuleURL| be the result of <a>parsing</a> the |moduleURL| argument relative to
+        the <a>relevant settings object</a> of <b>this</b>.
 
-        2. If this fails, reject |promise| with a <a>SyntaxError</a> exception and abort these
-            steps.
+    3. If this fails, reject |promise| with a "<a>SyntaxError</a>" <a>DOMException</a> and abort
+        these steps.
 
-        3. Add |resolvedModuleURL| to the list of <a>worklet's resolved module URLs</a>.
+    4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
+        WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
+        {{Worklet}}.
 
-        4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
-            WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
-            {{Worklet}}.
+        The user-agent may also create additional {{WorkletGlobalScope}}s at this time.
 
-        5. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
+    5. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
+
+    6. Run the following steps <a>in parallel</a>:
+
+        1. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
             substeps:
-            1. Let |settings| be the {{WorkletGlobalScope}}'s associated <a>environment settings
-                object</a>.
 
-            2. Let |script| be the result of <a>fetch a module script tree</a> given
-                |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
-                |settings|.
+            1. Let |insideSettings| be the {{WorkletGlobalScope}}'s associated <a>environment
+                settings object</a>.
 
-            Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
-                fetching resources.
+            2. <a>Fetch a module script tree</a> given |resolvedModuleURL|, "omit", the empty string
+                (as no cryptographic nonce is present for worklets), "not parser-inserted",
+                "script", |outsideSettings|, and |insideSettings|.
 
-            3. <a>Run a module script</a> given |script|.
+                To <a>perform the request</a> given |request|, perform the following steps:
 
-        6. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
+                    1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
+
+                    2. Let |url| be |request|'s <a >url</a>.
+
+                    3. If |cache| contains an entry with key |url| whose value is "fetching", wait
+                        (<a>in parallel</a>) until that entry's value changes, then proceed to the
+                        next step.
+
+                    4. If |cache| contains an entry with key |url|, asynchronously complete this
+                        algorithm with that entry's value, and abort these steps.
+
+                    5. Create an entry in |cache| with key |url| and value "fetching".
+
+                    6. <a>Fetch</a> |request|.
+
+                    7. Let |response| be the result of <a>fetch</a> when it asynchronously
+                        completes.
+
+                    8. Set the value of the entry in |cache| whose key is |url| to |response|, and
+                        asynchronously complete this algorithm with |response|.
+
+            3. Let |script| be the result of <a>fetch a module script tree</a> when it
+                asynchronously completes.
+
+            4. <a>Run a module script</a> given |script|.
+
+        2. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
                 and loaded into the global scopes), resolve |promise|.
                 <br>Otherwise, reject |promise|.
 
@@ -301,9 +342,10 @@ the user agent <em>must</em> run the following steps:
             reject the promise; if the script throws an error while first evaluating the promise
             should resolve as a classes may have been registered correctly.
 
-    3. Return |promise|.
+    7. Return |promise|.
 
-Issue(w3c/css-houdini-drafts#47): Need ability to load code into {{WorkletGlobalScope}} declaratively.
+Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlobalScope}}
+    declaratively.
 
 Lifetime of the Worklet {#lifetime-of-the-worklet}
 --------------------------------------------------

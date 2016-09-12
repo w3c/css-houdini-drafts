@@ -5,9 +5,10 @@ Group: houdini
 ED: https://drafts.css-houdini.org/css-parser-api-1/
 Shortname: css-parser-api
 Level: 1
-Abstract: 
+Abstract: This specification is not currently being worked on in the Houdini TF. Instead, it will be worked on in a WICG repository. This document will link to that repository once it exists.
 Editor: Tab Atkins, jackalmage@gmail.com
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Daniel Glazman, danie.glazman@disruptiveinnovations.com
 Editor: Brian Kardell, bkardell@gmail.com
+Warning: Replaced by http://example.com/filler-url
 </pre>
