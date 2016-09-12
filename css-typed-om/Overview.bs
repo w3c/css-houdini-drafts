@@ -295,7 +295,8 @@ After execution, the value of <code>opacity</code> is 1 ('opacity' is range-rest
 and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
 </div>
 
-{{LengthValue}} objects {#lengthvalue-objects}
+{{CSSLengthValue}} objects {#lengthvalue-objects}
+----------------------------------------------
 
 <pre class='idl'>
 enum LengthType {
