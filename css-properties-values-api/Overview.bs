@@ -128,7 +128,7 @@ However, "3em" is not (depending on the environment, 3em could compute to
 multiple different values). Additionally, "var(--foo)" is not computationally idempotent. 
 </div>
 
-Issue: define computational idempotency.
+Issue(282): define computational idempotency.
 
 Issue(121): Is computational idempotency the right thing to do here? We could also just
 resolve any relative values once (against all the other initial values) and use 
