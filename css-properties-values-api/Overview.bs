@@ -310,8 +310,19 @@ The following syntax strings are supported:
 ::  Any valid <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
-:   Any string, the contents of which matches the <<ident>> production
+:   Any string, the contents of which matches the <<custom-ident>> production
 ::  That identifier
+
+	Note: <<custom-ident>>s are compared codepoint-wise with each other;
+	this is different than the normal behavior of UA-defined CSS
+	which limits itself to ASCII
+	and is <a>ASCII case-insensitive</a>.
+	So, specifying an ident like <code>Red</code>
+	means that the precise value ''Red'' is accepted;
+	''red'', ''RED'', and any other casing variants are not matched by this.
+	It is recommended that idents be restricted to ASCII and written in lower-case,
+	to match CSS conventions.
+
 :   Any one of the preceding strings, followed by '+'
 ::  A list of values of the type specified by the string
 :   Any combination of the preceding, separated by '|'
@@ -333,23 +344,22 @@ Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
 of the {{PropertyDescriptor}} dictionary.
 
 <div class='example'>
-For example, the following are all valid syntax strings.
+	For example, the following are all valid syntax strings.
 
-:   <code>"&lt;length>"</code>
-::  accepts length values
-:   <code>"&lt;length> | &lt;percentage>"</code>
-::  accepts lengths, percentages, percentage calc expressions, and length calc
-	expressions, but not calc expressions containing a combination of length
-	and percentage values.
-:   <code>"&lt;length-percentage>"</code>
-::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-	accept, as well as calc expressions containing a combination of both length
-	and percentage values.
-:   <code>"big | bigger | BIGGER"</code>
-::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
-:   <code>"&lt;length>+"</code>
-::  accepts a list of length values.
-
+	:   <code>"&lt;length>"</code>
+	::  accepts length values
+	:   <code>"&lt;length> | &lt;percentage>"</code>
+	::  accepts lengths, percentages, percentage calc expressions, and length calc
+		expressions, but not calc expressions containing a combination of length
+		and percentage values.
+	:   <code>"&lt;length-percentage>"</code>
+	::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
+		accept, as well as calc expressions containing a combination of both length
+		and percentage values.
+	:   <code>"big | bigger | BIGGER"</code>
+	::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
+	:   <code>"&lt;length>+"</code>
+	::  accepts a list of length values.
 </div>
 
 Calculation of Computed Values {#calculation-of-computed-values}
