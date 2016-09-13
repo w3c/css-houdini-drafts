@@ -327,9 +327,13 @@ The following syntax strings are supported:
 	to match CSS conventions.
 
 :   Any one of the preceding strings, followed by '+'
-::  A list of values of the type specified by the string
+::  A space-separated list of one or more repetitions of the type specified by the string.
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
+
+	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
+	matching the value ''red'' against it will parse as an identifier,
+	while matching the value ''blue'' will parse as a <<color>>.
 :   "*"
 ::  Any valid token stream
 
