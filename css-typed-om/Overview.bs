@@ -130,34 +130,41 @@ future without breaking code that relies on calling
 {{StylePropertyMap/set()}} for those properties.
 </div>
 
-When invoked, the
-<dfn method for=StylePropertyMap>append(DOMString <var>property</var> (CSSStyleValue or DOMString)... <var>values</var>)</dfn>
-method follows the following steps:
+<div algorithm="append to a StylePropertyMap">
+	The <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (CSSStyleValue or DOMString)... <var>values</var>)</dfn> method,
+	when invoked,
+	must run these steps:
 
-Issue(143): first need to check whether the property is a valid property.
+	1. If |property| does not start with two dashes (U+002D HYPHEN),
+		let |property| be |property| <a>converted to ASCII lowercase</a>.
 
-1.
-	:   if <var>property</var> is not list-valued
-	::  throw a TypeError
+	2. If |property| is not a <a>supported property name</a>,
+		<a>throw</a> a {{TypeError}} and exit this algorithm.
 
-2.
-	:   if the <a>property model</a> has no entry for <var>property</var>
-	::  initialize an empty sequence in the <a>property model</a> for <var>property</var>
+	3. If |property| is not a <a>list-valued property</a>,
+		<a>throw</a> a {{TypeError}} and exit this algorithm.
 
-3.
-	:   for each <var>value</var> in <var>values</var>, if <var>value</var> is a {{CSSStyleValue}}, and its type is a type that <var>property</var> can't accept
-	::  throw a TypeError
+	4. If {{StylePropertyMap}}’s <a>property model</a> contains an entry for |property|,
+		let |entry| be that entry.
+		Otherwise, create a new entry for |property| with an empty list,
+		add it to the <a>property model</a>,
+		and let |entry| be the newly-created entry.
 
-4.
-	:   for each <var>value</var> in <var>values</var>, if <var>value</var> is a DOMString
-	::  set <var>value</var> to the result of invoking {{CSSStyleValue/parse()}}, providing <var>property</var>
-		and <var>value</var> as inputs.
+	5. Let |values to append| be the empty list.
 
-5.
-	:   if any <var>value</var> in <var>values</var> is null
-	::  throw a TypeError
-	:   else
-	::  concatenate <var>values</var> onto the end of the entry in the <a>property model</a>
+	6. For each |value| in |values|:
+		: If |value| is a {{CSSStyleValue}},
+		::	If |value|’s type is not one that |property| is defined to accept,
+			<a>throw</a> a {{TypeError}} and exit this algorithm.
+			Otherwise, append |value| to the end of |values to append|.
+		: If |value| is a {{DOMString}},
+		::	<a>Parse a CSSStyleValue</a> with property |property| and value |value|.
+			If the result is null,
+			<a>throw</a> a {{TypeError}} and exit this algorithm.
+			Otherwise, append the result to the end of |values to append|.
+
+	7. Append |values to append| to the end of |entry|’s list.
+</div>
 
 
 The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the properties listed in
