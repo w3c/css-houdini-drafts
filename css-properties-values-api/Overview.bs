@@ -413,8 +413,11 @@ Animation Behavior of Custom Properties {#animation-behavior-of-custom-propertie
 Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
 specify animations and transitions that reference custom properties.
 
-When referenced by animations and transitions, custom properties interpolate
-in a manner defined by their types.
+When referenced by animations and transitions,
+custom properties interpolate in a manner defined by their types.
+If their type is defined as a list with "+",
+it's interpolated as a simple list [[!css3-transitions]].
+
 If the start and end of an interpolation have matching types, then they
 will interpolate as specified in [[!css3-animations]].
 Otherwise, the interpolation falls back to the default 50% flip described in
