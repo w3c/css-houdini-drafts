@@ -19,32 +19,39 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec
 </pre>
 
 <pre class=link-defaults>
-spec:dom; type:interface; text:Document
-spec:dom; type:interface; text:Element;
-spec:css-transforms-1; type:property; text:transform;
+spec:dom; type:interface;
+	text:Document
+	text:Element;
 spec:css-color-3; type:property; text:color;
-spec:css-speech-1; type:property; text:cue-after;
-spec:css-speech-1; type:property; text:cue-before;
-spec:css-speech-1; type:property; text:pause-after;
-spec:css-speech-1; type:property; text:pause-before;
-spec:css-speech-1; type:property; text:speak;
-spec:css-speech-1; type:property; text:voice-family;
-spec:css21; type:property; text:max-height;
-spec:css21; type:property; text:max-width;
-spec:css21; type:property; text:min-height;
-spec:css21; type:property; text:min-width;
-spec:css-tables-3; type:property; text:border-collapse;
-spec:css-tables-3; type:property; text:caption-side;
-spec:css-tables-3; type:property; text:empty-cells;
-spec:css-tables-3; type:property; text:table-layout;
+spec:css-speech-1; type:property;
+	text:cue-after;
+	text:cue-before;
+	text:pause-after;
+	text:pause-before;
+	text:speak;
+	text:voice-family;
+spec:css21; type:property;
+	text:max-height;
+	text:max-width;
+	text:min-height;
+	text:min-width;
+spec:css-tables-3; type:property;
+	text:border-collapse;
+	text:caption-side;
+	text:empty-cells;
+	text:table-layout;
 spec:css-position-3; type:value; for:left; text:auto;
-spec:css-transforms-1; type:type; text:<transform-list>;
-spec:css-transforms-1; type:type; text:<transform-function>;
-spec:css-transforms-1; type:property; text:backface-visibility;
-spec:css-transforms-1; type:property; text:perspective;
-spec:css-transforms-1; type:property; text:perspective-origin;
-spec:css-transforms-1; type:property; text:transform-origin;
-spec:css-transforms-1; type:property; text:transform-style;
+spec:css-transforms-1;
+	type:type;
+		text:<transform-list>;
+		text:<transform-function>;
+	type:property;
+		text:transform;
+		text:backface-visibility;
+		text:perspective;
+		text:perspective-origin;
+		text:transform-origin;
+		text:transform-style;
 </pre>
 
 Introduction {#intro}
@@ -1449,7 +1456,7 @@ For example, a style rule containing:
 Will represent a specified value for --foo as a {{CSSUnparsedValue}}, and if
 this value is the winning declaration for --foo during computation for a given
 element, then that element's will have a computed value for --foo that is
-represented by a {{CSSStyleValue}}. 
+represented by a {{CSSStyleValue}}.
 </div>
 
 Computed {{CSSKeywordValue}} objects {#computed-keywordvalue-objects}
