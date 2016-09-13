@@ -115,9 +115,9 @@ A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn
 which is a list of property - sequence&lt;{{CSSStyleValue}}> pairs. This list
 is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
-[#computed-stylepropertymapreadonly-objects],
-[#specified-stylepropertymap-objects], and
-[#inline-stylepropertymap-objects]).
+[[#computed-stylepropertymapreadonly-objects]],
+[[#specified-stylepropertymap-objects]], and
+[[#inline-stylepropertymap-objects]]).
 
 <div class='note'>
 The sequence of {{CSSStyleValue}}s associated with a property do
