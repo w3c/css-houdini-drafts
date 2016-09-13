@@ -38,6 +38,7 @@ Repository: w3c/css-houdini-drafts
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:cssom-1; type:interface; text:CSS
 spec:css-color-4; type:property; text:color
+spec:dom; type:dfn; text:ascii case-insensitive
 </pre>
 
 Introduction {#intro}
@@ -310,7 +311,9 @@ The following syntax strings are supported:
 ::  Any valid <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
-:   Any string, the contents of which matches the <<custom-ident>> production
+:   Any sequence consisting of a <a>name-start code point</a>,
+	followed by zero or more <a>name code points</a>,
+	which matches the <<custom-ident>> production
 ::  That identifier
 
 	Note: <<custom-ident>>s are compared codepoint-wise with each other;
