@@ -708,9 +708,27 @@ of {{CSSResourceValue}}.
 
 Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
 ==================================================================================
-This section provides a table of which types of {{CSSStyleValue}} a given property can accept.
-Note that most, but not all properties take {{CSSKeywordValue}}.
-Shorthand properties and values are not supported.
+
+This section defines which types of {{CSSStyleValue}} a given property can accept.
+
+Issue(300): This is pretty incomplete, and incorrect in some places.
+For example, 'align-content' can take up to three keywords.
+More complex values like 'box-shadow' seem to be punted entirely.
+
+Issue(301): This doesn't handle shorthand properties,
+which is required for v1.
+(Properties occasionally get upgraded to shorthands;
+the failure to handle this was one of the reasons DOM Level 2 Style was sucky.)
+
+Issue(302): How should we handle values that allow reordering?
+We'll *return* them in a particular order,
+but should we accept them in any?
+Is it better to represent them as specialized value types,
+so they'll have field names?
+
+Issue(303): How should we handle optionality? List "Foo | PairValue&lt;Foo>", etc?
+
+Issue(304): What does PairValue/etc even mean? They're not documented.
 
 <table class=data>
 <thead>
