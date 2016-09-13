@@ -38,7 +38,9 @@ Repository: w3c/css-houdini-drafts
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:cssom-1; type:interface; text:CSS
 spec:css-color-4; type:property; text:color
-spec:dom; type:dfn; text:ascii case-insensitive
+spec:dom;
+	type:dfn; text:ascii case-insensitive
+	type:interface; text:Document
 </pre>
 
 Introduction {#intro}
@@ -76,7 +78,7 @@ partial interface CSS {
 };
 </pre>
 
-Additional, the {{Window}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
+Additional, the {{Document}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
 which is a set of records that describe registered custom properties.
 
 The {{PropertyDescriptor}} dictionary {#the-propertydescriptor-dictionary}
@@ -118,7 +120,13 @@ as arguments of the same names.
 	and |initialValue| being a string,
 	execute these steps:
 
-	1. Attempt to parse |name|
+	1. Let |property set|
+		be the value of the
+		<a>current global object's</a>
+		<a>associated <code>Document</code></a>'s
+		{{[[registeredPropertySet]]}} slot.
+
+	2. Attempt to parse |name|
 		as a <<custom-property-name>>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
@@ -127,13 +135,13 @@ as arguments of the same names.
 		Otherwise,
 		let |parsed name| be the parsed value.
 
-		If the window's {{[[registeredPropertySet]]}} slot
+		If |property set|
 		already contains an entry with |parsed name| as its property name
 		(compared codepoint-wise),
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
 
-	2. If |syntax| is not present,
+	3. If |syntax| is not present,
 		or is equal to <code>"*"</code> (U+002A ASTERISK),
 		let |parsed syntax| be undefined,
 		and skip to the next step of this algorithm.
@@ -151,7 +159,7 @@ as arguments of the same names.
 		Future levels of this specification are expected to expand the complexity of allowed syntax strings,
 		allowing custom properties that more closely resemble the full breadth of what CSS properties allow.
 
-	3. If |parsed syntax| is undefined,
+	4. If |parsed syntax| is undefined,
 		and |initialValue| is not present,
 		let |parsed initial value| be empty.
 		This must be treated identically to the "default" initial value of custom properties,
@@ -184,17 +192,17 @@ as arguments of the same names.
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
-	4. If |inherits| is present,
+	5. If |inherits| is present,
 		set |inherit flag| to its value.
 		Otherwise, set |inherit flag| to false.
 
-	5. Let |registered property| be a record
+	6. Let |registered property| be a record
 		with a property name of |parsed name|,
 		a syntax of |parsed syntax|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
 		Add |registered property|
-		to the window's {{[[registeredPropertySet]]}}.
+		to |property set|.
 </div>
 
 A property value is <dfn export>computationally idempotent</dfn>
@@ -231,16 +239,22 @@ with a <code>name</code> set to its sole argument.
 <div algorithm>
 	To <dfn>unregister a custom property</dfn> with the name |name|:
 
-	1. If the window's {{[[registeredPropertySet]]}}
+	1. Let |property set|
+		be the value of the
+		<a>current global object's</a>
+		<a>associated <code>Document</code></a>'s
+		{{[[registeredPropertySet]]}} slot.
+
+	2. If |property set|
 		contains a record with a property name matching |name|
 		(compared codepoint-wise),
-		remove the record from the set.
+		remove the record from |property set|.
 
 		Otherwise,
 		<a>throw</a> a {{NotFoundError}}.
 </div>
 
-When the window's {{[[registeredPropertySet]]}} changes,
+When the <a>current global object's</a> <a>associated <code>Document</code></a>'s {{[[registeredPropertySet]]}} changes,
 previously syntactically invalid property values can become valid and vice versa.
 This can change the set of <a>declared values</a> which requires the <a>cascade</a> to be recomputed.
 
