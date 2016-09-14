@@ -1,7 +1,3 @@
----
-title: Animation Worklet Explainer
----
-
 # Animation Worklet Explainer
 ---
 
@@ -10,8 +6,6 @@ title: Animation Worklet Explainer
 AnimationWorklet is a new primitive for creating scroll-linked and other high performance
 procedural animations on the web.
 
-{:toc}
-
 # Introduction
 
 Scripted effects (written in response to `requestAnimationFrame` or async `onscroll` events) are
@@ -19,8 +13,8 @@ rich but are subject to main thread jankiness. On the other hand, accelerated CS
 animations can be fast (for a subset of *accelerated* properties) but are not rich enough to enable
 [many common use cases](#motivating-use-cases) and currently have no way to access scroll offset
 and other user input. This is why scripted effects are still very popular for implementing common
-effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and others [agree][roc-
-thread] that there is a need for a new primitive for creating fast and rich visual effects with the
+effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and others [agree][roc-thread]
+that there is a need for a new primitive for creating fast and rich visual effects with the
 ability to respond to user input (e.g., scroll).
 
 This document proposes an API to animate a small subset of accelerated properties inside an
