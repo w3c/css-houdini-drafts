@@ -188,7 +188,7 @@ as arguments of the same names.
 		and exit this algorithm.
 
 		Otherwise, let |parsed initial value| be the parsed result.
-		If |parsed initial value| is not <a>computationally idempotent</a>,
+		If |parsed initial value| is not <a>computationally independent</a>,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
@@ -205,20 +205,20 @@ as arguments of the same names.
 		to |property set|.
 </div>
 
-A property value is <dfn export>computationally idempotent</dfn>
+A property value is <dfn export>computationally independent</dfn>
 if it can be converted into a computed value
 using only the value of the property on the element,
 and "global" information that cannot be changed by CSS.
 
 <div class='example'>
-	For example, ''5px'' is <a>computationally idempotent</a>,
+	For example, ''5px'' is <a>computationally independent</a>,
 	as converting it into a computed value doesn't change it at all.
-	Similarly, ''1in'' is <a>computationally idempotent</a>,
+	Similarly, ''1in'' is <a>computationally independent</a>,
 	as converting it into a computed value
 	relies only on the "global knowledge" that ''1in'' is ''96px'',
 	which can't be altered or adjusted by anything in CSS.
 
-	On the other hand, ''3em'' is not <a>computationally idempotent</a>,
+	On the other hand, ''3em'' is not <a>computationally independent</a>,
 	because it relies on the value of 'font-size' on the element
 	(or the element's parent).
 	Neither is a value with a ''var()'' function,
