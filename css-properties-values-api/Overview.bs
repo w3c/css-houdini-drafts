@@ -245,8 +245,17 @@ with a <code>name</code> set to its sole argument.
 		<a>associated <code>Document</code></a>'s
 		{{[[registeredPropertySet]]}} slot.
 
-	2. If |property set|
-		contains a record with a property name matching |name|
+	2. Attempt to parse |name|
+		as a <<custom-property-name>>.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+
+		Otherwise,
+		let |parsed name| be the parsed value.
+
+	3. If |property set|
+		contains a record with a property name matching |parsed name|
 		(compared codepoint-wise),
 		remove the record from |property set|.
 
