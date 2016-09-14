@@ -13,9 +13,9 @@ rich but are subject to main thread jankiness. On the other hand, accelerated CS
 animations can be fast (for a subset of *accelerated* properties) but are not rich enough to enable
 [many common use cases](#motivating-use-cases) and currently have no way to access scroll offset
 and other user input. This is why scripted effects are still very popular for implementing common
-effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and others [agree][roc-thread]
-that there is a need for a new primitive for creating fast and rich visual effects with the
-ability to respond to user input (e.g., scroll).
+effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and others
+[agree][roc-thread]) that there is a need for a new primitive for creating fast and rich visual
+effects with the ability to respond to user input such as scroll.
 
 This document proposes an API to animate a small subset of accelerated properties inside an
 isolated execution environment, *worklet*. We believe this API hits a sweet spot, one that is
@@ -53,12 +53,12 @@ options and without fundamentally reworking this design.
 
 # Examples
 
-Below is a set of simple examples to showcase the syntax and API usage.
+Below is a set of simple examples to showcase the proposed syntax and API usage.
 
 ## Example 1. A fade-in animation with spring timing
 
 
-Define animator in the worklet scope:
+Register the animator in AnimationWorklet scope:
 
 ```javascript
 registerAnimator('spring-fadein', class SpringAnimator {
@@ -124,7 +124,7 @@ registerAnimator('parallax', class ParallaxAnimator {
 });
 ```
 
-Declare and assign elements to animations:
+Assign elements to the animator declaratively in CSS:
 
 ```html
 <style>
@@ -150,7 +150,7 @@ Declare and assign elements to animations:
 </div>
 ```
 
-Define custom CSS properties in Document Scope:
+Define Custom CSS properties in document Scope:
 
 
 ```javascript
@@ -194,7 +194,7 @@ registerAnimator('top-sticky', class TopStickyAnimator {
 });
 ```
 
-In Document scope:
+Assign elements to the animator in document scope:
 
 ```html
 
