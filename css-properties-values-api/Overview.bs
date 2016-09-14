@@ -283,8 +283,9 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	The second '--my-color' declaration overrides the first at parse time (both are valid),
 	and the ''var()'' reference in the 'color' property is found to be <a spec=css-variables>invalid at computed-value time</a>
 	(because ''url("not-a-color")'' is not a color).
-	At computed-value time the only available fallback is the default value,
-	which in the case of color is ''inherit''.
+	At this stage of the CSS pipeline (computation time), the only available fallback is the initial value
+	of the property, which in the case of color is ''inherit''. Although there was a valid usable value
+	(green), this was removed during parsing because it was superceded by the URL.
 
 	if we call:
 
