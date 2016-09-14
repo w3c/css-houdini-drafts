@@ -75,21 +75,50 @@ Some particular considerations:
 
 <pre class='idl'>
 interface CSSStyleValue {
-	attribute DOMString cssText;
+	readonly attribute DOMString cssText;
 	static (CSSStyleValue or sequence&lt;CSSStyleValue>)? parse(DOMString property, DOMString cssText);
 };
 </pre>
 
-{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API. Unsupported values
+{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
 are also represented as {{CSSStyleValue}} objects.
 
-The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute provides a normalized
-representation (see <a section href="#stylevalue-normalization"></a>) of the value
-contained by a {{CSSStyleValue}} object.
+The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute,
+on getting,
+returns a normalized representation
+(see <a section href="#stylevalue-normalization"></a>)
+of the value the {{CSSStyleValue}} object represents.
 
-The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>
-method attempts to parse <var>cssText</var> as a valid {{CSSStyleValue}} or sequence&lt;{{CSSStyleValue}}> for
-<var>property</var>, returning null on failure.
+<div algorithm="parse a CSSStyleValue">
+	The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
+	when invoked,
+	must run these steps:
+
+	1. Attempt to parse |property| as an <<ident>>.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}} and exit this algorithm.
+		Otherwise, let |property| be the parsed result.
+		If |property| does not start with two dashes (U+002D HYPHEN),
+		let |property| be |property| <a>converted to ASCII lowercase</a>.
+
+	2. If |property| is not a <a>supported property name</a>,
+		<a>throw</a> a {{TypeError}} and exit this algorithm.
+
+	3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}} and exit this algorithm.
+		Otherwise,
+		let |value| be the parsed result.
+
+	4. If |property| is a <a>list-valued property</a>,
+		subdivide |value| into a list of {{CSSStyleValue}} objects,
+		each representing one <a>list-valued property iteration</a>,
+		and let |value| be the result.
+
+	5. Return a {{CSSStyleValue}} representing |value|.
+</div>
+
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
@@ -706,517 +735,6 @@ via <a>custom properties</a>.
 As font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
 of {{CSSResourceValue}}.
 
-Mapping of properties to accepted types {#mapping-of-properties-to-accepted-types}
-==================================================================================
-
-This section defines which types of {{CSSStyleValue}} a given property can accept.
-
-Issue(300): This is pretty incomplete, and incorrect in some places.
-For example, 'align-content' can take up to three keywords.
-More complex values like 'box-shadow' seem to be punted entirely.
-
-Issue(301): This doesn't handle shorthand properties,
-which is required for v1.
-(Properties occasionally get upgraded to shorthands;
-the failure to handle this was one of the reasons DOM Level 2 Style was sucky.)
-
-Issue(302): How should we handle values that allow reordering?
-We'll *return* them in a particular order,
-but should we accept them in any?
-Is it better to represent them as specialized value types,
-so they'll have field names?
-
-Issue(303): How should we handle optionality? List "Foo | PairValue&lt;Foo>", etc?
-
-Issue(304): What does PairValue/etc even mean? They're not documented.
-
-<table class=data>
-<thead>
-	<tr>
-		<th>Property</th>
-		<th>Allowable {{CSSStyleValue}} types</th>
-	</tr>
-</thead>
-<tbody>
-	<tr>
-		<td>'align-content'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'align-items'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'align-self'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'alignment-baseline'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'all'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-delay'</td>
-		<td>TimeValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-direction'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-duration'</td>
-		<td>TimeValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-fill-mode'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-iteration-count'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-name'</td>
-		<td>CustomIdentValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-play-state'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'animation-timing-function'</td>
-		<td>TransitionTimingFunctionValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'appearance'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'backface-visibility'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-attachment'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-blend-mode'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-clip'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-image'</td>
-		<td>{{CSSImageValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-origin'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-position'</td>
-		<td>{{CSSPositionValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-repeat'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'background-size'</td>
-		<td>PairValue<{{CSSLengthValue}}> (or SizeValue?)| {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'baseline-shift'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-boundary'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-collapse'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-top-color' 'border-right-color' 'border-bottom-color' 'border-left-color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-image-outset'</td>
-		<td>FourValues<{{CSSLengthValue}}|{{CSSNumberValue}}></td>
-	</tr>
-	<tr>
-		<td>'border-image-repeat'</td>
-		<td>PairValue<{{CSSKeywordValue}}></td>
-	</tr>
-	<tr>
-		<td>'border-image-slice'</td>
-		<td>BorderImageSliceValue</td>
-	</tr>
-	<tr>
-		<td>'border-image-source'</td>
-		<td>{{CSSImageValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-image-width'</td>
-		<td>FourValues<{{CSSLengthValue}}|{{CSSNumberValue}}|{{CSSKeywordValue}}></td>
-	</tr>
-	<tr>
-		<td>'border-top-style' 'border-right-style' 'border-bottom-style' 'border-left-style'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-top-right-radius' 'border-bottom-right-radius' 'border-bottom-left-radius' 'border-top-left-radius'</td>
-		<td>PairValue<{{CSSLengthValue}}> | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'border-top-width' 'border-right-width' 'border-bottom-width' 'border-left-width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'bottom'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'break-after'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'break-before'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'break-inside'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'caption-side'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'clear'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'clip'</td>
-		<td>ShapeValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-count'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-fill'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-gap'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-rule-color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-rule-style'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-rule-width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-span'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'column-width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'content'</td>
-		<td>StringValue | URIValue | CounterValue | AttrValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'counter-increment' 'counter-reset'</td>
-		<td>CounterValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'cue-after' 'cue-before'</td>
-		<td>URIValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'cursor'</td>
-		<td>URIValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'direction'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'display'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'empty-cells'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'float'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'font-family'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'font-size'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'font-style'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'font-variant'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'font-weight'</td>
-		<td>FontWeightValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'height'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'left'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'letter-spacing'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'line-height'</td>
-		<td>{{CSSNumberValue}} | {{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'list-style-image'</td>
-		<td>{{CSSImageValue}}</td>
-	</tr>
-	<tr>
-		<td>'list-style-position'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'list-style-type'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'margin-top' 'margin-right' 'margin-bottom' 'margin-left'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'max-height' 'max-width' 'min-height' 'min-width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'orphans'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'outline-color'</td>
-		<td>ColorValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'outline-style'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'outline-width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'overflow'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'padding-top' 'padding-right' 'padding-bottom' 'padding-left'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'page-break-after' 'page-break-before'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'page-break-inside'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'pause-after' 'pause-before'</td>
-		<td>TimeValue | PercentageValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'perspective'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'perspective-origin'</td>
-		<td>{{CSSPositionValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'pitch-range'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'pitch'</td>
-		<td>FrequencyValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'play-during'</td>
-		<td>PlayDuringValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'position'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'quotes'</td>
-		<td>PairValue&lt;StringValue&gt; | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'richness'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'right'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'speak-header'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'speak-numeral'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'speak-punctuation'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'speak'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'speech-rate'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'stress'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'table-layout'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'text-align'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'text-decoration'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'text-indent'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'text-transform'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'top'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'transform'</td>
-		<td>{{CSSTransformValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'transform-box'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'transform-origin'</td>
-		<td>TransformOriginValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'transform-style'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'unicode-bidi'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'vertical-align'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'visibility'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'voice-family'</td>
-		<td>VoiceValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'volume'</td>
-		<td>{{CSSNumberValue}} | PercentageValue | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'white-space'</td>
-		<td>{{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'widows'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'width'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'word-spacing'</td>
-		<td>{{CSSLengthValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-	<tr>
-		<td>'z-index'</td>
-		<td>{{CSSNumberValue}} | {{CSSKeywordValue}}</td>
-	</tr>
-</tbody>
-</table>
-
 Issue(159): Spec up ColorValue
 
 {{CSSStyleValue}} normalization {#stylevalue-normalization}
@@ -1228,7 +746,7 @@ constructed from CSS DOMString values.
 Strings are normalized by resulting CSSStyleValue subclass. To
 determine which subclass to use, the CSS property that the string
 is a value for is used to look up the table in
-<a section href='#mapping-of-properties-to-accepted-types'></a>. The normalization
+REPLACEME. The normalization
 procedure defined by each of the CSSStyleValue subclasses listed for that property in
 turn, falling back to the next subclass in the list if the current one
 fails to normalize.
