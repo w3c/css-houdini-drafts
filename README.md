@@ -4,9 +4,10 @@ title: Animation Worklet Explainer
 
 # Animation Worklet Explainer
 ---
+
 # Overview
 
-git remotegit AnimationWorklet is a new primitive for creating scroll-linked and other high performance
+AnimationWorklet is a new primitive for creating scroll-linked and other high performance
 procedural animations on the web.
 
 {:toc}
