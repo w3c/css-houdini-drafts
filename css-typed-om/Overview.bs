@@ -861,12 +861,12 @@ Otherwise, normalization fails.
 The string "scale(2, 0.5) translate(100px) rotate(20deg)"
 is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransformComponent}} with:
 *   a {{CSSScale}} with:
-		*   x value set to 2
-		*   y value set to 0.5
+		*   <a attribute for='CSSScale'>x</a> set to 2 
+		*   <a attribute for='CSSScale'>y</a> set to 0.5
 *   a {{CSSTranslation}} with:
-		*   a {{CSSLengthValue}} with value set to 100 and {{LengthType}} set to "px"
+		*   <a attribute for='CSSTranslation'>x</a> with <a attribute for='CSSSimpleLength'>value</a> of 100 and <a attribute for='CSSSimpleLength'>type</a> of "px" 
 *   a {{CSSRotation}} with:
-		*   a {{CSSAngleValue}} with the degree member set to 20 and {{CSSAngleUnit}} set to "deg"
+		*   20 <a attribute for='CSSAngleValue'>degrees</a> 
 
 </div>
 
