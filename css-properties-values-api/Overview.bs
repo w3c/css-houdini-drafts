@@ -25,18 +25,22 @@ Repository: w3c/css-houdini-drafts
 
 <pre class='biblio'>
 {
-  "css-paint-api": {
-    "title": "CSS Painting API"
-  },
-  "css-layout-api": {
-    "title": "CSS Layout API"
-  }
+	"css-paint-api": {
+		"title": "CSS Painting API"
+	},
+	"css-layout-api": {
+		"title": "CSS Layout API"
+	}
 }
 </pre>
 
 <pre class='link-defaults'>
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:cssom-1; type:interface; text:CSS
+spec:css-color-4; type:property; text:color
+spec:dom;
+	type:dfn; text:ascii case-insensitive
+	type:interface; text:Document
 </pre>
 
 Introduction {#intro}
@@ -62,17 +66,20 @@ Registering custom properties {#registering-custom-properties}
 
 <pre class='idl'>
 dictionary PropertyDescriptor {
-  required DOMString name;
-           DOMString syntax       = "*";
-           boolean   inherits     = false;
-           DOMString initialValue;
+	required DOMString name;
+	         DOMString syntax       = "*";
+	         boolean   inherits     = false;
+	         DOMString initialValue;
 };
 
 partial interface CSS {
-  static void registerProperty(PropertyDescriptor descriptor);
-  static void unregisterProperty(DOMString name);
+	static void registerProperty(PropertyDescriptor descriptor);
+	static void unregisterProperty(DOMString name);
 };
 </pre>
+
+Additional, the {{Document}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
+which is a set of records that describe registered custom properties.
 
 The {{PropertyDescriptor}} dictionary {#the-propertydescriptor-dictionary}
 --------------------------------------------------------------------------
@@ -93,97 +100,207 @@ following members:
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
-The {{registerProperty()}} function {#the-registerproperty-function}
---------------------------------------------------------------------
+The {{registerProperty()}} and {{unregisterProperty()}} functions {#the-registerproperty-function}
+--------------------------------------------------------------------------------------------------
 
 The <dfn method for=CSS>registerProperty(PropertyDescriptor descriptor)</dfn> method
-registers a custom property according the to configuration options provided in
+registers a custom property according to the configuration options provided in
 <code>descriptor</code>.
+When it is called,
+it executes the <a>register a custom property</a> algorithm,
+passing the options in its <code>descriptor</code> argument
+as arguments of the same names.
 
-Attempting to register properties with a {{PropertyDescriptor/name}} that doesn't
-correspond to the <<custom-property-name>> production must cause {{registerProperty()}}
-to throw a {{SyntaxError}}.
+<div algorithm>
+	To <dfn>register a custom property</dfn>
+	with |name| being a string,
+	and optionally
+	|syntax| being a string,
+	|inherits| being a boolean,
+	and |initialValue| being a string,
+	execute these steps:
 
-The list of types supported in the {{PropertyDescriptor/syntax}} member are listed
-in <a section href="#supported-syntax-strings"></a>. Currently, only simple
-type references are supported. Attempting to register properties with a
-{{PropertyDescriptor/syntax}} that is not supported must cause {{registerProperty()}}
-to throw a {{SyntaxError}}.
+	1. Let |property set|
+		be the value of the
+		<a>current global object's</a>
+		<a>associated <code>Document</code></a>'s
+		{{[[registeredPropertySet]]}} slot.
 
-Note: for example, the syntax string could be "&lt;length&gt;" or "&lt;number&gt;".
+	2. Attempt to parse |name|
+		as a <<custom-property-name>>.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
 
-Note: in future levels we anticipate supporting more sophisticated parse strings, e.g.
-"&lt;length&gt; || &lt;number&gt;"
+		Otherwise,
+		let |parsed name| be the parsed value.
 
-Attempting to call {{registerProperty()}} with an {{PropertyDescriptor/initialValue}} that is
-not parseable using the provided {{PropertyDescriptor/syntax}} must cause it to
-throw a {{SyntaxError}}. If no {{PropertyDescriptor/initialValue}} is provided and the
-{{PropertyDescriptor/syntax}} is '*', then a special initial value is used. This initial
-value must be considered parseable by {{registerProperty()}} but invalid at computed
-value time. Initial values that are not computationally idempotent must also cause
-{{registerProperty()}} to throw a {{SyntaxError}}.
+		If |property set|
+		already contains an entry with |parsed name| as its property name
+		(compared codepoint-wise),
+		<a>throw</a> an {{InvalidModificationError}}
+		and exit this algorithm.
 
-<div class='example'>
-For example, "3cm" is a computationally idempotent length, and hence valid as an initial value.
-However, "3em" is not (depending on the environment, 3em could compute to
-multiple different values). Additionally, "var(--foo)" is not computationally idempotent.
+	3. If |syntax| is not present,
+		or is equal to <code>"*"</code> (U+002A ASTERISK),
+		let |parsed syntax| be undefined,
+		and skip to the next step of this algorithm.
+
+		Otherwise, attempt to parse |syntax|
+		according to the rules in [[#supported-syntax-strings]].
+		If it does not parse successfully,
+		<a>throw</a> a {{SyntaxError}}.
+		Otherwise,
+		let |parsed syntax| be the parsed syntax.
+
+		Note: For example, a valid syntax string is something like <code>"&lt;length>"</code>,
+		or <code>"&lt;number>+"</code>;
+		the allowed syntax is a subset of [[css-values-3#value-defs]].
+		Future levels of this specification are expected to expand the complexity of allowed syntax strings,
+		allowing custom properties that more closely resemble the full breadth of what CSS properties allow.
+
+	4. If |parsed syntax| is undefined,
+		and |initialValue| is not present,
+		let |parsed initial value| be empty.
+		This must be treated identically to the "default" initial value of custom properties,
+		as defined in [[!css-variables]].
+		Skip to the next step of this algorithm.
+
+		Otherwise,
+		if |parsed syntax| is undefined,
+		parse |initialValue| as a <<declaration-value>>.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+		Otherwise,
+		let |parsed initial value| be the parsed result.
+		Skip to the next step of this algorithm.
+
+		Otherwise, if |initialValue| is not present,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+
+		Otherwise,
+		parse {{PropertyDescriptor/initialValue}}
+		according to |parsed syntax|.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+
+		Otherwise, let |parsed initial value| be the parsed result.
+		If |parsed initial value| is not <a>computationally independent</a>,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+
+	5. If |inherits| is present,
+		set |inherit flag| to its value.
+		Otherwise, set |inherit flag| to false.
+
+	6. Let |registered property| be a record
+		with a property name of |parsed name|,
+		a syntax of |parsed syntax|,
+		an initial value of |parsed initial value|,
+		and an inherit flag of |inherit flag|.
+		Add |registered property|
+		to |property set|.
 </div>
 
-Issue: define computational idempotency.
+A property value is <dfn export>computationally independent</dfn>
+if it can be converted into a computed value
+using only the value of the property on the element,
+and "global" information that cannot be changed by CSS.
 
-Issue(121): Is computational idempotency the right thing to do here? We could also just
-resolve any relative values once (against all the other initial values) and use
-that. OR! We could allow specified values and just fix our engines...
+<div class='example'>
+	For example, ''5px'' is <a>computationally independent</a>,
+	as converting it into a computed value doesn't change it at all.
+	Similarly, ''1in'' is <a>computationally independent</a>,
+	as converting it into a computed value
+	relies only on the "global knowledge" that ''1in'' is ''96px'',
+	which can't be altered or adjusted by anything in CSS.
 
-When a custom property is registered with a given type, the process via which specified
-values for that property are turned into computed values is defined
-fully by the type selected, as described in
-<a section href="#calculation-of-computed-values"></a>.
+	On the other hand, ''3em'' is not <a>computationally independent</a>,
+	because it relies on the value of 'font-size' on the element
+	(or the element's parent).
+	Neither is a value with a ''var()'' function,
+	because it relies on the value of a <a>custom property</a>.
+</div>
 
-If {{registerProperty()}} is called with a descriptor name that matches an already registered property,
-then an {{InvalidModificationError}} is thrown and the re-registration fails.
+When a custom property is registered with a given type,
+the process via which specified values for that property are turned into computed values
+is defined fully by the type selected,
+as described in [[#calculation-of-computed-values]].
 
 Properties can be unregistered using
 <dfn method for=CSS>unregisterProperty(DOMString name)</dfn>.
-If this function is called with a name that doesn't match an existing property
-then a {{NotFoundError}} is thrown.
+When it is called,
+it executes the <a>unregister a custom property</a> algorithm,
+with a <code>name</code> set to its sole argument.
 
-Successful calls to both {{registerProperty()}} and {{unregisterProperty()}}
-change the set of registered properties. When the set of registered properties
-changes, previously syntactically invalid property values can become valid and vice versa.
-This can change the set of <a>declared values</a> which requires the <a>cascade</a> to
-be recomputed.
+<div algorithm>
+	To <dfn>unregister a custom property</dfn> with the name |name|:
+
+	1. Let |property set|
+		be the value of the
+		<a>current global object's</a>
+		<a>associated <code>Document</code></a>'s
+		{{[[registeredPropertySet]]}} slot.
+
+	2. Attempt to parse |name|
+		as a <<custom-property-name>>.
+		If this fails,
+		<a>throw</a> a {{SyntaxError}}
+		and exit this algorithm.
+
+		Otherwise,
+		let |parsed name| be the parsed value.
+
+	3. If |property set|
+		contains a record with a property name matching |parsed name|
+		(compared codepoint-wise),
+		remove the record from |property set|.
+
+		Otherwise,
+		<a>throw</a> a {{NotFoundError}}.
+</div>
+
+When the <a>current global object's</a> <a>associated <code>Document</code></a>'s {{[[registeredPropertySet]]}} changes,
+previously syntactically invalid property values can become valid and vice versa.
+This can change the set of <a>declared values</a> which requires the <a>cascade</a> to be recomputed.
 
 <div class='example'>
-By default, all custom property declarations that can be parsed as a sequence of tokens
-are valid. Hence, the result of this stylesheet:
+	By default, all custom property declarations that can be parsed as a sequence of tokens
+	are valid. Hence, the result of this stylesheet:
 
-<pre class='lang-css'>
-.thing {
-  --my-color: green;
-  --my-color: url("not-a-color");
-  color: var(--my-color);
-}
-</pre>
+	<pre class='lang-css'>
+	.thing {
+		--my-color: green;
+		--my-color: url("not-a-color");
+		color: var(--my-color);
+	}
+	</pre>
 
-is to set the color property of elements of class "thing" to "inherit".
-The second --my-color declaration overrides the first at parse time (both are valid),
-and the var reference in the color property is found to be invalid at computation time
-(because <code>url("not-a-color")</code> is not a color). At computation time the only
-available fallback is the default value, which in the case of color is "inherit".
+	is to set the 'color' property of elements of class "thing" to ''inherit''.
+	The second '--my-color' declaration overrides the first at parse time (both are valid),
+	and the ''var()'' reference in the 'color' property is found to be <a spec=css-variables>invalid at computed-value time</a>
+	(because ''url("not-a-color")'' is not a color).
+	At this stage of the CSS pipeline (computation time), the only available fallback is the initial value
+	of the property, which in the case of color is ''inherit''. Although there was a valid usable value
+	(green), this was removed during parsing because it was superceded by the URL.
 
-if we call:
+	if we call:
 
-<pre class='lang-javascript'>
-registerProperty({
-name: "--my-color",
-syntax: "&lt;color>"
-});
-</pre>
+	<pre class='lang-javascript'>
+	CSS.registerProperty({
+		name: "--my-color",
+		syntax: "&lt;color>",
+		initialValue: "black"
+	});
+	</pre>
 
-then the second --my-color declaration becomes syntactically invalid, which means that
-the cascade uses the first declaration. The color therefore switches to green.
-
+	then the second '--my-color' declaration becomes syntactically invalid at parse time,
+	and is ignored.
+	The first '--my-color' is the only valid declaration left for the property,
+	so 'color' is set to the value ''green''.
 </div>
 
 Supported syntax strings {#supported-syntax-strings}
@@ -199,7 +316,7 @@ The following syntax strings are supported:
 ::  Any valid <<percentage>> value
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
-    expression combining <<length>> and <<percentage>> components.
+	expression combining <<length>> and <<percentage>> components.
 :   "&lt;color>"
 ::  Any valid <<color>> value
 :   "&lt;image>"
@@ -218,12 +335,29 @@ The following syntax strings are supported:
 ::  Any valid <<transform-function>> value
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
-:   Any string, the contents of which matches the <<ident>> production
+:   Any sequence consisting of a <a>name-start code point</a>,
+	followed by zero or more <a>name code points</a>,
+	which matches the <<custom-ident>> production
 ::  That identifier
+
+	Note: <<custom-ident>>s are compared codepoint-wise with each other;
+	this is different than the normal behavior of UA-defined CSS
+	which limits itself to ASCII
+	and is <a>ASCII case-insensitive</a>.
+	So, specifying an ident like <code>Red</code>
+	means that the precise value ''Red'' is accepted;
+	''red'', ''RED'', and any other casing variants are not matched by this.
+	It is recommended that idents be restricted to ASCII and written in lower-case,
+	to match CSS conventions.
+
 :   Any one of the preceding strings, followed by '+'
-::  A list of values of the type specified by the string
+::  A space-separated list of one or more repetitions of the type specified by the string.
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
+
+	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
+	matching the value ''red'' against it will parse as an identifier,
+	while matching the value ''blue'' will parse as a <<color>>.
 :   "*"
 ::  Any valid token stream
 
@@ -241,23 +375,22 @@ Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
 of the {{PropertyDescriptor}} dictionary.
 
 <div class='example'>
-For example, the following are all valid syntax strings.
+	For example, the following are all valid syntax strings.
 
-:   <code>"&lt;length>"</code>
-::  accepts length values
-:   <code>"&lt;length> | &lt;percentage>"</code>
-::  accepts lengths, percentages, percentage calc expressions, and length calc
-    expressions, but not calc expressions containing a combination of length
-    and percentage values.
-:   <code>"&lt;length-percentage>"</code>
-::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-    accept, as well as calc expressions containing a combination of both length
-    and percentage values.
-:   <code>"big | bigger | BIGGER"</code>
-::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
-:   <code>"&lt;length>+"</code>
-::  accepts a list of length values.
-
+	:   <code>"&lt;length>"</code>
+	::  accepts length values
+	:   <code>"&lt;length> | &lt;percentage>"</code>
+	::  accepts lengths, percentages, percentage calc expressions, and length calc
+		expressions, but not calc expressions containing a combination of length
+		and percentage values.
+	:   <code>"&lt;length-percentage>"</code>
+	::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
+		accept, as well as calc expressions containing a combination of both length
+		and percentage values.
+	:   <code>"big | bigger | BIGGER"</code>
+	::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
+	:   <code>"&lt;length>+"</code>
+	::  accepts a list of length values.
 </div>
 
 Calculation of Computed Values {#calculation-of-computed-values}
@@ -273,20 +406,23 @@ For &lt;length> values, the computed value is the absolute length expressed in p
 
 For &lt;length-percentage> values, the computed value is one of the following:
 *   if the specified value contains only length units, the computed value is the absolute length
-    expressed in pixels.
+	expressed in pixels.
 *   if the specified value contains only percentages, the computed value is a
-    simple percentage.
+	simple percentage.
 *   otherwise, the computed value is a calc expression containing an absolute
-    length expressed in pixels, and a percentage value.
+	length expressed in pixels, and a percentage value.
 
 For &lt;custom-ident>, ident, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
-&lt;angle>, &lt;time>, &lt;resolution>, &lt;transform-function> or "*" values, the
-computed value is identical to the specified value.
+&lt;angle>, &lt;time>, &lt;resolution> or "*" values, the
+computed value is as specified.
 
 For &lt;number> and &lt;percentage> values which are not calc expressions, the
-computed value is identical to the specified value. Calc expressions that are
+computed value is as specified. Calc expressions that are
 &lt;number> and &lt;percentage> values get reduced during computation to simple
 numbers and percentages respectively.
+
+For &lt;transform-function> values, the computed value is as specified but with
+all lengths resolved to their computed values.
 
 For values specified by a syntax string that include "|" clauses, the computed
 value is given by applying the calculation rules for the first clause that
@@ -304,8 +440,11 @@ Animation Behavior of Custom Properties {#animation-behavior-of-custom-propertie
 Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
 specify animations and transitions that reference custom properties.
 
-When referenced by animations and transitions, custom properties interpolate
-in a manner defined by their types.
+When referenced by animations and transitions,
+custom properties interpolate in a manner defined by their types.
+If their type is defined as a list with "+",
+it's interpolated as a simple list [[!css3-transitions]].
+
 If the start and end of an interpolation have matching types, then they
 will interpolate as specified in [[!css3-animations]].
 Otherwise, the interpolation falls back to the default 50% flip described in
@@ -336,23 +475,23 @@ Example 1: Using custom properties to add animation behavior {#example-1}
 <pre class='lang-markup'>
 &lt;script&gt;
 CSS.registerProperty({
-  name: "--stop-color",
-  syntax: "&lt;color&gt;",
-  inherits: false,
-  initialValue: "rgba(0,0,0,0)"
+	name: "--stop-color",
+	syntax: "&lt;color&gt;",
+	inherits: false,
+	initialValue: "rgba(0,0,0,0)"
 });
 &lt;/script&gt;
 
 &lt;style&gt;
 
 .button {
-  --stop-color: red;
-  background: linear-gradient(var(--stop-color), black);
-  transition: --stop-color 1s;
+	--stop-color: red;
+	background: linear-gradient(var(--stop-color), black);
+	transition: --stop-color 1s;
 }
 
 .button:hover {
-  --stop-color: green;
+	--stop-color: green;
 }
 
 &lt;/style&gt;
