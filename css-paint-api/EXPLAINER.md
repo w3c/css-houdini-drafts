@@ -127,7 +127,54 @@ In this example `performPathPreInit` is doing CPU intensive work which should on
 Drawing Images
 --------------
 
-TODO
+The API works in conjunction with the [CSS Properties and Values](https://drafts.css-houdini.org/css-properties-values-api/) proposal and the [CSS Typed OM](https://drafts.css-houdini.org/css-typed-om/) proposal.
+
+Using the Properties and Values `registerProperty` method, developers can create a custom CSS property with the `<image>` type. E.g.
+
+```js
+registerProperty({
+  name: '--profile-image',
+  syntax: '<image>'
+});
+```
+
+This tells the rendering engine to treat the CSS property `--profile-image` as an image; and as a result the style engine will parse and begin loading that image.
+
+You can then directly draw this image from within your paint method:
+
+```js
+registerPaint('avatar', class {
+  static inputProperties = ['--profile-image'];
+  
+  paint(ctx, size, styleMap) {
+    // Determine the center point and radius.
+    const x = size.width / 2;
+    const y = size.height / 2;
+    const radius = Math.min(x, y);
+    
+    ctx.save();
+    // Set up a round clipping path for the profile image.
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+    ctx.clip();
+    
+    // Draw the image inside the round clip.
+    ctx.drawImage(styleMap.get('--profile-image'));
+    ctx.restore();
+    
+    // Draw a badge or something on top of the image.
+    drawBadge(ctx);
+  }
+});
+```
+
+The above example would be used in CSS by:
+```css
+.avatar-img {
+  background: paint(avatar);
+  --profile-image: url("profile-image.png");
+}
+```
 
 Paint Efficiency
 ----------------
