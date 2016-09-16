@@ -28,8 +28,8 @@ options and without fundamentally reworking this design.
 # Motivating Use Cases
 
 * Scroll-linked effects:
-  -   Parallax
-  -   Hidey-bar
+  -   Parallax ([demo](https://rawgit.com/flackr/houdini-samples/master/compositor-worklet/parallax-scrolling/parallax.htm))
+  -   Animated scroll headers, eg. "hidey-bars" ([demo](http://rawgit.com/flackr/houdini-samples/animworklet/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [polyer paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
 
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
@@ -38,7 +38,7 @@ options and without fundamentally reworking this design.
 * Location tracking and positioning:
 
   -   Position: sticky
-
+  
 * Procedural animation of multiple elements in sync:
 
   -   Compositing growing / shrinking box with border (using 9 patch)
@@ -49,7 +49,6 @@ options and without fundamentally reworking this design.
       scroll either)
   -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
 
-* Custom effect libraries with reliable performance.
 
 # Examples
 
