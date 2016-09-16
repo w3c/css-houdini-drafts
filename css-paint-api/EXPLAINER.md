@@ -87,7 +87,7 @@ class RectPainter {
   }
 }
 
-class BorderRectPainter {
+class BorderRectPainter extends RectPainter {
   static inputProperties = ['--border-color', ...super.inputProperties];
   
   paint(ctx, size, style) {
