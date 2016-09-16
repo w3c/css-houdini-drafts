@@ -52,7 +52,15 @@ options and without fundamentally reworking this design.
 
 # Examples
 
-Below is a set of simple examples to showcase the proposed syntax and API usage.
+Below is a set of simple examples to showcase the proposed syntax and API usage.  Like [other Houdini APIs](https://github.com/w3c/css-houdini-drafts/blob/master/css-paint-api/EXPLAINER.md) they all rely on first importing a script into the scope of a [worklet](https://drafts.css-houdini.org/worklets/):
+
+```javascript
+
+if (animationWorklet)
+  animationWorklet.import('animworklet.js');
+else
+  // AnimationWorklet not supported, use legacy animation fallback or polyfill
+```
 
 ## Example 1. A fade-in animation with spring timing
 
