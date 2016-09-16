@@ -301,7 +301,7 @@ using static attributes:
 *   Regular and Custom CSS Properties - `inputProperties` and `rootInputProperties` (list of
     identifiers)
 *   Scroll Offset - `inputScroll` and `rootInputScroll` (boolean)
-*   Time - `inputTime  (boolean)
+*   Time - `inputTime` (boolean)
 
 **Output**
 
