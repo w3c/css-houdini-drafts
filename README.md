@@ -28,8 +28,8 @@ options and without fundamentally reworking this design.
 # Motivating Use Cases
 
 * Scroll-linked effects:
-  -   Parallax ([demo](http://rawgit.com/flackr/houdini-samples/animworklet/animation-worklet/parallax-scrolling/parallax.html))
-  -   Animated scroll headers, eg. "hidey-bars" ([demo](http://rawgit.com/flackr/houdini-samples/animworklet/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [polyer paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
+  -   Parallax ([demo](https://flackr.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
+  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://flackr.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [polyer paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
 
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
