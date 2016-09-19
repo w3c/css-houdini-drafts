@@ -238,6 +238,62 @@ onload = (e) => {
 </script>
 ```
 
+## Example 4. Synced Scroller
+
+Register the animator in AnimationWorklet scope:
+
+```javascript
+// worklet scope
+
+registerAnimator('synced-scroller', class TopStickyAnimator {
+  static get inputProperties = ['--scroller-type'];
+  static get inputScroll = true;
+  static get outputScroll = true;
+
+  animate(root, children) {
+    var master = children.filter(e => { return e.styleMap.get("--scroller-type") == "master"})[0];
+    var slaves = children.filter(e => { return e.styleMap.get("--scroller-type") == "slave"});
+
+    if (!master)
+      return;
+
+    slaves.forEach(elem => {
+      elem.scrollOffsets.top = master.scrollOffsets.top;
+      elem.scrollOffsets.left = master.scrollOffsets.left;
+    });
+  }
+
+  }
+});
+```
+
+Assign elements to the animator in document scope:
+
+```html
+<style>
+  .scroller {
+    overflow-y: scroll;
+  }
+
+  #main_scroller {
+    --animator: sync-scroller;
+    --scroller-type: master;
+  }
+
+  #alt_scroller {
+    --animator: sync-scroller;
+    --scroller-type: slave;
+  }
+</style>
+
+<div id="main_scroller" class="scroller">
+  <div>main content.</div>
+</div>
+<div id="alt_scroller" class="scroller">
+  <div>some other content that scroll in sync.</div>
+</div>
+```
+
 # Key Concepts
 
 ## Animator Root & Child Elements
