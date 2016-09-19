@@ -245,7 +245,7 @@ Register the animator in AnimationWorklet scope:
 ```javascript
 // worklet scope
 
-registerAnimator('synced-scroller', class TopStickyAnimator {
+registerAnimator('sync-scroller', class SyncScrollerAnimator {
   static get inputProperties = ['--scroller-type'];
   static get inputScroll = true;
   static get outputScroll = true;
@@ -261,8 +261,6 @@ registerAnimator('synced-scroller', class TopStickyAnimator {
       elem.scrollOffsets.top = master.scrollOffsets.top;
       elem.scrollOffsets.left = master.scrollOffsets.left;
     });
-  }
-
   }
 });
 ```
