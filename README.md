@@ -33,7 +33,7 @@ options and without fundamentally reworking this design.
 
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
-  -   Spring timing function
+  -   Spring timing function ([demo](https://flackr.github.io/houdini-samples/animation-worklet/spring-timing/))
 
 * Location tracking and positioning:
 
@@ -45,10 +45,13 @@ options and without fundamentally reworking this design.
 
 * Animating scroll offsets:
 
-  -   Having multiple scrollers scroll in sync (e.g. diff viewer keeping old/new in sync when you
-      scroll either)
+  -   Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
+      scroll either ([demo](https://flackr.github.io/houdini-samples/animation-worklet/sync-scroller/))
   -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
 
+***Note***:  Demos work best in the latest Chrome Canary with the experimental
+web platform features enabled (`--enable-experimental-web-platform-features`
+flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
 # Examples
 
