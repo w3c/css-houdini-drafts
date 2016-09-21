@@ -1,14 +1,119 @@
 <pre class='metadata'>
-Title:  CSS Parser API Level 1
-Status: DREAM
-Group: houdini
-ED: https://drafts.css-houdini.org/css-parser-api-1/
+Title: CSS Parser API
 Shortname: css-parser-api
 Level: 1
-Abstract: This specification is not currently being worked on in the Houdini TF. Instead, it will be worked on in a WICG repository. This document will link to that repository once it exists.
-Editor: Tab Atkins, jackalmage@gmail.com
-Editor: Shane Stephens, shanestephens@google.com
-Editor: Daniel Glazman, danie.glazman@disruptiveinnovations.com
-Editor: Brian Kardell, bkardell@gmail.com
-Warning: Replaced by http://example.com/filler-url
+Status: UD
+Group: HOUDINI
+URL: https://drafts.css-houdini.org/css-parser-api/
+Editor: Tab Atkins-Bittner
+Abstract: An API exposing the CSS parser more directly,
+Abstract: for parsing arbitrary CSS-like languages into a mildly typed representation.
+</pre>
+
+Introduction {#intro}
+=====================
+
+Common data-interchange / parsing formats are very valuable
+for reducing the learning curve of new languages,
+as users get to lean on their existing knowledge of the format when authoring
+and only have to newly learn the specifics of the language.
+This is why generic parsing formats like XML or JSON have become so popular.
+
+The CSS language could benefit from this same treatment;
+a number of languages and tools rely on CSS-like syntax to express themselves,
+but they usually rely on ad-hoc parsing
+(often regex-based)
+which can be relatively fragile,
+and might break with CSS practices in interesting syntax corner cases.
+Similarly, CSS syntax is increasingly used in places like attribute values
+(such as the <{img/sizes}> attribute,
+or most of the SVG presentation attributes),
+and custom elements wanting to do the same thing
+similarly have to rely on ad-hoc parsing right now.
+
+To help with these sorts of cases,
+this spec exposes the [[!css-syntax-3]] parsing algorithms,
+and represents their results in a mildly-typed representation,
+simpler and more abstract than what [[css-typed-om-1]] does for CSS properties.
+
+Parsing API {#parsing-api}
+==========================
+
+<pre class=idl>
+partial interface CSS {
+	sequence&lt;CSSParserRule> parseStylesheet(DOMString css, optional CSSParserOptions options);
+	sequence&lt;CSSParserRule> parseRuleList(DOMString css, optional CSSParserOptions options);
+	CSSParserRule parseRule(DOMString css, optional CSSParserOptions options);
+	sequence&lt;(CSSParserDeclaration or CSSParserRule)> parseDeclarationList(DOMString css, optional CSSParserOptions options);
+	CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options);
+	(CSSParserValue or DOMString) parseValue(DOMString css);
+	sequence&lt;(CSSParserValue or DOMString)> parseValueList(DOMString css);
+	sequence&lt;sequence&lt;(CSSParserValue or DOMString)>> parseCommaValueList(DOMString css);
+};
+
+dictionary CSSParserOptions {
+	object atRules;
+	boolean enforceCSSGrammar = false;
+};
+</pre>
+
+Parser Values {#parser-values}
+==============================
+
+<pre class=idl>
+interface CSSParserRule {
+
+};
+
+interface CSSParserAtRule : CSSParserRule {
+
+};
+
+interface CSSParserQualifiedRule : CSSParserRule {
+
+};
+
+interface CSSParserDeclaration {
+
+};
+
+interface CSSParserValue {
+
+};
+
+interface CSSParserBlock : CSSParserValue {
+
+};
+
+interface CSSParserFunction : CSSParserValue {
+
+};
+
+interface CSSParserIdent : CSSParserValue {
+
+};
+
+interface CSSParserNumber : CSSParserValue {
+
+};
+
+interface CSSParserPercentage : CSSParserValue {
+
+};
+
+interface CSSParserDimension : CSSParserValue {
+
+};
+
+interface CSSParserAtKeyword : CSSParserValue {
+
+};
+
+interface CSSParserHash : CSSParserValue {
+
+};
+
+interface CSSParserString : CSSParserValue {
+
+};
 </pre>
