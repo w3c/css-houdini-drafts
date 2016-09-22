@@ -44,7 +44,7 @@ partial interface CSS {
 	sequence&lt;CSSParserRule> parseStylesheet(DOMString css, optional CSSParserOptions options);
 	sequence&lt;CSSParserRule> parseRuleList(DOMString css, optional CSSParserOptions options);
 	CSSParserRule parseRule(DOMString css, optional CSSParserOptions options);
-	sequence&lt;(CSSParserDeclaration or CSSParserRule)> parseDeclarationList(DOMString css, optional CSSParserOptions options);
+	sequence&lt;CSSParserRule> parseDeclarationList(DOMString css, optional CSSParserOptions options);
 	CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options);
 	CSSParserValue parseValue(DOMString css);
 	sequence&lt;CSSParserValue> parseValueList(DOMString css);
