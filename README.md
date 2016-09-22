@@ -435,6 +435,10 @@ callback interface AnimatorCtor {
     static outputProperties = [];
     static rootInputProperties = [];
     static rootOutputProperties = [];
+    static boolean inputScroll = false;
+    static boolean outputScroll = false;
+    static boolean rootInputScroll = false;
+    static boolean rootOutputScroll = false;
     void animate(AnimationProxy root, sequence<AnimationProxy> children, optional AnimationTimeline timeline);
 };
 ```
