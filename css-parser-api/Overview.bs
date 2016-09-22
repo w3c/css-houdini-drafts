@@ -46,9 +46,9 @@ partial interface CSS {
 	CSSParserRule parseRule(DOMString css, optional CSSParserOptions options);
 	sequence&lt;(CSSParserDeclaration or CSSParserRule)> parseDeclarationList(DOMString css, optional CSSParserOptions options);
 	CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options);
-	(CSSParserValue or DOMString) parseValue(DOMString css);
-	sequence&lt;(CSSParserValue or DOMString)> parseValueList(DOMString css);
-	sequence&lt;sequence&lt;(CSSParserValue or DOMString)>> parseCommaValueList(DOMString css);
+	CSSParserValue parseValue(DOMString css);
+	sequence&lt;CSSParserValue> parseValueList(DOMString css);
+	sequence&lt;sequence&lt;CSSParserValue>> parseCommaValueList(DOMString css);
 };
 
 dictionary CSSParserOptions {
@@ -56,6 +56,23 @@ dictionary CSSParserOptions {
 	boolean enforceCSSGrammar = false;
 };
 </pre>
+
+Issue: {{parseCommaValueList()}} is in Syntax, and thus here,
+because it's actually a very common operation.
+It's trivial to do yourself
+(just call {{parseValueList()}} and then split into an array on top-level commas),
+but comma-separated lists are so common
+that it was worthwhile to improve spec ergonomics
+by providing a shortcut for that functionality.
+Is it worth it to provide this to JS as well?
+
+Issue: Do we handle comments?
+Currently I don't;
+Syntax by default just drops comments,
+but allows an impl to preserve information about them if they want.
+Maybe add an option to preserve comments?
+If so, they can appear *anywhere*,
+in any API that returns a sequence.
 
 Parser Values {#parser-values}
 ==============================
@@ -66,54 +83,62 @@ interface CSSParserRule {
 };
 
 interface CSSParserAtRule : CSSParserRule {
-
+	attribute DOMString name;
+	attribute sequence&lt;CSSParserValue> prelude;
+	attribute sequence&lt;CSSParserRule>? body;
+	/* nullable to handle at-statements */
 };
 
 interface CSSParserQualifiedRule : CSSParserRule {
-
+	attribute sequence&lt;CSSParserValue> prelude;
+	attribute sequence&lt;CSSParserRule> body;
 };
 
-interface CSSParserDeclaration {
-
+interface CSSParserDeclaration : CSSParserRule {
+	attribute DOMString name;
+	attribute sequence&lt;CSSParserValue> body;
 };
 
 interface CSSParserValue {
-
 };
 
 interface CSSParserBlock : CSSParserValue {
-
+	attribute DOMString name; /* "[]", "{}", or "()" */
+	attribute sequence&lt;CSSParserValue> body;
 };
 
 interface CSSParserFunction : CSSParserValue {
-
+	attribute DOMString name;
+	attribute sequence&lt;sequence&lt;CSSParserValue>> args;
 };
 
 interface CSSParserIdent : CSSParserValue {
-
+	attribute DOMString value;
 };
 
 interface CSSParserNumber : CSSParserValue {
-
+	attribute double value;
 };
 
 interface CSSParserPercentage : CSSParserValue {
-
+	attribute double value;
 };
 
 interface CSSParserDimension : CSSParserValue {
-
+	attribute double value;
+	attribute DOMString type;
 };
 
 interface CSSParserAtKeyword : CSSParserValue {
-
+	attribute DOMString value;
 };
 
 interface CSSParserHash : CSSParserValue {
-
+	attribute DOMString value;
+	/* expose an "is ident" boolean? */
 };
 
 interface CSSParserString : CSSParserValue {
-
+	attribute DOMString value;
 };
 </pre>
