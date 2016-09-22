@@ -90,69 +90,75 @@ interface CSSParserRule {
 };
 
 interface CSSParserAtRule : CSSParserRule {
-	attribute DOMString name;
-	attribute FrozenArray&lt;CSSParserValue> prelude;
-	attribute FrozenArray&lt;CSSParserRule>? body;
+	readonly attribute DOMString name;
+	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
+	readonly attribute FrozenArray&lt;CSSParserRule>? body;
 	/* nullable to handle at-statements */
 };
 
 interface CSSParserQualifiedRule : CSSParserRule {
-	attribute FrozenArray&lt;CSSParserValue> prelude;
-	attribute FrozenArray&lt;CSSParserRule> body;
+	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
+	readonly attribute FrozenArray&lt;CSSParserRule> body;
 };
 
 interface CSSParserDeclaration : CSSParserRule {
-	attribute DOMString name;
-	attribute FrozenArray&lt;CSSParserValue> body;
+	readonly attribute DOMString name;
+	readonly attribute FrozenArray&lt;CSSParserValue> body;
 };
 
 interface CSSParserValue {
 };
 
 interface CSSParserBlock : CSSParserValue {
-	attribute DOMString name; /* "[]", "{}", or "()" */
-	attribute FrozenArray&lt;CSSParserValue> body;
+	readonly attribute DOMString name; /* "[]", "{}", or "()" */
+	readonly attribute FrozenArray&lt;CSSParserValue> body;
 };
 
 interface CSSParserFunction : CSSParserValue {
-	attribute DOMString name;
-	attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
+	readonly attribute DOMString name;
+	readonly attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
 };
 
 interface CSSParserIdent : CSSParserValue {
-	attribute DOMString value;
+	readonly attribute DOMString value;
 };
 
 interface CSSParserNumber : CSSParserValue {
-	attribute double value;
+	readonly attribute double value;
 };
 
 interface CSSParserPercentage : CSSParserValue {
-	attribute double value;
+	readonly attribute double value;
 };
 
 interface CSSParserDimension : CSSParserValue {
-	attribute double value;
-	attribute DOMString type;
+	readonly attribute double value;
+	readonly attribute DOMString type;
 };
 
 interface CSSParserAtKeyword : CSSParserValue {
-	attribute DOMString value;
+	readonly attribute DOMString value;
 };
 
 interface CSSParserHash : CSSParserValue {
-	attribute DOMString value;
+	readonly attribute DOMString value;
 	/* expose an "is ident" boolean? */
 };
 
 interface CSSParserString : CSSParserValue {
-	attribute DOMString value;
+	readonly attribute DOMString value;
 };
 
 interface CSSParserChar : CSSParserValue {
-	attribute DOMString value;
+	readonly attribute DOMString value;
 	/* for all delims, whitespace, and the
 	   weird Selectors-based tokens
 	   (split up into the individual chars) */
 };
 </pre>
+
+Issue: Some of the CSSParserValue subtypes correspond closely to Typed OM types;
+in particular, {{CSSParserIdent}} and {{CSSKeywordValue}} are basically the same thing,
+as are {{CSSParserNumber}} and {{CSSNumberValue}}.
+Is it worthwhile to transplant this hierarchy underneath the {{CSSStyleValue}} superclass,
+and reuse the ones that are reasonable?
