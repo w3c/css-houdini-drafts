@@ -250,15 +250,15 @@ registerAnimator('sync-scroller', class SyncScrollerAnimator {
   static get outputScroll = true;
 
   animate(root, children) {
-    var master = children.filter(e => { return e.styleMap.get("--scroller-type") == "master"})[0];
-    var slaves = children.filter(e => { return e.styleMap.get("--scroller-type") == "slave"});
+    var input = children.filter(e => { return e.styleMap.get("--scroller-type") == "input"})[0];
+    var outputs = children.filter(e => { return e.styleMap.get("--scroller-type") == "output"});
 
     if (!master)
       return;
 
-    slaves.forEach(elem => {
-      elem.scrollOffsets.top = master.scrollOffsets.top;
-      elem.scrollOffsets.left = master.scrollOffsets.left;
+    outputs.forEach(elem => {
+      elem.scrollOffsets.top = input.scrollOffsets.top;
+      elem.scrollOffsets.left = input.scrollOffsets.left;
     });
   }
 });
@@ -274,12 +274,12 @@ Assign elements to the animator in document scope:
 
   #main_scroller {
     --animator: sync-scroller;
-    --scroller-type: master;
+    --scroller-type: input;
   }
 
   #alt_scroller {
     --animator: sync-scroller;
-    --scroller-type: slave;
+    --scroller-type: output;
   }
 </style>
 
