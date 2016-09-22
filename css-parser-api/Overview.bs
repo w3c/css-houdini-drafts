@@ -148,4 +148,11 @@ interface CSSParserHash : CSSParserValue {
 interface CSSParserString : CSSParserValue {
 	attribute DOMString value;
 };
+
+interface CSSParserChar : CSSParserValue {
+	attribute DOMString value;
+	/* for all delims, whitespace, and the
+	   weird Selectors-based tokens
+	   (split up into the individual chars) */
+};
 </pre>
