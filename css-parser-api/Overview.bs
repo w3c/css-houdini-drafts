@@ -89,6 +89,7 @@ interface CSSParserRule {
 
 };
 
+[Constructor(DOMString name, sequence&lt;CSSParserValue> prelude, optional sequence&lt;CSSParserRule>? body)]
 interface CSSParserAtRule : CSSParserRule {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
@@ -96,11 +97,13 @@ interface CSSParserAtRule : CSSParserRule {
 	/* nullable to handle at-statements */
 };
 
+[Constructor(sequence&lt;CSSParserValue> prelude, optional sequence&lt;CSSParserRule>? body)]
 interface CSSParserQualifiedRule : CSSParserRule {
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
 	readonly attribute FrozenArray&lt;CSSParserRule> body;
 };
 
+[Constructor(DOMString name, optional sequence&lt;CSSParserRule> body)]
 interface CSSParserDeclaration : CSSParserRule {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
@@ -109,46 +112,59 @@ interface CSSParserDeclaration : CSSParserRule {
 interface CSSParserValue {
 };
 
+[Constructor(DOMString name, sequence&lt;CSSParserValue> body)]
 interface CSSParserBlock : CSSParserValue {
 	readonly attribute DOMString name; /* "[]", "{}", or "()" */
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
 };
 
+[Constructor(DOMString name, sequence&lt;sequence&lt;CSSParserValue>> args)]
 interface CSSParserFunction : CSSParserValue {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
 };
 
+[Constructor(DOMString value)]
 interface CSSParserIdent : CSSParserValue {
 	readonly attribute DOMString value;
 };
 
+[Constructor(double value),
+ Constructor(DOMString css)]
 interface CSSParserNumber : CSSParserValue {
 	readonly attribute double value;
 };
 
+[Constructor(double value),
+ Constructor(DOMString css)]
 interface CSSParserPercentage : CSSParserValue {
 	readonly attribute double value;
 };
 
+[Constructor(double value, DOMString type),
+ Constructor(DOMString css)]
 interface CSSParserDimension : CSSParserValue {
 	readonly attribute double value;
 	readonly attribute DOMString type;
 };
 
+[Constructor(DOMString value)]
 interface CSSParserAtKeyword : CSSParserValue {
 	readonly attribute DOMString value;
 };
 
+[Constructor(DOMString value)]
 interface CSSParserHash : CSSParserValue {
 	readonly attribute DOMString value;
 	/* expose an "is ident" boolean? */
 };
 
+[Constructor(DOMString value)]
 interface CSSParserString : CSSParserValue {
 	readonly attribute DOMString value;
 };
 
+[Constructor(DOMString value)]
 interface CSSParserChar : CSSParserValue {
 	readonly attribute DOMString value;
 	/* for all delims, whitespace, and the
