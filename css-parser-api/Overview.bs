@@ -162,3 +162,10 @@ in particular, {{CSSParserIdent}} and {{CSSKeywordValue}} are basically the same
 as are {{CSSParserNumber}} and {{CSSNumberValue}}.
 Is it worthwhile to transplant this hierarchy underneath the {{CSSStyleValue}} superclass,
 and reuse the ones that are reasonable?
+
+Issue: Trying to be as useful as possible,
+without exposing so many details that we're unable to change tokenization in the future.
+In particular, whitespace, delims, and the weird Selectors tokens
+all get serialized as individual {{CSSParserChar}} "tokens",
+which should allow us to change the set of Selectors tokens in the future safely.
+Am I succeeding at this goal?
