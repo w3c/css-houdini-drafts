@@ -138,26 +138,20 @@ Assign elements to the animator declaratively in CSS:
 
 ```html
 <style>
-.parallax_scroller  {
+:root {
   animator-root: parallax;
-  overflow: scroll;
 }
 
-.parallax_scroller > .bg {
+.bg {
   animator: parallax;
-  position: absolute;
+  position: fixed;
   opacity: 0.5;
+  z-index: -1;
 }
 </style>
 
-<div class='parallax_scroller'>
-  <div class='bg' style='--parallax-rate: 0.2'></div>
-  <div class='bg' style='--parallax-rate: 0.5'></div>
-</div>
-
-<div class='parallax_scroller'>
-  <div class='bg'></div>
-</div>
+<div class='bg' style='--parallax-rate: 0.2'></div>
+<div class='bg' style='--parallax-rate: 0.5'></div>
 ```
 
 Define Custom CSS properties in document Scope:
