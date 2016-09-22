@@ -44,7 +44,7 @@ partial interface CSS {
 	Promise&lt;sequence&lt;CSSParserRule>> parseStylesheet(DOMString css, optional CSSParserOptions options);
 	Promise&lt;sequence&lt;CSSParserRule>> parseRuleList(DOMString css, optional CSSParserOptions options);
 	Promise&lt;CSSParserRule> parseRule(DOMString css, optional CSSParserOptions options);
-	Promsie&lt;sequence&lt;CSSParserRule>> parseDeclarationList(DOMString css, optional CSSParserOptions options);
+	Promise&lt;sequence&lt;CSSParserRule>> parseDeclarationList(DOMString css, optional CSSParserOptions options);
 	CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options);
 	CSSParserValue parseValue(DOMString css);
 	sequence&lt;CSSParserValue> parseValueList(DOMString css);
@@ -94,7 +94,7 @@ Parser Values {#parser-values}
 
 <pre class=idl>
 interface CSSParserRule {
-
+	/* Just a superclass. */
 };
 
 [Constructor(DOMString name, sequence&lt;CSSParserValue> prelude, optional sequence&lt;CSSParserRule>? body)]
@@ -103,50 +103,59 @@ interface CSSParserAtRule : CSSParserRule {
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
 	readonly attribute FrozenArray&lt;CSSParserRule>? body;
 	/* nullable to handle at-statements */
+	serializer;
 };
 
 [Constructor(sequence&lt;CSSParserValue> prelude, optional sequence&lt;CSSParserRule>? body)]
 interface CSSParserQualifiedRule : CSSParserRule {
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
 	readonly attribute FrozenArray&lt;CSSParserRule> body;
+	serializer;
 };
 
 [Constructor(DOMString name, optional sequence&lt;CSSParserRule> body)]
 interface CSSParserDeclaration : CSSParserRule {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
+	serializer;
 };
 
 interface CSSParserValue {
+	/* Just a superclass. */
 };
 
 [Constructor(DOMString name, sequence&lt;CSSParserValue> body)]
 interface CSSParserBlock : CSSParserValue {
 	readonly attribute DOMString name; /* "[]", "{}", or "()" */
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
+	serializer;
 };
 
 [Constructor(DOMString name, sequence&lt;sequence&lt;CSSParserValue>> args)]
 interface CSSParserFunction : CSSParserValue {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
+	serializer;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserIdent : CSSParserValue {
 	readonly attribute DOMString value;
+	serializer;
 };
 
 [Constructor(double value),
  Constructor(DOMString css)]
 interface CSSParserNumber : CSSParserValue {
 	readonly attribute double value;
+	serializer;
 };
 
 [Constructor(double value),
  Constructor(DOMString css)]
 interface CSSParserPercentage : CSSParserValue {
 	readonly attribute double value;
+	serializer;
 };
 
 [Constructor(double value, DOMString type),
@@ -154,22 +163,26 @@ interface CSSParserPercentage : CSSParserValue {
 interface CSSParserDimension : CSSParserValue {
 	readonly attribute double value;
 	readonly attribute DOMString type;
+	serializer;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserAtKeyword : CSSParserValue {
 	readonly attribute DOMString value;
+	serializer;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserHash : CSSParserValue {
 	readonly attribute DOMString value;
 	/* expose an "is ident" boolean? */
+	serializer;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserString : CSSParserValue {
 	readonly attribute DOMString value;
+	serializer;
 };
 
 [Constructor(DOMString value)]
@@ -178,6 +191,7 @@ interface CSSParserChar : CSSParserValue {
 	/* for all delims, whitespace, and the
 	   weird Selectors-based tokens
 	   (split up into the individual chars) */
+	serializer;
 };
 </pre>
 
