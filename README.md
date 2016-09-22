@@ -81,7 +81,7 @@ registerAnimator('spring-fadein', class SpringAnimator {
       // read a custom css property.
       const k = elem.styleMap.get('--spring-k') || 1;
       // compute progress using a fancy spring timing function.
-      const effectiveValue = springTiming(timeline.currentTime, k);
+      const effectiveValue = this.springTiming(timeline.currentTime, k);
       // update opacity accordingly.
       elem.styleMap.opacity = effectiveValue;
     });
