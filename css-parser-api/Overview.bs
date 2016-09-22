@@ -103,21 +103,21 @@ interface CSSParserAtRule : CSSParserRule {
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
 	readonly attribute FrozenArray&lt;CSSParserRule>? body;
 	/* nullable to handle at-statements */
-	serializer;
+	stringifier;
 };
 
 [Constructor(sequence&lt;CSSParserValue> prelude, optional sequence&lt;CSSParserRule>? body)]
 interface CSSParserQualifiedRule : CSSParserRule {
 	readonly attribute FrozenArray&lt;CSSParserValue> prelude;
 	readonly attribute FrozenArray&lt;CSSParserRule> body;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString name, optional sequence&lt;CSSParserRule> body)]
 interface CSSParserDeclaration : CSSParserRule {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
-	serializer;
+	stringifier;
 };
 
 interface CSSParserValue {
@@ -128,34 +128,34 @@ interface CSSParserValue {
 interface CSSParserBlock : CSSParserValue {
 	readonly attribute DOMString name; /* "[]", "{}", or "()" */
 	readonly attribute FrozenArray&lt;CSSParserValue> body;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString name, sequence&lt;sequence&lt;CSSParserValue>> args)]
 interface CSSParserFunction : CSSParserValue {
 	readonly attribute DOMString name;
 	readonly attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserIdent : CSSParserValue {
 	readonly attribute DOMString value;
-	serializer;
+	stringifier;
 };
 
 [Constructor(double value),
  Constructor(DOMString css)]
 interface CSSParserNumber : CSSParserValue {
 	readonly attribute double value;
-	serializer;
+	stringifier;
 };
 
 [Constructor(double value),
  Constructor(DOMString css)]
 interface CSSParserPercentage : CSSParserValue {
 	readonly attribute double value;
-	serializer;
+	stringifier;
 };
 
 [Constructor(double value, DOMString type),
@@ -163,26 +163,26 @@ interface CSSParserPercentage : CSSParserValue {
 interface CSSParserDimension : CSSParserValue {
 	readonly attribute double value;
 	readonly attribute DOMString type;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserAtKeyword : CSSParserValue {
 	readonly attribute DOMString value;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserHash : CSSParserValue {
 	readonly attribute DOMString value;
 	/* expose an "is ident" boolean? */
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString value)]
 interface CSSParserString : CSSParserValue {
 	readonly attribute DOMString value;
-	serializer;
+	stringifier;
 };
 
 [Constructor(DOMString value)]
@@ -191,7 +191,7 @@ interface CSSParserChar : CSSParserValue {
 	/* for all delims, whitespace, and the
 	   weird Selectors-based tokens
 	   (split up into the individual chars) */
-	serializer;
+	stringifier;
 };
 </pre>
 
