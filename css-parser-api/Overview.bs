@@ -41,10 +41,10 @@ Parsing API {#parsing-api}
 
 <pre class=idl>
 partial interface CSS {
-	sequence&lt;CSSParserRule> parseStylesheet(DOMString css, optional CSSParserOptions options);
-	sequence&lt;CSSParserRule> parseRuleList(DOMString css, optional CSSParserOptions options);
-	CSSParserRule parseRule(DOMString css, optional CSSParserOptions options);
-	sequence&lt;CSSParserRule> parseDeclarationList(DOMString css, optional CSSParserOptions options);
+	Promise&lt;sequence&lt;CSSParserRule>> parseStylesheet(DOMString css, optional CSSParserOptions options);
+	Promise&lt;sequence&lt;CSSParserRule>> parseRuleList(DOMString css, optional CSSParserOptions options);
+	Promise&lt;CSSParserRule> parseRule(DOMString css, optional CSSParserOptions options);
+	Promsie&lt;sequence&lt;CSSParserRule>> parseDeclarationList(DOMString css, optional CSSParserOptions options);
 	CSSParserDeclaration parseDeclaration(DOMString css, optional CSSParserOptions options);
 	CSSParserValue parseValue(DOMString css);
 	sequence&lt;CSSParserValue> parseValueList(DOMString css);
@@ -80,6 +80,14 @@ Issue: What do we do if an unknown at-rule
 shows up in the results?
 Default to decls or rules?
 Or treat it more simply as just a token sequence?
+
+Issue: Parsing stylesheets/rule lists should definitely be async,
+because stylesheets can be quite large.
+Parsing individual properties/value lists should definitely be sync,
+because they're small and it would be really annoying.
+Parsing a single rule, tho, is unclear--
+is it large enough to be worth making async,
+or is it too annoying to be worth it?
 
 Parser Values {#parser-values}
 ==============================
