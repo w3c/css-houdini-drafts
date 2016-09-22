@@ -447,7 +447,7 @@ dictionary ScrollOffests {
 };
 
 [
-    Exposed=(Window,AnimationWorklet),
+    Exposed=(AnimationWorklet),
 ] interface AnimationProxy {
     attribute ScrollOffests scrollOffsets;
     attribute StylePropertyMap styleMap;
