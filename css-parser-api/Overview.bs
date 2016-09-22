@@ -53,7 +53,8 @@ partial interface CSS {
 
 dictionary CSSParserOptions {
 	object atRules;
-	boolean enforceCSSGrammar = false;
+	/* dict of at-rule name => at-rule type
+	   (contains decls or contains qualified rules) */
 };
 </pre>
 
@@ -73,6 +74,12 @@ but allows an impl to preserve information about them if they want.
 Maybe add an option to preserve comments?
 If so, they can appear *anywhere*,
 in any API that returns a sequence.
+
+Issue: What do we do if an unknown at-rule
+(not appearing in the {{atRules}} option)
+shows up in the results?
+Default to decls or rules?
+Or treat it more simply as just a token sequence?
 
 Parser Values {#parser-values}
 ==============================
