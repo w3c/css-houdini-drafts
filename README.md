@@ -25,6 +25,8 @@ properties we give up some richness to gain performance while maintaining ration
 is possible to fine tune this trade-off in future iteration of this API by exposing additional
 options and without fundamentally reworking this design.
 
+This design supersedes our [CompositorWorker proposal][cw-proposal].
+
 # Motivating Use Cases
 
 * Scroll-linked effects:
@@ -451,19 +453,6 @@ dictionary ScrollOffests {
     attribute StylePropertyMap styleMap;
 };
 ```
-
-# Contributors
-
-This design supersedes our [CompositorWorker proposal][cw-proposal] and was possible by key contribution from:
-
-*   Rob Flack (flackr@)
-*   Ian Vollick (vollick@)
-*   Ian Kilpatrick (ikilpatrick@)
-*   Sadrul Chowdhury (sadrul@)
-*   Shane Stephens (shanes@)
-
-And many other members of Chrome web platform team.
-
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
