@@ -91,19 +91,19 @@ interface CSSParserRule {
 
 interface CSSParserAtRule : CSSParserRule {
 	attribute DOMString name;
-	attribute sequence&lt;CSSParserValue> prelude;
-	attribute sequence&lt;CSSParserRule>? body;
+	attribute FrozenArray&lt;CSSParserValue> prelude;
+	attribute FrozenArray&lt;CSSParserRule>? body;
 	/* nullable to handle at-statements */
 };
 
 interface CSSParserQualifiedRule : CSSParserRule {
-	attribute sequence&lt;CSSParserValue> prelude;
-	attribute sequence&lt;CSSParserRule> body;
+	attribute FrozenArray&lt;CSSParserValue> prelude;
+	attribute FrozenArray&lt;CSSParserRule> body;
 };
 
 interface CSSParserDeclaration : CSSParserRule {
 	attribute DOMString name;
-	attribute sequence&lt;CSSParserValue> body;
+	attribute FrozenArray&lt;CSSParserValue> body;
 };
 
 interface CSSParserValue {
@@ -111,12 +111,12 @@ interface CSSParserValue {
 
 interface CSSParserBlock : CSSParserValue {
 	attribute DOMString name; /* "[]", "{}", or "()" */
-	attribute sequence&lt;CSSParserValue> body;
+	attribute FrozenArray&lt;CSSParserValue> body;
 };
 
 interface CSSParserFunction : CSSParserValue {
 	attribute DOMString name;
-	attribute sequence&lt;sequence&lt;CSSParserValue>> args;
+	attribute FrozenArray&lt;FrozenArray&lt;CSSParserValue>> args;
 };
 
 interface CSSParserIdent : CSSParserValue {
