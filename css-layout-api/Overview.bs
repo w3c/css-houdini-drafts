@@ -531,8 +531,16 @@ TODO add example of exclusion usage.
 <pre class="idl">
 partial interface ConstraintSpace {
     // TODO add arguments to layoutOpportunities that make sense.
-    ConstraintSpaceIterable layoutOpportunities();
+    ConstraintSpaceIterable layoutOpportunities(optional LayoutOpportunitiesOptions);
 };
+
+dictionary LayoutOpportunitiesOptions {
+  optional sequence&lt;ExclusionTag> avoid = «»; // empty list is avoid everything. :)
+  optional sequence&lt;ExclusionTag> clear = «»; // defaults to clear nothing.
+  optional number jump; // defaults to 1em.
+};
+
+enum LayoutDirection { "inline", "block" };
 
 // TODO should be a generator function instead?
 interface ConstraintSpaceIterable {
@@ -560,7 +568,18 @@ The {{ConstraintSpace/inlineSize}} and {{ConstraintSpace/blockSize}} attributes 
 {{ConstraintSpace/inlinePercentResolutionSize}} and {{ConstraintSpace/blockPercentResolutionSize}}
 should remain the same as the parent.
 
-The {{DerivedConstraintSpace}} is used for "fitting" a child within a larger {{ConstraintSpace}}.
+The {{ConstraintSpace/layoutOpportunities()}} method takes an optional dictionary
+{{LayoutOpportunitiesOptions}}.
+
+The {{LayoutOpportunitiesOptions/clear}} property is similar to the ''clear'' property. The returned
+generator will only return {{DerivedConstraintSpace}}s which lower (in the block direction) that any
+types of exclusions listed.
+
+The {{LayoutOpportunitiesOptions/avoid}} property will return {{DerivedConstraintSpace}}s which wont
+have the listed exclusion types inside them.
+
+The {{LayoutOpportunitiesOptions/jump}} property allows authors to specify the minimum jump for
+non-rectangular exclusions.
 
 Issue: Add image showing a child "fitting" within a larger {{ConstraintSpace}}.
 
