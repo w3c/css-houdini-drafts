@@ -959,6 +959,10 @@ same rules referenced above.
 
 Normalization does not fail for {{CSSResourceValue}} objects.
 
+<div class='example'>
+The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with <a attribute for='CSSResourceValue'>state</a> set to ''unloaded'' and the <a attribute for='CSSURLImageValue'>url</a> set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The <a attribute for='CSSImageValue'>intrinsicWidth</a>, <a attribute for='CSSImageValue'>intrinsicHeight</a> and <a attribute for='CSSImageValue'>intrinsicRatio</a> are all set to null.
+</div>
+
 {{CSSStyleValue}} Serialization {#stylevalue-serialization}
 ===========================================================
 
