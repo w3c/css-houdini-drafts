@@ -4,7 +4,7 @@
 # Overview
 
 AnimationWorklet is a new primitive for creating scroll-linked and other high performance
-procedural animations on the web.
+procedural animations on the web.  It is being incubated here as part of the [CSS Houdini task force](https://github.com/w3c/css-houdini-drafts/wiki), and if successful will be transferred to that task force for full standardization.
 
 # Introduction
 
@@ -253,7 +253,7 @@ registerAnimator('sync-scroller', class SyncScrollerAnimator {
     var input = children.filter(e => { return e.styleMap.get("--scroller-type") == "input"})[0];
     var outputs = children.filter(e => { return e.styleMap.get("--scroller-type") == "output"});
 
-    if (!master)
+    if (!input)
       return;
 
     outputs.forEach(elem => {
