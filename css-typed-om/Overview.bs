@@ -857,6 +857,19 @@ then a {{CSSTransformValue}} is constructed around an empty sequence.
 
 Otherwise, normalization fails.
 
+<div class='example'>
+The string "scale(2, 0.5) translate(100px) rotate(20deg)"
+is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransformComponent}} with:
+*   a {{CSSScale}} with:
+		*   <a attribute for='CSSScale'>x</a> set to 2 
+		*   <a attribute for='CSSScale'>y</a> set to 0.5
+*   a {{CSSTranslation}} with:
+		*   <a attribute for='CSSTranslation'>x</a> with <a attribute for='CSSSimpleLength'>value</a> of 100 and <a attribute for='CSSSimpleLength'>type</a> of "px" 
+*   a {{CSSRotation}} with:
+		*   20 <a attribute for='CSSAngleValue'>degrees</a> 
+
+</div>
+
 {{CSSPositionValue}} normalization {#positionvalue-normalization}
 -----------------------------------------------------------------
 
