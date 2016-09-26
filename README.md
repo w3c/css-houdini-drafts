@@ -217,7 +217,7 @@ Assign elements to the animator in document scope:
 </style>
 
 <div class="sticky_container">
-   <!-- Next element is both an sticky root and and an sticky children. :) -->
+   <!-- Next element is both a sticky root and a sticky child. :) -->
    <div class="sticky_container sticky">
       <div class="sticky"></div>
     </div>
