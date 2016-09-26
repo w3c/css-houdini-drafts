@@ -31,7 +31,7 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
 
 * Scroll-linked effects:
   -   Parallax ([demo](https://flackr.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
-  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://flackr.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [polyer paper-scroll-header-panel](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
+  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://flackr.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
 
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
