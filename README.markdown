@@ -9,4 +9,4 @@ Specification issues are raised and discussed in GitHub Issues in this repositor
 We also maintain the [public-houdini mailing list](http://lists.w3.org/Archives/Public/public-houdini/) for general-interest topics.
 
 New specifications are generally first incubated in the WICG, in particular:
-- [https://github.com/WICG/animation-worklet](Animation Worklet)
+- [Animation Worklet](https://github.com/WICG/animation-worklet)
