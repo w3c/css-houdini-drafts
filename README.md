@@ -369,9 +369,11 @@ The API is designed to allow animation worklets to run on threads other than the
 particular, it is recommended to run them in a dedicated thread and provide a best-effort attempt
 to run in sync with frame production in the compositor. This ensures the animations will not be
 impacted by jank on main thread. It is still possible for such animation to slip in relation with
-frame production if *animate* callback cannot be completed in time. We believe such slippage is going to be a
-rare event because there is no other tasks beside authored animation tasks running on the thread
-and also the exposed features are limited to the fast subset (see below).
+frame production if *animate* callback cannot be completed in time. We believe such slippage is going to be
+rare because:
+
+- There are no other tasks running on the thread.
+- The exposed features are limited to the fast subset (see below).
 
 ## Limiting Mutations to Fast Subset
 
