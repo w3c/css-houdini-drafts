@@ -100,7 +100,7 @@ registerAnimator('spring-fadein', class SpringAnimator {
 Assign elements to the animator declaratively in CSS:
 
 ```html
-.myFadin {
+.myFadein {
   animator:'spring-fadein';
 }
 
