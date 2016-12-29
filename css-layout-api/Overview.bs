@@ -24,8 +24,8 @@ spec:dom; type:dfn; text:element
 Introduction {#intro}
 =====================
 
-The layout stage of CSS is responsible for generating and positioning <a>fragments</a> from a tree
-of <a>boxes</a>.
+The layout stage of CSS is responsible for generating and positioning <a>fragments</a> from the
+<a>box tree</a>.
 
 This specification describes an API which allows developers to layout a <a>box</a> in response to
 computed style and <a>box</a> tree changes.
@@ -487,13 +487,43 @@ registerLayout('fragmenting', class {
 Layout Invalidation {#layout-invalidation}
 ==========================================
 
-<div class='issue'>
-TODO, list all the ways that layout can be invalidated, namely:
-    - Computed style change.
-    - Child computed style change.
-    - Child add/remove change.
-    - etc.
-</div>
+A <a>document</a> has an associated <dfn>layout name to input properties map</dfn> and a <dfn>layout
+name to child input properties map</dfn>. Initialy these maps are empty and are populated when
+{{registerLayout(name, layoutCtor)}} is called.
+
+Each <a>box</a> has an associated <dfn>layout valid flag</dfn>. It may be either
+<dfn>layout-valid</dfn> or <dfn>layout-invalid</dfn>. It is initially set to <a>layout-invalid</a>.
+
+When the computed style for a |box| changes, the user agent must run the following steps:
+    1. Let |layoutFunction| be the <<layout()>> or <<inline-layout()>> function of the 'display'
+        property on the computed style if it exists. If it is a different type of value (e.g.
+        ''grid'') then abort all these steps.
+
+    2. Let |name| be the first argument of the |layoutFunction|.
+
+    3. Let |inputProperties| be the result of looking up |name| on <a>layout name to input
+        properties map</a>.
+
+    4. Let |childInputProperties| be the result of looking up |name| on <a>layout name to child
+        input properties map<a>.
+
+    5. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
+        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>.
+
+    6. For each |property| in |childInputProperties|, if the |property|'s <a>computed value</a> has
+        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>.
+
+When a child <a>box</a> represented by a {{BoxLayoutChild}} is added or removed from the <a>box
+tree</a> or has its layout invalidated (from a computed style change). Set the <a>layout valid
+flag</a> on the current <a>box</a> to <a>layout-invalid</a>.
+
+When a child non-<a>atomic inline</a> represented by a {{InlineLayoutChild}} is added or removed
+from the <a>box tree</a> or has its layout invalidated (from a computed style change, or if its text
+has changed). Set the <a>layout valid flag</a> on the current <a>box</a> to <a>layout-invalid</a>.
+
+NOTE: This only describes layout invalidatation as it relates to the CSS Layout API. All
+    <a>boxes</a> conceptually have a <a>layout valid flag</a> and these changes are propogated
+    through the <a>box tree</a>.
 
 Layout Engine {#layout-engine}
 ==============================
@@ -501,7 +531,7 @@ Layout Engine {#layout-engine}
 <pre class="idl">
 interface FragmentRequestToken {
   // Has internal slots:
-  // [[box]] - The box to generate the fragment for.
+  // [[layoutChild]] - The layout child to generate the fragment for.
   // [[constraintSpace]] - The constraint space to perform layout in.
   // [[breakToken]] - The break token to resume the layout with.
 };
@@ -528,8 +558,8 @@ An example layout engine written in javascript is shown below.
 
 <pre class="lang-javascript">
 class LayoutEngine {
-  // This function takes the root of the Box-tree, a ConstraintSpace, and a
-  //  BreakToken to (if paginating for printing for example) and generates a
+  // This function takes the root of the box-tree, a ConstraintSpace, and a
+  // BreakToken to (if paginating for printing for example) and generates a
   // Fragment.
   layoutEntry(rootBox, rootPageConstraintSpace, breakToken) {
     return layoutFragment({
@@ -576,8 +606,6 @@ Registering A Layout {#registering-a-layout}
 ============================================
 
 <pre class='idl'>
-callback VoidFunction = void ();
-
 partial interface LayoutWorkletGlobalScope {
     void registerLayout(DOMString name, VoidFunction layoutCtor);
 };
@@ -612,7 +640,8 @@ Layout Notation {#layout-notation}
     <dfn>inline-layout()</dfn> = inline-layout( <<ident>> )
 </pre>
 
-The <<layout()>> and <<inline-layout()>> function is an additional notation to be supported by the ''display'' property.
+The <<layout()>> and <<inline-layout()>> function is an additional notation to be supported by the
+'display' property.
 
 Issue: Resolve this with css-display-3 once required.
 
