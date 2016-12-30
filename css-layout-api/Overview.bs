@@ -21,6 +21,28 @@ spec:css-display-3; type:value; for:display; text:none
 spec:dom; type:dfn; text:element
 </pre>
 
+<pre class="anchors">
+urlPrefix: https://heycam.github.io/webidl/; type: dfn;
+    text: NotSupportedError
+    urlPrefix: #dfn-;
+        text: callback this value
+        text: exception
+        text: throw
+        url: throw; text: thrown
+    url: es-invoking-callback-functions; text: Invoke
+urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
+    text: constructor
+    text: Construct
+    text: IsArray
+    text: IsCallable
+    text: IsConstructor
+    text: HasProperty
+    url: get-o-p; text: Get
+    url: terms-and-definitions-function; text: function
+    urlPrefix: native-error-types-used-in-this-standard-
+        text: TypeError
+</pre>
+
 Introduction {#intro}
 =====================
 
@@ -494,10 +516,10 @@ name to child input properties map</dfn>. Initialy these maps are empty and are 
 Each <a>box</a> has an associated <dfn>layout valid flag</dfn>. It may be either
 <dfn>layout-valid</dfn> or <dfn>layout-invalid</dfn>. It is initially set to <a>layout-invalid</a>.
 
-When the computed style for a |box| changes, the user agent must run the following steps:
+When the <a>computed style</a> for a |box| changes, the user agent must run the following steps:
     1. Let |layoutFunction| be the <<layout()>> or <<inline-layout()>> function of the 'display'
-        property on the computed style if it exists. If it is a different type of value (e.g.
-        ''grid'') then abort all these steps.
+        property on the <a>computed style</a> for the |box| if it exists. If it is a different type
+        of value (e.g.  ''grid'') then abort all these steps.
 
     2. Let |name| be the first argument of the |layoutFunction|.
 
@@ -538,7 +560,7 @@ interface FragmentRequestToken {
 </pre>
 
 The layout method on the author supplied layout class is a generator function instead of a regular
-javascript function. This is for user-agents to be able to support asyncronous and parallel layout
+javascript function. This is for user-agents to be able to support asynchronous and parallel layout
 engines.
 
 When an author invokes the {{LayoutChild/doLayout()}} method on a {{LayoutChild}} the user-agent
@@ -602,33 +624,132 @@ class LayoutEngine {
 
 TODO explain parallel layout + {{FragmentRequestToken}}, etc.
 
-Registering A Layout {#registering-a-layout}
-============================================
+Layout Worklet {#layout-worklet}
+================================
+
+The {{layoutWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
+which are related to layout.
+
+The {{layoutWorklet}}'s <a>worklet global scope type</a> is {{LayoutWorkletGlobalScope}}.
 
 <pre class='idl'>
-partial interface LayoutWorkletGlobalScope {
+partial interface CSS {
+    [SameObject] readonly attribute Worklet layoutWorklet;
+};
+</pre>
+
+The {{LayoutWorkletGlobalScope}} is the global execution context of the {{layoutWorklet}}.
+
+<pre class='idl'>
+[Global=(Worklet,LayoutWorklet),Exposed=LayoutWorklet]
+interface LayoutWorkletGlobalScope : WorkletGlobalScope {
     void registerLayout(DOMString name, VoidFunction layoutCtor);
 };
 </pre>
 
-The {{LayoutWorkletGlobalScope}} has a map of <b>name to layout constructor map</b>. Initially this
-map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+Registering A Layout {#registering-layout}
+==========================================
 
-Issue: Write full register algorithm, and checks required.
+A <dfn>layout definition</dfn> describes an author defined layout which can be referenced by the
+<<layout()>> or <<inline-layout()>> functions. It consists of:
+
+ - A <dfn>layout name</dfn>.
+
+ - A <dfn>layout class constructor</dfn> which is the class <a>constructor</a>.
+
+ - A <dfn>layout generator function</dfn> which is the layout <a>generator function</a> callback.
+
+ - A <dfn>layout class constructor valid flag</dfn>.
+
+The {{LayoutWorkletGlobalScope}} has a map of <b>layout name to layout definition map</b>. Initially
+this map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+
+When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
+is called, the user agent <em>must</em> run the following steps:
+    1. If the |name| exists as a key in the <a>layout name to layout definition map</dfn>,
+        <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+
+    2. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+    3. Let |inputProperties| be the result of <a>Get</a>(|layoutCtor|,
+        <code>"inputProperties"</code>).
+
+    4. If |inputProperties| is not undefined, and the result of <a>IsArray</a>(|inputProperties|) is
+        false, <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+        If |inputProperties| is undefined, let |inputProperties| be a new empty array.
+
+    5. For each |item| in |inputProperties| perform the following substeps:
+
+        1. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a> and
+            abort all these steps.
+
+    6. Let |childInputProperties| be the result of <a>Get</a>(|layoutCtor|,
+        <code>"childInputProperties"</code>).
+
+    7. If |childInputProperties| is not undefined, and the result of
+        <a>IsArray</a>(|childInputProperties|) is false, <a>throw</a> a <a>TypeError</a> and abort
+        all these steps.
+
+        If |childInputProperties| is undefined, let |childInputProperties| be a new empty array.
+
+    8. For each |item| in |childInputProperties| perform the following substeps:
+
+        1. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a> and
+            abort these steps.
+
+    Note: The list of CSS properties provided by "inputProperties" or "childInputProperties" can
+        either by custom or native CSS properties.
+
+    Note: The list of CSS properties may contain shorthands.
+
+    Note: In order for a layout class to be forwards compatible, the list of CSS properties can also
+        contain currently invalid properties for the user agent. For example
+        <code>margin-bikeshed-property</code>.
+
+    9. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, <code>"prototype"</code>).
+
+    10. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
+
+    11. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+
+    12. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
+
+    13. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
+        <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+    14. Let |definition| be a new <a>layout definition</a> with:
+
+        - <a>layout name</a> being |name|.
+
+        - <a>layout class constructor</a> being |layoutCtor|.
+
+        - <a>layout generator function</a> being |layout|.
+
+        - <a>layout class constructor valid flag</a> being true
+
+    15. Add the key-value pair (|name| - |inputProperties|) to the <a>layout name to input
+        properties map</a> of the associated <a>document</a>.
+
+    16. Add the key-value pair (|name| - |childInputProperties|) to the <a>layout name to child
+        input properties map</a> of the associated <a>document</a>.
+
+    17. Add the key-value pair (|name| - |definition|) to the <a>layout name to layout definition
+        map</a> of the associated <a>document</a>.
 
 <div class='note'>
-    This is what the shape of the class should be:
-    <pre class='idl'>
-        callback interface LayoutClass {
-            readonly attribute sequence&lt;DOMString> inputProperties;
-            readonly attribute sequence&lt;DOMString> childInputProperties;
+    The shape of the class should be:
+    <pre class='lang-javascript'>
+        class MyLayout {
+            static get inputProperties() { return ['--foo'] }
+            static get childrenInputProperties() { return ['--bar'] }
 
-            LayoutResult layout(
-                    ConstraintSpace space,
-                    sequence&lt;Box> children,
-                    StylePropertyMap styleMap,
-                    BreakToken break);
-        };
+            *layout(constraintSpace, children, styleMap, breakToken) {
+                // Etc.
+            }
+        }
     </pre>
 </div>
 
