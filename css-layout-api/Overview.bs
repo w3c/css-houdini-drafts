@@ -43,6 +43,16 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
         text: TypeError
 </pre>
 
+<!--
+TODO
+ - Fix layout invalidation section.
+ - Add painting behaviour section.
+ - Fix examples.
+ - Add utility functions.
+ - Define invalid fragment.
+ - Layout instance on box is incorrect.
+-->
+
 Introduction {#intro}
 =====================
 
@@ -99,6 +109,10 @@ href="https://www.w3.org/TR/CSS2/visuren.html#dis-pos-flo">CSS 2.1 Section 9.7</
 contain an additional row, with ''inline-layout()'' in the "Specified Value" column and ''layout()''
 in the "Computed Value" column.
 
+A <a>layout API container</a> has a <dfn>layout instance</dfn>, initially this is set to null. This
+is an instance of the author defined layout class (see [[#registering-layout]]). If the <a>box</a>'s
+<a>computed value</a> of 'display' changes, this must be reset to null.
+
 Layout API Model and Terminology {#layout-api-model-and-terminology}
 ====================================================================
 
@@ -117,7 +131,7 @@ Layout Children {#layout-children}
 
 <pre class='idl'>
 interface LayoutChild {
-    FragmentRequestToken doLayout(ConstraintSpace space, ChildBreakToken breakToken);
+    FragmentRequest doLayout(ConstraintSpace space, ChildBreakToken breakToken);
 };
 
 interface InlineLayoutChild : LayoutChild {
@@ -339,6 +353,9 @@ interface ConstraintSpace {
     readonly attribute double percentageInlineSize;
     readonly attribute double percentageBlockSize;
 
+    readonly attribute boolean inlineOverflow;
+    readonly attribute boolean blockOverflow;
+
     readonly attribute BlockFragmentationType blockFragmentationType;
 };
 
@@ -556,6 +573,19 @@ registerLayout('fragmenting', class {
 </pre>
 </div>
 
+Utility Functions {#utility-functions}
+--------------------------------------
+
+<pre class='idl'>
+partial interface LayoutWorkletGlobalScope {
+    resolveInlineSize();
+    resolveBlockSize();
+
+    resolveBordersAndPadding();
+    resolveScrollbarSize();
+};
+</pre>
+
 Layout {#layout}
 ================
 
@@ -735,7 +765,7 @@ Layout Engine {#layout-engine}
 ------------------------------
 
 <pre class="idl">
-interface FragmentRequestToken {
+interface FragmentRequest {
   // Has internal slots:
   // [[layoutChild]] - The layout child to generate the fragment for.
   // [[constraintSpace]] - The constraint space to perform layout in.
@@ -749,10 +779,10 @@ engines.
 
 When an author invokes the {{LayoutChild/doLayout()}} method on a {{LayoutChild}} the user-agent
 doesn't synchronously generate a {{Fragment}} to return to the author's code. Instead it returns a
-{{FragmentRequestToken}}. This is a completely opaque object to the author but contains internal
-slots which encapsulates the {{Box/doLayout()}} method call.
+{{FragmentRequest}}. This is a completely opaque object to the author but contains internal
+slots which encapsulates the {{LayoutChild/doLayout()}} method call.
 
-When a {{FragmentRequestToken}}(s) are yielded from a layout generator object the user-agent's
+When a {{FragmentRequest}}(s) are yielded from a layout generator object the user-agent's
 layout engine may run the algorithm asynchronously with other work, and/or on a different thread of
 execution. When {{Fragment}}(s) have been produced by the engine, the user-agent will 'tick' the
 generator object with the resulting {{Fragment}}(s).
@@ -775,7 +805,7 @@ class LayoutEngine {
     });
   }
 
-  // This function takes a FragmentRequestToken and calls the appropriate layout
+  // This function takes a FragmentRequest and calls the appropriate layout
   // algorithm to generate the a Fragment.
   layoutFragment(fragmentRequest) {
     const box = fragmentRequest.box;
@@ -806,61 +836,175 @@ class LayoutEngine {
 </pre>
 </div>
 
-TODO explain parallel layout + {{FragmentRequestToken}}, etc.
+TODO explain parallel layout + {{FragmentRequest}}, etc.
 
-Performing layout {#performing-layout}
+Performing Layout {#performing-layout}
 --------------------------------------
 
 <pre class='idl'>
-dictionary LayoutResult {
-    double inlineSize;
-    double blockSize;
-    sequence&lt;Fragment> fragments;
-    BreakToken breakToken;
-    double baseline;
+// This is the final return value from the author defined layout() method.
+dictionary FragmentResultOptions {
+    double inlineSize = 0;
+    double blockSize = 0;
+    double inlineOverflowSize = null;
+    double blockOverflowSize = null;
+    sequence&lt;Fragment> childFragments = [];
+    BreakTokenOptions breakToken = null;
+    double dominantBaseline = null;
 };
 </pre>
 
-{{LayoutClass/layout()}} is invoked by the user agent when <a>generate a layout</a> for a <a>box</a>.
+When the user agent wants to <dfn>generate a layout API fragment</dfn> of a <a>layout API formatting
+context</a> for a given |box|, |constraintSpace|, |children| and an optional |breakToken| it
+<em>must</em> run the following steps:
 
-The user agent passes in:
-  - The current children for the <a>box</a>, with only {{LayoutClass/childInputProperties}} on
-    {{Box/styleMap}}
-  - The available space defined by a {{ConstraintSpace}}
-  - The computed style of the <a>box</a>, with only {{LayoutClass/inputProperties}}
-  - The {{BreakToken}} if any, for where the <a>box</a> was last fragmented.
+    1. If the <a>layout valid flag</a> for the |box| is <a>layout-valid</a> the user agent
+        <em>may</em> use a fragment from a previous invocation of this algorithm if the |box|,
+        |constraintSpace|, |children| and optional |breakToken| are the same. If so it <em>may</em>
+        abort all these steps and use the cached fragment.
 
-The author defined code should produce a {{LayoutResult}}.
+        Issue: The above is too limiting wrt. the layout valid flag. Need to separate out the produce
+            the fragment step, with the cache invalidation.
 
-The {{LayoutResult}} consists of:
- - A {{LayoutResult/minContent}} which represents the fragment's <a>min-content inline-size
-    contribution</a>.
- - A {{LayoutResult/maxContent}} which represents the fragment's <a>max-content inline-size
-    contribution</a>.
- - A {{LayoutResult/width}} which represents the fragment's resulting width.
- - A {{LayoutResult/height}} which represents the fragment's resulting height.
- - A list of {{LayoutResult/fragments}} which represents the fragment's direct child fragments.
- - A list of {{LayoutResult/unpositionedFragments}} which represents the fragment's children which
-    should be positioned by a parent fragment.
- - A {{LayoutResult/breakToken}} which represents where the current layout's box last broke.
- - A {{LayoutResult/baseline}} which represents the baseline of the fragment.
+        Note: The user agent for implementation reasons may also continue with all these steps in this
+            case. It can do this every frame, or multiple times per frame.
 
-Issue: Write the following into the algorithm.
+    2. Let |layoutFunction| be the <<layout()>> or <<inline-layout()>> for the <a>computed value</a>
+        of 'display' on the |box|.
 
-If any {{Fragment}}s appear in both the list of {{LayoutResult/fragments}} or the list of
-{{LayoutResult/unpositionedFragments}} the user agent should throw an error.
+    3. Let |name| be the first argument of the |layoutFunction|.
 
-The user agent should check that a consistent set of {{Fragment}}s generated from a {{LayoutChild}}
-is returned in either the list of {{LayoutResult/fragments}} or
-{{LayoutResult/unpositionedFragments}}. (Consistent being that a {{Fragment/breakToken}} from one
-{{Fragment}} was used to generate another {{Fragment}} in the set).
+    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
+        WorkletGlobalScopes</a> from the layout {{Worklet}}.
 
-If any {{Fragment}}s appear more than once, the user agent should throw an error.
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the layout 
+        {{Worklet}} and use that.
 
-When the user agent wants to <dfn>generate a layout</dfn> of a <<layout()>> or <<inline-layout()>>
-for a box it <em>must</em> run the following steps:
+        Note: The user agent <em>may</em> use any policy for which {{LayoutWorkletGlobalScope}} to
+            select or create. It may use a single {{LayoutWorkletGlobalScope}} or multiple and
+            randomly assign between them.
 
-Issue: TODO specify these steps.
+    5. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s <a>layout
+        name to layout definition map</a>.
+
+        If |definition| does not exist, let the fragment output be an <a>invalid fragment</a> and
+        abort all these steps.
+
+    6. Let |layoutInstance| be the result of looking up the <a>layout instance</a> on the |box|. If
+        |layoutInstance| is null run the following substeps.
+
+        1. If the <a>layout class constructor valid flag</a> on |definition| is false, let the
+            fragment output be an <a>invalid fragment</a> and abort all these steps.
+
+        2. Let |layoutCtor| be the <a>layout class constructor</a> on |definition|.
+
+        3. Let |layoutInstance| be the result of <a>Construct</a>(|layoutCtor|).
+
+            If <a>Construct</a> throws an exception, set the |definition|'s <a>layout class
+            constructor valid flag</a> to false, let the fragment output be an <a>invalid
+            fragment</a> and abort all these steps.
+
+        4. Set <a>layout instance</a> on |box| to |layoutInstance|.
+
+        Note: <a>Layout instance</a> will be set to null whenever the <a>computed style</a> of
+            'display' on |box| changes.
+
+    7. Let |layoutGeneratorFunction| be the result of looking up the <a>layout generator
+        function</a>.
+
+    8. Let |inputProperties| be the result of looking up |name| on the associated <a>document</a>'s
+        <a>layout name to input properties map</a>.
+
+    9. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+        <a>computed value</a>'s for properties listed in |inputProperties|.
+
+    10. Let |layoutGenerator| be the result of <a>Call</a>(|layoutGeneratorFunction|,
+        |layoutInstance|, «|constraintSpace|, |children|, |styleMap|, |breakToken|»).
+
+    12. Let |childFragmentResults| be «» (the empty list).
+
+    11. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>,
+        |layoutGenerator|, |childFragmentResults|).
+
+    12. Perform the following substeps until the result of <a>Get</a>(|nextResult|,
+        <code>"done"</code>) is <code>true</code>.
+
+        1. Set |childFragmentResults| be «» (the empty list).
+
+        2. Let |fragmentRequests| be the result of <a>Get</a>(|nextResult|, <code>"value"</code>).
+
+        3. For each |fragmentRequest| in |fragmentRequests| perform the following substeps:
+
+            1. Let |layoutChild| be result of looking up the internal slot
+                <code>\[[layoutChild]]</code> on |fragmentRequest|.
+
+            2. Let |childConstraintSpace| be the result of looking up the internal slot
+                <code>\[[childConstraintSpace]]</code> on |fragmentRequest|.
+
+            3. Let |childBreakToken| be the result of looking up the internal slot
+                <code>\[[childBreakToken]]</code> on |fragmentRequest|.
+
+            4. Let |childFragmentResult| be the result of invoking <a>generate a fragment</a> with
+                the arguments |layoutChild|, |childConstraintSpace|, |childBreakToken|.
+
+                The user agent <em>may</em> perform this step <a>in parallel</a>.
+
+            5. Append |childFragmentResult| to |childFragmentResults|.
+
+        4. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>,
+            |layoutGenerator|, |childFragmentResults|).
+
+    13. Let |fragmentResult| be the result of calling <a>Get</a>(|nextResult|,
+            <code>"value"</code>).
+
+    14. Let |fragment| be a <a>fragment</a> with the following properties:
+
+      - The <a>border box</a> <a>inline size</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/inlineSize}}.
+
+      - The <a>border box</a> <a>block size</a> is set to |fragmentRequest|'s
+          {{FragmentResultOptions/blockSize}}.
+
+      - The <a>inline overflow size</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/inlineOverflowSize}} if not null, otherwise it is set to
+          {{FragmentResultOptions/inlineSize}}.
+
+      - The <a>block overflow size</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/blockOverflowSize}} if not null, otherwise it is set to
+          {{FragmentResultOptions/blockSize}}.
+
+          If the |constraintSpace|'s {{ConstraintSpace/inlineOverflow}} is <code>false</code> and
+          the <a>inline overflow size</a> is greater than the <a>inline size</a> and the <a>computed
+          value</a> for <a>inline</a> 'overflow' is ''auto'' then set |constraintSpace|'s
+          {{ConstraintSpace/inlineOverflow}} to <code>true</code>.
+
+          If the |constraintSpace|'s {{ConstraintSpace/blockOverflow}} is <code>false</code> and the
+          <a>block overflow size</a> is greater than the <a>block size</a> and the <a>computed
+          value</a> for <a>block</a> 'overflow' is ''auto'' then set |constraintSpace|'s
+          {{ConstraintSpace/blockOverflow}} to <code>true</code>.
+
+          If either {{ConstraintSpace/inlineOverflow}} or {{ConstraintSpace/blockOverflow}} were set
+          in the above steps, restart this algorithm with the updated |constraintSpace|.
+
+          Note: In a future level of the specification there may be a way to more efficiently abort
+              a layout given a "scroll trigger line" on the constraint space.
+
+      - The children fragments of the |fragment| is set from |fragmentResult|'s
+          {{FragmentResultOptions/childFragments}}. The ordering <em>is</em> important as this is
+          dictates their paint order (described in [[#layout-api-containers]]). Their position
+          relative to the <a>border box</a> of the |fragment| should be based off the author
+          specified {{Fragment/inlineOffset}} and {{Fragment/blockOffset}}.
+
+      - The <a>fragmentation break</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/breakToken}}.
+
+      - The <a>dominant baseline</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/dominantBaseline}} if not null, otherwise it is set to:
+              - The {{Fragment/dominantBaseline}} of the first child fragment if present.
+
+              - The {{FragmentResultOptions/blockSize}} of the fragment.
+
+    15. Return |fragment|.
 
 Examples {#examples}
 ====================
