@@ -46,7 +46,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
 <!--
 TODO
  - Fix layout invalidation section.
- - Add painting behaviour section.
  - Fix examples.
  - Add utility functions.
  - Define invalid fragment.
@@ -112,6 +111,14 @@ in the "Computed Value" column.
 A <a>layout API container</a> has a <dfn>layout instance</dfn>, initially this is set to null. This
 is an instance of the author defined layout class (see [[#registering-layout]]). If the <a>box</a>'s
 <a>computed value</a> of 'display' changes, this must be reset to null.
+
+Layout API Container Painting {#painting}
+-----------------------------------------
+
+<a>Layout API Container</a> children paint exactly the same as inline blocks [[!CSS21]], except that
+the order in which they are returned from the layout method (via
+{{FragmentResultOptions/childFragments}} is used in place of raw document order, and 'z-index'
+values other than ''z-index/auto'' create a stacking context even if 'position' is ''static''.
 
 Layout API Model and Terminology {#layout-api-model-and-terminology}
 ====================================================================
