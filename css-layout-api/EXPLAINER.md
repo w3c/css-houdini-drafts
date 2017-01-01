@@ -340,7 +340,7 @@ We pass the `BreakToken` to add back into the `layout()` call in order to produc
 registerLayout('basic-inline', class extends Layout {
   static inputProperties = super.inputProperties;
 
-  *layout(constraintSpace, children, styleMap) {
+  *layout(constraintSpace, children, styleMap, breakToken) {
     // Resolve our inline size.
     const inlineSize = resolveInlineSize(constraintSpace, styleMap);
 
@@ -381,8 +381,15 @@ registerLayout('basic-inline', class extends Layout {
       maxLineBlockSize = 0;
     }
 
+    let childBreakToken = null;
+    if (breakToken) {
+      childBreakToken = breakToken.childBreakTokens[0];
+
+      // Remove all the children we have already produced fragments for.
+      children.splice(0, children.indexOf(childBreakToken.child));
+    }
+
     let child = children.shift();
-    let breakToken = null;
     while (child) {
       // Make sure we actually have space on the current line.
       if (usedInlineSize > availableInlineSize) {
@@ -395,15 +402,22 @@ registerLayout('basic-inline', class extends Layout {
       const constraintSpace = new ConstraintSpace({
         inlineSize: availableInlineSize - usedInlineSize,
         blockSize: availableBlockSize,
-        percentageInlineSize: availableInlineSize
+        percentageInlineSize: availableInlineSize,
+        inlineShrinkToFit: true,
       });
 
-      const fragment = yield child.doLayout(constraintSpace, breakToken);
+      const fragment = yield child.doLayout(constraintSpace, childBreakToken);
       childFragments.push(fragment);
 
       // Check if there is still space on the current line.
       if (fragment.inlineSize > remainingInlineSize) {
         nextLine();
+
+        // Check if we have gone over the block fragmentation limit.
+        if (constraintSpace.blockFragmentationType != 'none' &&
+            lineOffset > constraintSpace.blockSize) {
+          break;
+        }
       }
 
       // Insert fragment on the current line.
@@ -428,11 +442,12 @@ registerLayout('basic-inline', class extends Layout {
       }
 
       if (fragment.breakToken) {
-        breakToken = fragment.breakToken;
+        childBreakToken = fragment.breakToken;
       } else {
         // If a fragment doesn't have a break token, we move onto the next
         // child.
         child = children.shift();
+        childBreakToken = null;
       }
     }
 
@@ -444,13 +459,21 @@ registerLayout('basic-inline', class extends Layout {
     const blockSize = resolveBlockSize(constraintSpace, styleMap, blockOverflowSize);
 
     // Return our fragment.
-    return {
+    const result = {
       inlineSize: inlineSize,
       blockSize: blockSize,
       inlineOverflowSize: maxInlineSize,
       blockOverflowSize: blockOverflowSize,
       childFragments: childFragments,
     }
+
+    if (childBreakToken) {
+      result.breakToken = {
+        childBreakTokens: [childBreakToken],
+      };
+    }
+
+    return result;
   }
 });
 ```

@@ -493,7 +493,7 @@ Breaking and Fragmentation {#breaking-and-fragmentation}
 <pre class="idl">
 interface ChildBreakToken {
     readonly attribute BreakType breakType;
-    readonly attribute Box box;
+    readonly attribute LayoutChild child;
 };
 
 interface BreakToken {
@@ -519,62 +519,160 @@ A subsequent {{Fragment}} is produced by using the previous {{Fragment}}'s {{Fra
 This tells the <a>child layout</a> to produce a {{Fragment}} starting at the point encoded in the
 {{ChildBreakToken}}.
 
-When returning a list of {{Fragment}}s from the <a>current layout</a> the list of {{Fragment}}s must
-have a contiguous set of {{Fragment/breakToken}}s.
-
 <div class="example">
-TODO: add example showing non-contiguous set of fragments.
-</div>
+This example shows a simple inline layout which places child fragments in the inline direction. It
+places each of its on a line, aligning their dominant baselines.
 
-<div class="example">
-This example shows how to use a previous {{Fragment}}'s {{Fragment/breakToken}} to produce the next
-{{Fragment}} in the sequence.
+This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
+produce the next fragment for the {{LayoutChild}}.
+
+It also demonstrates using the {{BreakToken}} to respect the {{ConstraintSpace}}'s
+{{ConstraintSpace/blockFragmentationType}}, it resumes it layout from the previous {{BreakToken}}.
+It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken}} which is used to
+resume the layout.
 
 <pre class="lang-javascript">
-registerLayout('fragmenting', class {
-    *layout(space, children, styleMap, breakToken) {
+registerLayout('basic-inline', class extends Layout {
+    static inputProperties = super.inputProperties;
 
-      // ... snip ...
+    *layout(constraintSpace, children, styleMap, breakToken) {
+        // Resolve our inline size.
+        const inlineSize = resolveInlineSize(constraintSpace, styleMap);
 
-      const fragments = [];
-      let breakToken = null;
-      for (let child of children) {
-          // This do-while loop will keep producing fragments for a child box
-          // until it cannot produce any more.
-          do {
-              // ... snip ... (setting up child constraint space).
+        // Determine our (inner) available size.
+        const bordersAndPadding =
+            resolveBordersAndPadding(constraintSpace, styleMap);
+        const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
+        const availableInlineSize = inlineSize -
+                                    bordersAndPadding.inlineStart -
+                                    bordersAndPadding.inlineEnd -
+                                    scrollbarSize.inline;
 
-              let fragment = yield child.doLayout(childSpace, breakToken);
-              breakToken = fragment.breakToken;
+        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
+                                   bordersAndPadding.blockStart -
+                                   bordersAndPadding.blockEnd -
+                                   scrollbarSize.block;
 
-              fragments.push(fragment);
-          } while (breakToken);
-      }
+        const childFragments = [];
+        let maxInlineSize = 0;
 
-      // ... snip ...
+        let currentLine = [];
+        let usedInlineSize = 0;
+        let maxBaseline = 0;
 
-    }
-});
-</pre>
-</div>
+        let lineOffset = 0;
+        let maxLineBlockSize = 0;
 
-<div class="example">
-This example shows how to use resume a layout given a breakToken.
+        // Just a small little function which will update the above variables.
+        const nextLine = function() {
+            if (usedInlineSize > maxInlineSize) {
+                maxInlineSize = usedInlineSize;
+            }
 
-<pre class="lang-javascript">
-registerLayout('fragmenting', class {
-    *layout(space, children, styleMap, breakToken) {
-        const fragments = [];
+            currentLine = [];
+            usedInlineSize = 0;
+            maxBaseline = 0;
 
-        // Produce the next fragment in the sequence if we have a breakToken.
+            lineOffset += maxLineBlockSize;
+            maxLineBlockSize = 0;
+        }
+
+        let childBreakToken = null;
         if (breakToken) {
-            for (let childBreakToken of breakToken.childBreakTokens) {
-                let fragment = yield childBreakToken.box.doLayout(
-                        childSpace, childBreakToken);
+            childBreakToken = breakToken.childBreakTokens[0];
 
-                fragments.push(fragment);
+            // Remove all the children we have already produced fragments for.
+            children.splice(0, children.indexOf(childBreakToken.child));
+        }
+
+        let child = children.shift();
+        while (child) {
+            // Make sure we actually have space on the current line.
+            if (usedInlineSize > availableInlineSize) {
+                nextLine();
+            }
+
+            // The constraint space here will have the inline size of the
+            // remaining space on the line.
+            const remainingInlineSize = availableInlineSize - usedInlineSize;
+            const constraintSpace = new ConstraintSpace({
+                inlineSize: availableInlineSize - usedInlineSize,
+                blockSize: availableBlockSize,
+                percentageInlineSize: availableInlineSize,
+                inlineShrinkToFit: true,
+            });
+
+            const fragment = yield child.doLayout(constraintSpace,
+                                                  childBreakToken);
+            childFragments.push(fragment);
+
+            // Check if there is still space on the current line.
+            if (fragment.inlineSize > remainingInlineSize) {
+                nextLine();
+
+                // Check if we have gone over the block fragmentation limit.
+                if (constraintSpace.blockFragmentationType != 'none' &&
+                    lineOffset > constraintSpace.blockSize) {
+                    break;
+                }
+            }
+
+            // Insert fragment on the current line.
+            currentLine.push(fragment);
+            fragment.inlineOffset = usedInlineSize;
+
+            if (fragment.dominantBaseline > maxBaseline) {
+                maxBaseline = fragment.dominantBaseline;
+            }
+
+            // Go through each of the fragments on the line and update their
+            // block offsets.
+            for (let fragmentOnLine of currentLine) {
+                fragmentOnLine.blockOffset = lineOffset +
+                    maxBaseline - fragmentOnLine.dominantBaseline;
+
+                const lineBlockSize =
+                    fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
+                if (maxLineBlockSize < lineBlockSize) {
+                    maxLineBlockSize = lineBlockSize;
+                }
+            }
+
+            if (fragment.breakToken) {
+                childBreakToken = fragment.breakToken;
+            } else {
+                // If a fragment doesn't have a break token, we move onto the
+                // next child.
+                child = children.shift();
+                childBreakToken = null;
             }
         }
+
+        // Determine our block size.
+        nextLine();
+        const blockOverflowSize = lineOffset +
+                                  bordersAndPadding.blockStart +
+                                  bordersAndPadding.blockEnd;
+        const blockSize = resolveBlockSize(constraintSpace,
+                                           styleMap,
+                                           blockOverflowSize);
+
+        // Return our fragment.
+        const result = {
+            inlineSize: inlineSize,
+            blockSize: blockSize,
+            inlineOverflowSize: maxInlineSize,
+            blockOverflowSize: blockOverflowSize,
+            childFragments: childFragments,
+        }
+
+        if (childBreakToken) {
+            result.breakToken = {
+                childBreakTokens: [childBreakToken],
+            };
+        }
+
+        return result;
     }
 });
 </pre>
@@ -969,7 +1067,7 @@ context</a> for a given |box|, |constraintSpace|, |children| and an optional |br
       - The <a>border box</a> <a>inline size</a> is set to |fragmentResult|'s
           {{FragmentResultOptions/inlineSize}}.
 
-      - The <a>border box</a> <a>block size</a> is set to |fragmentRequest|'s
+      - The <a>border box</a> <a>block size</a> is set to |fragmentResult|'s
           {{FragmentResultOptions/blockSize}}.
 
       - The <a>inline overflow size</a> is set to |fragmentResult|'s
