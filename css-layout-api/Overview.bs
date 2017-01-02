@@ -137,13 +137,16 @@ Layout Children {#layout-children}
 ----------------------------------
 
 <pre class='idl'>
+[Exposed=LayoutWorklet]
 interface LayoutChild {
     FragmentRequest doLayout(ConstraintSpace space, ChildBreakToken breakToken);
 };
 
+[Exposed=LayoutWorklet]
 interface InlineLayoutChild : LayoutChild {
 };
 
+[Exposed=LayoutWorklet]
 interface BoxLayoutChild : LayoutChild {
     readonly attribute StylePropertyMapReadOnly styleMap;
 };
@@ -233,6 +236,7 @@ Layout Fragments {#layout-fragments}
 ------------------------------------
 
 <pre class='idl'>
+[Exposed=LayoutWorklet]
 interface Fragment {
     readonly attribute double inlineSize;
     readonly attribute double blockSize;
@@ -347,7 +351,7 @@ Constraint Spaces {#constraint-spaces}
 --------------------------------------
 
 <pre class='idl'>
-[Constructor(optional ConstraintSpaceOptions options)]
+[Constructor(optional ConstraintSpaceOptions options),Exposed=LayoutWorklet]
 interface ConstraintSpace {
     readonly attribute double inlineSize;
     readonly attribute double blockSize;
@@ -491,11 +495,13 @@ Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
 
 <pre class="idl">
+[Exposed=LayoutWorklet]
 interface ChildBreakToken {
     readonly attribute BreakType breakType;
     readonly attribute LayoutChild child;
 };
 
+[Exposed=LayoutWorklet]
 interface BreakToken {
     readonly attribute sequence&lt;ChildBreakToken> childBreakTokens;
     readonly attribute Object data;
@@ -682,14 +688,38 @@ Utility Functions {#utility-functions}
 --------------------------------------
 
 <pre class='idl'>
-partial interface LayoutWorkletGlobalScope {
-    resolveInlineSize();
-    resolveBlockSize();
+[Exposed=LayoutWorklet]
+interface LayoutStrut {
+  readonly attribute double inlineStart;
+  readonly attribute double inlineEnd;
 
-    resolveBordersAndPadding();
-    resolveScrollbarSize();
+  readonly attribute double blockStart;
+  readonly attribute double blockEnd;
+};
+
+[Exposed=LayoutWorklet]
+interface LayoutSize {
+  readonly attribute double inline;
+  readonly attribute double block;
+};
+
+partial interface LayoutWorkletGlobalScope {
+    double resolveInlineSize(ConstraintSpace constraintSpace,
+                             StylePropertyMapReadOnly styleMap);
+
+    double resolveBlockSize(ConstraintSpace constraintSpace,
+                            StylePropertyMapReadOnly styleMap,
+                            optional double contentSize);
+
+    LayoutStrut resolveBordersAndPadding(ConstraintSpace constraintSpace,
+                                         StylePropertyMapReadOnly styleMap);
+
+    LayoutSize resolveScrollbarSize(ConstraintSpace constraintSpace,
+                                    StylePropertyMapReadOnly styleMap);
 };
 </pre>
+
+Issue: Specify the behaviour of these functions.
 
 Layout {#layout}
 ================
@@ -870,6 +900,7 @@ Layout Engine {#layout-engine}
 ------------------------------
 
 <pre class="idl">
+[Exposed=LayoutWorklet]
 interface FragmentRequest {
   // Has internal slots:
   // [[layoutChild]] - The layout child to generate the fragment for.
