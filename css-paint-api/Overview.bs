@@ -112,12 +112,14 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
 </pre>
 
 <div class='note'>
-    Note: This is how the class should look.
-    <pre class='idl'>
-        callback interface PaintClass {
-            readonly attribute sequence&lt;DOMString&gt; inputProperties;
-            void paint(PaintRenderingContext2D ctx, PaintSize geom, StylePropertyMap inputProperties);
-        };
+    Note: The shape of the class should be:
+    <pre class='lang-javascript'>
+        class MyPaint {
+            static get inputProperties() { return ['--foo']; }
+            paint(ctx, size, styleMap) {
+                // Paint code goes here.
+            }
+        }
     </pre>
 </div>
 
