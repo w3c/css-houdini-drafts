@@ -103,8 +103,6 @@ partial interface Window {
 The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
 
 <pre class='idl'>
-callback VoidFunction = void ();
-
 [Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
 interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
