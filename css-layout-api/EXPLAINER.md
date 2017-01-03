@@ -97,7 +97,7 @@ registerLayout('centering', class extends Layout {
     let maxChildInlineSize = 0;
     let maxChildBlockSize = 0;
     for (let child of children) {
-      const childFragment = yield child.doLayout(childConstraintSpace);
+      const childFragment = yield child.layoutNextFragment(childConstraintSpace);
 
       maxChildInlineSize = Math.max(maxChildInlineSize, childFragments.inlineSize);
       maxChildBlockSize = Math.max(maxChildBlockSize, childFragments.blockSize);
@@ -196,7 +196,7 @@ child constraint space just sets the size available to the children.
 We now loop through all of our children and perform layout. This is done by:
 
 ```js
-const childFragment = yield child.doLayout(childConstraintSpace);
+const childFragment = yield child.layoutNextFragment(childConstraintSpace);
 ```
 
 `child` has a very simple API. You can query the style of a child and perform layout - e.g.
@@ -205,7 +205,7 @@ const childFragment = yield child.doLayout(childConstraintSpace);
 child instanceof LayoutChild; // true
 child.styleMap.get('--a-property');
 
-const fragment = yield child.doLayout(childConstraintSpace);
+const fragment = yield child.layoutNextFragment(childConstraintSpace);
 ```
 
 The result of performing layout on a child is a `Fragment`. A fragment is read-only except for
@@ -319,8 +319,8 @@ The quick brown fox jumped over the lazy dog.
 ```js
 child instanceof LayoutChild;
 
-const fragment1 = yield child.doLayout(constraintSpace);
-const fragment2 = yield child.doLayout(constraintSpace, fragment1.breakToken);
+const fragment1 = yield child.layoutNextFragment(constraintSpace);
+const fragment2 = yield child.layoutNextFragment(constraintSpace, fragment1.breakToken);
 
 fragment2.breakToken == null;
 ```
@@ -406,7 +406,7 @@ registerLayout('basic-inline', class extends Layout {
         inlineShrinkToFit: true,
       });
 
-      const fragment = yield child.doLayout(constraintSpace, childBreakToken);
+      const fragment = yield child.layoutNextFragment(constraintSpace, childBreakToken);
       childFragments.push(fragment);
 
       // Check if there is still space on the current line.
@@ -569,7 +569,7 @@ registerLayout('multi-col', class extends Layout {
         blockFragmentationType: 'column',
       });
 
-      const fragment = yield child.doLayout(childConstraintSpace);
+      const fragment = yield child.layoutNextFragment(childConstraintSpace);
     }
 
     // ... 
