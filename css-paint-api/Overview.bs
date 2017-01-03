@@ -127,13 +127,13 @@ Concepts {#concepts}
 A <dfn>paint image definition</dfn> describes an author defined <<image>> which can be referenced by
 the <<paint()>> function. It consists of:
 
- - A <dfn>paint image name</dfn>
+ - A <dfn>paint image name</dfn>.
 
- - A <dfn>class constructor</dfn> which is the class <a>constructor</a>
+ - A <dfn>paint class constructor</dfn> which is the class <a>constructor</a>.
 
- - A <dfn>paint function</dfn> which is the paint <a>function</a> callback
+ - A <dfn>paint function</dfn> which is the paint <a>function</a> callback.
 
- - A <dfn>class constructor valid flag</dfn>
+ - A <dfn>paint constructor valid flag</dfn>.
 
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
@@ -194,11 +194,11 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>paint image name</a> being |name|
  
-        - <a>class constructor</a> being |paintCtor|
+        - <a>paint class constructor</a> being |paintCtor|
 
         - <a>paint function</a> being |paint|
 
-        - <a>class constructor valid flag</a> being true
+        - <a>paint constructor valid flag</a> being true
     
     11. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
@@ -364,16 +364,16 @@ following steps:
     6. Let |paintInstance| be the result of looking up |name| on |workletGlobalScope|'s <a>paint
         name to instance map</a>. If |paintInstance| is null run the following substeps:
 
-        1. If the <a>class constructor valid flag</a> on |definition| is false, let the image output
+        1. If the <a>paint constructor valid flag</a> on |definition| is false, let the image output
             be an <a>invalid image</a> and abort all these steps.
 
-        2. Let |paintCtor| be the <a>class constructor</a> on |definition|.
+        2. Let |paintCtor| be the <a>paint class constructor</a> on |definition|.
 
         3. Let |paintInstance| be the result of <a>Construct</a>(|paintCtor|).
 
-            If <a>Construct</a> throws an exception, set the |definition|'s <a>constructor valid
-            flag</a> to false, let the image output be an <a>invalid image</a> and abort all these
-            steps.
+            If <a>Construct</a> throws an exception, set the |definition|'s <a>paint constructor
+            valid flag</a> to false, let the image output be an <a>invalid image</a> and abort all
+            these steps.
 
         4. Add the key-value pair (|name| - |paintInstance|) to the <a>paint name to instance
             map</a> of the |workletGlobalScope|.
