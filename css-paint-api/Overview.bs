@@ -73,7 +73,7 @@ When the computed style for a |box| changes, the user agent must run the followi
 
         2. Let |name| be the first argument of the <<paint()>> function.
 
-        3. Let |inputProperties| be the result of lookuping up |name| on <a>paint name to input
+        3. Let |inputProperties| be the result of looking up |name| on <a>paint name to input
             properties map</a>.
 
         4. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
