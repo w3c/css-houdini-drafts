@@ -194,7 +194,7 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>paint image name</a> being |name|
  
-        - <a>class constructor</a> being |constructor|
+        - <a>class constructor</a> being |paintCtor|
 
         - <a>paint function</a> being |paint|
 
