@@ -888,14 +888,14 @@ is called, the user agent <em>must</em> run the following steps:
         map</a> of the associated <a>document</a>.
 
 <div class='note'>
-    The shape of the class should be:
+    Note: The shape of the class should be:
     <pre class='lang-javascript'>
         class MyLayout {
-            static get inputProperties() { return ['--foo'] }
-            static get childrenInputProperties() { return ['--bar'] }
+            static get inputProperties() { return ['--foo']; }
+            static get childrenInputProperties() { return ['--bar']; }
 
             *layout(constraintSpace, children, styleMap, breakToken) {
-                // Etc.
+                // Layout code goes here.
             }
         }
     </pre>
