@@ -114,6 +114,7 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
     <pre class='lang-javascript'>
         class MyPaint {
             static get inputProperties() { return ['--foo']; }
+            static get alpha() { return true; }
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
             }
@@ -134,6 +135,8 @@ the <<paint()>> function. It consists of:
  - A <dfn>paint function</dfn> which is the paint <a>function</a> callback.
 
  - A <dfn>paint constructor valid flag</dfn>.
+
+ - A <dfn>paint context alpha flag</dfn>.
 
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
@@ -177,20 +180,32 @@ called, the user agent <em>must</em> run the following steps:
             can also contains currently invalid properties for the user agent. For example
             <code>margin-bikeshed-property</code>.
 
-    5. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    5. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+
+    6. If |alphaValue| is not undefined and the result of <a>Type</a>(|alpha|) is not Boolean,
+        <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+    7. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the value
+        of |alphaValue|.
+
+        Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
+            an addition to performing "visibility" optimizations, e.g. not painting an image behind
+            the paint image as the paint image is opaque.
+
+    8. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    6. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    9. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    7. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    10. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    8. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    11. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    9. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+    12. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    10. Let |definition| be a new <a>paint image definition</a> with:
+    13. Let |definition| be a new <a>paint image definition</a> with:
 
         - <a>paint image name</a> being |name|
  
@@ -199,11 +214,13 @@ called, the user agent <em>must</em> run the following steps:
         - <a>paint function</a> being |paint|
 
         - <a>paint constructor valid flag</a> being true
+
+        - <a>paint context alpha flag</a> being |alpha|.
     
-    11. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
+    14. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
 
-    12. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
+    15. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
         definition map</a> of the associated <a>document</a>.
 
 
@@ -269,19 +286,17 @@ that the user agent will use internally or during rendering. For example, if the
 zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
 the coordinate space, so that the resulting rendering is of high quality.
 
-The {{PaintRenderingContext2D}} object should have its <a>alpha</a> flag set to true. That is the
-rendering context is initially fully transparent.
-
 Additionally the user agent may record the sequence of drawing operations which have been applied to
 the <a>output bitmap</a> such that the user agent can subsequently draw onto a device bitmap at the
 correct resolution. This also allows user agents to re-use the same output of the <a>output
 bitmap</a> repeatably while the visual viewport is being zoomed for example.
 
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
-|height| it <em>must</em> run the following steps:
+|height| and |alpha| it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
     2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to |width| and |height|.
-    3. Return the new {{PaintRenderingContext2D}}.
+    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |alpha|.
+    4. Return the new {{PaintRenderingContext2D}}.
 
 Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
     algorithm, as it invokes <a>reset the rendering context to its default state</a> and clears the
@@ -387,6 +402,7 @@ following steps:
     9. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
         - "width" - The width given by |concreteObjectSize|.
         - "height" - The height given by |concreteObjectSize|.
+        - "alpha" - The <a>paint context alpha flag</a> given by |definition|.
 
         Note: The |renderingContext| must not be re-used between invocations of paint. Implicitly
             this means that there is no stored data, or state on the |renderingContext| between
