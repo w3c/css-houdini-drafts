@@ -99,8 +99,8 @@ registerLayout('centering', class extends Layout {
     for (let child of children) {
       const childFragment = yield child.layoutNextFragment(childConstraintSpace);
 
-      maxChildInlineSize = Math.max(maxChildInlineSize, childFragments.inlineSize);
-      maxChildBlockSize = Math.max(maxChildBlockSize, childFragments.blockSize);
+      maxChildInlineSize = Math.max(maxChildInlineSize, childFragment.inlineSize);
+      maxChildBlockSize = Math.max(maxChildBlockSize, childFragment.blockSize);
       childFragments.push(childFragment);
     }
 
