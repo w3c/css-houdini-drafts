@@ -442,20 +442,24 @@ Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
 <pre class='lang-markup'>
-&lt;div id="myElement"&gt;
+&lt;div id="myElement">
     CSS is awesome.
-&lt;/div&gt;
+&lt;/div>
 
-&lt;style&gt;
+&lt;style>
 #myElement {
     --circle-color: red;
     background-image: paint(circle);
 }
-&lt;/style&gt;
+&lt;/style>
+
+&lt;script>
+    paintWorklet.import('circle.js');
+&lt;/script>
 </pre>
 
 <pre class='lang-javascript'>
-// Inside PaintWorkletGlobalScope.
+// circle.js
 registerPaint('circle', class {
     static get inputProperties() { return ['--circle-color']; }
     paint(ctx, geom, properties) {
@@ -483,27 +487,28 @@ It is possible for an author to use paint to draw a placeholder image while an i
 loaded.
 
 <pre class='lang-markup'>
-&lt;div id="myElement"&gt;
-&lt;/div&gt;
+&lt;div id="myElement">
+&lt;/div>
 
-&lt;style&gt;
+&lt;style>
 #myElement {
     --image: url('#someUrlWhichIsLoading');
     background-image: paint(image-with-placeholder);
 }
-&lt;/style&gt;
+&lt;/style>
 
-&lt;script&gt;
-document.registerProperty({
-    name: '--image',
-    syntax: '&lt;image&gt;'
-});
-&lt;/script&gt;
+&lt;script>
+    document.registerProperty({
+        name: '--image',
+        syntax: '&lt;image&gt;'
+    });
+    paintWorklet.import('image-placeholder.js');
+&lt;/script>
 </pre>
 
 <pre class='lang-javascript'>
-// Inside PaintWorkletGlobalScope.
-registerPaint('circle', class {
+// image-placeholder.js
+registerPaint('image-with-placeholder', class {
     static get inputProperties() { return ['--image']; }
     paint(ctx, geom, properties) {
         const img = properties.get('--image');
@@ -536,22 +541,26 @@ Example 4: Different color based on size {#example-4}
 -----------------------------------------------------
 
 <pre class='lang-markup'>
-&lt;h1&gt;
-Heading 1
-&lt;/h1&gt;
-&lt;h1&gt;
-Another heading
-&lt;/h1&gt;
+&lt;h1>
+    Heading 1
+&lt;/h1>
+&lt;h1>
+    Another heading
+&lt;/h1>
 
-&lt;style&gt;
+&lt;style>
 h1 {
     background-image: paint(heading-color);
 }
-&lt;/style&gt;
+&lt;/style>
+
+&lt;script>
+    paintWorklet.import('heading-color.js');
+&lt;/script>
 </pre>
 
 <pre class='lang-javascript'>
-// Inside PaintWorkletGlobalScope.
+// heading-color.js
 registerPaint('heading-color', class {
     static get inputProperties() { return []; }
     paint(ctx, geom, properties) {
