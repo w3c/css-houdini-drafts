@@ -153,11 +153,10 @@ used, or the user agent needs to reclaim memory.
 
 When the <dfn method for=PaintWorkletGlobalScope>registerPaint(|name|, |paintCtor|)</dfn> method is
 called, the user agent <em>must</em> run the following steps:
-    1. If the |name| is not a valid <<ident>>, <a>throw</a> a <a>TypeError</a> and abort all these
-        steps.
-
-    2. If the |name| exists as a key in the <a>paint name to paint image definition map</a>,
+    1. If the |name| exists as a key in the <a>paint name to paint image definition map</a>,
         <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+
+    2. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
     3. Let |inputProperties| be the result of <a>Get</a>(|paintCtor|, "inputProperties").
 
