@@ -25,6 +25,7 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
         text: throw
         url: throw; text: thrown
     url: es-invoking-callback-functions; text: Invoke
+    url: es-type-mapping; text: converting
 urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
     text: reset the rendering context to its default state
     text: output bitmap
@@ -158,53 +159,49 @@ called, the user agent <em>must</em> run the following steps:
 
     2. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    3. Let |inputProperties| be the result of <a>Get</a>(|paintCtor|, "inputProperties").
+    3. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>
 
-    4. If |inputProperties| is not undefined, and the result of <a>IsArray</a>(|inputProperties|) is
-        false, <a>throw</a> a <a>TypeError</a> and abort all these steps.
+    4. Let |inputPropertiesIterable| be the result of <a>Get</a>(|paintCtor|, "inputProperties").
 
-        If |inputProperties| is undefined, let |inputProperties| be a new empty array.
+    5. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
+        <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
+        execption is thrown, rethrow the execption and abort all these steps.
 
-    5. For each |item| in |inputProperties| perform the following substeps:
+    Note: The list of CSS properties provided by the input properties getter can either be custom or
+        native CSS properties.
 
-        1. If the result of <a>Type</a>(|item|) is not String, <a>throw</a> a <a>TypeError</a>
-            and abort all these steps.
+    Note: The list of CSS properties may contain shorthands.
 
-        Note: The list of CSS properties provided by the input properties getter can either be
-            custom or native CSS properties.
+    Note: In order for a paint image class to be forwards compatible, the list of CSS properties can
+        also contains currently invalid properties for the user agent. For example
+        <code>margin-bikeshed-property</code>.
 
-        Note: The list of CSS properties may contain shorthands.
+    6. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
 
-        Note: In order for a paint image class to be forwards compatible, the list of CSS properties
-            can also contains currently invalid properties for the user agent. For example
-            <code>margin-bikeshed-property</code>.
-
-    5. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
-
-    6. If |alphaValue| is not undefined and the result of <a>Type</a>(|alpha|) is not Boolean,
+    7. If |alphaValue| is not undefined and the result of <a>Type</a>(|alpha|) is not Boolean,
         <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    7. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the value
+    8. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the value
         of |alphaValue|.
 
         Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
             an addition to performing "visibility" optimizations, e.g. not painting an image behind
             the paint image as the paint image is opaque.
 
-    8. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    9. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    9. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    10. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    10. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    11. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    11. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    12. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    12. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+    13. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    13. Let |definition| be a new <a>paint image definition</a> with:
+    14. Let |definition| be a new <a>paint image definition</a> with:
 
         - <a>paint image name</a> being |name|
  
@@ -216,10 +213,10 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>paint context alpha flag</a> being |alpha|.
     
-    14. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
+    15. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
 
-    15. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
+    16. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
         definition map</a> of the associated <a>document</a>.
 
 
