@@ -24,6 +24,8 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
         text: exception
         text: throw
         url: throw; text: thrown
+    urlPrefix: #idl-;
+        text: boolean
     url: es-invoking-callback-functions; text: Invoke
     url: es-type-mapping; text: converting
 urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
@@ -178,30 +180,28 @@ called, the user agent <em>must</em> run the following steps:
 
     6. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
 
-    7. If |alphaValue| is not undefined and the result of <a>Type</a>(|alpha|) is not Boolean,
-        <a>throw</a> a <a>TypeError</a> and abort all these steps.
-
-    8. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the value
-        of |alphaValue|.
+    7. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the result
+        of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is thrown, rethrow
+        the exception and abort all these steps.
 
         Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
             an addition to performing "visibility" optimizations, e.g. not painting an image behind
             the paint image as the paint image is opaque.
 
-    9. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    8. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    10. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    9. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    11. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    10. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    12. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    11. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    13. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+    12. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    14. Let |definition| be a new <a>paint image definition</a> with:
+    13. Let |definition| be a new <a>paint image definition</a> with:
 
         - <a>paint image name</a> being |name|
  
@@ -213,10 +213,10 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>paint context alpha flag</a> being |alpha|.
     
-    15. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
+    14. Add the key-value pair (|name| - |inputProperties|) to the <a>paint name to input properties
         map</a> of the associated <a>document</a>.
 
-    16. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
+    15. Add the key-value pair (|name| - |definition|) to the <a>paint name to paint image
         definition map</a> of the associated <a>document</a>.
 
 
