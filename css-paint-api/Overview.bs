@@ -413,10 +413,10 @@ following steps:
     10. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    11. Let |paintFunction| be |definition|'s <a>paint function</a>.
+    11. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
 
-    12. <a>Invoke</a> |paintFunction| with arguments «|renderingContext|, |paintSize|, |styleMap|»,
-        and with |paintInstance| as the <a>callback this value</a>.
+    12. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+        |styleMap|», and with |paintInstance| as the <a>callback this value</a>.
 
     13. The image output is to be produced from the |renderingContext| given to the method.
 
