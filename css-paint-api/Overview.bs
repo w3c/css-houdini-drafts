@@ -28,11 +28,15 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
         text: boolean
     url: es-invoking-callback-functions; text: Invoke
     url: es-type-mapping; text: converting
-urlPrefix: https://html.spec.whatwg.org/multipage/scripting.html; type: dfn;
-    text: reset the rendering context to its default state
-    text: output bitmap
-    text: set bitmap dimensions
-    url: concept-canvas-alpha; text: alpha
+urlPrefix: https://html.spec.whatwg.org/multipage/; type: dfn;
+    urlPrefix: scripting.html
+        text: reset the rendering context to its default state
+        text: output bitmap
+        text: queue a task
+        text: set bitmap dimensions
+        url: concept-canvas-alpha; text: alpha
+    urlPrefix: infrastructure.html
+        text: in parallel
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -230,10 +234,20 @@ called, the user agent <em>must</em> run the following steps:
 
     15. <a>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
 
-    16. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
-        properties</a> map.
+    16. <a>Queue a task</a> to run the following steps:
 
-    17. <a>Set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
+        1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
+            properties</a> map.
+
+        2. If |paintInputPropertiesMap|[|name|] <a>exists</a> run the following substeps:
+
+            1. Let |existingInputProperties| be the result of <a>get</a>
+                |paintInputPropertiesMap|[|name|].
+
+            2. If |existingInputProperties| and |inputProperties| are not equivilent, <a>set</a>
+                |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+
+        3. Otherwise, <a>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
     opportunity to dynamically change its input properties.
@@ -357,10 +371,11 @@ interface PaintSize {
 </pre>
 
 When the user agent wants to <dfn>draw a paint image</dfn> of a <<paint()>> function for a |box|
-into its appropriate stacking level (as defined by the property the CSS property it's associated
-with), given it's |concreteObjectSize| (<a>concrete object size</a>) it <em>must</em> run the
+into its appropriate stacking level (as defined by the property the CSS property its associated
+with), given its |concreteObjectSize| (<a>concrete object size</a>) it <em>must</em> run the
 following steps:
-    1. Let |paintFunction| be the current <<paint()>> function on the |box|.
+    1. Let |paintFunction| be the <<paint()>>> function on the |box| which the user agent wants to
+        draw.
 
     2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a> the user agent
         <em>may</em> use the drawn image from the previous invocation. If so it <em>may</em> abort
@@ -369,9 +384,20 @@ following steps:
         Note: The user agent for implementation reasons may also continue with all these steps in
             this case. It can do this every frame, or multiple times per frame.
 
-    3. Let |name| be the first argument of the |paintFunction|.
+    3. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
 
-    4. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
+    4. Let |name| be the first argument of the |paintFunction|.
+
+    5. Let |paintInputPropertiesMap| be the associated <a>document's</a> <a>paint input
+        properties</a> map.
+
+    6. If |paintInputPropertiesMap|[|name|] does not <a>exist</a>, let the image output be an
+        <a>invalid image</a> and abort all these steps.
+
+    7. If the result of <a>get</a> |paintInputPropertiesMap|[|name|] is <code>"invalid"</code>, let
+        the image output be an <a>invalid image</a> and abort all these steps.
+
+    8. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}.
 
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the paint
@@ -381,16 +407,38 @@ following steps:
             select or create. It may use a single {{PaintWorkletGlobalScope}} or multiple and
             randomly assign between them.
 
-    5. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint image definitions</a> map.
+    9. Run <a>invoke a paint callback</a> given |name|, |concreteObjectSize|, |workletGlobalScope|
+        optionally <a>in parallel</a>.
 
-    6. If |paintImageDefinitionMap|[|name|] does not <a>exist</a>, let the image output be an
-        <a>invalid image</a> and abort all these steps.
+        Note: If the user agent runs <a>invoke a paint callback</a> on a thread <a>in parallel</a>,
+            it should select a paint worklet global scope which can be used on that thread.
 
-    7. Let |definition| be the result of <a>get</a> |paintImageDefinitionMap|[|name|].
+When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |concreteObjectSize|,
+|workletGlobalScope|, it <em>must</em> run the following steps:
 
-    8. Let |paintClassInstanceMap| be |workletGlobalScope|'s <a>paint class instances</a> map.
+    1. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint image definitions</a> map.
 
-    8. Let |paintInstance| be the result of <a>get</a> |paintClassInstanceMap|[|name]|. If
+    2. If |paintImageDefinitionMap|[|name|] does not <a>exist</a>, run the following substeps:
+
+        1. <a>Queue a task</a> to run the following substeps:
+
+            1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
+                properties</a> map.
+
+            2. <a>Set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+
+        2. Let the image output be an <a>invalid image</a> and abort all these steps.
+
+        Note: This handles the case where there may be a paint worklet global scope which didn't
+            receive the {{registerPaint(name, paintCtor)}} for |name| (however another global scope
+            did). A paint callback which is invoked on the other global scope may succeed, but wont
+            succeed on a subsequent frame when <a>draw a paint image</a> is called.
+
+    3. Let |definition| be the result of <a>get</a> |paintImageDefinitionMap|[|name|].
+
+    4. Let |paintClassInstanceMap| be |workletGlobalScope|'s <a>paint class instances</a> map.
+
+    5. Let |paintInstance| be the result of <a>get</a> |paintClassInstanceMap|[|name]|. If
         |paintInstance| is null run the following substeps:
 
         1. If the <a>paint constructor valid flag</a> on |definition| is false, let the image output
@@ -406,12 +454,12 @@ following steps:
 
         4. <a>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
 
-    9. Let |inputProperties| be |definition|'s <a>paint input property list</a>.
+    6. Let |inputProperties| be |definition|'s <a>paint input property list</a>.
 
-    10. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+    7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed value</a>'s for properties listed in |inputProperties|.
 
-    11. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a>
+    8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a>
         given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
@@ -427,19 +475,17 @@ following steps:
             invoke methods on it, but this will have no effect on the current image, or subsequent
             images.
 
-    12. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
+    9. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    13. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+    10. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
 
-    14. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+    11. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
         |styleMap|», and with |paintInstance| as the <a>callback this value</a>.
 
-    15. The image output is to be produced from the |renderingContext| given to the method.
+    12. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
-
-    16. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
 
 Note: The user agent <em>should</em> consider long running paint functions similar to long running
     script in the main execution context. For example, they <em>should</em> show a "unresponsive
