@@ -14,6 +14,7 @@ Editor: Dean Jackson, dino@apple.com
 
 <pre class="link-defaults">
 spec:css-break-3; type:dfn; text:fragment
+spec:css-ui-3; type:property; text:cursor
 </pre>
 
 <pre class="anchors">
@@ -50,6 +51,8 @@ urlPrefix: https://infra.spec.whatwg.org/#; type: dfn;
     urlPrefix: map-
         url: exists; text: exist
         url: set; text: set
+    urlPrefix: list-
+        url: iterate; text: for each
 </pre>
 
 Introduction {#intro}
@@ -69,6 +72,9 @@ Paint Invalidation {#paint-invalidation}
 
 A <a>document</a> has a <a>map</a> of <dfn>paint input properties</dfn>. Initially it is empty and
 is populated when {{registerPaint(name, paintCtor)}} is called.
+
+A <a>document</a> has a <a>map</a> of <dfn>paint input argument types</dfn>. Initially it is empty
+and is populated when {{registerPaint(name, paintCtor)}} is called.
 
 Each <<paint()>> function for a box has an associated <dfn>paint valid flag</dfn>. It may be either
 <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
@@ -124,8 +130,9 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
     Note: The shape of the class should be:
     <pre class='lang-javascript'>
         class MyPaint {
-            static get inputProperties() { return ['--foo']; }
             static get alpha() { return true; }
+            static get inputArguments() { return ['<color>']; }
+            static get inputProperties() { return ['--foo']; }
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
             }
@@ -143,11 +150,13 @@ the <<paint()>> function. It consists of:
 
  - A <dfn>paint class constructor</dfn> which is the class <a>constructor</a>.
 
- - A <dfn>paint function</dfn> which is the paint <a>function</a> callback.
+ - A <dfn>paint function callback</dfn> which is the paint <a>function</a> callback.
 
  - A <dfn>paint constructor valid flag</dfn>.
 
  - A <dfn>paint input property list</dfn>.
+
+ - A <dfn>paint input argument types</dfn> <a>list</a>.
 
  - A <dfn>paint context alpha flag</dfn>.
 
@@ -191,9 +200,27 @@ called, the user agent <em>must</em> run the following steps:
         also contains currently invalid properties for the user agent. For example
         <code>margin-bikeshed-property</code>.
 
-    7. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+    7. Let |inputArguments| be an empty <code>sequence&lt;DOMString></code>.
 
-    8. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the result
+    8. Let |inputArgumentsIterable| be the result of <a>Get</a>(|paintCtor|, "inputArguments").
+
+    9. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
+        <a>converting</a> |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
+        execption is thrown, rethrow the execption and abort all these steps.
+
+    10. Let |inputArgumentTypes| be an empty <a>list</a>.
+
+    11. <a>For each</a> |item| in |inputArguments| perform the following substeps:
+
+        1. Let |parsedItem| be the result of parsing |item| according to the rules in
+            [[css-properties-values-api-1#supported-syntax-strings]]. If it fails to parse
+            <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+        2. <a>Append</a> |parsedItem| to |inputArgumentTypes|.
+
+    12. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+
+    13. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the result
         of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is thrown, rethrow
         the exception and abort all these steps.
 
@@ -201,39 +228,46 @@ called, the user agent <em>must</em> run the following steps:
             an addition to performing "visibility" optimizations, e.g. not painting an image behind
             the paint image as the paint image is opaque.
 
-    9. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    14. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    10. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    15. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    11. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    16. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    12. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    17. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    13. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+    18. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    14. Let |definition| be a new <a>paint image definition</a> with:
+    19. Let |definition| be a new <a>paint image definition</a> with:
 
         - <a>paint image name</a> being |name|
  
         - <a>paint class constructor</a> being |paintCtor|
 
-        - <a>paint function</a> being |paint|
+        - <a>paint function callback</a> being |paint|
 
         - <a>paint constructor valid flag</a> being true
 
         - <a>paint input property list</a> being |inputProperties|.
 
+        - <a>paint input argument types</a> being |inputArgumentTypes|.
+
         - <a>paint context alpha flag</a> being |alpha|.
 
-    15. <a>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
+    20. <a>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
 
-    16. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
+    21. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
         properties</a> map.
 
-    17. <a>Set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
+    22. <a>Set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
+
+    23. Let |paintInputArgumentsMap| be the associated <a>document</a>'s <a>paint input argument
+        types</a> map.
+
+    24. <a>Set</a> |paintInputArgumentsMap|[|name|] to |inputArgumentTypes|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
     opportunity to dynamically change its input properties.
@@ -247,22 +281,31 @@ Paint Notation {#paint-notation}
 ================================
 
 <pre class='prod'>
-    <dfn>paint()</dfn> = paint( <<ident>> )
+    <dfn>paint()</dfn> = paint( <<ident>> [, <<custom-value>>]* )
 </pre>
 
 The <<paint()>> function is an additional notation to be supported by the <<image>> type.
 
 <div class="example">
     <pre>background-image: paint(my_logo);</pre>
+    <pre>border-image: paint(gradient, 100);</pre>
 </div>
+
+<<custom-value>> is the set of types listed in
+[[css-properties-values-api-1#supported-syntax-strings]].
+
+When computing the <a>declared value</a> of the <<paint()>> function the user agent must lookup the
+<a>document</a>'s <a>paint input argument types</a> map and validate that the syntax of the
+<<paint()>> function matches the syntax described by the author. If it doesn't the user agent should
+treat it as an invalid property value.
+
+When the <a>current global object's</a> associated <a>document</a>'s <a>paint input argument
+types</a> map changes a previously syntactically invalid property values can become valid and vice
+versa. This can change the set of <a>declared values</a> which requires the <a>cascade</a> to be
+recomputed.
 
 For the 'cursor' property, the <<paint()>> function should be treated as an <a>invalid image</a> and
 fallback to the next supported <<image>>.
-
-Issue(w3c/css-houdini-drafts#100): Support additional arbitrary arguments for the paint function.
-    This is difficult to specify, as you need to define a sane grammar. A better way would be to
-    expose a token stream which you can parse into Typed OM objects. This would allow a full
-    arbitrary set of function arguments, and be future proof.
 
 The 2D rendering context {#2d-rendering-context}
 ================================================
@@ -430,16 +473,31 @@ following steps:
     12. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    13. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+    13. Let |inputArgumentTypes| be |definition|'s <a>paint input argument types</a>.
 
-    14. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
-        |styleMap|», and with |paintInstance| as the <a>callback this value</a>.
+    14. Let |inputArguments| be an empty <a>list</a>.
 
-    15. The image output is to be produced from the |renderingContext| given to the method.
+    15. For each argument of the |paintFunction| after the "paint name" argument run the
+        [[css-typed-om-1#stylevalue-normalization]] to construct the appropriate {{CSSStyleValue}}.
+
+        The syntax to use is given by the parsed syntax object in the corresponding position of the
+        |inputArgumentTypes| list.
+
+        The resulting {{CSSStyleValue}} should be appended to the |inputArguments| array.
+
+        Note: This step should succeed as an invalid argument should have been rejected when
+            computing the <a>declared value</a> of the |paintFunction|.
+
+    16. Let |paintFunctionCallback| be |definition|'s <a>paint function callback</a>.
+
+    17. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+        |styleMap|, |arguments|», and with |paintInstance| as the <a>callback this value</a>.
+
+    18. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
 
-    16. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
+    19. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
 
 Note: The user agent <em>should</em> consider long running paint functions similar to long running
     script in the main execution context. For example, they <em>should</em> show a "unresponsive
