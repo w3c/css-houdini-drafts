@@ -184,7 +184,7 @@ called, the user agent <em>must</em> run the following steps:
 
     6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
         <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        execption is thrown, rethrow the execption and abort all these steps.
+        exception is thrown, rethrow the exception and abort all these steps.
 
     Note: The list of CSS properties provided by the input properties getter can either be custom or
         native CSS properties.
@@ -244,7 +244,7 @@ called, the user agent <em>must</em> run the following steps:
             1. Let |existingInputProperties| be the result of <a>get</a>
                 |paintInputPropertiesMap|[|name|].
 
-            2. If |existingInputProperties| and |inputProperties| are not equivilent, <a>set</a>
+            2. If |existingInputProperties| and |inputProperties| are not equivalent, <a>set</a>
                 |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
 
         3. Otherwise, <a>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
