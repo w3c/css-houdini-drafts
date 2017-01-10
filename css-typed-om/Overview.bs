@@ -1127,7 +1127,7 @@ that --foo resolves to a valid substitution).
 
 Often there will be no {{CSSStyleValue}} subclass appropriate - for example when a custom property
 contains a reference to another custom property. In these cases, a {{CSSStyleValue}}
-is used directly to represent a valud of unknown type.
+is used directly to represent a value of unknown type.
 
 <div class='example'>
 
