@@ -242,7 +242,7 @@ interface Fragment {
 
     readonly attribute ChildBreakToken? breakToken;
 
-    readonly attribute double dominantBaseline;
+    readonly attribute double alignmentBaseline;
 };
 </pre>
 
@@ -336,7 +336,7 @@ be changed.
 If the <a>current layout</a> requires a different {{Fragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
-The {{Fragment}}'s {{Fragment/dominantBaseline}} attribute specify where the dominant baseline is
+The {{Fragment}}'s {{Fragment/alignmentBaseline}} attribute specify where the alignment baseline is
 positioned relative to the block start of the fragment. It cannot be changed.
 
 Note: In a future level of the specification there may be a way to query for additional baseline
@@ -524,7 +524,7 @@ Issue: Explain resuming the author defined layout.
 
 <div class="example">
 This example shows a simple inline layout which places child fragments in the inline direction. It
-places each of its on a line, aligning their dominant baselines.
+places each of its on a line, aligning their baselines.
 
 This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
 produce the next fragment for the {{LayoutChild}}.
@@ -624,15 +624,15 @@ registerLayout('basic-inline', class extends Layout {
             currentLine.push(fragment);
             fragment.inlineOffset = usedInlineSize;
 
-            if (fragment.dominantBaseline > maxBaseline) {
-                maxBaseline = fragment.dominantBaseline;
+            if (fragment.alignmentBaseline > maxBaseline) {
+                maxBaseline = fragment.alignmentBaseline;
             }
 
             // Go through each of the fragments on the line and update their
             // block offsets.
             for (let fragmentOnLine of currentLine) {
                 fragmentOnLine.blockOffset = lineOffset +
-                    maxBaseline - fragmentOnLine.dominantBaseline;
+                    maxBaseline - fragmentOnLine.alignmentBaseline;
 
                 const lineBlockSize =
                     fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
@@ -989,7 +989,7 @@ dictionary FragmentResultOptions {
     double blockOverflowSize = null;
     sequence&lt;Fragment> childFragments = [];
     BreakTokenOptions breakToken = null;
-    double dominantBaseline = null;
+    double alignmentBaseline = null;
 };
 </pre>
 
@@ -1144,9 +1144,9 @@ context</a> for a given |box|, |constraintSpace|, |children| and an optional |br
       - The <a>fragmentation break</a> is set to |fragmentResult|'s
           {{FragmentResultOptions/breakToken}}.
 
-      - The <a>dominant baseline</a> is set to |fragmentResult|'s
-          {{FragmentResultOptions/dominantBaseline}} if not null, otherwise it is set to:
-              - The {{Fragment/dominantBaseline}} of the first child fragment if present.
+      - The <a>alignment baseline</a> is set to |fragmentResult|'s
+          {{FragmentResultOptions/alignmentBaseline}} if not null, otherwise it is set to:
+              - The {{Fragment/alignmentBaseline}} of the first child fragment if present.
 
               - The {{FragmentResultOptions/blockSize}} of the fragment.
 

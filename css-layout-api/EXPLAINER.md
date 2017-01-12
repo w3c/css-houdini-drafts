@@ -218,8 +218,8 @@ fragment instanceof Fragment; // true
 fragment.inlineSize;
 fragment.blockSize;
 
-// The dominant baseline of the fragment.
-fragment.dominantBaseline;
+// The alignment baseline of the fragment.
+fragment.alignmentBaseline;
 
 // We can set the offset relative to the current layout.
 frgment.inlineOffset = 10;
@@ -424,15 +424,15 @@ registerLayout('basic-inline', class extends Layout {
       currentLine.push(fragment);
       fragment.inlineOffset = usedInlineSize;
 
-      if (fragment.dominantBaseline > maxBaseline) {
-        maxBaseline = fragment.dominantBaseline;
+      if (fragment.alignmentBaseline > maxBaseline) {
+        maxBaseline = fragment.alignmentBaseline;
       }
 
       // Go through each of the fragments on the line and update their block
       // offsets.
       for (let fragmentOnLine of currentLine) {
         fragmentOnLine.blockOffset =
-          lineOffset + maxBaseline - fragmentOnLine.dominantBaseline;
+          lineOffset + maxBaseline - fragmentOnLine.alignmentBaseline;
 
         const lineBlockSize =
           fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
