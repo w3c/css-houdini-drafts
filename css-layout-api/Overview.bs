@@ -88,7 +88,7 @@ Note: In a future level of the specification there may be a way to override the 
 The 'overflow' property applies to <a>layout API containers</a>. This is discussed (TODO: writing
 about scrollbars).
 
-As the layout is entirely up to the author properties which are used in other layout modes (e.g.
+As the layout is entirely up to the author, properties which are used in other layout modes (e.g.
 flex, block) may not apply. For example an author may not call respect the 'width' or 'height'
 properties.
 
