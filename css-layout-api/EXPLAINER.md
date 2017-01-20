@@ -230,7 +230,7 @@ In step (3) we do some additional book-keeping to keep track of the largest chil
 
 ### Step (4) - Resolving the Block Size ###
 
-The now that we know how large our biggest child is going to be, we can calculate our actual
+Now that we know how large our biggest child is going to be, we can calculate our actual
 `blockSize`.
 
 We perform a call to `resolveBlockSize` again, except this time we also pass in the size that we
@@ -330,7 +330,7 @@ In the above example the text child produces two fragments. Containing:
 2. `the lazy dog.`
 
 The critical detail here to be aware of is the concept of a `BreakToken`. The `BreakToken` contains
-all of the information necessary to continue/resume the layout where we the child finished.
+all of the information necessary to continue/resume the layout where the child finished.
 
 We pass the `BreakToken` to add back into the `layout()` call in order to produce the next fragment.
 
