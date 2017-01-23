@@ -367,10 +367,10 @@ using static attributes:
 
 The API is designed to allow animation worklets to run on threads other than the main thread. In
 particular, it is recommended to run them in a dedicated thread and provide a best-effort attempt
-to run in sync with frame production in the compositor. This ensures the animations will not be
-impacted by jank on main thread. It is still possible for such animation to slip in relation with
-frame production if *animate* callback cannot be completed in time. We believe such slippage is going to be
-rare because:
+to run in sync with frame production. This ensures the animations will not be impacted by jank on
+main thread. It is still possible for such animation to slip in relation with frame production if
+*animate* callback cannot be completed in time. We believe such slippage is going to be rare
+because:
 
 - There are no other tasks running on the thread.
 - The exposed features are limited to the fast subset (see below).
