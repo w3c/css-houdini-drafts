@@ -67,7 +67,7 @@ Some particular considerations:
 *   retrieved JavaScript representations of CSS values are not mutable - instead updates
 		must explicitly be set using the API.
 *   objects are organized for consistency rather than ease of access. For example, even
-		though lengths are often numeric pixel values, a specified {{CSSLengthValue}} can't be
+		though lengths are often numeric pixel values, a declared {{CSSLengthValue}} can't be
 		treated as a number without first explicitly casting it to a {{CSSSimpleLength}}, as calc
 		expressions and keywords are also valid lengths.
 
@@ -146,7 +146,7 @@ which is a list of property - sequence&lt;{{CSSStyleValue}}> pairs. This list
 is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
 [[#computed-stylepropertymapreadonly-objects]],
-[[#specified-stylepropertymap-objects]], and
+[[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
 <div class='note'>
@@ -232,7 +232,7 @@ Note: The StylePropertyMap returned by getComputedStyleMap represents computed s
 			not resolved style. In this regard it provides different values than those
 			in objects returned by getComputedStyle.
 
-Specified {{StylePropertyMap}} objects {#specified-stylepropertymap-objects}
+Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
@@ -241,11 +241,11 @@ partial interface CSSStyleRule {
 };
 </pre>
 
-<dfn>Specified StylePropertyMap</dfn> objects represent style property-value pairs embedded
+<dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-When constructed, the <a>property model</a> for <a>specified StylePropertyMap</a>
+When constructed, the <a>property model</a> for <a>declared StylePropertyMap</a>
 objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
@@ -317,7 +317,7 @@ interface CSSNumberValue : CSSStyleValue {
 {{CSSNumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
 
 {{CSSNumberValue}} objects are not range-restricted. Any valid number can be represented by a {{CSSNumberValue}},
-and that value will not be clamped, rounded, or rejected when set on a <a>specified StylePropertyMap</a> or
+and that value will not be clamped, rounded, or rejected when set on a <a>declared StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
 <div class='example'>
@@ -420,7 +420,7 @@ interface CSSSimpleLength : CSSLengthValue {
 		"calc(56em + 10%)").
 
 {{CSSLengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{CSSLengthValue}},
-that value will be accepted unaltered when set on a <a>specified StylePropertyMap</a> or
+that value will be accepted unaltered when set on a <a>declared StylePropertyMap</a> or
 <a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
 
 Note that lengths which incorporate variable references will instead be represented as
@@ -1106,7 +1106,7 @@ appear as computed values (i.e. as a value stored on computed
 Computed {{CSSUnparsedValue}} objects {#computed-unparsedvalue-objects}
 -----------------------------------------------------------------------------
 
-A property with a specified {{CSSUnparsedValue}} value will not
+A property with a declared {{CSSUnparsedValue}} value will not
 compute to a {{CSSUnparsedValue}}. Instead, after custom property references
 are resolved, the {{CSSStyleValue}} subclass appropriate to the property will be
 used.
@@ -1118,7 +1118,7 @@ For example, a style rule containing:
 width: calc(var(--foo) + 10%);
 </pre>
 
-Will represent a specified width as an {{CSSUnparsedValue}}, but if this value
+Will represent a declared width as an {{CSSUnparsedValue}}, but if this value
 is the winning value during computation for a given element then that element's
 computed width will be represented by a {{CSSLengthValue}} object (assuming
 that --foo resolves to a valid substitution).
@@ -1136,7 +1136,7 @@ For example, a style rule containing:
 --foo: var(--bar) black;
 </pre>
 
-Will represent a specified value for --foo as a {{CSSUnparsedValue}}, and if
+Will represent a declared value for --foo as a {{CSSUnparsedValue}}, and if
 this value is the winning declaration for --foo during computation for a given
 element, then that element's will have a computed value for --foo that is
 represented by a {{CSSStyleValue}}.
