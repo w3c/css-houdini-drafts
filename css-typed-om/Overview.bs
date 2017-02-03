@@ -206,7 +206,7 @@ the <a>property model</a>. This list of properties is sorted in the following ma
 
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
-Issue(147): need a robust description of what "a type that <var>property</var> can't accept" means.
+Issue(147): need a robust description of what "a type that <var ignore>property</var> can't accept" means.
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
@@ -453,7 +453,7 @@ The following methods are defined for {{CSSLengthValue}} objects:
 		if the object is a {{CSSCalcLength}}. The function will throw a <a>RangeError</a> when the value given is 0.
 
 :   <dfn method for=CSSLengthValue>from(DOMString cssText)</dfn>
-::  Parses the provided <var>cssText</var> as a length value. Will return a
+::  Parses the provided <var ignore>cssText</var> as a length value. Will return a
 		{{CSSSimpleLength}} when possible, or a {{CSSCalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
 
 :   <dfn method for=CSSLengthValue>from(double value, LengthType type)</dfn>
