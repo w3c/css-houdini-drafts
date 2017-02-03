@@ -8,9 +8,10 @@ Shortname: css-typed-om
 Level: 1
 Abstract: Converting CSSOM value strings into meaningfully typed JavaScript representations and back can incur a significant performance overhead. This specification exposes CSS values as typed JavaScript objects to facilitate their performant manipulation.
 Editor: Shane Stephens, shanestephens@google.com
+Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
-Ignored Terms: Drawable, paint image definition
+Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue
 </pre>
 
 <pre class=anchors>
