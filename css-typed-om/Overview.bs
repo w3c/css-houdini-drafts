@@ -500,7 +500,6 @@ interface CSSTransformValue : CSSStyleValue {
 interface CSSTransformComponent {
 	readonly attribute DOMString cssText;
 	readonly attribute boolean is2D;
-	readonly attribute DOMMatrixReadOnly matrix;
 };
 
 [Constructor(CSSLengthValue x, CSSLengthValue y),
@@ -541,6 +540,7 @@ interface CSSPerspective : CSSTransformComponent {
 
 [Constructor(DOMMatrixReadOnly matrix)]
 interface CSSMatrixComponent : CSSTransformComponent {
+	attribute DOMMatrix matrix;
 };
 </pre>
 
@@ -583,7 +583,7 @@ will always generate <code>cssText</code> according to the following rules:
 		employing the 3D version of the relevant transform function (translate3d,
 		rotate3d, scale3d).
 *   {{CSSMatrixComponent}} objects are constructed around a {{DOMMatrixReadOnly}}, and
-		well serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
+		will serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
 		{{DOMMatrixReadOnly/is2D}} attribute is false, and a matrix3d function
 		otherwise.
 
