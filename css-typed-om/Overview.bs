@@ -222,7 +222,7 @@ partial interface Window {
 
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
-{{Window/getComputedStyleMap(Element, optional DOMString?)}} method.
+{{Window/getComputedStyleMap()}} method.
 
 When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
