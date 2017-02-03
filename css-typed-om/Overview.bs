@@ -1083,7 +1083,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 -----------------------------------------------------------------
 
 {{CSSFontFaceValue}} objects are serialized to the value of their contained
-{{CSSFontFaceValue/fontFaceName}}.
+{{CSSFontFaceValue/fontFamilyName}}.
 
 Security Considerations {#security-considerations}
 ==================================================
