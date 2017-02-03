@@ -87,7 +87,7 @@ are also represented as {{CSSStyleValue}} objects.
 The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute,
 on getting,
 returns a normalized representation
-(see <a section href="#stylevalue-normalization"></a>)
+(see [[#stylevalue-normalization]])
 of the value the {{CSSStyleValue}} object represents.
 
 <div algorithm="parse a CSSStyleValue">
@@ -616,8 +616,7 @@ from the top edge of the container, expressed as a length.
 Note that <<position>> productions accept a complicated combination of keywords
 and values. When specified as such in a stylesheet or via the untyped CSSOM,
 the {{CSSStyleValue/cssText}} attribute will contain the specified
-string. However, this string is normalized as two Lengths into the <a attribute
-for=CSSPositionValue>x</a> and {{CSSPositionValue/y}} values of the
+string. However, this string is normalized as two Lengths into the {{CSSPositionValue/x}} and {{CSSPositionValue/y}} values of the
 {{CSSStyleValue}} object.
 
 New {{CSSPositionValue}} objects can only be constructed via pairs of lengths, and
@@ -860,12 +859,12 @@ Otherwise, normalization fails.
 The string "scale(2, 0.5) translate(100px) rotate(20deg)"
 is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransformComponent}} with:
 *   a {{CSSScale}} with:
-		*   <a attribute for='CSSScale'>x</a> set to 2
-		*   <a attribute for='CSSScale'>y</a> set to 0.5
+		*   {{CSSScale/x}} set to 2
+		*   {{CSSScale/y}} set to 0.5
 *   a {{CSSTranslation}} with:
-		*   <a attribute for='CSSTranslation'>x</a> with <a attribute for='CSSSimpleLength'>value</a> of 100 and <a attribute for='CSSSimpleLength'>type</a> of "px"
+		*   {{CSSTranslation/x}} with {{CSSSimpleLength/value}} of 100 and {{CSSSimpleLength/type}} of "px"
 *   a {{CSSRotation}} with:
-		*   20 <a attribute for='CSSAngleValue'>degrees</a>
+		*   20 {{CSSAngleValue/degrees}}
 
 </div>
 
@@ -878,33 +877,33 @@ any sub-process referenced by this process fails, then normalization as a whole 
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSSimpleLength}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
-		the procedure outlined in <a section href="#from-single-keyword"></a> with <var>value</var> given
+		the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
 		by the provided value and a horizontal <var>bias</var>.
 1.  Otherwise, if the provided value consists of a combination of two keywords, then:
 
-		1.  follow the procedure outlined in <a section href='#from-single-keyword'></a> with <var>value</var> given by the
+		1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
 				first keyword and an auto <var>bias</var>.
 		1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
 		1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
 
 1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and
-		calc expressions, then follow the procedure outlined in <a section href="#from-single-keyword"></a> with
+		calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
 		<var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
 		procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
 1.  Otherwise:
 
 		1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
-				the procedure outlined in <a section href="#from-keyword-and-length"></a> with <var>keyword</var> set to the
+				the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
 				keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
-		1.  otherwise, follow the procedure outlined in <a section href="#from-single-keyword"></a> with <var>value</var>
+		1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
 				set to the first component of the provided value and an auto <var>bias</var>.
 		1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
 		1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
 				the procedure outlined in
-				<a section href="#from-single-keyword"></a> with <var>value</var> set to the keyword and the existing
+				[[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
 				<var>bias</var>.
 		1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
-				calc expression, follow the procedure outlined in <a section href="#from-keyword-and-length"></a> with
+				calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
 				<var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
 				the existing <var>bias</var>.
 		1.  Otherwise, the process fails.
@@ -923,7 +922,7 @@ and <var>bias</var>. The process also updates <var>bias</var> based on the <var>
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
 		{{CSSSimpleLength}} value representing 100% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
-		normalizing the value according to <a section href="#lengthvalue-normalization"></a>. If <var>bias</var> is vertical,
+		normalizing the value according to [[#lengthvalue-normalization]]. If <var>bias</var> is vertical,
 		set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
 		horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
@@ -934,10 +933,10 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 <var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
 <var>length</var>.
 
-1.  follow the procedure outlined in <a section href='#from-single-keyword'></a> with <var>value</var> given by
+1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
 		<var>keyword</var>, using the provided <var>bias</var>
 1.  let <var>adjustment</var> be the result of normalizing <var>length</var> according to
-		<a section href="#lengthvalue-normalization"></a>.
+		[[#lengthvalue-normalization]].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
 		<var>adjustment</var> from a zero length.
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
@@ -959,7 +958,7 @@ same rules referenced above.
 Normalization does not fail for {{CSSResourceValue}} objects.
 
 <div class='example'>
-The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with <a attribute for='CSSResourceValue'>state</a> set to ''unloaded'' and the <a attribute for='CSSURLImageValue'>url</a> set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The <a attribute for='CSSImageValue'>intrinsicWidth</a>, <a attribute for='CSSImageValue'>intrinsicHeight</a> and <a attribute for='CSSImageValue'>intrinsicRatio</a> are all set to null.
+The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
 </div>
 
 {{CSSStyleValue}} Serialization {#stylevalue-serialization}
@@ -1010,20 +1009,20 @@ length3.cssText; // "42px";
 ---------------------------------------------------------------
 
 {{CSSKeywordValue}} objects are serialized to their contained
-<a attribute for='CSSKeywordValue'>keywordValue</a> attribute.
+{{CSSKeywordValue/keywordValue}} attribute.
 
 {{CSSNumberValue}} Serialization {#numbervalue-serialization}
 -------------------------------------------------------------
 
 {{CSSNumberValue}} objects are serialized to the string representation
-of their contained <a attribute for='CSSNumberValue'>value</a> attribute.
+of their contained {{CSSNumberValue/value}} attribute.
 
 {{CSSLengthValue}} Serialization {#lengthvalue-serialization}
 -------------------------------------------------------------
 
 {{CSSSimpleLength}} objects are serialized by appending their contained
-<a attribute for='CSSSimpleLength'>type</a> to the string representation of
-their contained <a attribute for='CSSSimpleLength'>value</a> attribute.
+{{CSSSimpleLength/type}} to the string representation of
+their contained {{CSSSimpleLength/value}} attribute.
 
 {{CSSCalcLength}} objects are serialized into a calc expression. Each
 type attribute that is present (i.e. not undefined) on the object forms
@@ -1035,7 +1034,7 @@ order.
 
 {{CSSAngleValue}} objects are serialized by appending "deg" to the
 string representation of their contained
-<a attribute for='CSSAngleValue'>degrees</a> attribute.
+{{CSSAngleValue/degrees}} attribute.
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
@@ -1048,7 +1047,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 *   For all objects except {{CSSMatrixComponent}} objects, the serialization
     is defined by the object constructors.
 *   When there are multiple constructors for a {{CSSMatrixComponent}} object, then
-    if the <a attribute for='CSSTransformComponent'>is2D</a> attribute is set to true,
+    if the {{CSSTransformComponent/is2D}} attribute is set to true,
     then the relevant constructor is the constructor with fewer arguments; otherwise
     the relevant constructor is the constructor with more arguments.
 *   Each serialization is represented by a function
@@ -1060,16 +1059,16 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 *   {{CSSLengthValue}} and {{CSSAngleValue}} attributes serialize using the rules
     above. doubles serialize to their string representation.
 *   {{CSSMatrixComponent}} objects serialize to a list of 6 components if
-    <a attribute for='CSSTransformComponent'>is2D</a> is set, or 12 components otherwise.
+    {{CSSTransformComponent/is2D}} is set, or 12 components otherwise.
     Component order and format is given by [[CSS-TRANSFORMS-1]].
 
 {{CSSPositionValue}} Serialization {#positionvalue-serialization}
 -----------------------------------------------------------------
 
 {{CSSPositionValue}} objects are serialized by:
-*   serializing the <a attribute for=CSSPositionValue>x</a> attribute according to
+*   serializing the {{CSSPositionValue/x}} attribute according to
     the rules for {{CSSLengthValue}} objects above.
-*   serializing the <a attribute for=CSSPositionValue>y</a> attribute according to
+*   serializing the {{CSSPositionValue/y}} attribute according to
     the rules for {{CSSLengthValue}} objects above.
 *   returning the concatenation of the two serializations (x before y), separated
     by a space.
@@ -1078,13 +1077,13 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 -----------------------------------------------------------
 
 {{CSSURLImageValue}} objects are serialized to the string given by
-"url(" + <a attribute for='CSSURLImageValue'>url</a> + ")".
+"url(" + {{CSSURLImageValue/url}} + ")".
 
 {{CSSFontFaceValue}} Serialization {#fontfacevalue-serialization}
 -----------------------------------------------------------------
 
 {{CSSFontFaceValue}} objects are serialized to the value of their contained
-<a attribute for='CSSFontFaceValue'>fontFaceName</a>.
+{{CSSFontFaceValue/fontFaceName}}.
 
 Security Considerations {#security-considerations}
 ==================================================
@@ -1154,7 +1153,7 @@ Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
 
 During computation, {{CSSNumberValue}} objects are range-restricted or rounded as
 appropriate to the relevant property, but otherwise as specified (see the example
-in <a section href='#numbervalue-objects'></a>).
+in [[#numbervalue-objects]]).
 
 Computed {{CSSLengthValue}} objects {#computed-lengthvalue-objects}
 -------------------------------------------------------------------
@@ -1177,7 +1176,7 @@ Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 
 During computation, any {{CSSLengthValue}} objects referenced by a {{CSSTransformComponent}}
 (e.g. the {{CSSTranslation/x}} attribute of a {{CSSTranslation}}) are
-computed according to <a section href='#computed-lengthvalue-objects'></a>, but the
+computed according to [[#computed-lengthvalue-objects]], but the
 {{CSSTransformValue}} object is otherwise as specified.
 
 Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
@@ -1185,7 +1184,7 @@ Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
 
 During computation, both the {{CSSPositionValue/x}} and
 {{CSSPositionValue/y}} components of a {{CSSPositionValue}} are
-computed according to <a section href='#computed-lengthvalue-objects'></a>.
+computed according to [[#computed-lengthvalue-objects]].
 
 Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
 -----------------------------------------------------------------
