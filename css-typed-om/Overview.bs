@@ -282,8 +282,8 @@ interface CSSUnparsedValue : CSSStyleValue {
 };
 
 interface CSSVariableReferenceValue {
-	readonly attribute DOMString variable;
-	readonly attribute CSSUnparsedValue fallback;
+	attribute DOMString variable;
+	attribute CSSUnparsedValue fallback;
 };
 </pre>
 
@@ -295,7 +295,7 @@ interface CSSVariableReferenceValue {
 <pre class='idl'>
 [Constructor(DOMString)]
 interface CSSKeywordValue : CSSStyleValue {
-	readonly attribute DOMString keywordValue;
+	attribute DOMString keywordValue;
 };
 </pre>
 
@@ -309,7 +309,7 @@ keyword for a particular property. Property setters are required to enforce keyw
 <pre class='idl'>
 [Constructor(double), Constructor(DOMString cssText)]
 interface CSSNumberValue : CSSStyleValue {
-	readonly attribute double value;
+	attribute double value;
 };
 </pre>
 
@@ -383,22 +383,22 @@ interface CSSLengthValue : CSSStyleValue {
  Constructor(CSSLengthCalcDictionary)
 ]
 interface CSSCalcLength : CSSLengthValue {
-	readonly attribute double? px;
-	readonly attribute double? percent;
-	readonly attribute double? em;
-	readonly attribute double? ex;
-	readonly attribute double? ch;
-	readonly attribute double? rem;
-	readonly attribute double? vw;
-	readonly attribute double? vh;
-	readonly attribute double? vmin;
-	readonly attribute double? vmax;
-	readonly attribute double? cm;
-	readonly attribute double? mm;
-	readonly attribute double? q;
-	readonly attribute double? in;
-	readonly attribute double? pc;
-	readonly attribute double? pt;
+	attribute double? px;
+	attribute double? percent;
+	attribute double? em;
+	attribute double? ex;
+	attribute double? ch;
+	attribute double? rem;
+	attribute double? vw;
+	attribute double? vh;
+	attribute double? vmin;
+	attribute double? vmax;
+	attribute double? cm;
+	attribute double? mm;
+	attribute double? q;
+	attribute double? in;
+	attribute double? pc;
+	attribute double? pt;
 };
 
 // lengths that are *just* keywords don't become CSSSimpleLengths or CSSCalcLengths.
@@ -407,8 +407,8 @@ interface CSSCalcLength : CSSLengthValue {
  Constructor(CSSLengthValue),
  Constructor(double value, LengthType type)]
 interface CSSSimpleLength : CSSLengthValue {
-	readonly attribute double value;
-	readonly attribute LengthType type;
+	attribute double value;
+	attribute LengthType type;
 };
 </pre>
 
@@ -473,10 +473,10 @@ enum CSSAngleUnit {
 
 [Constructor(double value, CSSAngleUnit unit)]
 interface CSSAngleValue : CSSStyleValue {
-	readonly attribute double degrees;
-	readonly attribute double radians;
-	readonly attribute double gradians;
-	readonly attribute double turns;
+	attribute double degrees;
+	attribute double radians;
+	attribute double gradians;
+	attribute double turns;
 };
 </pre>
 
@@ -506,37 +506,37 @@ interface CSSTransformComponent {
 [Constructor(CSSLengthValue x, CSSLengthValue y),
  Constructor(CSSLengthValue x, CSSLengthValue y, CSSLengthValue z)]
 interface CSSTranslation : CSSTransformComponent {
-	readonly attribute CSSLengthValue x;
-	readonly attribute CSSLengthValue y;
-	readonly attribute CSSLengthValue z;
+	attribute CSSLengthValue x;
+	attribute CSSLengthValue y;
+	attribute CSSLengthValue z;
 };
 
 [Constructor(CSSAngleValue angle),
  Constructor(double x, double y, double z, CSSAngleValue angle)]
 interface CSSRotation : CSSTransformComponent {
-	readonly attribute double x;
-	readonly attribute double y;
-	readonly attribute double z;
-	readonly attribute CSSAngleValue angle;
+	attribute double x;
+	attribute double y;
+	attribute double z;
+	attribute CSSAngleValue angle;
 };
 
 [Constructor(double x, double y),
  Constructor(double x, double y, double z)]
 interface CSSScale : CSSTransformComponent {
-	readonly attribute double x;
-	readonly attribute double y;
-	readonly attribute double z;
+	attribute double x;
+	attribute double y;
+	attribute double z;
 };
 
 [Constructor(CSSAngleValue ax, CSSAngleValue ay)]
 interface CSSSkew : CSSTransformComponent {
-	readonly attribute CSSAngleValue ax;
-	readonly attribute CSSAngleValue ay;
+	attribute CSSAngleValue ax;
+	attribute CSSAngleValue ay;
 };
 
 [Constructor(CSSLengthValue length)]
 interface CSSPerspective : CSSTransformComponent {
-	readonly attribute CSSLengthValue length;
+	attribute CSSLengthValue length;
 };
 
 [Constructor(DOMMatrixReadOnly matrix)]
@@ -598,8 +598,8 @@ returns true, and false otherwise.
 
 [Constructor(CSSLengthValue x, CSSLengthValue y)]
 interface CSSPositionValue : CSSStyleValue {
-	readonly attribute CSSLengthValue x;
-	readonly attribute CSSLengthValue y;
+	attribute CSSLengthValue x;
+	attribute CSSLengthValue y;
 };
 
 </pre>
@@ -686,7 +686,6 @@ providing values that track loaded state via the {{CSSResourceState}} enum.
 -----------------------------------------------
 
 <pre class='idl'>
-
 interface CSSImageValue : CSSResourceValue {
 	readonly attribute double? intrinsicWidth;
 	readonly attribute double? intrinsicHeight;
@@ -861,12 +860,12 @@ Otherwise, normalization fails.
 The string "scale(2, 0.5) translate(100px) rotate(20deg)"
 is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransformComponent}} with:
 *   a {{CSSScale}} with:
-		*   <a attribute for='CSSScale'>x</a> set to 2 
+		*   <a attribute for='CSSScale'>x</a> set to 2
 		*   <a attribute for='CSSScale'>y</a> set to 0.5
 *   a {{CSSTranslation}} with:
-		*   <a attribute for='CSSTranslation'>x</a> with <a attribute for='CSSSimpleLength'>value</a> of 100 and <a attribute for='CSSSimpleLength'>type</a> of "px" 
+		*   <a attribute for='CSSTranslation'>x</a> with <a attribute for='CSSSimpleLength'>value</a> of 100 and <a attribute for='CSSSimpleLength'>type</a> of "px"
 *   a {{CSSRotation}} with:
-		*   20 <a attribute for='CSSAngleValue'>degrees</a> 
+		*   20 <a attribute for='CSSAngleValue'>degrees</a>
 
 </div>
 
@@ -970,7 +969,7 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 
 :   if the value was constructed from a DOMString
 ::  the serialization is the DOMString from which the value was constructed.
-:   otherwise, if the value was constructed using an IDL constructor 
+:   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
 ::  the serialization matches the CSSOM serialization of the corresponding value.
@@ -1026,8 +1025,8 @@ of their contained <a attribute for='CSSNumberValue'>value</a> attribute.
 <a attribute for='CSSSimpleLength'>type</a> to the string representation of
 their contained <a attribute for='CSSSimpleLength'>value</a> attribute.
 
-{{CSSCalcLength}} objects are serialized into a calc expression. Each 
-type attribute that is present (i.e. not undefined) on the object forms 
+{{CSSCalcLength}} objects are serialized into a calc expression. Each
+type attribute that is present (i.e. not undefined) on the object forms
 a clause in the expression, with the clauses sorted in IDL specification
 order.
 
@@ -1048,7 +1047,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 
 *   For all objects except {{CSSMatrixComponent}} objects, the serialization
     is defined by the object constructors.
-*   When there are multiple constructors for a {{CSSMatrixComponent}} object, then 
+*   When there are multiple constructors for a {{CSSMatrixComponent}} object, then
     if the <a attribute for='CSSTransformComponent'>is2D</a> attribute is set to true,
     then the relevant constructor is the constructor with fewer arguments; otherwise
     the relevant constructor is the constructor with more arguments.
@@ -1060,7 +1059,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
     by the attributes contained in the {{CSSTransformComponent}}.
 *   {{CSSLengthValue}} and {{CSSAngleValue}} attributes serialize using the rules
     above. doubles serialize to their string representation.
-*   {{CSSMatrixComponent}} objects serialize to a list of 6 components if 
+*   {{CSSMatrixComponent}} objects serialize to a list of 6 components if
     <a attribute for='CSSTransformComponent'>is2D</a> is set, or 12 components otherwise.
     Component order and format is given by [[CSS-TRANSFORMS-1]].
 
