@@ -100,7 +100,7 @@ of the value the {{CSSStyleValue}} object represents.
 		<a>throw</a> a {{SyntaxError}} and exit this algorithm.
 		Otherwise, let |property| be the parsed result.
 		If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| <a>converted to ASCII lowercase</a>.
+		let |property| be |property| <a>ASCII lowercased</a>.
 
 	2. If |property| is not a <a>supported property name</a>,
 		<a>throw</a> a {{TypeError}} and exit this algorithm.
@@ -165,7 +165,7 @@ future without breaking code that relies on calling
 	must run these steps:
 
 	1. If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| <a>converted to ASCII lowercase</a>.
+		let |property| be |property| <a>ASCII lowercased</a>.
 
 	2. If |property| is not a <a>supported property name</a>,
 		<a>throw</a> a {{TypeError}} and exit this algorithm.
