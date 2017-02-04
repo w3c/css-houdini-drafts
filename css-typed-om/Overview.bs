@@ -71,6 +71,16 @@ Some particular considerations:
 		treated as a number without first explicitly casting it to a {{CSSSimpleLength}}, as calc
 		expressions and keywords are also valid lengths.
 
+<!--
+ ██████   ██████   ██████   ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ██       ██     ██ ████████
+██    ██ ██    ██ ██    ██ ██    ██    ██     ██  ██  ██       ██       ██     ██   ██ ██   ██       ██     ██ ██
+██       ██       ██       ██          ██      ████   ██       ██       ██     ██  ██   ██  ██       ██     ██ ██
+██        ██████   ██████   ██████     ██       ██    ██       ██████   ██     ██ ██     ██ ██       ██     ██ ██████
+██             ██       ██       ██    ██       ██    ██       ██        ██   ██  █████████ ██       ██     ██ ██
+██    ██ ██    ██ ██    ██ ██    ██    ██       ██    ██       ██         ██ ██   ██     ██ ██       ██     ██ ██
+ ██████   ██████   ██████   ██████     ██       ██    ████████ ████████    ███    ██     ██ ████████  ███████  ████████
+-->
+
 {{CSSStyleValue}} objects {#stylevalue-objects}
 ============================================
 
@@ -120,6 +130,15 @@ of the value the {{CSSStyleValue}} object represents.
 	5. Return a {{CSSStyleValue}} representing |value|.
 </div>
 
+<!--
+ ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████ 
+██    ██    ██     ██  ██  ██       ██       ███   ███   ██ ██   ██     ██
+██          ██      ████   ██       ██       ████ ████  ██   ██  ██     ██
+ ██████     ██       ██    ██       ██████   ██ ███ ██ ██     ██ ████████ 
+      ██    ██       ██    ██       ██       ██     ██ █████████ ██       
+██    ██    ██       ██    ██       ██       ██     ██ ██     ██ ██       
+ ██████     ██       ██    ████████ ████████ ██     ██ ██     ██ ██       
+-->
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
@@ -274,6 +293,16 @@ The value for a given property is the last valid value provided in the string.
 {{CSSStyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
 
+<!--
+██     ██ ██    ██ ████████     ███    ████████   ██████  ████████ ████████ 
+██     ██ ███   ██ ██     ██   ██ ██   ██     ██ ██    ██ ██       ██     ██
+██     ██ ████  ██ ██     ██  ██   ██  ██     ██ ██       ██       ██     ██
+██     ██ ██ ██ ██ ████████  ██     ██ ████████   ██████  ██████   ██     ██
+██     ██ ██  ████ ██        █████████ ██   ██         ██ ██       ██     ██
+██     ██ ██   ███ ██        ██     ██ ██    ██  ██    ██ ██       ██     ██
+ ███████  ██    ██ ██        ██     ██ ██     ██  ██████  ████████ ████████ 
+-->
+
 {{CSSUnparsedValue}} objects {#unparsedvalue-objects}
 ----------------------------------------------
 
@@ -290,6 +319,16 @@ interface CSSVariableReferenceValue {
 
 {{CSSUnparsedValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
 
+<!--
+██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████ 
+██   ██  ██        ██  ██  ██  ██  ██ ██     ██ ██     ██ ██     ██
+██  ██   ██         ████   ██  ██  ██ ██     ██ ██     ██ ██     ██
+█████    ██████      ██    ██  ██  ██ ██     ██ ████████  ██     ██
+██  ██   ██          ██    ██  ██  ██ ██     ██ ██   ██   ██     ██
+██   ██  ██          ██    ██  ██  ██ ██     ██ ██    ██  ██     ██
+██    ██ ████████    ██     ███  ███   ███████  ██     ██ ████████ 
+-->
+
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
 ------------------------------------------------
 
@@ -303,6 +342,16 @@ interface CSSKeywordValue : CSSStyleValue {
 {{CSSKeywordValue}} objects represent {{CSSStyleValue}}s that are keywords. The constructor for {{CSSKeywordValue}}
 should check that they contain valid CSS, but they do not check whether the contained string is a valid
 keyword for a particular property. Property setters are required to enforce keyword validity.
+
+<!--
+██    ██ ██     ██ ██     ██ ████████  ████████ ████████ 
+███   ██ ██     ██ ███   ███ ██     ██ ██       ██     ██
+████  ██ ██     ██ ████ ████ ██     ██ ██       ██     ██
+██ ██ ██ ██     ██ ██ ███ ██ ████████  ██████   ████████ 
+██  ████ ██     ██ ██     ██ ██     ██ ██       ██   ██  
+██   ███ ██     ██ ██     ██ ██     ██ ██       ██    ██ 
+██    ██  ███████  ██     ██ ████████  ████████ ██     ██
+-->
 
 {{CSSNumberValue}} objects {#numbervalue-objects}
 ----------------------------------------------
@@ -338,6 +387,16 @@ The following code is valid
 After execution, the value of <code>opacity</code> is 1 ('opacity' is range-restricted),
 and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
 </div>
+
+<!--
+██       ████████ ██    ██  ██████   ████████ ██     ██
+██       ██       ███   ██ ██    ██     ██    ██     ██
+██       ██       ████  ██ ██           ██    ██     ██
+██       ██████   ██ ██ ██ ██   ████    ██    █████████
+██       ██       ██  ████ ██    ██     ██    ██     ██
+██       ██       ██   ███ ██    ██     ██    ██     ██
+████████ ████████ ██    ██  ██████      ██    ██     ██
+-->
 
 {{CSSLengthValue}} objects {#lengthvalue-objects}
 ----------------------------------------------
@@ -464,6 +523,16 @@ The following methods are defined for {{CSSLengthValue}} objects:
 ::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
 	dictionary.
 
+<!--
+   ███    ██    ██  ██████   ██       ████████
+  ██ ██   ███   ██ ██    ██  ██       ██      
+ ██   ██  ████  ██ ██        ██       ██      
+██     ██ ██ ██ ██ ██   ████ ██       ██████  
+█████████ ██  ████ ██    ██  ██       ██      
+██     ██ ██   ███ ██    ██  ██       ██      
+██     ██ ██    ██  ██████   ████████ ████████
+-->
+
 {{CSSAngleValue}} objects {#anglevalue-objects}
 ----------------------------------------------
 
@@ -485,6 +554,15 @@ interface CSSAngleValue : CSSStyleValue {
 CSSAngleValue provides attributes that reflect the size of the angle in each of the
 CSS angle units represented by the {{CSSAngleUnit}} enum.
 
+<!--
+████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
+   ██    ██     ██   ██ ██   ███   ██ ██    ██ ██       ██     ██ ██     ██ ███   ███
+   ██    ██     ██  ██   ██  ████  ██ ██       ██       ██     ██ ██     ██ ████ ████
+   ██    ████████  ██     ██ ██ ██ ██  ██████  ██████   ██     ██ ████████  ██ ███ ██
+   ██    ██   ██   █████████ ██  ████       ██ ██       ██     ██ ██   ██   ██     ██
+   ██    ██    ██  ██     ██ ██   ███ ██    ██ ██       ██     ██ ██    ██  ██     ██
+   ██    ██     ██ ██     ██ ██    ██  ██████  ██        ███████  ██     ██ ██     ██
+-->
 
 {{CSSTransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
@@ -592,6 +670,16 @@ will always generate <code>cssText</code> according to the following rules:
 attribute of every {{CSSTransformComponent}} referenced by the {{CSSTransformValue}}
 returns true, and false otherwise.
 
+<!--
+████████   ███████   ██████  ████ ████████ ████  ███████  ██    ██
+██     ██ ██     ██ ██    ██  ██     ██     ██  ██     ██ ███   ██
+██     ██ ██     ██ ██        ██     ██     ██  ██     ██ ████  ██
+████████  ██     ██  ██████   ██     ██     ██  ██     ██ ██ ██ ██
+██        ██     ██       ██  ██     ██     ██  ██     ██ ██  ████
+██        ██     ██ ██    ██  ██     ██     ██  ██     ██ ██   ███
+██         ███████   ██████  ████    ██    ████  ███████  ██    ██
+-->
+
 {{CSSPositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
 
@@ -649,6 +737,16 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 </div>
 
+<!--
+████████  ████████  ██████   ███████  ██     ██ ████████   ██████  ████████
+██     ██ ██       ██    ██ ██     ██ ██     ██ ██     ██ ██    ██ ██      
+██     ██ ██       ██       ██     ██ ██     ██ ██     ██ ██       ██      
+████████  ██████    ██████  ██     ██ ██     ██ ████████  ██       ██████  
+██   ██   ██             ██ ██     ██ ██     ██ ██   ██   ██       ██      
+██    ██  ██       ██    ██ ██     ██ ██     ██ ██    ██  ██    ██ ██      
+██     ██ ████████  ██████   ███████   ███████  ██     ██  ██████  ████████
+-->
+
 {{CSSResourceValue}} objects {#resourcevalue-objects}
 -----------------------------------------------------
 
@@ -681,6 +779,16 @@ For example, images that match the <<url>> production can be used immediately, b
 in a visual change until the image data is fetched. {{CSSResourceValue}} objects represent this by
 providing values that track loaded state via the {{CSSResourceState}} enum.
 </div>
+
+<!--
+████ ██     ██    ███     ██████   ████████
+ ██  ███   ███   ██ ██   ██    ██  ██      
+ ██  ████ ████  ██   ██  ██        ██      
+ ██  ██ ███ ██ ██     ██ ██   ████ ██████  
+ ██  ██     ██ █████████ ██    ██  ██      
+ ██  ██     ██ ██     ██ ██    ██  ██      
+████ ██     ██ ██     ██  ██████   ████████
+-->
 
 {{CSSImageValue}} objects {#imagevalue-objects}
 -----------------------------------------------
@@ -715,6 +823,16 @@ Issue: Does the loading lifecycle need to be described here?
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
 objects, the {{CSSURLImageValue/url}} attribute contains the URL that references the image.
 
+<!--
+████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
+██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██      
+██       ██     ██ ████  ██    ██    ██        ██   ██  ██       ██      
+██████   ██     ██ ██ ██ ██    ██    ██████   ██     ██ ██       ██████  
+██       ██     ██ ██  ████    ██    ██       █████████ ██       ██      
+██       ██     ██ ██   ███    ██    ██       ██     ██ ██    ██ ██      
+██        ███████  ██    ██    ██    ██       ██     ██  ██████  ████████
+-->
+
 {{CSSFontFaceValue}} objects {#fontfacevalue-objects}
 -----------------------------------------------------
 
@@ -735,6 +853,16 @@ As font data may need to be fetched from a remote source, {{CSSFontFaceValue}} i
 of {{CSSResourceValue}}.
 
 Issue(159): Spec up ColorValue
+
+<!--
+██    ██  ███████  ████████  ██     ██    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
+███   ██ ██     ██ ██     ██ ███   ███   ██ ██   ██        ██       ██    ██ ██      ██     ██  ██     ██ ███   ██
+████  ██ ██     ██ ██     ██ ████ ████  ██   ██  ██        ██      ██    ██   ██     ██     ██  ██     ██ ████  ██
+██ ██ ██ ██     ██ ████████  ██ ███ ██ ██     ██ ██        ██     ██    ██     ██    ██     ██  ██     ██ ██ ██ ██
+██  ████ ██     ██ ██   ██   ██     ██ █████████ ██        ██    ██     █████████    ██     ██  ██     ██ ██  ████
+██   ███ ██     ██ ██    ██  ██     ██ ██     ██ ██        ██   ██      ██     ██    ██     ██  ██     ██ ██   ███
+██    ██  ███████  ██     ██ ██     ██ ██     ██ ████████ ████ ████████ ██     ██    ██    ████  ███████  ██    ██
+-->
 
 {{CSSStyleValue}} normalization {#stylevalue-normalization}
 ===========================================================
@@ -962,6 +1090,16 @@ Normalization does not fail for {{CSSResourceValue}} objects.
 The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
 </div>
 
+<!--
+ ██████  ████████ ████████  ████    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
+██    ██ ██       ██     ██  ██    ██ ██   ██        ██       ██    ██ ██      ██     ██  ██     ██ ███   ██
+██       ██       ██     ██  ██   ██   ██  ██        ██      ██    ██   ██     ██     ██  ██     ██ ████  ██
+ ██████  ██████   ████████   ██  ██     ██ ██        ██     ██    ██     ██    ██     ██  ██     ██ ██ ██ ██
+      ██ ██       ██   ██    ██  █████████ ██        ██    ██     █████████    ██     ██  ██     ██ ██  ████
+██    ██ ██       ██    ██   ██  ██     ██ ██        ██   ██      ██     ██    ██     ██  ██     ██ ██   ███
+ ██████  ████████ ██     ██ ████ ██     ██ ████████ ████ ████████ ██     ██    ██    ████  ███████  ██    ██
+-->
+
 {{CSSStyleValue}} Serialization {#stylevalue-serialization}
 ===========================================================
 
@@ -1095,6 +1233,16 @@ Privacy Considerations {#privacy-considerations}
 ==================================================
 
 There are no known privacy issues introduced by these features.
+
+<!--
+ ██████   ███████  ██     ██ ████████  ██     ██ ████████ ████████ ████████
+██    ██ ██     ██ ███   ███ ██     ██ ██     ██    ██    ██       ██     ██
+██       ██     ██ ████ ████ ██     ██ ██     ██    ██    ██       ██     ██
+██       ██     ██ ██ ███ ██ ████████  ██     ██    ██    ██████   ██     ██
+██       ██     ██ ██     ██ ██        ██     ██    ██    ██       ██     ██
+██    ██ ██     ██ ██     ██ ██        ██     ██    ██    ██       ██     ██
+ ██████   ███████  ██     ██ ██         ███████     ██    ████████ ████████
+-->
 
 Appendix A: Computed {{CSSStyleValue}} objects {#computed-stylevalue-objects}
 =============================================================================
