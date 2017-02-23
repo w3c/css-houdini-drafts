@@ -1444,16 +1444,12 @@ During computation, {{CSSKeywordValue}} objects are either as specified (e.g. ''
 values for lengths that participate in layout) or resolved to a relevant value
 and renormalized (e.g. the color ''red'').
 
-Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
-------------------------------------------------------------------
-
-
 Computed {{CSSNumericValue}} objects {#computed-numericvalue-objects}
 ---------------------------------------------------------------------
 
 During computation, {{CSSUnitValue}} objects
 are range-restricted or rounded as appropriate to the relevant property,
-but otherwise as specified (see the example in [[#numbervalue-objects]]).
+but otherwise as specified.
 
 Computed <a>calc() interface</a> objects {#computed-calc-objects}
 -----------------------------------------------------------------
