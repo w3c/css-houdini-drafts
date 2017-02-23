@@ -12,6 +12,7 @@ Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
 Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue
+Markup Shorthands: markdown yes
 </pre>
 
 <pre class=anchors>
@@ -67,8 +68,8 @@ Some particular considerations:
 *   retrieved JavaScript representations of CSS values are not mutable - instead updates
 		must explicitly be set using the API.
 *   objects are organized for consistency rather than ease of access. For example, even
-		though lengths are often numeric pixel values, a declared {{CSSLengthValue}} can't be
-		treated as a number without first explicitly casting it to a {{CSSSimpleLength}}, as calc
+		though lengths are often numeric pixel values, a declared {{CSSNumericValue}} can't be
+		treated as a number without first explicitly casting it to a {{CSSSimpleNumericValue}}, as calc
 		expressions and keywords are also valid lengths.
 
 <!--
@@ -131,13 +132,13 @@ of the value the {{CSSStyleValue}} object represents.
 </div>
 
 <!--
- ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████ 
+ ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
 ██    ██    ██     ██  ██  ██       ██       ███   ███   ██ ██   ██     ██
 ██          ██      ████   ██       ██       ████ ████  ██   ██  ██     ██
- ██████     ██       ██    ██       ██████   ██ ███ ██ ██     ██ ████████ 
-      ██    ██       ██    ██       ██       ██     ██ █████████ ██       
-██    ██    ██       ██    ██       ██       ██     ██ ██     ██ ██       
- ██████     ██       ██    ████████ ████████ ██     ██ ██     ██ ██       
+ ██████     ██       ██    ██       ██████   ██ ███ ██ ██     ██ ████████
+      ██    ██       ██    ██       ██       ██     ██ █████████ ██
+██    ██    ██       ██    ██       ██       ██     ██ ██     ██ ██
+ ██████     ██       ██    ████████ ████████ ██     ██ ██     ██ ██
 -->
 
 The {{StylePropertyMap}} {#the-stylepropertymap}
@@ -331,13 +332,13 @@ The value for a given property is the last valid value provided in the string.
 ==================================================
 
 <!--
-██     ██ ██    ██ ████████     ███    ████████   ██████  ████████ ████████ 
+██     ██ ██    ██ ████████     ███    ████████   ██████  ████████ ████████
 ██     ██ ███   ██ ██     ██   ██ ██   ██     ██ ██    ██ ██       ██     ██
 ██     ██ ████  ██ ██     ██  ██   ██  ██     ██ ██       ██       ██     ██
 ██     ██ ██ ██ ██ ████████  ██     ██ ████████   ██████  ██████   ██     ██
 ██     ██ ██  ████ ██        █████████ ██   ██         ██ ██       ██     ██
 ██     ██ ██   ███ ██        ██     ██ ██    ██  ██    ██ ██       ██     ██
- ███████  ██    ██ ██        ██     ██ ██     ██  ██████  ████████ ████████ 
+ ███████  ██    ██ ██        ██     ██ ██     ██  ██████  ████████ ████████
 -->
 
 {{CSSUnparsedValue}} objects {#unparsedvalue-objects}
@@ -357,13 +358,13 @@ interface CSSVariableReferenceValue {
 {{CSSUnparsedValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
 
 <!--
-██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████ 
+██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████
 ██   ██  ██        ██  ██  ██  ██  ██ ██     ██ ██     ██ ██     ██
 ██  ██   ██         ████   ██  ██  ██ ██     ██ ██     ██ ██     ██
 █████    ██████      ██    ██  ██  ██ ██     ██ ████████  ██     ██
 ██  ██   ██          ██    ██  ██  ██ ██     ██ ██   ██   ██     ██
 ██   ██  ██          ██    ██  ██  ██ ██     ██ ██    ██  ██     ██
-██    ██ ████████    ██     ███  ███   ███████  ██     ██ ████████ 
+██    ██ ████████    ██     ███  ███   ███████  ██     ██ ████████
 -->
 
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
@@ -381,12 +382,12 @@ should check that they contain valid CSS, but they do not check whether the cont
 keyword for a particular property. Property setters are required to enforce keyword validity.
 
 <!--
-██    ██ ██     ██ ██     ██ ████████  ████████ ████████ 
+██    ██ ██     ██ ██     ██ ████████  ████████ ████████
 ███   ██ ██     ██ ███   ███ ██     ██ ██       ██     ██
 ████  ██ ██     ██ ████ ████ ██     ██ ██       ██     ██
-██ ██ ██ ██     ██ ██ ███ ██ ████████  ██████   ████████ 
-██  ████ ██     ██ ██     ██ ██     ██ ██       ██   ██  
-██   ███ ██     ██ ██     ██ ██     ██ ██       ██    ██ 
+██ ██ ██ ██     ██ ██ ███ ██ ████████  ██████   ████████
+██  ████ ██     ██ ██     ██ ██     ██ ██       ██   ██
+██   ███ ██     ██ ██     ██ ██     ██ ██       ██    ██
 ██    ██  ███████  ██     ██ ████████  ████████ ██     ██
 -->
 
@@ -402,194 +403,390 @@ interface CSSNumberValue : CSSStyleValue {
 
 {{CSSNumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
 
-{{CSSNumberValue}} objects are not range-restricted. Any valid number can be represented by a {{CSSNumberValue}},
-and that value will not be clamped, rounded, or rejected when set on a <a>declared StylePropertyMap</a> or
-<a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
+
+
+
+<!--
+██    ██ ██     ██ ██     ██ ████████ ████████  ████  ██████
+███   ██ ██     ██ ███   ███ ██       ██     ██  ██  ██    ██
+████  ██ ██     ██ ████ ████ ██       ██     ██  ██  ██
+██ ██ ██ ██     ██ ██ ███ ██ ██████   ████████   ██  ██
+██  ████ ██     ██ ██     ██ ██       ██   ██    ██  ██
+██   ███ ██     ██ ██     ██ ██       ██    ██   ██  ██    ██
+██    ██  ███████  ██     ██ ████████ ██     ██ ████  ██████
+-->
+
+
+Numeric Values: {#numeric-objects}
+----------------------------------
+
+{{CSSNumericValue}} objects represent CSS values that are numeric in nature
+(<<number>>s, <<percentage>>s, <<dimension>>s).
+
+* {{CSSSimpleNumericValue}} objects represent values that contain a single unit type
+	(for example "42px").
+* Objects of the <a>calc() interfaces</a> represent values that contain multiple units
+	(for example "calc(56em + 10%)").
+
+{{CSSNumericValue}} objects are not range-restricted.
+Any valid numeric value can be represented by a {{CSSNumericValue}},
+and that value will not be clamped, rounded, or rejected
+when set on a <a>declared StylePropertyMap</a> or <a>inline StylePropertyMap</a>.
+Instead, clamping and/or rounding will occur during computation of style.
 
 <div class='example'>
-The following code is valid
+	The following code is valid
 
-<pre class='lang-javascript'>
-	myElement.styleMap.set("opacity", new CSSNumberValue(3));
-	myElement.styleMap.set("z-index", new CSSNumberValue(15.4));
+	<pre>
+		myElement.styleMap.set("opacity", CSS.number(3));
+		myElement.styleMap.set("z-index", CSS.number(15.4));
 
-	console.log(myElement.styleMap.get("opacity").value); // 3
-	console.log(myElement.styleMap.get("z-index").value); // 15.4
+		console.log(myElement.styleMap.get("opacity").value); // 3
+		console.log(myElement.styleMap.get("z-index").value); // 15.4
 
-	var computedStyle = getComputedStyleMap(myElement);
-	var opacity = computedStyle.get("opacity");
-	var zIndex = computedStyle.get("z-index");
-</pre>
+		var computedStyle = getComputedStyleMap(myElement);
+		var opacity = computedStyle.get("opacity");
+		var zIndex = computedStyle.get("z-index");
+	</pre>
 
-After execution, the value of <code>opacity</code> is 1 ('opacity' is range-restricted),
-and the value of <code>zIndex</code> is 15 ('z-index' is rounded to an integer value).
+	After execution, the value of `opacity` is `1` ('opacity' is range-restricted),
+	and the value of `zIndex` is `15` ('z-index' is rounded to an integer value).
 </div>
 
-<!--
-██       ████████ ██    ██  ██████   ████████ ██     ██
-██       ██       ███   ██ ██    ██     ██    ██     ██
-██       ██       ████  ██ ██           ██    ██     ██
-██       ██████   ██ ██ ██ ██   ████    ██    █████████
-██       ██       ██  ████ ██    ██     ██    ██     ██
-██       ██       ██   ███ ██    ██     ██    ██     ██
-████████ ████████ ██    ██  ██████      ██    ██     ██
--->
+Note that "numeric values" which incorporate variable references
+will instead be represented as {{CSSUnparsedValue}} objects,
+and keywords as {{CSSKeywordValue}} objects.
 
-{{CSSLengthValue}} objects {#lengthvalue-objects}
-----------------------------------------------
 
-<pre class='idl'>
-enum LengthType {
-	"px", "percent",
-	"em", "ex", "ch", "rem",
-	"vw", "vh", "vmin", "vmax",
-	"cm", "mm", "q", "in", "pc", "pt"
+### Common Numeric Operations, and the {{CSSNumericValue}} Superclass ### {#numeric-value}
+
+All numeric CSS values
+(<<number>>s, <<percentage>>s, and <<dimension>>s)
+are represented by subclasses of the {{CSSNumericValue}} interface.
+
+<pre class=idl>
+interface CSSNumericValue : CSSStyleValue {
+	CSSNumericValue add(CSSNumericValue value);
+	CSSNumericValue subtract(CSSNumericValue value);
+	CSSNumericValue multiply(double value);
+	CSSNumericValue divide(double value);
+
+	static CSSNumericValue from(DOMString cssText);
+	static CSSNumericValue from(double value, DOMString unit);
+	CSSNumericValue to(DOMString unit);
 };
+</pre>
 
-dictionary CSSLengthCalcDictionary {
-	double px;
-	double percent;
-	double em;
-	double ex;
-	double ch;
-	double rem;
-	double vw;
-	double vh;
-	double vmin;
-	double vmax;
-	double cm;
-	double mm;
-	double q;
-	double in;
-	double pc;
-	double pt;
+The methods on the {{CSSNumericValue}} superclass
+represent operations that all <<dimension>>s can perform.
+
+The following are the arithmetic operations you can perform on dimensions:
+
+<dl dfn-for="CSSNumericValue">
+	: <dfn method>add(|value|)</dfn>
+	::
+		1. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+			and have the same unit,
+			return a new {{CSSSimpleNumericValue}}
+			with the same unit
+			and a value equal to the sum of |this|’s and |value|’s values.
+
+		2. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+			and one has the unit `"number"`
+			while the other has the unit `"percentage"`,
+			then <a>throw</a> a {{TypeError}}
+			and abort this algorithm.
+
+		3. Otherwise,
+			if |this| and |value| have units both associated with the same <a>calc() interface</a>,
+			return an instance of that <a>calc() interface</a>
+			representing |this| and |value|’s sum.
+
+		4. Otherwise,
+			<a>throw</a> a {{TypeError}}.
+
+	: <dfn method>sub(|value|)</dfn>
+	::
+		1. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+			and have the same unit,
+			return a new {{CSSSimpleNumericValue}}
+			with the same unit
+			and a value equal to the difference of |this|’s and |value|’s values.
+
+		2. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+			and one has the unit `"number"`
+			while the other has the unit `"percentage"`,
+			then <a>throw</a> a {{TypeError}}
+			and abort this algorithm.
+
+		3. Otherwise,
+			if |this| and |value| have units both associated with the same <a>calc() interface</a>,
+			return an instance of that <a>calc() interface</a>
+			representing |this| and |value|’s difference.
+
+		4. Otherwise,
+			<a>throw</a> a {{TypeError}}.
+
+	: <dfn method>mul(|value|)</dfn>
+	::
+		1. If |this| is a {{CSSSimpleNumericValue}},
+			return a new {{CSSSimpleNumericValue}}
+			with the same unit
+			and a value equal to |this|’s value times |value|.
+
+		2. Otherwise,
+			return a <a>calc() interface</a> object of the same type as |this|,
+			with all the units either set to `null` if they are `null` in |this|,
+			or set to that unit's value in |this| times |value|.
+
+	: <dfn method>div(|value|)</dfn>
+	::
+		1. If |this| is a {{CSSSimpleNumericValue}},
+			return a new {{CSSSimpleNumericValue}}
+			with the same unit
+			and a value equal to |this|’s value divided by |value|.
+
+		2. Otherwise,
+			return a <a>calc() interface</a> object of the same type as |this|,
+			with all the units either set to `null` if they are `null` in |this|,
+			or set to that unit's value in |this| divided by |value|.
+</dl>
+
+The following two factory methods allow a {{CSSNumericValue}} to be constructed directly.
+Note that they are static methods,
+existing directly on the {{CSSNumericValue}} interface object,
+rather than on {{CSSNumericValue}} instances.
+
+: <dfn method for=CSSNumericValue>from(|cssText|)</dfn>
+::
+	1. <a>Parse a component value</a> from |cssText|
+		and let |result| be the result.
+		If |result| is a syntax error,
+		<a>throw</a> a {{SyntaxError}}
+		and abort this algorithm.
+
+	2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
+		or a <<calc()>>,
+		<a>throw</a> a {{SyntaxError}}
+		and abort this algorithm.
+
+	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
+		return a new {{CSSSimpleNumericValue}} object
+		with its value set to the token's value,
+		and the unit set to the token's unit if it's a <<dimension-token>>,
+		or `"number"` if it is a <<number-token>>,
+		or `"percentage"` if it is a <<percentage-token>>.
+
+	4. If |result| is a <<calc()>>,
+		normalize the ''calc()'' argument
+		into a sum of values with unique units,
+		then return a new <a>calc() interface</a> object of the appropriate type,
+		with the corresponding fields set to the specified values,
+		and all the rest set to `null`.
+
+: <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn>
+::
+	1. If |unit| is not an <a>ASCII case-insensitive</a> match
+		for one of the CSS units
+		(including `"number"` and `"percent"` as units for this purpose),
+		<a>throw</a> a {{SyntaxError}}
+		and abort this algorithm.
+
+	2. Return a new {{CSSSimpleNumericValue}}
+		with its value set to |value|
+		and its unit set to |unit|.
+
+
+The <dfn method for=CSSNumericValue>to(|unit|)</dfn> converts an existing {{CSSNumericValue}}
+into another one with the specified |unit|.
+When invoked, it must run these steps:
+
+1. If |unit| is not an <a>ASCII case-insensitive</a> match
+	for one of the CSS units
+	(including `"number"` and `"percent"` as units for this purpose),
+	<a>throw</a> a {{SyntaxError}}
+	and abort this algorithm.
+
+2. If |this| is a {{CSSSimpleNumericValue}}
+	and |this|’s unit and |unit| are <a>compatible units</a>,
+	return a new {{CSSSimpleNumericValue}}
+	with its unit set to |unit|
+	and its value set to |this|’s value
+	multiplied by the conversion ratio between the two units.
+
+3. If |this| is a <a>calc() interface</a>
+	and the units of all of its non-null, non-zero fields
+	are <a>compatible units</a> with |unit|,
+	return a new {{CSSSimpleNumericValue}}
+	with its unit set to |unit|
+	and its value to the sum of
+	each of |this|’s non-null, non-zero fields
+	multiplied by the corresponding conversion ratios
+	between them and |unit|.
+
+4. Otherwise,
+	<a>throw</a> a {{TypeError}}.
+
+### {{CSSSimpleNumericValue}} objects ### {#simple-numeric}
+
+Numeric values that can be expressed as a single unit
+(or a naked number or percentage)
+are represented as {{CSSSimpleNumericValue}}s.
+
+<pre class=idl>
+interface CSSSimpleNumericValue : CSSNumericValue {
+  attribute double value;
+  attribute DOMString unit;
 };
+</pre>
 
-interface CSSLengthValue : CSSStyleValue {
-	CSSLengthValue add(CSSLengthValue value);
-	CSSLengthValue subtract(CSSLengthValue value);
-	CSSLengthValue multiply(double value);
-	CSSLengthValue divide(double value);
-	static CSSLengthValue from(DOMString cssText);
-	static CSSLengthValue from(double value, LengthType type);
-	static CSSLengthValue from(optional CSSLengthCalcDictionary dictionary);
-};
+When attempting to set the {{CSSSimpleNumericValue/unit}} attribute,
+if the value is not an <a>ASCII case-insensitive</a> match
+for one of the CSS units
+(including `"number"` and `"percent"` as units for this purpose),
+<a>throw</a> a {{SyntaxError}}
+and leave {{CSSSimpleNumericValue/unit}} unchanged.
 
-[Constructor(DOMString cssText),
- Constructor(CSSLengthValue),
- Constructor(CSSLengthCalcDictionary)
-]
-interface CSSCalcLength : CSSLengthValue {
-	attribute double? px;
-	attribute double? percent;
+<<number>> values are represented with the unit `"number"`,
+while <<percentage>> values are represented with the unit `"percent"`.
+<<dimension>>s are represented with their corresponding unit.
+
+Each {{CSSSimpleNumericValue}} is associated with a corresponding CSS type
+(such as <<length>>),
+based on its unit.
+
+<div class=example>
+	For example, the value ''5px'' in a stylesheet
+	will be represented by a {{CSSSimpleNumericValue}}
+	with its `value` attribute set to `5`
+	and its `unit` attribute set to `"px"`.
+
+	Similarly, the value ''10'' in a stylesheet
+	will be represented by a {{CSSSimpleNumericValue}}
+	with its `value` attribute set to `10`
+	and its `unit` attribute set to `"number"`.
+</div>
+
+### Complex Numeric Values ### {#complex-numeric}
+
+Numeric values that can only be expressed with a combination of units
+are represented as one of the following <dfn>calc() interfaces</dfn>.
+
+<pre class=idl>
+[Constructor(CSSCalcLengthDictionary)]
+interface CSSCalcLength : CSSNumericValue {
+	attribute double? ch;
+	attribute double? cm;
 	attribute double? em;
 	attribute double? ex;
-	attribute double? ch;
-	attribute double? rem;
-	attribute double? vw;
-	attribute double? vh;
-	attribute double? vmin;
-	attribute double? vmax;
-	attribute double? cm;
-	attribute double? mm;
-	attribute double? q;
 	attribute double? in;
+	attribute double? mm;
 	attribute double? pc;
 	attribute double? pt;
+	attribute double? px;
+	attribute double? q;
+	attribute double? rem;
+	attribute double? vh;
+	attribute double? vmax;
+	attribute double? vmin;
+	attribute double? vw;
+	attribute double? number;
+	attribute double? percent;
 };
 
-// lengths that are *just* keywords don't become CSSSimpleLengths or CSSCalcLengths.
-// Instead they are represented as CSSKeywordValue objects.
-[Constructor(DOMString cssText),
- Constructor(CSSLengthValue),
- Constructor(double value, LengthType type)]
-interface CSSSimpleLength : CSSLengthValue {
-	attribute double value;
-	attribute LengthType type;
-};
-</pre>
-
-{{CSSLengthValue}} objects represent lengths:
-
-*   {{CSSSimpleLength}} objects represent lengths that contain a single unit type (for example "42px").
-*   {{CSSCalcLength}} objects represent lengths that contain multiple units (for example
-		"calc(56em + 10%)").
-
-{{CSSLengthValue}} objects are not range-restricted. Any valid combination of primitive lengths can be represented by a {{CSSLengthValue}},
-that value will be accepted unaltered when set on a <a>declared StylePropertyMap</a> or
-<a>inline StylePropertyMap</a>. Instead, clamping and/or rounding will occur during computation of style.
-
-Note that lengths which incorporate variable references will instead be represented as
-{{CSSUnparsedValue}} objects, and keywords as {{CSSKeywordValue}} objects.
-
-The following methods are defined for {{CSSLengthValue}} objects:
-
-:   <dfn method for=CSSLengthValue>add(CSSLengthValue value)</dfn>
-::  Adds the provided <var>value</var> to the length represented by the object,
-		and returns the result as a new {{CSSLengthValue}}. This will construct
-		a {{CSSSimpleLength}} or {{CSSCalcLength}} depending on whether the result can
-		be expressed in terms of a single unit.
-
-:   <dfn method for=CSSLengthValue>subtract(CSSLengthValue value)</dfn>
-::  Subtracts the provided <var>value</var> from the length represented by the object,
-		and returns the result as a new {{CSSLengthValue}}. This will construct
-		a {{CSSSimpleLength}} or {{CSSCalcLength}} depending on whether the result can
-		be expressed in terms of a single unit.
-
-:   <dfn method for=CSSLengthValue>multiply(double value)</dfn>
-::  Multiplies the length represented by the object by the provided <var>value</var>,
-		and returns the result as a new {{CSSLengthValue}}. This will construct
-		a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
-		if the object is a {{CSSCalcLength}}.
-
-:   <dfn method for=CSSLengthValue>divide(double value)</dfn>
-::  Divides the length represented by the object by the provided <var>value</var>,
-		and returns the result as a new {{CSSLengthValue}}. This will construct
-		a {{CSSSimpleLength}} if the object is a {{CSSSimpleLength}}, or a {{CSSCalcLength}}
-		if the object is a {{CSSCalcLength}}. The function will throw a <a>RangeError</a> when the value given is 0.
-
-:   <dfn method for=CSSLengthValue>from(DOMString cssText)</dfn>
-::  Parses the provided <var ignore>cssText</var> as a length value. Will return a
-		{{CSSSimpleLength}} when possible, or a {{CSSCalcLength}} otherwise. The function will throw a {{SyntaxError}}, when the DOMString it is passed doesn't represent a valid length.
-
-:   <dfn method for=CSSLengthValue>from(double value, LengthType type)</dfn>
-::  Constructs a {{CSSSimpleLength}} with the given <var>value</var> and unit
-	<var>type</var>.
-
-:   <dfn method for=CSSLengthValue>from(CSSLengthCalcDictionary dictionary)</dfn>
-::  Constructs a {{CSSCalcLength}} with units and values as defined by the provided
-	dictionary.
-
-<!--
-   ███    ██    ██  ██████   ██       ████████
-  ██ ██   ███   ██ ██    ██  ██       ██      
- ██   ██  ████  ██ ██        ██       ██      
-██     ██ ██ ██ ██ ██   ████ ██       ██████  
-█████████ ██  ████ ██    ██  ██       ██      
-██     ██ ██   ███ ██    ██  ██       ██      
-██     ██ ██    ██  ██████   ████████ ████████
--->
-
-{{CSSAngleValue}} objects {#anglevalue-objects}
-----------------------------------------------
-
-<pre class='idl'>
-enum CSSAngleUnit {
-	"deg", "rad", "grad", "turn"
+dictionary CSSCalcLengthDictionary {
+	double? ch;
+	double? cm;
+	double? em;
+	double? ex;
+	double? in;
+	double? mm;
+	double? pc;
+	double? pt;
+	double? px;
+	double? q;
+	double? rem;
+	double? vh;
+	double? vmax;
+	double? vmin;
+	double? vw;
+	double? number;
+	double? percent;
 };
 
-[Constructor(double value, CSSAngleUnit unit)]
-interface CSSAngleValue : CSSStyleValue {
-	attribute double degrees;
-	attribute double radians;
-	attribute double gradians;
-	attribute double turns;
+[Constructor(CSSCalcAngleDictionary)]
+interface CSSCalcAngle : CSSNumericValue {
+	attribute double? deg;
+	attribute double? grad;
+	attribute double? rad;
+	attribute double? turn;
+	attribute double? number;
+	attribute double? percent;
+};
+
+dictionary CSSCalcAngleDictionary {
+	double? deg;
+	double? grad;
+	double? rad;
+	double? turn;
+	double? number;
+	double? percent;
+};
+
+[Constructor(CSSCalcTimeDictionary)]
+interface CSSCalcTime : CSSNumericValue {
+	attribute double? s;
+	attribute double? ms;
+	attribute double? number;
+	attribute double? percent;
+};
+
+dictionary CSSCalcTimeDictionary {
+	double? s;
+	double? ms;
+	double? number;
+	double? percent;
+};
+
+[Constructor(CSSCalcFrequencyDictionary)]
+interface CSSCalcFrequency : CSSNumericValue {
+	attribute double? Hz;
+	attribute double? kHz;
+	attribute double? number;
+	attribute double? percent;
+};
+
+dictionary CSSCalcFrequencyictionary {
+	double? Hz;
+	double? kHz;
+	double? number;
+	double? percent;
 };
 </pre>
 
-{{CSSAngleValue}} objects represent CSS angles. Once constructed, a
-CSSAngleValue provides attributes that reflect the size of the angle in each of the
-CSS angle units represented by the {{CSSAngleUnit}} enum.
+For each of these interfaces,
+the construct must execute the following steps:
+
+1. For each <a>present</a> member of the passed dictionary,
+	set the corresponding attribute of the same name to the member's value.
+
+2. Set any remaining attributes to the value `null`.
+
+Each <a>calc() interface</a> is associated with a corresponding CSS type:
+
+* {{CSSCalcLength}} with <<length>>
+* {{CSSCalcAngle}} with <<angle>>
+* {{CSSCalcTime}} with <<time>>
+* {{CSSCalcFrequency}} with <<frequency>>
+
+They are additionally associated with the units that each of the CSS types represent.
+(For example, {{CSSCalcLength}} is associated with the ''px'' unit,
+as that unit represents a <<length>>.)
+
+All of the <a>calc() interfaces</a> are associated with <<number>> and <<percentage>>.
+However, these two types do not uniquely identify a <a>calc() interface</a>.
+
+
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
@@ -618,21 +815,21 @@ interface CSSTransformComponent {
 	readonly attribute boolean is2D;
 };
 
-[Constructor(CSSLengthValue x, CSSLengthValue y),
- Constructor(CSSLengthValue x, CSSLengthValue y, CSSLengthValue z)]
+[Constructor(CSSNumericValue x, CSSNumericValue y),
+ Constructor(CSSNumericValue x, CSSNumericValue y, CSSNumericValue z)]
 interface CSSTranslation : CSSTransformComponent {
-	attribute CSSLengthValue x;
-	attribute CSSLengthValue y;
-	attribute CSSLengthValue z;
+	attribute CSSNumericValue x;
+	attribute CSSNumericValue y;
+	attribute CSSNumericValue z;
 };
 
-[Constructor(CSSAngleValue angle),
- Constructor(double x, double y, double z, CSSAngleValue angle)]
+[Constructor(CSSNumericValue angle),
+ Constructor(double x, double y, double z, CSSNumericValue angle)]
 interface CSSRotation : CSSTransformComponent {
 	attribute double x;
 	attribute double y;
 	attribute double z;
-	attribute CSSAngleValue angle;
+	attribute CSSNumericValue angle;
 };
 
 [Constructor(double x, double y),
@@ -643,15 +840,15 @@ interface CSSScale : CSSTransformComponent {
 	attribute double z;
 };
 
-[Constructor(CSSAngleValue ax, CSSAngleValue ay)]
+[Constructor(CSSNumericValue ax, CSSNumericValue ay)]
 interface CSSSkew : CSSTransformComponent {
-	attribute CSSAngleValue ax;
-	attribute CSSAngleValue ay;
+	attribute CSSNumericValue ax;
+	attribute CSSNumericValue ay;
 };
 
-[Constructor(CSSLengthValue length)]
+[Constructor(CSSNumericValue length)]
 interface CSSPerspective : CSSTransformComponent {
-	attribute CSSLengthValue length;
+	attribute CSSNumericValue length;
 };
 
 [Constructor(DOMMatrixReadOnly matrix)]
@@ -722,10 +919,10 @@ returns true, and false otherwise.
 
 <pre class='idl'>
 
-[Constructor(CSSLengthValue x, CSSLengthValue y)]
+[Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
-	attribute CSSLengthValue x;
-	attribute CSSLengthValue y;
+	attribute CSSNumericValue x;
+	attribute CSSNumericValue y;
 };
 
 </pre>
@@ -765,7 +962,7 @@ Will produce the following behavior:
 // "center bottom 10px"
 document.querySelector('.example').styleMap.get('background-position').cssText;
 
-// 50% - as a CSSSimpleLength
+// 50% - as a CSSSimpleNumericValue
 document.querySelector('.example').styleMap.get('background-position').x;
 
 // calc(100% - 10px) - as a CSSCalcLength
@@ -776,11 +973,11 @@ document.querySelector('.example').styleMap.get('background-position').y;
 
 <!--
 ████████  ████████  ██████   ███████  ██     ██ ████████   ██████  ████████
-██     ██ ██       ██    ██ ██     ██ ██     ██ ██     ██ ██    ██ ██      
-██     ██ ██       ██       ██     ██ ██     ██ ██     ██ ██       ██      
-████████  ██████    ██████  ██     ██ ██     ██ ████████  ██       ██████  
-██   ██   ██             ██ ██     ██ ██     ██ ██   ██   ██       ██      
-██    ██  ██       ██    ██ ██     ██ ██     ██ ██    ██  ██    ██ ██      
+██     ██ ██       ██    ██ ██     ██ ██     ██ ██     ██ ██    ██ ██
+██     ██ ██       ██       ██     ██ ██     ██ ██     ██ ██       ██
+████████  ██████    ██████  ██     ██ ██     ██ ████████  ██       ██████
+██   ██   ██             ██ ██     ██ ██     ██ ██   ██   ██       ██
+██    ██  ██       ██    ██ ██     ██ ██     ██ ██    ██  ██    ██ ██
 ██     ██ ████████  ██████   ███████   ███████  ██     ██  ██████  ████████
 -->
 
@@ -819,11 +1016,11 @@ providing values that track loaded state via the {{CSSResourceState}} enum.
 
 <!--
 ████ ██     ██    ███     ██████   ████████
- ██  ███   ███   ██ ██   ██    ██  ██      
- ██  ████ ████  ██   ██  ██        ██      
- ██  ██ ███ ██ ██     ██ ██   ████ ██████  
- ██  ██     ██ █████████ ██    ██  ██      
- ██  ██     ██ ██     ██ ██    ██  ██      
+ ██  ███   ███   ██ ██   ██    ██  ██
+ ██  ████ ████  ██   ██  ██        ██
+ ██  ██ ███ ██ ██     ██ ██   ████ ██████
+ ██  ██     ██ █████████ ██    ██  ██
+ ██  ██     ██ ██     ██ ██    ██  ██
 ████ ██     ██ ██     ██  ██████   ████████
 -->
 
@@ -862,11 +1059,11 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
 
 <!--
 ████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
-██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██      
-██       ██     ██ ████  ██    ██    ██        ██   ██  ██       ██      
-██████   ██     ██ ██ ██ ██    ██    ██████   ██     ██ ██       ██████  
-██       ██     ██ ██  ████    ██    ██       █████████ ██       ██      
-██       ██     ██ ██   ███    ██    ██       ██     ██ ██    ██ ██      
+██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██
+██       ██     ██ ████  ██    ██    ██        ██   ██  ██       ██
+██████   ██     ██ ██ ██ ██    ██    ██████   ██     ██ ██       ██████
+██       ██     ██ ██  ████    ██    ██       █████████ ██       ██
+██       ██     ██ ██   ███    ██    ██       ██     ██ ██    ██ ██
 ██        ███████  ██    ██    ██    ██       ██     ██  ██████  ████████
 -->
 
@@ -960,54 +1157,10 @@ as the {{CSSKeywordValue/keywordValue}} attribute.
 
 Otherwise, normalization fails.
 
-{{CSSNumberValue}} normalization {#numbervalue-normalization}
+{{CSSNumericValue}} normalization {#numericvalue-normalization}
 -------------------------------------------------------------
 
-If the provided value can tokenize as a <<number-token>>, then
-a {{CSSNumberValue}} is constructed with the {{CSSNumberValue/value}}
-attribute set to the number parsed from the <<number-token>>.
-
-Otherwise, if the provided value can be parsed as a calc expression with a
-<a spec='css-values-3'>resolved type</a> of <<number>>, then the expression is solved and
-a {{CSSNumberValue}} is constructed with the {{CSSNumberValue/value}}
-attribute set to the result.
-
-Otherwise, normalization fails.
-
-{{CSSLengthValue}} normalization {#lengthvalue-normalization}
--------------------------------------------------------------
-
-If the provided value matches the <<length>> production or the <<percentage>>
-production then a {{CSSSimpleLength}} is constructed with the {{CSSSimpleLength/value}}
-attribute set to the number part of the length, and the {{CSSSimpleLength/type}}
-set to the unit.
-
-Otherwise, if the provided value can be parsed as a calc expression with a
-<a spec='css-values-3'>resolved type</a> of <<length>> or <<percentage>>, then
-a {{CSSCalcLength}} is constructed with each unit that is mentioned in the
-calc expression reflected as the matching attribute set to the appropriate
-value.
-
-<div class='example'>
-A length of <code>calc(42px + 15% - 42px)</code> will normalize to a
-{{CSSCalcLength}} with both the {{CSSCalcLength/px}} and
-the {{CSSCalcLength/percent}} attributes set (to 0 and 15
-respectively). Even though the two pixel lengths cancel each other, the fact
-that pixels are mentioned in the expression means that they're represented
-in the normalized object.
-</div>
-
-Otherwise, normalization fails.
-
-{{CSSAngleValue}} normalization {#anglevalue-normalization}
------------------------------------------------------------
-
-If the provided value matches the <<angle>> production then a {{CSSAngleValue}}
-is constructed using the <a>CSSAngleValue(double value, CSSAngleUnit unit)</a>
-constructor, with <var>value</var> set to the number part of the angle,
-and <var>unit</var> set to the unit.
-
-Otherwise, normalization fails.
+Issue: todo
 
 {{CSSTransformValue}} normalization {#transformvalue-normalization}
 -------------------------------------------------------------------
@@ -1028,9 +1181,9 @@ is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransform
 		*   {{CSSScale/x}} set to 2
 		*   {{CSSScale/y}} set to 0.5
 *   a {{CSSTranslation}} with:
-		*   {{CSSTranslation/x}} with {{CSSSimpleLength/value}} of 100 and {{CSSSimpleLength/type}} of "px"
+		*   {{CSSTranslation/x}} with {{CSSSimpleNumericValue/value}} of `100` and {{CSSSimpleNumericValue/unit}} of `"px"`
 *   a {{CSSRotation}} with:
-		*   20 {{CSSAngleValue/degrees}}
+		*   {{CSSRotation/angle}} with {{CSSSimpleNumericValue/value}} of `20` and {{CSSSimpleNumericValue/unit}} of `"deg"`
 
 </div>
 
@@ -1041,7 +1194,7 @@ If the provided value matches the <<position>> production, then a {{CSSPositionV
 with <var>x</var> and <var>y</var> components determined via the following process. If this process, or
 any sub-process referenced by this process fails, then normalization as a whole fails.
 
-1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSSimpleLength}} value representing 50%.
+1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
 		the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
 		by the provided value and a horizontal <var>bias</var>.
@@ -1080,15 +1233,15 @@ The following process sets a value for either <var>x</var> or <var>y</var>, depe
 and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
 
 1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
-		{{CSSSimpleLength}} value representing 0% and <var>bias</var> to horizontal and exit this process.
+		{{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
 1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a
-		{{CSSSimpleLength}} value representing 100% and <var>bias</var> to horizontal and exit this process.
+		{{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
 1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-		{{CSSSimpleLength}} value representing 0% and <var>bias</var> to vertical and exit this process.
+		{{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-		{{CSSSimpleLength}} value representing 100% and <var>bias</var> to vertical and exit this process.
+		{{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
-		normalizing the value according to [[#lengthvalue-normalization]]. If <var>bias</var> is vertical,
+		normalizing the value according to [[#numericvalue-normalization]]. If <var>bias</var> is vertical,
 		set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
 		horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
@@ -1102,7 +1255,7 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
 		<var>keyword</var>, using the provided <var>bias</var>
 1.  let <var>adjustment</var> be the result of normalizing <var>length</var> according to
-		[[#lengthvalue-normalization]].
+		[[#numericvalue-normalization]].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
 		<var>adjustment</var> from a zero length.
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
@@ -1154,10 +1307,10 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 For example:
 
 <pre class='lang-javascript'>
-var length1 = CSSLengthValue.from("42.0px");
+var length1 = CSSNumericValue.from("42.0px");
 length1.cssText; // "42.0px"
 
-var length2 = CSSLengthValue.from(42.0, "px");
+var length2 = CSSNumericValue.from(42.0, "px");
 length2.cssText; // "42px";
 
 element.style.width = "42.0px";
@@ -1187,30 +1340,29 @@ length3.cssText; // "42px";
 {{CSSKeywordValue}} objects are serialized to their contained
 {{CSSKeywordValue/keywordValue}} attribute.
 
-{{CSSNumberValue}} Serialization {#numbervalue-serialization}
--------------------------------------------------------------
+{{CSSSimpleNumericValue}} Serialization {#numericvalue-serialization}
+--------------------------------------------------------------
 
-{{CSSNumberValue}} objects are serialized to the string representation
-of their contained {{CSSNumberValue/value}} attribute.
+If their {{CSSSimpleNumericValue/unit}} is "number",
+{{CSSSimpleNumericValue}} objects are serialized
+to the string representation of their {{CSSSimpleNumericValue/value}}.
 
-{{CSSLengthValue}} Serialization {#lengthvalue-serialization}
--------------------------------------------------------------
+Otherwise, if their {{CSSSimpleNumericValue/unit}} is "percent",
+{{CSSSimpleNumericValue}} objects are serialized
+to the string representation of their {{CSSSimpleNumericValue/value}}
+followed by the character U+0025 PERCENTAGE SIGN (%).
 
-{{CSSSimpleLength}} objects are serialized by appending their contained
-{{CSSSimpleLength/type}} to the string representation of
-their contained {{CSSSimpleLength/value}} attribute.
+Otherwise,
+{{CSSSimpleNumericValue}} objects are serialized
+to the string representation of their {{CSSSimpleNumericValue/value}}
+followed by their {{CSSSimpleNumericValue/unit}}.
 
-{{CSSCalcLength}} objects are serialized into a calc expression. Each
-type attribute that is present (i.e. not undefined) on the object forms
-a clause in the expression, with the clauses sorted in IDL specification
-order.
+<a>Calc() Interface</a> Serialization {#calc-serialization}
+---------------------------------------------------------
 
-{{CSSAngleValue}} Serialization {#anglevalue-serialization}
------------------------------------------------------------
-
-{{CSSAngleValue}} objects are serialized by appending "deg" to the
-string representation of their contained
-{{CSSAngleValue/degrees}} attribute.
+<a>Calc() interface</a> objects are serialized into a ''calc()'' expression,
+per the rules in [[css-values-3#calc-serialize]],
+treating the object as a summation of all the non-`null` values it contains.
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
@@ -1232,8 +1384,8 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 *   The function's arguments are a comma-separated list that matches the
     arguments to the relevant constructor. The values of the arguments are given
     by the attributes contained in the {{CSSTransformComponent}}.
-*   {{CSSLengthValue}} and {{CSSAngleValue}} attributes serialize using the rules
-    above. doubles serialize to their string representation.
+*   {{CSSNumericValue}} attributes serialize using the rules above.
+	Doubles serialize to their string representation.
 *   {{CSSMatrixComponent}} objects serialize to a list of 6 components if
     {{CSSTransformComponent/is2D}} is set, or 12 components otherwise.
     Component order and format is given by [[CSS-TRANSFORMS-1]].
@@ -1243,9 +1395,9 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 
 {{CSSPositionValue}} objects are serialized by:
 *   serializing the {{CSSPositionValue/x}} attribute according to
-    the rules for {{CSSLengthValue}} objects above.
+    the rules for {{CSSNumericValue}} objects above.
 *   serializing the {{CSSPositionValue/y}} attribute according to
-    the rules for {{CSSLengthValue}} objects above.
+    the rules for {{CSSNumericValue}} objects above.
 *   returning the concatenation of the two serializations (x before y), separated
     by a space.
 
@@ -1305,7 +1457,7 @@ width: calc(var(--foo) + 10%);
 
 Will represent a declared width as an {{CSSUnparsedValue}}, but if this value
 is the winning value during computation for a given element then that element's
-computed width will be represented by a {{CSSLengthValue}} object (assuming
+computed width will be represented by a {{CSSNumericValue}} object (assuming
 that --foo resolves to a valid substitution).
 </div>
 
@@ -1337,32 +1489,36 @@ and renormalized (e.g. the color ''red'').
 Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
 ------------------------------------------------------------------
 
-During computation, {{CSSNumberValue}} objects are range-restricted or rounded as
-appropriate to the relevant property, but otherwise as specified (see the example
-in [[#numbervalue-objects]]).
 
-Computed {{CSSLengthValue}} objects {#computed-lengthvalue-objects}
--------------------------------------------------------------------
+Computed {{CSSNumericValue}} objects {#computed-numericvalue-objects}
+---------------------------------------------------------------------
 
-During computation, {{CSSLengthValue}} objects are reduced to combinations of
-pixel and percentage values by the standard length computation process described
-as part of the <<length>> type. Lengths may then be further range-restricted as appropriate
-(for example, 'border-left-width' requires non-negative lengths).
+During computation, {{CSSSimpleNumericValue}} objects
+are range-restricted or rounded as appropriate to the relevant property,
+but otherwise as specified (see the example in [[#numbervalue-objects]]).
 
-Note that lengths combining percentage and pixel units can't in general be
-range restricted (e.g. is 100px - 50% greater or less than zero?).
+Computed <a>calc() interface</a> objects {#computed-calc-objects}
+-----------------------------------------------------------------
 
-Computed {{CSSAngleValue}} objects {#computed-anglevalue-objects}
-----------------------------------------------------------------
+During computation, <a>calc() interface</a> objects are reduced accordingly:
 
-Computed {{CSSAngleValue}} objects are as specified.
+1. All non-`number`, non-`percent` values are absolutized
+	into the <a>canonical unit</a> for the object's associated type.
+2. If the objects contains exactly one of (the canonical unit, a percent value, a number)
+	with a present, non-zero value,
+	then the computed value is an equivalent computed {{CSSSimpleNumericValue}}.
+3. Otherwise,
+	it's a <a>calc() interface</a>
+	containing the canonical unit, percent value, and number,
+	if those are present and non-zero,
+	and all other fields are `null`.
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
 
-During computation, any {{CSSLengthValue}} objects referenced by a {{CSSTransformComponent}}
+During computation, any {{CSSNumericValue}} objects referenced by a {{CSSTransformComponent}}
 (e.g. the {{CSSTranslation/x}} attribute of a {{CSSTranslation}}) are
-computed according to [[#computed-lengthvalue-objects]], but the
+computed according to [[#computed-numericvalue-objects]], but the
 {{CSSTransformValue}} object is otherwise as specified.
 
 Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
@@ -1370,7 +1526,7 @@ Computed {{CSSPositionValue}} objects {#computed-positionvalue-objects}
 
 During computation, both the {{CSSPositionValue/x}} and
 {{CSSPositionValue/y}} components of a {{CSSPositionValue}} are
-computed according to [[#computed-lengthvalue-objects]].
+computed according to [[#computed-numericvalue-objects]].
 
 Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
 -----------------------------------------------------------------
