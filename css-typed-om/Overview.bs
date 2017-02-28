@@ -15,6 +15,21 @@ Ignored Terms: Drawable, paint image definition, list-valued property, list-valu
 Markup Shorthands: markdown yes
 </pre>
 
+<style>
+/* Put nice boxes around each algorithm. */
+[data-algorithm]:not(.heading) {
+  padding: .5em;
+  border: thin solid #ddd; border-radius: .5em;
+  margin: .5em calc(-0.5em - 1px);
+}
+[data-algorithm]:not(.heading) > :first-child {
+  margin-top: 0;
+}
+[data-algorithm]:not(.heading) > :last-child {
+  margin-bottom: 0;
+}
+</style>
+
 <pre class=anchors>
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec: ecma-262
 	text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
