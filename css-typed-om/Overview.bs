@@ -656,8 +656,22 @@ are represented as {{CSSUnitValue}}s.
     };
 </xmp>
 
-<div algorithm="CSSUnitValue/type">
+<div algorithm="CSSUnitValue/unit">
+	The <dfn attribute for=CSSUnitValue>unit</dfn> attribute of a {{CSSUnitValue}} |this| must,
+	on setting a value |unit|,
+	perform the following steps:
 
+	1. If |unit| does not have a [=CSS type=],
+		[=throw=] a {{TypeError}}.
+
+	2. Otherwise,
+		set |this|’s internal {{CSSUnitValue/unit}} slot to |unit|.
+
+	On reading,
+	it must return the value of |this|’s internal {{CSSUnitValue/unit}} slot.
+</div>
+
+<div algorithm="CSSUnitValue/type">
     The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
     on reading,
     return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}}.
