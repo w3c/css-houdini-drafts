@@ -824,6 +824,10 @@ if its equivalent CSS ''calc()'' value matches that production.
 {{CSSTransformValue}} objects represent values for the 'transform' property. A
 {{CSSTransformValue}} represents a list of {{CSSTransformComponent}}s.
 
+<dfn attribute for=CSSTransformValue>is2D</dfn> is true if the {{CSSTransformComponent/is2D}}
+attribute of every {{CSSTransformComponent}} referenced by the {{CSSTransformValue}}
+returns true, and false otherwise.
+
 <xmp class=idl>
     interface CSSTransformComponent {
     	readonly attribute DOMString cssText;
@@ -922,10 +926,6 @@ will always generate <code>cssText</code> according to the following rules:
 		will serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
 		{{DOMMatrixReadOnly/is2D}} attribute is false, and a matrix3d function
 		otherwise.
-
-<dfn attribute for=CSSTransformValue>is2D</dfn> is true if the {{CSSTransformComponent/is2D}}
-attribute of every {{CSSTransformComponent}} referenced by the {{CSSTransformValue}}
-returns true, and false otherwise.
 
 <!--
 ████████   ███████   ██████  ████ ████████ ████  ███████  ██    ██
