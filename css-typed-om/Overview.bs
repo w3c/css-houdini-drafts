@@ -794,13 +794,9 @@ A {{CSSCalcValue}} has a <dfn for=CSSCalcValue>strong type</dfn>
 if its [=CSS type set=] [=set/contains=] a value other than "percent" or "number",
 equal to that other value.
 
-A {{CSSCalcValue}} is <dfn for=CSSCalcValue>length-compatible</dfn>
-if its [=strong type=] is "length",
-or if it has no [=strong type=]
-but its [=CSS type set=] [=set/contains=] "percent" or "number".
-Mutatis mutandi for <dfn for=CSSCalcValue>angle-compatible</dfn>,
-<dfn for=CSSCalcValue>time-compatible</dfn>,
-or <dfn for=CSSCalcValue>resolution-compatible</dfn>.
+A {{CSSCalcValue}} matches a CSS type production,
+such as <<number>> or <<length-percentage>>,
+if its equivalent CSS ''calc()'' value matches that production.
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
