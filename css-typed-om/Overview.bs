@@ -604,6 +604,17 @@ When invoked, it must run these steps:
 4. Otherwise,
 	<a>throw</a> a {{TypeError}}.
 
+
+<!--
+██     ██ ██    ██ ████ ████████
+██     ██ ███   ██  ██     ██   
+██     ██ ████  ██  ██     ██   
+██     ██ ██ ██ ██  ██     ██   
+██     ██ ██  ████  ██     ██   
+██     ██ ██   ███  ██     ██   
+ ███████  ██    ██ ████    ██   
+-->
+
 ### Value + Unit: {{CSSUnitValue}} objects ### {#simple-numeric}
 
 Numeric values that can be expressed as a single unit
@@ -660,6 +671,17 @@ are represented as {{CSSUnitValue}}s.
         :: "flex"
     </dl>
 </div>
+
+
+<!--
+ ██████     ███    ██        ██████    ███ ███  
+██    ██   ██ ██   ██       ██    ██  ██     ██ 
+██        ██   ██  ██       ██       ██       ██
+██       ██     ██ ██       ██       ██       ██
+██       █████████ ██       ██       ██       ██
+██    ██ ██     ██ ██       ██    ██  ██     ██ 
+ ██████  ██     ██ ████████  ██████    ███ ███  
+-->
 
 ### Complex Numeric Values: {{CSSCalcValue}} objects ### {#complex-numeric}
 
