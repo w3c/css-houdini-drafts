@@ -622,12 +622,12 @@ When invoked, it must run these steps:
 
 <!--
 ██     ██ ██    ██ ████ ████████
-██     ██ ███   ██  ██     ██   
-██     ██ ████  ██  ██     ██   
-██     ██ ██ ██ ██  ██     ██   
-██     ██ ██  ████  ██     ██   
-██     ██ ██   ███  ██     ██   
- ███████  ██    ██ ████    ██   
+██     ██ ███   ██  ██     ██
+██     ██ ████  ██  ██     ██
+██     ██ ██ ██ ██  ██     ██
+██     ██ ██  ████  ██     ██
+██     ██ ██   ███  ██     ██
+ ███████  ██    ██ ████    ██
 -->
 
 ### Value + Unit: {{CSSUnitValue}} objects ### {#simple-numeric}
@@ -684,18 +684,27 @@ are represented as {{CSSUnitValue}}s.
         :: "resolution"
         : |unit| is a <<flex>> unit
         :: "flex"
+        : anything else
+        :: the string does not have a [=CSS type=]
     </dl>
 </div>
 
+A {{CSSUnitValue}} matches a CSS type production,
+such as <<number>> or <<length>>,
+if its equivalent CSS value
+(with the same value and unit,
+or similar with "number" and "percent")
+matches that production.
+
 
 <!--
- ██████     ███    ██        ██████    ███ ███  
-██    ██   ██ ██   ██       ██    ██  ██     ██ 
+ ██████     ███    ██        ██████    ███ ███
+██    ██   ██ ██   ██       ██    ██  ██     ██
 ██        ██   ██  ██       ██       ██       ██
 ██       ██     ██ ██       ██       ██       ██
 ██       █████████ ██       ██       ██       ██
-██    ██ ██     ██ ██       ██    ██  ██     ██ 
- ██████  ██     ██ ████████  ██████    ███ ███  
+██    ██ ██     ██ ██       ██    ██  ██     ██
+ ██████  ██     ██ ████████  ██████    ███ ███
 -->
 
 ### Complex Numeric Values: {{CSSCalcValue}} objects ### {#complex-numeric}
@@ -715,7 +724,7 @@ and the object as a whole represents the sum of its units.
 
 <xmp class=idl>
 interface CSSCalcValue : CSSNumericValue {
-    maplike <DOMString, double>;
+    maplike<DOMString, double>;
     CSSCalcValue set(DOMString unit, double value);
     readonly attribute DOMString type;
 };
