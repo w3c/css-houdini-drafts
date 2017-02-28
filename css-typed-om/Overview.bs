@@ -124,23 +124,23 @@ of the value the {{CSSStyleValue}} object represents.
 
 	1. Attempt to parse |property| as an <<ident>>.
 		If this fails,
-		<a>throw</a> a {{SyntaxError}} and exit this algorithm.
+		[=throw=] a {{SyntaxError}} and exit this algorithm.
 		Otherwise, let |property| be the parsed result.
 		If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| <a>ASCII lowercased</a>.
+		let |property| be |property| [=ASCII lowercased=].
 
-	2. If |property| is not a <a>supported property name</a>,
-		<a>throw</a> a {{TypeError}} and exit this algorithm.
+	2. If |property| is not a [=supported property name=],
+		[=throw=] a {{TypeError}} and exit this algorithm.
 
 	3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
 		If this fails,
-		<a>throw</a> a {{SyntaxError}} and exit this algorithm.
+		[=throw=] a {{SyntaxError}} and exit this algorithm.
 		Otherwise,
 		let |value| be the parsed result.
 
-	4. If |property| is a <a>list-valued property</a>,
+	4. If |property| is a [=list-valued property=],
 		subdivide |value| into a list of {{CSSStyleValue}} objects,
-		each representing one <a>list-valued property iteration</a>,
+		each representing one [=list-valued property iteration=],
 		and let |value| be the result.
 
 	5. Return a {{CSSStyleValue}} representing |value|.
@@ -204,32 +204,32 @@ future without breaking code that relies on calling
 	must run these steps:
 
 	1. If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| <a>ASCII lowercased</a>.
+		let |property| be |property| [=ASCII lowercased=].
 
-	2. If |property| is not a <a>supported property name</a>,
-		<a>throw</a> a {{TypeError}} and exit this algorithm.
+	2. If |property| is not a [=supported property name=],
+		[=throw=] a {{TypeError}} and exit this algorithm.
 
-	3. If |property| is not a <a>list-valued property</a>,
-		<a>throw</a> a {{TypeError}} and exit this algorithm.
+	3. If |property| is not a [=list-valued property=],
+		[=throw=] a {{TypeError}} and exit this algorithm.
 
-	4. If {{StylePropertyMap}}’s <a>property model</a> contains an entry for |property|,
+	4. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
 		let |entry| be that entry.
 		Otherwise, create a new entry for |property| with an empty list,
-		add it to the <a>property model</a>,
+		add it to the [=property model=],
 		and let |entry| be the newly-created entry.
 
 	5. Let |values to append| be the empty list.
 
 	6. For each |value| in |values|:
 		: If |value| is a {{CSSStyleValue}},
-		:: If |value| does not match the grammar of a <a>list-valued property iteration</a> of |property|,
-			<a>throw</a> a {{TypeError}} and exit this algorithm.
+		:: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
+			[=throw=] a {{TypeError}} and exit this algorithm.
 			Otherwise, append |value| to the end of |values to append|.
 		: If |value| is a {{DOMString}},
-		::	<a>Parse a CSSStyleValue</a> with property |property| and value |value|.
+		::	[=Parse a CSSStyleValue=] with property |property| and value |value|.
 			If the result is null,
-			<a>throw</a> a {{TypeError}} and exit this algorithm.
-			Otherwise, append each <a>list-valued property iteration</a> in the result to the end of |values to append|.
+			[=throw=] a {{TypeError}} and exit this algorithm.
+			Otherwise, append each [=list-valued property iteration=] in the result to the end of |values to append|.
 
 	7. Append |values to append| to the end of |entry|’s list.
 </div>
@@ -248,7 +248,7 @@ future without breaking code that relies on calling
 
 The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
 UpdateFunction <var>updateFunction</var>)</dfn> method, when invoked, must
-<a>update a value in a StylePropertyMap</a> with property name
+[=update a value in a StylePropertyMap=] with property name
 <var>property</var>, update function <var>updateFunction</var>, and property
 map set to the object this method was invoked on .
 
@@ -258,19 +258,19 @@ map set to the object this method was invoked on .
     steps:
 
     1.  Let <var>old value</var> be the result of running the algorithm to
-        <a>get a value from a StylePropertyMap</a> with property name <var>property
+        [=get a value from a StylePropertyMap=] with property name <var>property
         name</var> and property map <var>property map</var>.
 
-    2.  Let <var>new value</var> be the return value given by <a>invoking</a> the callback
+    2.  Let <var>new value</var> be the return value given by [=invoking=] the callback
         <var>update function</var> with a single input of <var>old value</var>.
 
-    3.  Run the algorithm to <a>set a value on a StylePropertyMap</a> with property name <var>property name</var>,
+    3.  Run the algorithm to [=set a value on a StylePropertyMap=] with property name <var>property name</var>,
         value <var>new value</var>, and property map <var>property map</var>.
 
 </div>
 
 The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the properties listed in
-the <a>property model</a>. This list of properties is sorted in the following manner:
+the [=property model=]. This list of properties is sorted in the following manner:
 
 *   normal properties are sorted alphabetically.
 *   custom properties are sorted by increasing code point order.
@@ -297,7 +297,7 @@ partial interface Window {
 {{Element}} or pseudo element, and are accessed by calling the
 {{Window/getComputedStyleMap()}} method.
 
-When constructed, the <a>property model</a> for <a>computed StylePropertyMap</a>
+When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
 Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
@@ -317,7 +317,7 @@ partial interface CSSStyleRule {
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-When constructed, the <a>property model</a> for <a>declared StylePropertyMap</a>
+When constructed, the [=property model=] for [=declared StylePropertyMap=]
 objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
@@ -337,7 +337,7 @@ partial interface Element {
 directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
 attribute of {{Element}} objects.
 
-When constructed, the <a>property model</a> for <a>inline StylePropertyMap</a> objects
+When constructed, the [=property model=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
@@ -423,7 +423,7 @@ Numeric Values: {#numeric-objects}
 {{CSSNumericValue}} objects are not range-restricted.
 Any valid numeric value can be represented by a {{CSSNumericValue}},
 and that value will not be clamped, rounded, or rejected
-when set on a <a>declared StylePropertyMap</a> or <a>inline StylePropertyMap</a>.
+when set on a [=declared StylePropertyMap=] or [=inline StylePropertyMap=].
 Instead, clamping and/or rounding will occur during computation of style.
 
 <div class='example'>
@@ -470,79 +470,81 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 </xmp>
 
 The methods on the {{CSSNumericValue}} superclass
-represent operations that all <<dimension>>s can perform.
+represent operations that all numeric values can perform.
 
 The following are the arithmetic operations you can perform on dimensions:
 
-<dl dfn-for="CSSNumericValue">
-	: <dfn method>add(|value|)</dfn>
-	::
-		1. If |this| and |value| are both {{CSSUnitValue}}s
-			and have the same unit,
-			return a new {{CSSUnitValue}}
-			with the same unit
-			and a value equal to the sum of |this|’s and |value|’s values.
+<div algorithm="CSSNumericValue/add">
+	The <dfn for=CSSNumericValue method>add(|value|)</dfn> method,
+	when called on a {{CSSNumericValue}} |this|,
+	must perform the following steps:
 
-		2. If |this| and |value| are both {{CSSUnitValue}}s
-			and one has the unit `"number"`
-			while the other has the unit `"percentage"`,
-			then <a>throw</a> a {{TypeError}}
-			and abort this algorithm.
+	1. If |this| and |value| are both [=strongly typed=],
+		but to different types,
+		[=throw=] a {{TypeError}}.
 
-		3. Otherwise,
-			if |this| and |value| have units of the same [=CSS type=],
-			return a {{CSSCalcValue}}
-			representing |this| and |value|’s sum.
+	2. If |this| and |value| are both {{CSSUnitValue}}s:
+		and have the same {{CSSUnitValue/unit}},
+		return a new {{CSSUnitValue}}
+		with the same unit
+		and a value equal to the sum of |this|’s and |value|’s values.
 
-		4. Otherwise,
-			<a>throw</a> a {{TypeError}}.
+	3. Otherwise,
+		return a {{CSSCalcValue}}
+		representing the sum of the |this| and |value|.
+</div>
 
-	: <dfn method>sub(|value|)</dfn>
-	::
-		1. If |this| and |value| are both {{CSSUnitValue}}s
-			and have the same unit,
-			return a new {{CSSUnitValue}}
-			with the same unit
-			and a value equal to the difference of |this|’s and |value|’s values.
+<div algorithm="CSSNumericValue/sub">
+	The <dfn for=CSSNumericValue method>sub(|value|)</dfn> method,
+	when called on a {{CSSNumericValue}} |this|,
+	must perform the following steps:
 
-		2. If |this| and |value| are both {{CSSUnitValue}}s
-			and one has the unit `"number"`
-			while the other has the unit `"percentage"`,
-			then <a>throw</a> a {{TypeError}}
-			and abort this algorithm.
+	1. If |this| and |value| are both [=strongly typed=],
+		but to different types,
+		[=throw=] a {{TypeError}}.
 
-		3. Otherwise,
-			if |this| and |value| have units both associated with the same [=CSS type=],
-			return a {{CSSCalcValue}}
-			representing |this| and |value|’s difference.
+	2. If |this| and |value| are both {{CSSUnitValue}}s:
+		and have the same {{CSSUnitValue/unit}},
+		return a new {{CSSUnitValue}}
+		with the same unit
+		and a value equal to the difference of |this|’s and |value|’s values.
 
-		4. Otherwise,
-			<a>throw</a> a {{TypeError}}.
+	3. Otherwise,
+		return a {{CSSCalcValue}}
+		representing the difference of the |this| and |value|.
+</div>
 
-	: <dfn method>mul(|value|)</dfn>
-	::
-		1. If |this| is a {{CSSUnitValue}},
-			return a new {{CSSUnitValue}}
-			with the same unit
-			and a value equal to |this|’s value times |value|.
+<div algorithm="CSSNumericValue/mul">
+	The <dfn for=CSSNumericValue method>mul(|value|)</dfn> method,
+	when called on a {{CSSNumericValue}} |this|,
+	must perform the following steps:
 
-		2. Otherwise,
-			return a new {{CSSCalcValue}}
-			containing the same keys,
-			but with each value multiplied by |value|.
+	1. If |this| is a {{CSSUnitValue}},
+		return a new {{CSSUnitValue}}
+		with the same unit
+		and a value equal to |this|’s value times |value|.
 
-	: <dfn method>div(|value|)</dfn>
-	::
-		1. If |this| is a {{CSSUnitValue}},
-			return a new {{CSSUnitValue}}
-			with the same unit
-			and a value equal to |this|’s value divided by |value|.
+	2. Otherwise,
+		return a new {{CSSCalcValue}}
+		containing the same keys,
+		but with each value multiplied by |value|.
+</div>
 
-		2. Otherwise,
-			return a new {{CSSCalcValue}}
-			containing the same keys,
-			but with each value divided by |value|.
-</dl>
+<div algorithm="CSSNumericValue/div">
+	The <dfn for=CSSNumericValue method>div(|value|)</dfn> method,
+	when called on a {{CSSNumericValue}} |this|,
+	must perform the following steps:
+
+	1. If |this| is a {{CSSUnitValue}},
+		return a new {{CSSUnitValue}}
+		with the same unit
+		and a value equal to |this|’s value divided by |value|.
+
+	2. Otherwise,
+		return a new {{CSSCalcValue}}
+		containing the same keys,
+		but with each value divided by |value|.
+</div>
 
 The following two factory methods allow a {{CSSNumericValue}} to be constructed directly.
 Note that they are static methods,
@@ -551,15 +553,15 @@ rather than on {{CSSNumericValue}} instances.
 
 : <dfn method for=CSSNumericValue>from(|cssText|)</dfn>
 ::
-	1. <a>Parse a component value</a> from |cssText|
+	1. [=Parse a component value=] from |cssText|
 		and let |result| be the result.
 		If |result| is a syntax error,
-		<a>throw</a> a {{SyntaxError}}
+		[=throw=] a {{SyntaxError}}
 		and abort this algorithm.
 
 	2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
 		or a <<calc()>>,
-		<a>throw</a> a {{SyntaxError}}
+		[=throw=] a {{SyntaxError}}
 		and abort this algorithm.
 
 	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
@@ -578,10 +580,10 @@ rather than on {{CSSNumericValue}} instances.
 
 : <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn>
 ::
-	1. If |unit| is not an <a>ASCII case-insensitive</a> match
+	1. If |unit| is not an [=ASCII case-insensitive=] match
 		for one of the CSS units
 		(including `"number"` and `"percent"` as units for this purpose),
-		<a>throw</a> a {{SyntaxError}}
+		[=throw=] a {{SyntaxError}}
 		and abort this algorithm.
 
 	2. Return a new {{CSSUnitValue}}
@@ -593,14 +595,14 @@ The <dfn method for=CSSNumericValue>to(|unit|)</dfn> converts an existing {{CSSN
 into another one with the specified |unit|.
 When invoked, it must run these steps:
 
-1. If |unit| is not an <a>ASCII case-insensitive</a> match
+1. If |unit| is not an [=ASCII case-insensitive=] match
 	for one of the CSS units
 	(including `"number"` and `"percent"` as units for this purpose),
-	<a>throw</a> a {{SyntaxError}}
+	[=throw=] a {{SyntaxError}}
 	and abort this algorithm.
 
 2. If |this| is a {{CSSUnitValue}}
-	and |this|’s unit and |unit| are <a>compatible units</a>,
+	and |this|’s unit and |unit| are [=compatible units=],
 	return a new {{CSSUnitValue}}
 	with its unit set to |unit|
 	and its value set to |this|’s value
@@ -608,7 +610,7 @@ When invoked, it must run these steps:
 
 3. If |this| is a {{CSSCalcValue}}
 	and all of its keys
-	are <a>compatible units</a> with |unit|,
+	are [=compatible units=] with |unit|,
 	return a new {{CSSUnitValue}}
 	with its unit set to |unit|
 	and its value to the sum of
@@ -617,7 +619,25 @@ When invoked, it must run these steps:
 	between their key and |unit|.
 
 4. Otherwise,
-	<a>throw</a> a {{TypeError}}.
+	[=throw=] a {{TypeError}}.
+
+<div algorithm="CSSNumericValue/typing" dfn-for=CSSNumericValue>
+	{{CSSNumericValue}}s can be <dfn export>strongly typed</dfn>
+	or <dfn>weakly typed</dfn> to a type,
+	or <dfn>untyped</dfn>.
+
+	A {{CSSUnitValue}} is [=weakly typed=] to its [=CSS type=]
+	if that [=CSS type=] is "percent" or "number".
+	It's [=strongly typed=] to its [=CSS type=] otherwise.
+	It's never [=untyped=].
+
+	A {{CSSCalcValue}} is [=strongly typed=] if its [=CSS type set=]
+	contains a value other than "percent" or "number",
+	to that value.
+	It's [=weakly typed=] if it's not [=strongly typed=],
+	but its [=CSS type set=] [=set/is not empty=].
+	It's [=untyped=] if its [=CSS type set=] [=set/is empty=].
+</div>
 
 
 <!--
@@ -678,7 +698,6 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm="CSSUnitValue/CSS type">
-
     The <dfn>CSS type</dfn> of a string |unit| is:
 
     <dl class=switch>
@@ -702,6 +721,8 @@ are represented as {{CSSUnitValue}}s.
         :: the string does not have a [=CSS type=]
     </dl>
 </div>
+
+A {{CSSUnitValue}}
 
 A {{CSSUnitValue}} matches a CSS type production,
 such as <<number>> or <<length>>,
@@ -756,7 +777,7 @@ interface CSSCalcValue : CSSNumericValue {
     2. If |this| has no [=strong type=],
         or if |newType| is "percent", "number",
         or equal to |this|’s [=strong type=],
-        [=map/set=] the key |unit| to the value |value| in |this|’s <a>map entries</a>,
+        [=map/set=] the key |unit| to the value |value| in |this|’s [=map entries=],
         and return |this|.
 
     3. Otherwise, [=throw=] a {{TypeError}}.
@@ -1103,8 +1124,8 @@ interface CSSFontFaceValue : CSSResourceValue {
 </pre>
 
 {{CSSFontFaceValue}} objects are opaque representations of the contents of
-@font-face rules. They are used to pass font information into <a>paint image definition</a>s,
-via <a>custom properties</a>.
+@font-face rules. They are used to pass font information into [=paint image definition=]s,
+via [=custom properties=].
 
 As font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
 of {{CSSResourceValue}}.
@@ -1522,7 +1543,7 @@ Computed {{CSSCalcValue}} objects {#computed-calc-objects}
 During computation, {{CSSCalcValue}} objects are reduced accordingly:
 
 1. All non-`number`, non-`percent` values are absolutized
-	into the <a>canonical unit</a> for the object's associated type.
+	into the [=canonical unit=] for the object's associated type.
 2. If the objects contains exactly one of (the canonical unit, a percent value, a number)
 	with a present, non-zero value,
 	then the computed value is an equivalent computed {{CSSUnitValue}}.
