@@ -824,11 +824,6 @@ if its equivalent CSS ''calc()'' value matches that production.
 {{CSSTransformValue}} objects represent values for the 'transform' property. A
 {{CSSTransformValue}} represents a list of {{CSSTransformComponent}}s.
 
-Issue: {{CSSTransformValue}} needs a way to actually manipulate the list;
-add/remove/etc.
-`iterable` doesn't give this.
-I think we just need to define indexed getter/setter?
-
 <xmp class=idl>
     interface CSSTransformComponent {
     	readonly attribute DOMString cssText;
