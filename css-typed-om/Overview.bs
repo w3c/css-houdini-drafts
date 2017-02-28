@@ -874,11 +874,23 @@ if its equivalent CSS ''calc()'' value matches that production.
 
 {{CSSTransformComponent}} objects have the following properties:
 
-The <dfn attribute for=CSSTransformComponent>is2D</dfn> attribute is
-true if the component represents a 2D transform function,
-and false otherwise. The transform function which the component represents is
-stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</dfn>
-attribute.
+<div algorithm="CSSTransformComponent/is2D">
+	The <dfn attribute for=CSSTransformComponent>is2D</dfn> attribute is
+	true if the component represents a 2D transform function,
+	and false otherwise.
+
+	This is only true for:
+
+	* {{CSSTranslation}} objects if their {{CSSTranslation/z}} attribute is 0
+	* {{CSSRotation}} objects if their {{CSSRotation/x}} and {{CSSRotation/y}} attributes are 0
+	* {{CSSScale}} objects if their {{CSSScale/z}} attribute is 1
+	* {{CSSSkew}} objects at all times
+	* {{CSSPerspective}} objects never.
+	* {{CSSMatrixComponent}} objects if their {{CSSMatrixComponent/matrix}}’s [=DOMMatrixReadonly/is2D=] flag is true.
+</div>
+
+The transform function which the component represents
+is stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</dfn> attribute.
 
 <div class=note>
     Each {{CSSTransformComponent}} can correspond to one of a number of underlying
