@@ -475,8 +475,8 @@ The following are the arithmetic operations you can perform on dimensions:
 			and abort this algorithm.
 
 		3. Otherwise,
-			if |this| and |value| have units both associated with the same <a>calc() interface</a>,
-			return an instance of that <a>calc() interface</a>
+			if |this| and |value| have units of the same [=CSS type=],
+			return a {{CSSCalcValue}}
 			representing |this| and |value|’s sum.
 
 		4. Otherwise,
@@ -497,8 +497,8 @@ The following are the arithmetic operations you can perform on dimensions:
 			and abort this algorithm.
 
 		3. Otherwise,
-			if |this| and |value| have units both associated with the same ,
-			return an instance of that <a>calc() interface</a>
+			if |this| and |value| have units both associated with the same [=CSS type=],
+			return a {{CSSCalcValue}}
 			representing |this| and |value|’s difference.
 
 		4. Otherwise,
@@ -512,9 +512,9 @@ The following are the arithmetic operations you can perform on dimensions:
 			and a value equal to |this|’s value times |value|.
 
 		2. Otherwise,
-			return a <a>calc() interface</a> object of the same type as |this|,
-			with all the units either set to `null` if they are `null` in |this|,
-			or set to that unit's value in |this| times |value|.
+			return a new {{CSSCalcValue}}
+			containing the same keys,
+			but with each value multiplied by |value|.
 
 	: <dfn method>div(|value|)</dfn>
 	::
@@ -524,9 +524,9 @@ The following are the arithmetic operations you can perform on dimensions:
 			and a value equal to |this|’s value divided by |value|.
 
 		2. Otherwise,
-			return a <a>calc() interface</a> object of the same type as |this|,
-			with all the units either set to `null` if they are `null` in |this|,
-			or set to that unit's value in |this| divided by |value|.
+			return a new {{CSSCalcValue}}
+			containing the same keys,
+			but with each value divided by |value|.
 </dl>
 
 The following two factory methods allow a {{CSSNumericValue}} to be constructed directly.
@@ -557,9 +557,9 @@ rather than on {{CSSNumericValue}} instances.
 	4. If |result| is a <<calc()>>,
 		normalize the ''calc()'' argument
 		into a sum of values with unique units,
-		then return a new <a>calc() interface</a> object of the appropriate type,
-		with the corresponding fields set to the specified values,
-		and all the rest set to `null`.
+		then return a {{CSSCalcValue}} object,
+		with keys for each unit in the calc,
+		and values set to the corresponding numeric values.
 
 : <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn>
 ::
@@ -591,15 +591,15 @@ When invoked, it must run these steps:
 	and its value set to |this|’s value
 	multiplied by the conversion ratio between the two units.
 
-3. If |this| is a <a>calc() interface</a>
-	and the units of all of its non-null, non-zero fields
+3. If |this| is a {{CSSCalcValue}}
+	and all of its keys
 	are <a>compatible units</a> with |unit|,
 	return a new {{CSSUnitValue}}
 	with its unit set to |unit|
 	and its value to the sum of
-	each of |this|’s non-null, non-zero fields
+	each of |this|’s values
 	multiplied by the corresponding conversion ratios
-	between them and |unit|.
+	between their key and |unit|.
 
 4. Otherwise,
 	<a>throw</a> a {{TypeError}}.
@@ -631,12 +631,14 @@ are represented as {{CSSUnitValue}}s.
 </xmp>
 
 <div algorithm="CSSUnitValue/type">
+
     The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
     on reading,
     return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}}.
 </div>
 
-<div algorithm="CSSUnitValue/CSS type>
+<div algorithm="CSSUnitValue/CSS type">
+
     The <dfn>CSS type</dfn> of a string |unit| is:
 
     <dl class=switch>
@@ -671,7 +673,7 @@ and the object as a whole represents the sum of its units.
     For example,
     the CSS value ''calc(1em + 5px)''
     will be represented by a {{CSSCalcValue}}
-    [=map/contains|containing=] «[ "em" → `1`, "px" → `5` ]».
+    [=map/contains|containing=] <nobr>«[ "em" → 1, "px" → 5 ]»</nobr>.
 </div>
 
 <xmp class=idl>
@@ -817,7 +819,7 @@ I think we just need to define indexed getter/setter?
     interface CSSMatrixComponent : CSSTransformComponent {
     	attribute DOMMatrix matrix;
     };
-</pre>
+</xmp>
 
 {{CSSTransformComponent}} objects have the following properties:
 
@@ -1315,10 +1317,10 @@ Otherwise,
 to the string representation of their {{CSSUnitValue/value}}
 followed by their {{CSSUnitValue/unit}}.
 
-<a>Calc() Interface</a> Serialization {#calc-serialization}
+{{CSSCalcValue}} Serialization {#calc-serialization}
 ---------------------------------------------------------
 
-<a>Calc() interface</a> objects are serialized into a ''calc()'' expression,
+{{CSSCalcValue}} objects are serialized into a ''calc()'' expression,
 per the rules in [[css-values-3#calc-serialize]],
 treating the object as a summation of all the non-`null` values it contains.
 
@@ -1444,17 +1446,17 @@ During computation, {{CSSKeywordValue}} objects are either as specified (e.g. ''
 values for lengths that participate in layout) or resolved to a relevant value
 and renormalized (e.g. the color ''red'').
 
-Computed {{CSSNumericValue}} objects {#computed-numericvalue-objects}
+Computed {{CSSUnitValue}} objects {#computed-numericvalue-objects}
 ---------------------------------------------------------------------
 
 During computation, {{CSSUnitValue}} objects
 are range-restricted or rounded as appropriate to the relevant property,
 but otherwise as specified.
 
-Computed <a>calc() interface</a> objects {#computed-calc-objects}
+Computed {{CSSCalcValue}} objects {#computed-calc-objects}
 -----------------------------------------------------------------
 
-During computation, <a>calc() interface</a> objects are reduced accordingly:
+During computation, {{CSSCalcValue}} objects are reduced accordingly:
 
 1. All non-`number`, non-`percent` values are absolutized
 	into the <a>canonical unit</a> for the object's associated type.
@@ -1462,7 +1464,7 @@ During computation, <a>calc() interface</a> objects are reduced accordingly:
 	with a present, non-zero value,
 	then the computed value is an equivalent computed {{CSSUnitValue}}.
 3. Otherwise,
-	it's a <a>calc() interface</a>
+	it's a {{CSSCalcValue}}
 	containing the canonical unit, percent value, and number,
 	if those are present and non-zero,
 	and all other fields are `null`.
