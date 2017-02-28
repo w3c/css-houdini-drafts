@@ -69,7 +69,7 @@ Some particular considerations:
 		must explicitly be set using the API.
 *   objects are organized for consistency rather than ease of access. For example, even
 		though lengths are often numeric pixel values, a declared {{CSSNumericValue}} can't be
-		treated as a number without first explicitly casting it to a {{CSSSimpleNumericValue}}, as calc
+		treated as a number without first explicitly casting it to a {{CSSUnitValue}}, as calc
 		expressions and keywords are also valid lengths.
 
 <!--
@@ -227,7 +227,7 @@ future without breaking code that relies on calling
 
 <div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
-    
+
     Issue: write this.
 </div>
 
@@ -381,29 +381,6 @@ interface CSSKeywordValue : CSSStyleValue {
 should check that they contain valid CSS, but they do not check whether the contained string is a valid
 keyword for a particular property. Property setters are required to enforce keyword validity.
 
-<!--
-██    ██ ██     ██ ██     ██ ████████  ████████ ████████
-███   ██ ██     ██ ███   ███ ██     ██ ██       ██     ██
-████  ██ ██     ██ ████ ████ ██     ██ ██       ██     ██
-██ ██ ██ ██     ██ ██ ███ ██ ████████  ██████   ████████
-██  ████ ██     ██ ██     ██ ██     ██ ██       ██   ██
-██   ███ ██     ██ ██     ██ ██     ██ ██       ██    ██
-██    ██  ███████  ██     ██ ████████  ████████ ██     ██
--->
-
-{{CSSNumberValue}} objects {#numbervalue-objects}
-----------------------------------------------
-
-<pre class='idl'>
-[Constructor(double), Constructor(DOMString cssText)]
-interface CSSNumberValue : CSSStyleValue {
-	attribute double value;
-};
-</pre>
-
-{{CSSNumberValue}} objects represent values for simple number-valued properties like 'z-index' or 'opacity'.
-
-
 
 
 <!--
@@ -423,9 +400,9 @@ Numeric Values: {#numeric-objects}
 {{CSSNumericValue}} objects represent CSS values that are numeric in nature
 (<<number>>s, <<percentage>>s, <<dimension>>s).
 
-* {{CSSSimpleNumericValue}} objects represent values that contain a single unit type
+* {{CSSUnitValue}} objects represent values that contain a single unit type
 	(for example "42px").
-* Objects of the <a>calc() interfaces</a> represent values that contain multiple units
+* {{CSSCalcValue}} objects represent values that contain multiple units
 	(for example "calc(56em + 10%)").
 
 {{CSSNumericValue}} objects are not range-restricted.
@@ -437,7 +414,7 @@ Instead, clamping and/or rounding will occur during computation of style.
 <div class='example'>
 	The following code is valid
 
-	<pre>
+	<pre class=lang-js>
 		myElement.styleMap.set("opacity", CSS.number(3));
 		myElement.styleMap.set("z-index", CSS.number(15.4));
 
@@ -464,18 +441,18 @@ All numeric CSS values
 (<<number>>s, <<percentage>>s, and <<dimension>>s)
 are represented by subclasses of the {{CSSNumericValue}} interface.
 
-<pre class=idl>
-interface CSSNumericValue : CSSStyleValue {
-	CSSNumericValue add(CSSNumericValue value);
-	CSSNumericValue subtract(CSSNumericValue value);
-	CSSNumericValue multiply(double value);
-	CSSNumericValue divide(double value);
+<xmp class=idl>
+    interface CSSNumericValue : CSSStyleValue {
+    	CSSNumericValue add(CSSNumericValue value);
+    	CSSNumericValue subtract(CSSNumericValue value);
+    	CSSNumericValue multiply(double value);
+    	CSSNumericValue divide(double value);
 
-	static CSSNumericValue from(DOMString cssText);
-	static CSSNumericValue from(double value, DOMString unit);
-	CSSNumericValue to(DOMString unit);
-};
-</pre>
+    	static CSSNumericValue from(DOMString cssText);
+    	static CSSNumericValue from(double value, DOMString unit);
+    	CSSNumericValue to(DOMString unit);
+    };
+</xmp>
 
 The methods on the {{CSSNumericValue}} superclass
 represent operations that all <<dimension>>s can perform.
@@ -485,13 +462,13 @@ The following are the arithmetic operations you can perform on dimensions:
 <dl dfn-for="CSSNumericValue">
 	: <dfn method>add(|value|)</dfn>
 	::
-		1. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+		1. If |this| and |value| are both {{CSSUnitValue}}s
 			and have the same unit,
-			return a new {{CSSSimpleNumericValue}}
+			return a new {{CSSUnitValue}}
 			with the same unit
 			and a value equal to the sum of |this|’s and |value|’s values.
 
-		2. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+		2. If |this| and |value| are both {{CSSUnitValue}}s
 			and one has the unit `"number"`
 			while the other has the unit `"percentage"`,
 			then <a>throw</a> a {{TypeError}}
@@ -507,20 +484,20 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	: <dfn method>sub(|value|)</dfn>
 	::
-		1. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+		1. If |this| and |value| are both {{CSSUnitValue}}s
 			and have the same unit,
-			return a new {{CSSSimpleNumericValue}}
+			return a new {{CSSUnitValue}}
 			with the same unit
 			and a value equal to the difference of |this|’s and |value|’s values.
 
-		2. If |this| and |value| are both {{CSSSimpleNumericValue}}s
+		2. If |this| and |value| are both {{CSSUnitValue}}s
 			and one has the unit `"number"`
 			while the other has the unit `"percentage"`,
 			then <a>throw</a> a {{TypeError}}
 			and abort this algorithm.
 
 		3. Otherwise,
-			if |this| and |value| have units both associated with the same <a>calc() interface</a>,
+			if |this| and |value| have units both associated with the same ,
 			return an instance of that <a>calc() interface</a>
 			representing |this| and |value|’s difference.
 
@@ -529,8 +506,8 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	: <dfn method>mul(|value|)</dfn>
 	::
-		1. If |this| is a {{CSSSimpleNumericValue}},
-			return a new {{CSSSimpleNumericValue}}
+		1. If |this| is a {{CSSUnitValue}},
+			return a new {{CSSUnitValue}}
 			with the same unit
 			and a value equal to |this|’s value times |value|.
 
@@ -541,8 +518,8 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	: <dfn method>div(|value|)</dfn>
 	::
-		1. If |this| is a {{CSSSimpleNumericValue}},
-			return a new {{CSSSimpleNumericValue}}
+		1. If |this| is a {{CSSUnitValue}},
+			return a new {{CSSUnitValue}}
 			with the same unit
 			and a value equal to |this|’s value divided by |value|.
 
@@ -571,7 +548,7 @@ rather than on {{CSSNumericValue}} instances.
 		and abort this algorithm.
 
 	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
-		return a new {{CSSSimpleNumericValue}} object
+		return a new {{CSSUnitValue}} object
 		with its value set to the token's value,
 		and the unit set to the token's unit if it's a <<dimension-token>>,
 		or `"number"` if it is a <<number-token>>,
@@ -592,7 +569,7 @@ rather than on {{CSSNumericValue}} instances.
 		<a>throw</a> a {{SyntaxError}}
 		and abort this algorithm.
 
-	2. Return a new {{CSSSimpleNumericValue}}
+	2. Return a new {{CSSUnitValue}}
 		with its value set to |value|
 		and its unit set to |unit|.
 
@@ -607,9 +584,9 @@ When invoked, it must run these steps:
 	<a>throw</a> a {{SyntaxError}}
 	and abort this algorithm.
 
-2. If |this| is a {{CSSSimpleNumericValue}}
+2. If |this| is a {{CSSUnitValue}}
 	and |this|’s unit and |unit| are <a>compatible units</a>,
-	return a new {{CSSSimpleNumericValue}}
+	return a new {{CSSUnitValue}}
 	with its unit set to |unit|
 	and its value set to |this|’s value
 	multiplied by the conversion ratio between the two units.
@@ -617,7 +594,7 @@ When invoked, it must run these steps:
 3. If |this| is a <a>calc() interface</a>
 	and the units of all of its non-null, non-zero fields
 	are <a>compatible units</a> with |unit|,
-	return a new {{CSSSimpleNumericValue}}
+	return a new {{CSSUnitValue}}
 	with its unit set to |unit|
 	and its value to the sum of
 	each of |this|’s non-null, non-zero fields
@@ -627,166 +604,141 @@ When invoked, it must run these steps:
 4. Otherwise,
 	<a>throw</a> a {{TypeError}}.
 
-### {{CSSSimpleNumericValue}} objects ### {#simple-numeric}
+### Value + Unit: {{CSSUnitValue}} objects ### {#simple-numeric}
 
 Numeric values that can be expressed as a single unit
 (or a naked number or percentage)
-are represented as {{CSSSimpleNumericValue}}s.
-
-<pre class=idl>
-interface CSSSimpleNumericValue : CSSNumericValue {
-  attribute double value;
-  attribute DOMString unit;
-};
-</pre>
-
-When attempting to set the {{CSSSimpleNumericValue/unit}} attribute,
-if the value is not an <a>ASCII case-insensitive</a> match
-for one of the CSS units
-(including `"number"` and `"percent"` as units for this purpose),
-<a>throw</a> a {{SyntaxError}}
-and leave {{CSSSimpleNumericValue/unit}} unchanged.
-
-<<number>> values are represented with the unit `"number"`,
-while <<percentage>> values are represented with the unit `"percent"`.
-<<dimension>>s are represented with their corresponding unit.
-
-Each {{CSSSimpleNumericValue}} is associated with a corresponding CSS type
-(such as <<length>>),
-based on its unit.
+are represented as {{CSSUnitValue}}s.
 
 <div class=example>
 	For example, the value ''5px'' in a stylesheet
-	will be represented by a {{CSSSimpleNumericValue}}
+	will be represented by a {{CSSUnitValue}}
 	with its `value` attribute set to `5`
 	and its `unit` attribute set to `"px"`.
 
 	Similarly, the value ''10'' in a stylesheet
-	will be represented by a {{CSSSimpleNumericValue}}
+	will be represented by a {{CSSUnitValue}}
 	with its `value` attribute set to `10`
 	and its `unit` attribute set to `"number"`.
 </div>
 
-### Complex Numeric Values ### {#complex-numeric}
+<xmp class=idl>
+    interface CSSUnitValue : CSSNumericValue {
+        attribute double value;
+        attribute DOMString unit;
+        readonly attribute DOMString type;
+    };
+</xmp>
+
+<div algorithm="CSSUnitValue/type">
+    The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
+    on reading,
+    return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}}.
+</div>
+
+<div algorithm="CSSUnitValue/CSS type>
+    The <dfn>CSS type</dfn> of a string |unit| is:
+
+    <dl class=switch>
+        : |unit| is "number"
+        :: "number"
+        : |unit| is "percent"
+        :: "percent"
+        : |unit| is a <<length>> unit
+        :: "length"
+        : |unit| is an <<angle>> unit
+        :: "angle"
+        : |unit| is a <<time>> unit
+        :: "time"
+        : |unit| is a <<frequency>> unit
+        :: "frequency"
+        : |unit| is a <<resolution>> unit
+        :: "resolution"
+        : |unit| is a <<flex>> unit
+        :: "flex"
+    </dl>
+</div>
+
+### Complex Numeric Values: {{CSSCalcValue}} objects ### {#complex-numeric}
 
 Numeric values that can only be expressed with a combination of units
-are represented as one of the following <dfn>calc() interfaces</dfn>.
+are represented as {{CSSCalcValue}}.
+This is a Map-like value,
+where each entry represents the value of one unit,
+and the object as a whole represents the sum of its units.
 
-<pre class=idl>
-[Constructor(CSSCalcLengthDictionary)]
-interface CSSCalcLength : CSSNumericValue {
-	attribute double? ch;
-	attribute double? cm;
-	attribute double? em;
-	attribute double? ex;
-	attribute double? in;
-	attribute double? mm;
-	attribute double? pc;
-	attribute double? pt;
-	attribute double? px;
-	attribute double? q;
-	attribute double? rem;
-	attribute double? vh;
-	attribute double? vmax;
-	attribute double? vmin;
-	attribute double? vw;
-	attribute double? number;
-	attribute double? percent;
+<div class=example>
+    For example,
+    the CSS value ''calc(1em + 5px)''
+    will be represented by a {{CSSCalcValue}}
+    [=map/contains|containing=] «[ "em" → `1`, "px" → `5` ]».
+</div>
+
+<xmp class=idl>
+interface CSSCalcValue : CSSNumericValue {
+    maplike <DOMString, double>;
+    CSSCalcValue set(DOMString unit, double value);
+    readonly attribute DOMString type;
 };
+</xmp>
 
-dictionary CSSCalcLengthDictionary {
-	double? ch;
-	double? cm;
-	double? em;
-	double? ex;
-	double? in;
-	double? mm;
-	double? pc;
-	double? pt;
-	double? px;
-	double? q;
-	double? rem;
-	double? vh;
-	double? vmax;
-	double? vmin;
-	double? vw;
-	double? number;
-	double? percent;
-};
+<div algorithm="CSSCalcValue/set">
+    The <dfn method for=CSSCalcValue>set(|unit|, |value|)</dfn> method,
+    when called on a {{CSSCalcValue}} |this|,
+    must perform the following steps:
 
-[Constructor(CSSCalcAngleDictionary)]
-interface CSSCalcAngle : CSSNumericValue {
-	attribute double? deg;
-	attribute double? grad;
-	attribute double? rad;
-	attribute double? turn;
-	attribute double? number;
-	attribute double? percent;
-};
+    1. Let |newType| be the [=CSS type=] of |unit|.
+        If |unit| does not have a [=CSS type=],
+        [=throw=] a {{TypeError}}.
 
-dictionary CSSCalcAngleDictionary {
-	double? deg;
-	double? grad;
-	double? rad;
-	double? turn;
-	double? number;
-	double? percent;
-};
+    2. If |this| has no [=strong type=],
+        or if |newType| is "percent", "number",
+        or equal to |this|’s [=strong type=],
+        [=map/set=] the key |unit| to the value |value| in |this|’s <a>map entries</a>,
+        and return |this|.
 
-[Constructor(CSSCalcTimeDictionary)]
-interface CSSCalcTime : CSSNumericValue {
-	attribute double? s;
-	attribute double? ms;
-	attribute double? number;
-	attribute double? percent;
-};
+    3. Otherwise, [=throw=] a {{TypeError}}.
+</div>
 
-dictionary CSSCalcTimeDictionary {
-	double? s;
-	double? ms;
-	double? number;
-	double? percent;
-};
+<div algorithm="CSSCalcValue/type">
+    The <dfn attribute for=CSSCalcValue>type</dfn> attribute
+    of a {{CSSCalcValue}} |this| must,
+    on reading,
+    must return the concatenation of the entries in |this|’s [=CSS type set=],
+    each separated by a U+002D HYPHEN-MINUS (-) character.
+    If there are multiple entries,
+    they must be concatenated in the order:
+    [=strong type=],
+    "percent",
+    "number".
 
-[Constructor(CSSCalcFrequencyDictionary)]
-interface CSSCalcFrequency : CSSNumericValue {
-	attribute double? Hz;
-	attribute double? kHz;
-	attribute double? number;
-	attribute double? percent;
-};
+    Note: This implies that if the [=CSS type set=] is empty
+    (because |this| [=map/is empty=]),
+    this attribute returns the empty string.
+</div>
 
-dictionary CSSCalcFrequencyictionary {
-	double? Hz;
-	double? kHz;
-	double? number;
-	double? percent;
-};
-</pre>
+<div algorithm="CSSCalcValue/CSS type set">
+    The <dfn for=CSSCalcValue>CSS type set</dfn> of a {{CSSCalcValue}} |this|
+    is an [=ordered set=]
+    that contains the [=CSS types=] of every key
+    [=map/contains|contained=] in |this|’s [=map entries=].
 
-For each of these interfaces,
-the construct must execute the following steps:
+    Note: The [=CSS type set=] will contain at most 3 entries;
+    "percent", "number",
+    and this {{CSSCalcValue}}’s [=strong type=].
+</div>
 
-1. For each <a>present</a> member of the passed dictionary,
-	set the corresponding attribute of the same name to the member's value.
+A {{CSSCalcValue}} has a <dfn for=CSSCalcValue>strong type</dfn>
+if its [=CSS type set=] [=set/contains=] a value other than "percent" or "number",
+equal to that other value.
 
-2. Set any remaining attributes to the value `null`.
-
-Each <a>calc() interface</a> is associated with a corresponding CSS type:
-
-* {{CSSCalcLength}} with <<length>>
-* {{CSSCalcAngle}} with <<angle>>
-* {{CSSCalcTime}} with <<time>>
-* {{CSSCalcFrequency}} with <<frequency>>
-
-They are additionally associated with the units that each of the CSS types represent.
-(For example, {{CSSCalcLength}} is associated with the ''px'' unit,
-as that unit represents a <<length>>.)
-
-All of the <a>calc() interfaces</a> are associated with <<number>> and <<percentage>>.
-However, these two types do not uniquely identify a <a>calc() interface</a>.
-
-
+A {{CSSCalcValue}} is <dfn for=CSSCalcValue>length-compatible</dfn>
+if its [=strong type=] is "length",
+or if it has no [=strong type=]
+but its [=CSS type set=] [=set/contains=] "percent" or "number".
+Mutatis mutandi for <dfn for=CSSCalcValue>angle-compatible</dfn>,
+<dfn for=CSSCalcValue>time-compatible</dfn>,
+or <dfn for=CSSCalcValue>resolution-compatible</dfn>.
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
@@ -801,65 +753,71 @@ However, these two types do not uniquely identify a <a>calc() interface</a>.
 {{CSSTransformValue}} objects {#transformvalue-objects}
 -----------------------------------------------------------
 
-<pre class='idl'>
-[Constructor(),
- Constructor(sequence&lt;CSSTransformComponent> transforms)]
-interface CSSTransformValue : CSSStyleValue {
-	iterable&lt;CSSTransformComponent>;
-	readonly attribute boolean is2D;
-	readonly attribute DOMMatrixReadOnly matrix;
-};
-
-interface CSSTransformComponent {
-	readonly attribute DOMString cssText;
-	readonly attribute boolean is2D;
-};
-
-[Constructor(CSSNumericValue x, CSSNumericValue y),
- Constructor(CSSNumericValue x, CSSNumericValue y, CSSNumericValue z)]
-interface CSSTranslation : CSSTransformComponent {
-	attribute CSSNumericValue x;
-	attribute CSSNumericValue y;
-	attribute CSSNumericValue z;
-};
-
-[Constructor(CSSNumericValue angle),
- Constructor(double x, double y, double z, CSSNumericValue angle)]
-interface CSSRotation : CSSTransformComponent {
-	attribute double x;
-	attribute double y;
-	attribute double z;
-	attribute CSSNumericValue angle;
-};
-
-[Constructor(double x, double y),
- Constructor(double x, double y, double z)]
-interface CSSScale : CSSTransformComponent {
-	attribute double x;
-	attribute double y;
-	attribute double z;
-};
-
-[Constructor(CSSNumericValue ax, CSSNumericValue ay)]
-interface CSSSkew : CSSTransformComponent {
-	attribute CSSNumericValue ax;
-	attribute CSSNumericValue ay;
-};
-
-[Constructor(CSSNumericValue length)]
-interface CSSPerspective : CSSTransformComponent {
-	attribute CSSNumericValue length;
-};
-
-[Constructor(DOMMatrixReadOnly matrix)]
-interface CSSMatrixComponent : CSSTransformComponent {
-	attribute DOMMatrix matrix;
-};
-</pre>
-
+<xmp class='idl'>
+    [Constructor(),
+     Constructor(sequence<CSSTransformComponent> transforms)]
+    interface CSSTransformValue : CSSStyleValue {
+    	iterable<CSSTransformComponent>;
+    	readonly attribute boolean is2D;
+    	readonly attribute DOMMatrixReadOnly matrix;
+    };
+</xmp>
 
 {{CSSTransformValue}} objects represent values for the 'transform' property. A
 {{CSSTransformValue}} represents a list of {{CSSTransformComponent}}s.
+
+Issue: {{CSSTransformValue}} needs a way to actually manipulate the list;
+add/remove/etc.
+`iterable` doesn't give this.
+I think we just need to define indexed getter/setter?
+
+<xmp class=idl>
+    interface CSSTransformComponent {
+    	readonly attribute DOMString cssText;
+    	readonly attribute boolean is2D;
+    };
+
+    [Constructor(CSSNumericValue x, CSSNumericValue y),
+     Constructor(CSSNumericValue x, CSSNumericValue y, CSSNumericValue z)]
+    interface CSSTranslation : CSSTransformComponent {
+    	attribute CSSNumericValue x;
+    	attribute CSSNumericValue y;
+    	attribute CSSNumericValue z;
+    };
+
+    [Constructor(CSSNumericValue angle),
+     Constructor(double x, double y, double z, CSSNumericValue angle)]
+    interface CSSRotation : CSSTransformComponent {
+    	attribute double x;
+    	attribute double y;
+    	attribute double z;
+    	attribute CSSNumericValue angle;
+    };
+
+    [Constructor(double x, double y),
+     Constructor(double x, double y, double z)]
+    interface CSSScale : CSSTransformComponent {
+    	attribute double x;
+    	attribute double y;
+    	attribute double z;
+    };
+
+    [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
+    interface CSSSkew : CSSTransformComponent {
+    	attribute CSSNumericValue ax;
+    	attribute CSSNumericValue ay;
+    };
+
+    [Constructor(CSSNumericValue length)]
+    interface CSSPerspective : CSSTransformComponent {
+    	attribute CSSNumericValue length;
+    };
+
+    [Constructor(DOMMatrixReadOnly matrix)]
+    interface CSSMatrixComponent : CSSTransformComponent {
+    	attribute DOMMatrix matrix;
+    };
+</pre>
 
 {{CSSTransformComponent}} objects have the following properties:
 
@@ -870,14 +828,14 @@ stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</d
 attribute.
 
 <div class=note>
-Each {{CSSTransformComponent}} can correspond to one of a number of underlying
-transform functions. For example, a {{CSSTranslation}} with an x value of "10px"
-and y &amp; z values of 0 could be:
-*   translate(10px)
-*   translate(10px, 0)
-*   translateX(10px)
-*   translate3d(10px, 0, 0)
+    Each {{CSSTransformComponent}} can correspond to one of a number of underlying
+    transform functions. For example, a {{CSSTranslation}} with an x value of "10px"
+    and y &amp; z values of 0 could be:
 
+    *   translate(10px)
+    *   translate(10px, 0)
+    *   translateX(10px)
+    *   translate3d(10px, 0, 0)
 </div>
 
 When a {{CSSTransformValue}} is read from a {{StylePropertyMap}}, each
@@ -962,7 +920,7 @@ Will produce the following behavior:
 // "center bottom 10px"
 document.querySelector('.example').styleMap.get('background-position').cssText;
 
-// 50% - as a CSSSimpleNumericValue
+// 50% - as a CSSUnitValue
 document.querySelector('.example').styleMap.get('background-position').x;
 
 // calc(100% - 10px) - as a CSSCalcLength
@@ -1181,9 +1139,9 @@ is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransform
 		*   {{CSSScale/x}} set to 2
 		*   {{CSSScale/y}} set to 0.5
 *   a {{CSSTranslation}} with:
-		*   {{CSSTranslation/x}} with {{CSSSimpleNumericValue/value}} of `100` and {{CSSSimpleNumericValue/unit}} of `"px"`
+		*   {{CSSTranslation/x}} with {{CSSUnitValue/value}} of `100` and {{CSSUnitValue/unit}} of `"px"`
 *   a {{CSSRotation}} with:
-		*   {{CSSRotation/angle}} with {{CSSSimpleNumericValue/value}} of `20` and {{CSSSimpleNumericValue/unit}} of `"deg"`
+		*   {{CSSRotation/angle}} with {{CSSUnitValue/value}} of `20` and {{CSSUnitValue/unit}} of `"deg"`
 
 </div>
 
@@ -1340,22 +1298,22 @@ length3.cssText; // "42px";
 {{CSSKeywordValue}} objects are serialized to their contained
 {{CSSKeywordValue/keywordValue}} attribute.
 
-{{CSSSimpleNumericValue}} Serialization {#numericvalue-serialization}
+{{CSSUnitValue}} Serialization {#numericvalue-serialization}
 --------------------------------------------------------------
 
-If their {{CSSSimpleNumericValue/unit}} is "number",
-{{CSSSimpleNumericValue}} objects are serialized
-to the string representation of their {{CSSSimpleNumericValue/value}}.
+If their {{CSSUnitValue/unit}} is "number",
+{{CSSUnitValue}} objects are serialized
+to the string representation of their {{CSSUnitValue/value}}.
 
-Otherwise, if their {{CSSSimpleNumericValue/unit}} is "percent",
-{{CSSSimpleNumericValue}} objects are serialized
-to the string representation of their {{CSSSimpleNumericValue/value}}
+Otherwise, if their {{CSSUnitValue/unit}} is "percent",
+{{CSSUnitValue}} objects are serialized
+to the string representation of their {{CSSUnitValue/value}}
 followed by the character U+0025 PERCENTAGE SIGN (%).
 
 Otherwise,
-{{CSSSimpleNumericValue}} objects are serialized
-to the string representation of their {{CSSSimpleNumericValue/value}}
-followed by their {{CSSSimpleNumericValue/unit}}.
+{{CSSUnitValue}} objects are serialized
+to the string representation of their {{CSSUnitValue/value}}
+followed by their {{CSSUnitValue/unit}}.
 
 <a>Calc() Interface</a> Serialization {#calc-serialization}
 ---------------------------------------------------------
@@ -1493,7 +1451,7 @@ Computed {{CSSNumberValue}} objects {#computed-numbervalue-objects}
 Computed {{CSSNumericValue}} objects {#computed-numericvalue-objects}
 ---------------------------------------------------------------------
 
-During computation, {{CSSSimpleNumericValue}} objects
+During computation, {{CSSUnitValue}} objects
 are range-restricted or rounded as appropriate to the relevant property,
 but otherwise as specified (see the example in [[#numbervalue-objects]]).
 
@@ -1506,7 +1464,7 @@ During computation, <a>calc() interface</a> objects are reduced accordingly:
 	into the <a>canonical unit</a> for the object's associated type.
 2. If the objects contains exactly one of (the canonical unit, a percent value, a number)
 	with a present, non-zero value,
-	then the computed value is an equivalent computed {{CSSSimpleNumericValue}}.
+	then the computed value is an equivalent computed {{CSSUnitValue}}.
 3. Otherwise,
 	it's a <a>calc() interface</a>
 	containing the canonical unit, percent value, and number,
