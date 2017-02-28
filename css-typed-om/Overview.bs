@@ -464,7 +464,6 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
     	CSSNumericValue divide(double value);
 
     	static CSSNumericValue from(DOMString cssText);
-    	static CSSNumericValue from(double value, DOMString unit);
     	CSSNumericValue to(DOMString unit);
     };
 </xmp>
@@ -582,20 +581,6 @@ rather than on {{CSSNumericValue}} instances.
 		and values set to the corresponding numeric values.
 </div>
 
-<div algorithm="CSSNumericValue.from(value, unit)">
-	The <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn> method must,
-	when called,
-	perform the following steps:
-
-	1. If |unit| does not have a [=CSS type=],
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
-
-	2. Return a new {{CSSUnitValue}}
-		with its value set to |value|
-		and its unit set to |unit|.
-</div>
-
 <div algorithm="CSSNumericValue.to()">
 	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}}
 	into another one with the specified |unit|.
@@ -672,12 +657,27 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <xmp class=idl>
+	[Constructor(double value, DOMString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
         attribute DOMString unit;
         readonly attribute DOMString type;
     };
 </xmp>
+
+<div algorithm="CSSUnitValue constructor(value, unit)">
+	The <dfn constructor for=CSSUnitValue>CSSUnitValue(|value|, |unit|)</dfn> method must,
+	when called,
+	perform the following steps:
+
+	1. If |unit| does not have a [=CSS type=],
+		[=throw=] a {{SyntaxError}}
+		and abort this algorithm.
+
+	2. Return a new {{CSSUnitValue}}
+		with its value set to |value|
+		and its unit set to |unit|.
+</div>
 
 <div algorithm="CSSUnitValue.unit">
 	The <dfn attribute for=CSSUnitValue>unit</dfn> attribute of a {{CSSUnitValue}} |this| must,
