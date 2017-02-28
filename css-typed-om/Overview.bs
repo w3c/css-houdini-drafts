@@ -474,7 +474,7 @@ represent operations that all numeric values can perform.
 
 The following are the arithmetic operations you can perform on dimensions:
 
-<div algorithm="CSSNumericValue/add">
+<div algorithm="CSSNumericValue.add()">
 	The <dfn for=CSSNumericValue method>add(|value|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
@@ -494,7 +494,7 @@ The following are the arithmetic operations you can perform on dimensions:
 		representing the sum of the |this| and |value|.
 </div>
 
-<div algorithm="CSSNumericValue/sub">
+<div algorithm="CSSNumericValue.sub()">
 	The <dfn for=CSSNumericValue method>sub(|value|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
@@ -514,7 +514,7 @@ The following are the arithmetic operations you can perform on dimensions:
 		representing the difference of the |this| and |value|.
 </div>
 
-<div algorithm="CSSNumericValue/mul">
+<div algorithm="CSSNumericValue.mul()">
 	The <dfn for=CSSNumericValue method>mul(|value|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
@@ -530,7 +530,7 @@ The following are the arithmetic operations you can perform on dimensions:
 		but with each value multiplied by |value|.
 </div>
 
-<div algorithm="CSSNumericValue/div">
+<div algorithm="CSSNumericValue.div()">
 	The <dfn for=CSSNumericValue method>div(|value|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
@@ -551,8 +551,11 @@ Note that they are static methods,
 existing directly on the {{CSSNumericValue}} interface object,
 rather than on {{CSSNumericValue}} instances.
 
-: <dfn method for=CSSNumericValue>from(|cssText|)</dfn>
-::
+<div algorithm="CSSNumericValue.from(cssText)">
+	The <dfn method for=CSSNumericValue>from(|cssText|)</dfn> method,
+	when called,
+	must perform the following steps:
+
 	1. [=Parse a component value=] from |cssText|
 		and let |result| be the result.
 		If |result| is a syntax error,
@@ -577,67 +580,67 @@ rather than on {{CSSNumericValue}} instances.
 		then return a {{CSSCalcValue}} object,
 		with keys for each unit in the calc,
 		and values set to the corresponding numeric values.
+</div>
 
-: <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn>
-::
-	1. If |unit| is not an [=ASCII case-insensitive=] match
-		for one of the CSS units
-		(including `"number"` and `"percent"` as units for this purpose),
+<div algorithm="CSSNumericValue.from(value, unit)">
+	The <dfn method for=CSSNumericValue>from(|value|, |unit|)</dfn> method must,
+	when called,
+	perform the following steps:
+
+	1. If |unit| does not have a [=CSS type=],
 		[=throw=] a {{SyntaxError}}
 		and abort this algorithm.
 
 	2. Return a new {{CSSUnitValue}}
 		with its value set to |value|
 		and its unit set to |unit|.
-
-
-The <dfn method for=CSSNumericValue>to(|unit|)</dfn> converts an existing {{CSSNumericValue}}
-into another one with the specified |unit|.
-When invoked, it must run these steps:
-
-1. If |unit| is not an [=ASCII case-insensitive=] match
-	for one of the CSS units
-	(including `"number"` and `"percent"` as units for this purpose),
-	[=throw=] a {{SyntaxError}}
-	and abort this algorithm.
-
-2. If |this| is a {{CSSUnitValue}}
-	and |this|’s unit and |unit| are [=compatible units=],
-	return a new {{CSSUnitValue}}
-	with its unit set to |unit|
-	and its value set to |this|’s value
-	multiplied by the conversion ratio between the two units.
-
-3. If |this| is a {{CSSCalcValue}}
-	and all of its keys
-	are [=compatible units=] with |unit|,
-	return a new {{CSSUnitValue}}
-	with its unit set to |unit|
-	and its value to the sum of
-	each of |this|’s values
-	multiplied by the corresponding conversion ratios
-	between their key and |unit|.
-
-4. Otherwise,
-	[=throw=] a {{TypeError}}.
-
-<div algorithm="CSSNumericValue/typing" dfn-for=CSSNumericValue>
-	{{CSSNumericValue}}s can be <dfn export>strongly typed</dfn>
-	or <dfn>weakly typed</dfn> to a type,
-	or <dfn>untyped</dfn>.
-
-	A {{CSSUnitValue}} is [=weakly typed=] to its [=CSS type=]
-	if that [=CSS type=] is "percent" or "number".
-	It's [=strongly typed=] to its [=CSS type=] otherwise.
-	It's never [=untyped=].
-
-	A {{CSSCalcValue}} is [=strongly typed=] if its [=CSS type set=]
-	contains a value other than "percent" or "number",
-	to that value.
-	It's [=weakly typed=] if it's not [=strongly typed=],
-	but its [=CSS type set=] [=set/is not empty=].
-	It's [=untyped=] if its [=CSS type set=] [=set/is empty=].
 </div>
+
+<div algorithm="CSSNumericValue.to()">
+	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}}
+	into another one with the specified |unit|.
+	When called, it must perform the following steps:
+
+	1. If |unit| does not have a [=CSS type=],
+		[=throw=] a {{SyntaxError}}
+		and abort this algorithm.
+
+	2. If |this| is a {{CSSUnitValue}}
+		and |this|’s unit and |unit| are [=compatible units=],
+		return a new {{CSSUnitValue}}
+		with its unit set to |unit|
+		and its value set to |this|’s value
+		multiplied by the conversion ratio between the two units.
+
+	3. If |this| is a {{CSSCalcValue}}
+		and all of its keys
+		are [=compatible units=] with |unit|,
+		return a new {{CSSUnitValue}}
+		with its unit set to |unit|
+		and its value to the sum of
+		each of |this|’s values
+		multiplied by the corresponding conversion ratios
+		between their key and |unit|.
+
+	4. Otherwise,
+		[=throw=] a {{TypeError}}.
+</div>
+
+{{CSSNumericValue}}s can be <dfn>strongly typed</dfn>
+or <dfn>weakly typed</dfn> to a type,
+or <dfn>untyped</dfn>.
+
+A {{CSSUnitValue}} is [=weakly typed=] to its [=CSS type=]
+if that [=CSS type=] is "percent" or "number".
+It's [=strongly typed=] to its [=CSS type=] otherwise.
+It's never [=untyped=].
+
+A {{CSSCalcValue}} is [=strongly typed=] if its [=CSS type set=]
+contains a value other than "percent" or "number",
+to that value.
+It's [=weakly typed=] if it's not [=strongly typed=],
+but its [=CSS type set=] [=set/is not empty=].
+It's [=untyped=] if its [=CSS type set=] [=set/is empty=].
 
 
 <!--
@@ -676,7 +679,7 @@ are represented as {{CSSUnitValue}}s.
     };
 </xmp>
 
-<div algorithm="CSSUnitValue/unit">
+<div algorithm="CSSUnitValue.unit">
 	The <dfn attribute for=CSSUnitValue>unit</dfn> attribute of a {{CSSUnitValue}} |this| must,
 	on setting a value |unit|,
 	perform the following steps:
@@ -691,13 +694,13 @@ are represented as {{CSSUnitValue}}s.
 	it must return the value of |this|’s internal {{CSSUnitValue/unit}} slot.
 </div>
 
-<div algorithm="CSSUnitValue/type">
+<div algorithm="CSSUnitValue.type">
     The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
     on reading,
     return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}}.
 </div>
 
-<div algorithm="CSSUnitValue/CSS type">
+<div algorithm="CSS type of a unit">
     The <dfn>CSS type</dfn> of a string |unit| is:
 
     <dl class=switch>
@@ -721,8 +724,6 @@ are represented as {{CSSUnitValue}}s.
         :: the string does not have a [=CSS type=]
     </dl>
 </div>
-
-A {{CSSUnitValue}}
 
 A {{CSSUnitValue}} matches a CSS type production,
 such as <<number>> or <<length>>,
@@ -765,7 +766,7 @@ interface CSSCalcValue : CSSNumericValue {
 };
 </xmp>
 
-<div algorithm="CSSCalcValue/set">
+<div algorithm="CSSCalcValue.set()">
     The <dfn method for=CSSCalcValue>set(|unit|, |value|)</dfn> method,
     when called on a {{CSSCalcValue}} |this|,
     must perform the following steps:
@@ -783,7 +784,7 @@ interface CSSCalcValue : CSSNumericValue {
     3. Otherwise, [=throw=] a {{TypeError}}.
 </div>
 
-<div algorithm="CSSCalcValue/type">
+<div algorithm="CSSCalcValue.type">
     The <dfn attribute for=CSSCalcValue>type</dfn> attribute
     of a {{CSSCalcValue}} |this| must,
     on reading,
@@ -800,7 +801,7 @@ interface CSSCalcValue : CSSNumericValue {
     this attribute returns the empty string.
 </div>
 
-<div algorithm="CSSCalcValue/CSS type set">
+<div algorithm="CSS type set">
     The <dfn for=CSSCalcValue>CSS type set</dfn> of a {{CSSCalcValue}} |this|
     is an [=ordered set=]
     that contains the [=CSS types=] of every key
