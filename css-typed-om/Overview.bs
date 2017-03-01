@@ -666,7 +666,7 @@ are represented as {{CSSUnitValue}}s.
 </xmp>
 
 <div algorithm="CSSUnitValue constructor(value, unit)">
-	The <dfn constructor for=CSSUnitValue>CSSUnitValue(|value|, |unit|)</dfn> method must,
+	The <dfn constructor for=CSSUnitValue>CSSUnitValue(|value|, |unit|)</dfn> constructor must,
 	when called,
 	perform the following steps:
 
@@ -759,12 +759,38 @@ and the object as a whole represents the sum of its units.
 </div>
 
 <xmp class=idl>
+[Constructor(record<DOMString, double> recordValue)]
 interface CSSCalcValue : CSSNumericValue {
     maplike<DOMString, double>;
     CSSCalcValue set(DOMString unit, double value);
     readonly attribute DOMString type;
 };
 </xmp>
+
+<div algorithm="CSSCalcValue(recordValue)">
+	The <dfn constructor for=CSSCalcValue>CSSCalcValue(|recordValue|)</dfn> constructor must,
+	when called,
+	perform the following steps:
+
+	1. Let |strongType| be initially null.
+
+	2. [=map/For each=] unit → value of |recordValue|:
+
+		1. If |unit| does not have a [=CSS type=],
+			[=throw=] a {{TypeError}}.
+		2. If |unit| is a [=strong type=],
+			and |strongType| is null,
+			let |strongType| be |unit|’s [=CSS type=].
+		3. If |unit| is a [=strong type=],
+			and |strongType| is not equal to that type,
+			[=throw=] a {{TypeError}}.
+
+	3. Return a new {{CSSCalcValue}} whose <a>map entries</a> are |recordValue|.
+</div>
+
+Issue: When IDL grows a map-iterator concept,
+add a constructor that takes one.
+It's supremely awkward to handle one manually right now.
 
 <div algorithm="CSSCalcValue.set()">
     The <dfn method for=CSSCalcValue>set(|unit|, |value|)</dfn> method,
