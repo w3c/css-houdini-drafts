@@ -457,15 +457,15 @@ All numeric CSS values
 are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
-    interface CSSNumericValue : CSSStyleValue {
-    	CSSNumericValue add(CSSNumericValue value);
-    	CSSNumericValue subtract(CSSNumericValue value);
-    	CSSNumericValue multiply(double value);
-    	CSSNumericValue divide(double value);
+	interface CSSNumericValue : CSSStyleValue {
+		CSSNumericValue add(CSSNumericValue value);
+		CSSNumericValue sub(CSSNumericValue value);
+		CSSNumericValue mul(double value);
+		CSSNumericValue div(double value);
 
-    	static CSSNumericValue from(DOMString cssText);
-    	CSSNumericValue to(DOMString unit);
-    };
+		static CSSNumericValue from(DOMString cssText);
+		CSSNumericValue to(DOMString unit);
+	};
 </xmp>
 
 The methods on the {{CSSNumericValue}} superclass
