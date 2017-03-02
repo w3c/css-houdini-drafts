@@ -457,11 +457,11 @@ interface CSSKeywordValue : CSSStyleValue {
 	3. If |keyword| is anything but an [=identifier=],
 		[=throw=] a {{SyntaxError}}.
 
-	4. Otherwise, set |this|’s internal {{CSSKeywordValue/unit}} slot
+	4. Otherwise, set |this|’s internal {{CSSKeywordValue/value}} slot
 		to the serialization of |keyword|.
 
-	On reading, {{CSSKeywordValue/unit}}
-	must return the serialization of |this|’s internal {{CSSKeywordValue/unit}} slot.
+	On reading, {{CSSKeywordValue/value}}
+	must return the serialization of |this|’s internal {{CSSKeywordValue/value}} slot.
 </div>
 
 
@@ -1299,7 +1299,7 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 ''var()'' References {#normalize-var}
 -------------------------------------
 
-''var()'' references become {{CSSVariableReferenceValues}} in the Typed OM.
+''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
 
 <div algorithm>
 	To <dfn dfn export>normalize a ''var()'' reference</dfn> |var|:
@@ -1512,7 +1512,7 @@ length3.cssText; // "42px";
 ---------------------------------------------------------------
 
 {{CSSKeywordValue}} objects are serialized to their contained
-{{CSSKeywordValue/keywordValue}} attribute.
+{{CSSKeywordValue/value}} attribute.
 
 {{CSSUnitValue}} Serialization {#numericvalue-serialization}
 --------------------------------------------------------------
