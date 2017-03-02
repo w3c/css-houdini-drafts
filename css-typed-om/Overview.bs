@@ -1100,7 +1100,7 @@ returns true, and false otherwise.
 	* {{CSSScale}} objects if their {{CSSScale/z}} attribute is 1
 	* {{CSSSkew}} objects at all times
 	* {{CSSPerspective}} objects never.
-	* {{CSSMatrixComponent}} objects if their {{CSSMatrixComponent/matrix}}’s [=DOMMatrixReadonly/is2D=] flag is true.
+	* {{CSSMatrixComponent}} objects if their {{CSSMatrixComponent/matrix}}’s [=DOMMatrixReadOnly/is2D=] flag is true.
 </div>
 
 The transform function which the component represents
