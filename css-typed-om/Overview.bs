@@ -370,11 +370,17 @@ interface CSSUnparsedValue : CSSStyleValue {
 
 interface CSSVariableReferenceValue {
 	attribute DOMString variable;
-	attribute CSSUnparsedValue fallback;
+	attribute CSSUnparsedValue? fallback;
 };
 </pre>
 
-{{CSSUnparsedValue}} objects represent values that reference custom properties. They represent a list of string fragments and variable references.
+{{CSSUnparsedValue}} objects represent values that reference custom properties.
+They represent a list of string fragments and variable references.
+
+They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
+which is a [=list=] of alternating {{DOMString}} and {{CSSVariableReferenceValue}} objects.
+This list is the object's [=values to iterate over=].
+
 
 <!--
 ██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████
