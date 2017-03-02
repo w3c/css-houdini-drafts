@@ -530,8 +530,9 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 		CSSNumericValue mul(double value);
 		CSSNumericValue div(double value);
 
-		static CSSNumericValue from(DOMString cssText);
 		CSSNumericValue to(DOMString unit);
+
+		static CSSNumericValue parse(DOMString cssText);
 	};
 </xmp>
 
@@ -612,42 +613,6 @@ The following are the arithmetic operations you can perform on dimensions:
 		but with each value divided by |value|.
 </div>
 
-The following two factory methods allow a {{CSSNumericValue}} to be constructed directly.
-Note that they are static methods,
-existing directly on the {{CSSNumericValue}} interface object,
-rather than on {{CSSNumericValue}} instances.
-
-<div algorithm="CSSNumericValue.from(cssText)">
-	The <dfn method for=CSSNumericValue>from(|cssText|)</dfn> method,
-	when called,
-	must perform the following steps:
-
-	1. [=Parse a component value=] from |cssText|
-		and let |result| be the result.
-		If |result| is a syntax error,
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
-
-	2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
-		or a <<calc()>>,
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
-
-	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
-		return a new {{CSSUnitValue}} object
-		with its value set to the token's value,
-		and the unit set to the token's unit if it's a <<dimension-token>>,
-		or `"number"` if it is a <<number-token>>,
-		or `"percentage"` if it is a <<percentage-token>>.
-
-	4. If |result| is a <<calc()>>,
-		normalize the ''calc()'' argument
-		into a sum of values with unique units,
-		then return a {{CSSCalcValue}} object,
-		with keys for each unit in the calc,
-		and values set to the corresponding numeric values.
-</div>
-
 <div algorithm="CSSNumericValue.to()">
 	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}}
 	into another one with the specified |unit|.
@@ -676,6 +641,43 @@ rather than on {{CSSNumericValue}} instances.
 
 	4. Otherwise,
 		[=throw=] a {{TypeError}}.
+</div>
+
+The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
+to be constructed directly from a string containing CSS.
+Note that this is a static method,
+existing directly on the {{CSSNumericValue}} interface object,
+rather than on {{CSSNumericValue}} instances.
+
+<div algorithm="CSSNumericValue.parse(cssText)">
+	The <dfn method for=CSSNumericValue>parse(|cssText|)</dfn> method,
+	when called,
+	must perform the following steps:
+
+	1. [=Parse a component value=] from |cssText|
+		and let |result| be the result.
+		If |result| is a syntax error,
+		[=throw=] a {{SyntaxError}}
+		and abort this algorithm.
+
+	2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
+		or a <<calc()>>,
+		[=throw=] a {{SyntaxError}}
+		and abort this algorithm.
+
+	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
+		return a new {{CSSUnitValue}} object
+		with its value set to the token's value,
+		and the unit set to the token's unit if it's a <<dimension-token>>,
+		or `"number"` if it is a <<number-token>>,
+		or `"percentage"` if it is a <<percentage-token>>.
+
+	4. If |result| is a <<calc()>>,
+		normalize the ''calc()'' argument
+		into a sum of values with unique units,
+		then return a {{CSSCalcValue}} object,
+		with keys for each unit in the calc,
+		and values set to the corresponding numeric values.
 </div>
 
 {{CSSNumericValue}}s can be <dfn>strongly typed</dfn>
