@@ -1227,73 +1227,109 @@ of {{CSSResourceValue}}.
 Issue(159): Spec up ColorValue
 
 <!--
-██    ██  ███████  ████████  ██     ██    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
-███   ██ ██     ██ ██     ██ ███   ███   ██ ██   ██        ██       ██    ██ ██      ██     ██  ██     ██ ███   ██
-████  ██ ██     ██ ██     ██ ████ ████  ██   ██  ██        ██      ██    ██   ██     ██     ██  ██     ██ ████  ██
-██ ██ ██ ██     ██ ████████  ██ ███ ██ ██     ██ ██        ██     ██    ██     ██    ██     ██  ██     ██ ██ ██ ██
-██  ████ ██     ██ ██   ██   ██     ██ █████████ ██        ██    ██     █████████    ██     ██  ██     ██ ██  ████
-██   ███ ██     ██ ██    ██  ██     ██ ██     ██ ██        ██   ██      ██     ██    ██     ██  ██     ██ ██   ███
-██    ██  ███████  ██     ██ ██     ██ ██     ██ ████████ ████ ████████ ██     ██    ██    ████  ███████  ██    ██
+ ██████   ██████   ██████                ██           ███████  ██     ██
+██    ██ ██    ██ ██    ██                ██         ██     ██ ███   ███
+██       ██       ██                       ██        ██     ██ ████ ████
+██        ██████   ██████        ███████    ██       ██     ██ ██ ███ ██
+██             ██       ██                 ██        ██     ██ ██     ██
+██    ██ ██    ██ ██    ██                ██         ██     ██ ██     ██
+ ██████   ██████   ██████                ██           ███████  ██     ██
 -->
 
 {{CSSStyleValue}} normalization {#stylevalue-normalization}
 ===========================================================
 
-This section describes how normalized {{CSSStyleValue}} objects are
-constructed from CSS DOMString values.
+This section describes how Typed OM objects are constructed from CSS values.
 
-Strings are normalized by resulting CSSStyleValue subclass. To
-determine which subclass to use, the CSS property that the string
-is a value for is used to look up the table in
-REPLACEME. The normalization
-procedure defined by each of the CSSStyleValue subclasses listed for that property in
-turn, falling back to the next subclass in the list if the current one
-fails to normalize.
+If a property's grammar is more complex than one of the types listed here,
+it produces a raw {{CSSStyleValue}},
+with its {{CSSStyleValue/cssText}}
+set to the CSSOM serialization of the property.
 
-If all listed subclasses fail, then the value is normalized as a raw
-{{CSSStyleValue}}, with the {{CSSStyleValue/cssText}} attribute
-set to the input value.
+Issue: Better to define a full table of properties and what types they normalize to.
 
-{{CSSUnparsedValue}} normalization {#unparsedvalue-normalization}
------------------------------------------------------------------------
+Issue: Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
+We instead need to strictly define the serialization of every property.
+This should be done according to CSSOM principlies, tho
+(generally, shortest possible value).
 
-Values which contain custom property references are tokenized then split into runs of
-tokens separated by custom property references.
+Raw CSS tokens: properties with ''var()'' references {#normalize-tokens}
+--------------------------------------------------
 
-The token runs are serialized, while each custom property reference
-is represented by a {{CSSVariableReferenceValue}}.
+Regardless of what the property's grammar is otherwise,
+a property value with an un-substituted ''var()'' reference
+is represented as a [=list=] of [=component values=],
+which becomes a {{CSSUnparsedValue}} in the Typed OM.
 
-<div class='example'>
+<div algorithm>
+	To <dfn export>normalize a list of component values</dfn>
+	from a |list|:
 
-The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
-is converted into a {{CSSUnparsedValue}} that contains a sequence with:
-*   the string "calc(42px + "
-*   a {{CSSVariableReferenceValue}} with:
-		*   {{CSSVariableReferenceValue/variable}} "--foo"
-		*   {{CSSVariableReferenceValue/fallback}} a
-				{{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
-*   the string " + "
-*   a {{CSSVariableReferenceValue}} with:
-		*   {{CSSVariableReferenceValue/variable}} "--bar"
-		*   {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
-				with a sequence containing:
-				*   the string " "
-				*   a {{CSSVariableReferenceValue}} with
-						*   {{CSSVariableReferenceValue/variable}} "--far"
-						*   {{CSSVariableReferenceValue/fallback}} undefined
-				*   the string " + 15px"
-*   the string ")"
-
+	1. Replace all ''var()'' references in |list|
+		with {{CSSVariableReferenceValue}} objects,
+		as described in [[#normalize-var]].
+	2. Replace each remaining maximal subsequence of [=component values=] in |list|
+		with a single string of their concatenated serializations.
+	3. Return a new {{CSSUnparsedValue}}
+		whose {{CSSUnparsedValue/[[tokens]]}} slot is set to |list|.
 </div>
 
-{{CSSKeywordValue}} normalization {#keywordvalue-normalization}
----------------------------------------------------------------
+<div class='example'>
+The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
+is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 
-If the provided value can tokenize as an <<ident-token>>, then
-a {{CSSKeywordValue}} is constructed with the provided value
-as the {{CSSKeywordValue/keywordValue}} attribute.
+	* the string "calc(42px + "
+	* a {{CSSVariableReferenceValue}} with:
+		* {{CSSVariableReferenceValue/variable}} "--foo"
+		* {{CSSVariableReferenceValue/fallback}} a
+			{{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
+	* the string " + "
+	* a {{CSSVariableReferenceValue}} with:
+		* {{CSSVariableReferenceValue/variable}} "--bar"
+		* {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
+			with a sequence containing:
+			* the string " "
+			* a {{CSSVariableReferenceValue}} with
+				* {{CSSVariableReferenceValue/variable}} "--far"
+				* {{CSSVariableReferenceValue/fallback}} null
+			* the string " + 15px"
+	* the string ")"
+</div>
 
-Otherwise, normalization fails.
+''var()'' References {#normalize-var}
+-------------------------------------
+
+''var()'' references become {{CSSVariableReferenceValues}} in the Typed OM.
+
+<div algorithm>
+	To <dfn dfn export>normalize a ''var()'' reference</dfn> |var|:
+
+	1. Let |object| be a new {{CSSVariableReferenceValue}}.
+
+	2. Set |object|’s {{CSSVariableReferenceValue/variable}} internal slot
+		to the serialization of the <<custom-ident>> providing the variable name.
+
+	3. If |var| has a fallback value,
+		set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
+		to the result of [=normalize a list of component values|normalizing the fallback's component values=].
+		Otherwise,
+		set it to `null`.
+
+	4. Return |object|.
+</div>
+
+[=Identifier=] Values {#normalize-ident}
+-----------------------------------
+
+CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
+
+<div algorithm>
+	To <dfn export>normalize an [=identifier=]</dfn> |ident|:
+
+	1. Return a new {{CSSKeywordValue}}
+		with its {{CSSKeywordValue/value}} internal slot
+		set to the serialization of |ident|.
+</div>
 
 {{CSSNumericValue}} normalization {#numericvalue-normalization}
 -------------------------------------------------------------
