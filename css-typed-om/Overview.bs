@@ -69,6 +69,10 @@ spec:css-transforms-1;
 		text:perspective-origin;
 		text:transform-origin;
 		text:transform-style;
+spec:css-syntax-3;
+	type:dfn; text:identifier
+spec:infra;
+	type: dfn; text: list
 </pre>
 
 Introduction {#intro}
