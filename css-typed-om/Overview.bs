@@ -393,19 +393,76 @@ This list is the object's [=values to iterate over=].
 -->
 
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
-------------------------------------------------
+---------------------------------------------------
+
+{{CSSKeywordValue}} objects represent CSS keywords and other [=identifiers=].
 
 <pre class='idl'>
-[Constructor(DOMString)]
+[Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
-	attribute DOMString keywordValue;
+	attribute DOMString value;
 };
 </pre>
 
-{{CSSKeywordValue}} objects represent {{CSSStyleValue}}s that are keywords. The constructor for {{CSSKeywordValue}}
-should check that they contain valid CSS, but they do not check whether the contained string is a valid
-keyword for a particular property. Property setters are required to enforce keyword validity.
+<div algorithm>
+	The <dfn constructor for=CSSKeywordValue>CSSKeywordValue(|value|)</dfn> constructor must,
+	when called,
+	perform the following steps:
 
+	1. [=Parse a component value=] from |value|,
+		and let |keyword| be the result.
+
+	2. If |keyword| is a syntax error,
+		[=throw=] a {{SyntaxError}}.
+
+	3. If |keyword| is anything but an [=identifier=],
+		[=throw=] a {{SyntaxError}}.
+
+	4. Otherwise, return a new {{CSSKeywordValue}}
+		with its {{CSSKeywordValue/value}} internal slot
+		set to the serialization of |keyword|.
+</div>
+
+<div class=issue>
+	It's intentional that this does a CSS parse,
+	rather than just taking the string literally.
+
+	Goals are (1) allow .value to round-trip thru the constructor,
+	and (2) allow .value to work when stitched directly into a string
+	that's then fed to CSS.
+	#2 requires us to have .value contain the appropriate CSS escapes,
+	and #1 then requires us to parse those escapes.
+
+	On the other hand,
+	I think this conflicts with the most desirable handling of CSS strings;
+	a CSSStringValue should take the value literally, I think.
+	(Otherwise we have to do some weird things around quotes, I think.)
+	Need to evaluate this holistically.
+
+	Possible solution: different behavior between .value
+	and the stringifier.
+</div>
+
+<div algorithm for="CSSKeywordValue.value">
+	The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
+	on setting a value |value|,
+	perform the following steps:
+
+	1. [=Parse a component value=] from |value|,
+		and let |keyword| be the result.
+
+	2. If |keyword| is a syntax error,
+		[=throw=] a {{SyntaxError}}.
+
+	3. If |keyword| is anything but an [=identifier=],
+		[=throw=] a {{SyntaxError}}.
+
+	4. Otherwise, set |this|’s internal {{CSSKeywordValue/unit}} slot
+		to the serialization of |keyword|.
+
+	On reading, {{CSSKeywordValue/unit}}
+	must return the serialization of |this|’s internal {{CSSKeywordValue/unit}} slot.
+</div>
 
 
 <!--
