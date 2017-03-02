@@ -916,6 +916,99 @@ such as <<number>> or <<length-percentage>>,
 if its equivalent CSS ''calc()'' value matches that production.
 
 <!--
+██    ██ ██     ██ ██     ██        ██████   ██████   ██████
+███   ██ ██     ██ ███   ███       ██    ██ ██    ██ ██    ██
+████  ██ ██     ██ ████ ████       ██       ██       ██
+██ ██ ██ ██     ██ ██ ███ ██       ██        ██████   ██████
+██  ████ ██     ██ ██     ██       ██             ██       ██
+██   ███ ██     ██ ██     ██       ██    ██ ██    ██ ██    ██
+██    ██  ███████  ██     ██        ██████   ██████   ██████
+-->
+
+### Numeric Factory Functions ### {#numeric-factory}
+
+The following factory functions can be used
+to create new numeric values much less verbosely
+than using the constructors directly.
+
+<xmp class=idl>
+partial namespace CSS {
+	CSSUnitValue number(double value);
+	CSSUnitValue percent(double value);
+
+	// <length>
+	CSSUnitValue em(double value);
+	CSSUnitValue ex(double value);
+	CSSUnitValue ch(double value);
+	CSSUnitValue ic(double value);
+	CSSUnitValue rem(double value);
+	CSSUnitValue lh(double value);
+	CSSUnitValue rlh(double value);
+	CSSUnitValue vw(double value);
+	CSSUnitValue vh(double value);
+	CSSUnitValue vi(double value);
+	CSSUnitValue vb(double value);
+	CSSUnitValue vmin(double value);
+	CSSUnitValue vmax(double value);
+	CSSUnitValue cm(double value);
+	CSSUnitValue mm(double value);
+	CSSUnitValue q(double value);
+	CSSUnitValue in(double value);
+	CSSUnitValue pt(double value);
+	CSSUnitValue pc(double value);
+	CSSUnitValue px(double value);
+
+	// <angle>
+	CSSUnitValue deg(double value);
+	CSSUnitValue grad(double value);
+	CSSUnitValue rad(double value);
+	CSSUnitValue turn(double value);
+
+	// <time>
+	CSSUnitValue s(double value);
+	CSSUnitValue ms(double value);
+
+	// <frequency>
+	CSSUnitValue Hz(double value);
+	CSSUnitValue kHz(double value);
+
+	// <resolution>
+	CSSUnitValue dpi(double value);
+	CSSUnitValue dpcm(double value);
+	CSSUnitValue dppx(double value);
+
+	// <flex>
+	CSSUnitValue fr(double value);
+};
+</xmp>
+
+<div algorithm="CSS.numeric">
+	All of the above methods must,
+	when called with a double |value|,
+	return a new {{CSSUnitValue}}
+	whose {{CSSUnitValue/value}} internal slot
+	is set to |value|
+	and whose {{CSSUnitValue/unit}} internal slot
+	is set to the name of the method as defined here.
+</div>
+
+<div class=example>
+	For example, rather than creating a new {{CSSPositionValue}} with code like:
+
+	<pre class=lang-js>
+		let pos = new CSSPositionValue(
+			new CSSUnitValue(5, "px"),
+			new CSSUnitValue(10, "px"));
+	</pre>
+
+	One can instead write:
+
+	<pre class=lang-js>
+		let pos = new CSSPositionValue(CSS.px(5), CSS.px(10));
+	</pre>
+</div>
+
+<!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
    ██    ██     ██   ██ ██   ███   ██ ██    ██ ██       ██     ██ ██     ██ ███   ███
    ██    ██     ██  ██   ██  ████  ██ ██       ██       ██     ██ ██     ██ ████ ████
