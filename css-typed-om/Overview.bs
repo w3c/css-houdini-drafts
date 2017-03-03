@@ -1150,58 +1150,77 @@ will always generate <code>cssText</code> according to the following rules:
 {{CSSPositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
 
-<pre class='idl'>
+{{CSSPositionValue}} objects represent values for properties that take <<position>> productions,
+such as 'background-position'.
 
+<pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
 	attribute CSSNumericValue x;
 	attribute CSSNumericValue y;
 };
-
 </pre>
 
-{{CSSPositionValue}} objects represent values for properties that take <<position>>
-productions, for example 'background-position'.
+The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of the container.
+{{CSSPositionValue/y}} expressions the offset from the top edge of the container.
 
-The <dfn attribute for=CSSPositionValue>x</dfn> attribute contains the position offset
-from the left edge of the container, expressed as a length.
+<div algorithm>
+	The <dfn constructor for=CSSPositionValue>CSSPositionValue(|x|, |y|)</dfn> constructor must,
+	when called,
+	perform the following steps:
 
-The <dfn attribute for=CSSPositionValue>y</dfn> attribute contains the position offset
-from the top edge of the container, expressed as a length.
+	1. If |x| or |y| has a [=strong type=] that's not "length",
+		[=throw=] a {{TypeError}}.
 
-Note that <<position>> productions accept a complicated combination of keywords
+	2. Otherwise, return a new {{CSSPositionValue}}
+		whose internal {{CSSPositionValue/x}} slot is set to |x|,
+		and whose internal {{CSSPositionValue/y}} slot is set to |y|.
+</div>
+
+<div algorithm="CSSPositionValue.x">
+	The <dfn attribute for=CSSPositionValue>x</dfn> and <dfn attribute for=CSSPositionValue>y</dfn> attribute of a {{CSSPositionValue}} |this| must,
+	on setting a value |value|,
+	perform the following steps:
+
+	1. If |value| has a [=strong type=] that's not "length",
+		[=throw=] a {{TypeError}}.
+
+	2. Otherwise, set |this|’s internal {{CSSPositionValue/x}} or {{CSSPositionValue/y}} slot,
+		as appropriate,
+		to |value|.
+
+	On reading, the attributes must return the value of the internal {{CSSPositionValue/x}} or {{CSSPositionValue/y}} slot,
+		as appropriate.
+</div>
+
+Note: <<position>> productions accept a complicated combination of keywords
 and values. When specified as such in a stylesheet or via the untyped CSSOM,
 the {{CSSStyleValue/cssText}} attribute will contain the specified
 string. However, this string is normalized as two Lengths into the {{CSSPositionValue/x}} and {{CSSPositionValue/y}} values of the
 {{CSSStyleValue}} object.
 
-New {{CSSPositionValue}} objects can only be constructed via pairs of lengths, and
-will only return the direct serialization of these lengths in the
-{{CSSStyleValue/cssText}} attribute.
 
 <div class='example'>
+	For example, the following style sheet:
 
-For example, the following style sheet:
+	<pre class='style'>
+	.example {
+		background-position: center bottom 10px;
+	}
+	</pre>
 
-<pre class='style'>
-.example {
-	background-position: center bottom 10px;
-}
-</pre>
+	Will produce the following behavior:
 
-Will produce the following behavior:
+	<pre class='lang-javascript'>
+	// "center bottom 10px"
+	document.querySelector('.example').styleMap.get('background-position').cssText;
 
-<pre class='lang-javascript'>
-// "center bottom 10px"
-document.querySelector('.example').styleMap.get('background-position').cssText;
+	// 50% - as a CSSUnitValue
+	document.querySelector('.example').styleMap.get('background-position').x;
 
-// 50% - as a CSSUnitValue
-document.querySelector('.example').styleMap.get('background-position').x;
-
-// calc(100% - 10px) - as a CSSCalcLength
-document.querySelector('.example').styleMap.get('background-position').y;
-</pre>
-
+	// calc(100% - 10px) - as a CSSCalcLength
+	document.querySelector('.example').styleMap.get('background-position').y;
+	</pre>
 </div>
 
 <!--
