@@ -1416,7 +1416,7 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 ''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
 
 <div algorithm>
-	To <dfn dfn export>normalize a ''var()'' reference</dfn> |var|:
+	To <dfn export>normalize a ''var()'' reference</dfn> |var|:
 
 	1. Let |object| be a new {{CSSVariableReferenceValue}}.
 
@@ -1445,10 +1445,58 @@ CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 		set to the serialization of |ident|.
 </div>
 
-{{CSSNumericValue}} normalization {#numericvalue-normalization}
--------------------------------------------------------------
+<<number>>, <<percentage>>, and <<dimension>> values {#normalize-numeric}
+-------------------------------------------------------------------------
 
-Issue: todo
+CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}s or {{CSSCalcValue}}s in the Typed OM.
+
+<div algorithm>
+	To <dfn export>normalize a numeric value</dfn> |num|:
+
+	1. If |num| is a ''calc()'' expression,
+		[=normalize a calc() expression=] from |num|
+		and return the result.
+
+	2. Return a new {{CSSUnitValue}}
+		with its {{CSSUnitValue/value}} internal slot
+		set to the numeric value of |num|,
+		and its {{CSSUnitValue/unit}} internal slot
+		set to "number" if |num| is a <<number>>,
+		"percent" if |num| is a <<percentage>>,
+		and |num|’s unit if |num| is a <<dimension>>.
+</div>
+
+<div algorithm>
+	To <dfn export>normalize a ''calc()'' expression</dfn> |num|
+
+	1. Simplify |num| into an equivalent summation of terms with unique units
+		(preserving terms with a zero value).
+
+	2. If |num| is a [=computed value=] and |num| contains only a single term,
+		[=normalize a numeric value=] from that single term
+		and return the result.
+
+	3. Return a {{CSSCalcValue}},
+		whose [=map entries=] is an ordered map which contains, in order:
+
+		1. If |num| contains a <<number>> term,
+			the [=map/entry=] «[ "number" → |val| ]»,
+			where |val| is the value of that term.
+		2. If |num| contains any <<dimension>> terms,
+			the [=map/entries=] «[ |unit| → |val| ]» for each term,
+			where |unit| is the term's unit and |val| is the term's value,
+			sorted in [=ASCII case-insensitive=] alphabetical order by their |unit|.
+		3. If |num| contains a <<percentage>> term,
+			the [=map/entry=] «[ "percent" → |val| ]»,
+			where |val| is the value of that term.
+
+	Note: The value computation process may transform different units into identical ones,
+	simplifying the resulting expression.
+	For example, ''calc(1px + 2em)'' as a specified value
+	results in a {{CSSCalcValue}} with <nobr>«[ "em" → 2, "px" → 1 ]»</nobr>,
+	but as a computed value will give a {{CSSUnitValue}} something like <code>{unit: "px", value: 33}</code>.
+</div>
+
 
 {{CSSTransformValue}} normalization {#transformvalue-normalization}
 -------------------------------------------------------------------
@@ -1529,7 +1577,7 @@ and <var>bias</var>. The process also updates <var>bias</var> based on the <var>
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
 		{{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
-		normalizing the value according to [[#numericvalue-normalization]]. If <var>bias</var> is vertical,
+		[=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
 		set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
 		horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
@@ -1542,8 +1590,8 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 
 1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
 		<var>keyword</var>, using the provided <var>bias</var>
-1.  let <var>adjustment</var> be the result of normalizing <var>length</var> according to
-		[[#numericvalue-normalization]].
+1.  let <var>adjustment</var> be the result of
+	[=normalize a numeric value|normalizing |length| as a numeric value=].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
 		<var>adjustment</var> from a zero length.
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
