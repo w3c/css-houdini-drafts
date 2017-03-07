@@ -11,7 +11,7 @@ Editor: Shane Stephens, shanestephens@google.com
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Repository: w3c/css-houdini-drafts
 Ignored Vars: type, unit
-Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue
+Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS
 Markup Shorthands: markdown yes
 </pre>
 
@@ -1019,11 +1019,15 @@ partial namespace CSS {
 -->
 
 {{CSSTransformValue}} objects {#transformvalue-objects}
------------------------------------------------------------
+-------------------------------------------------------
+
+{{CSSTransformValue}} objects represent <<transform-list>> values,
+used by the 'transform' property.
+They "contain" one or more {{CSSTransformComponent}}s,
+which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
-    [Constructor(),
-     Constructor(sequence<CSSTransformComponent> transforms)]
+    [Constructor(optional sequence<CSSTransformComponent> transforms)]
     interface CSSTransformValue : CSSStyleValue {
     	iterable<CSSTransformComponent>;
     	readonly attribute boolean is2D;
@@ -1031,12 +1035,46 @@ partial namespace CSS {
     };
 </xmp>
 
-{{CSSTransformValue}} objects represent values for the 'transform' property. A
-{{CSSTransformValue}} represents a list of {{CSSTransformComponent}}s.
+Issue: This *should* be an Array-like,
+pending proper resolution of [the GitHub issue](https://github.com/heycam/webidl/issues/291).
 
-<dfn attribute for=CSSTransformValue>is2D</dfn> is true if the {{CSSTransformComponent/is2D}}
-attribute of every {{CSSTransformComponent}} referenced by the {{CSSTransformValue}}
-returns true, and false otherwise.
+A {{CSSTransformValue}}’s [=values to iterate over=]
+is a [=list=] of {{CSSTransformComponent}}s.
+
+<div algorithm>
+	The <dfn constructor for=CSSTransformValue>CSSTransformValue(|transforms|)</dfn> constructor must,
+	when called,
+	perform the following steps:
+
+	1. Return a new {{CSSTransformValue}} whose [=values to iterate over=] is |transforms|.
+</div>
+
+<div algorithm="CSSTransformValue.is2D">
+	The <dfn attribute for=CSSTransformValue>is2D</dfn> attribute of a {{CSSTransformValue}} |this| must,
+	on getting,
+	return `true` if,
+	[=list/for each=] |func| in |this|’s [=values to iterate over=],
+	the |func|’s {{CSSTransformComponent/is2D}} attribute would return `true`;
+	otherwise,
+	the attribute returns `false`.
+</div>
+
+<div algorithm="CSSTransformValue.matrix">
+	The <dfn attribute for=CSSTransformValue>matrix</dfn> attribute of a {{CSSTransformValue}} |this| must,
+	on getting,
+	perform the following steps:
+
+	1. Let |matrix| be a 4x4 matrix,
+		initially set to the identity matrix.
+
+	2. [=list/For each=] |func| in |this|’s [=values to iterate over=],
+		set |matrix| to the result of multiplying |matrix|
+		and |func|’s equivalent 4x4 transform matrix.
+
+	3. Return a new {{DOMMatrixReadOnly}}
+		representing |matrix|.
+</div>
+
 
 <xmp class=idl>
     interface CSSTransformComponent {
