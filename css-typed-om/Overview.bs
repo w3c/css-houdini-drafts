@@ -1498,29 +1498,85 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}
 </div>
 
 
-{{CSSTransformValue}} normalization {#transformvalue-normalization}
--------------------------------------------------------------------
+<<transform-list>> and <<transform-function>> values {#transformvalue-normalization}
+------------------------------------------------------------------------------------
 
-If the provided value matches the <<transform-list>> production then a {{CSSTransformComponent}}
-is constructed for each matching <<transform-function>> in the production, and a {{CSSTransformValue}}
-is constructed around the resulting sequence.
+CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
+while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 
-Otherwise, if the provided value is "none", an empty string, or a string containing only whitespace,
-then a {{CSSTransformValue}} is constructed around an empty sequence.
+<div algorithm>
+	To <dfn export>normalize a <<transform-list>></dfn> |list|:
 
-Otherwise, normalization fails.
+	1. Return a new {{CSSTransformValue}}
+		whose [=values to iterate over=]
+		are the result of mapping the [=normalize a &lt;transform-function>=] algorithm
+		over |list|.
+</div>
 
-<div class='example'>
-The string "scale(2, 0.5) translate(100px) rotate(20deg)"
-is converted into a {{CSSTransformValue}} that contains a list of {{CSSTransformComponent}} with:
-*   a {{CSSScale}} with:
-		*   {{CSSScale/x}} set to 2
-		*   {{CSSScale/y}} set to 0.5
-*   a {{CSSTranslation}} with:
-		*   {{CSSTranslation/x}} with {{CSSUnitValue/value}} of `100` and {{CSSUnitValue/unit}} of `"px"`
-*   a {{CSSRotation}} with:
-		*   {{CSSRotation/angle}} with {{CSSUnitValue/value}} of `20` and {{CSSUnitValue/unit}} of `"deg"`
+<div algorithm>
+	To <dfn export>normalize a <<transform-function>></dfn> |func|,
+	perform the appropriate set of steps below,
+	based on |func|:
 
+	<dl class=switch>
+		: ''matrix()''
+		: ''matrix3d()''
+		::
+			1. Return a new {{CSSMatrixComponent}} object,
+				whose {{CSSMatrixComponent/matrix}} internal slot
+				is set to a 4x4 matrix representing the same information
+				as |func|.
+
+		: ''translate()''
+		: ''translateX()''
+		: ''translateY()''
+		: ''translate3d()''
+		: ''translateZ()''
+		::
+			1. Return a new {{CSSTranslation}} object,
+				whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
+				are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
+				or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|.
+
+		: ''scale()''
+		: ''scaleX()''
+		: ''scaleY()''
+		: ''scale3d()''
+		: ''scaleZ()''
+		::
+			1. Return a new {{CSSScale}} object,
+				whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
+				are set to the specified x/y/z scales,
+				or to ''1'' if not specified in |func|.
+
+		: ''rotate()''
+		: ''rotate3d()''
+		: ''rotateX()''
+		: ''rotateY()''
+		: ''rotateZ()''
+		::
+			1. Return a new {{CSSRotation}} object,
+				whose {{CSSRotation/angle}} internal slot
+				is set to the [=normalize a numeric value|normalization=] of the specified angle,
+				and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
+				are set to the specified rotation axis coordinates,
+				or the implicit axis coordinates if not specified in |func|.
+
+		: ''skew()''
+		: ''skewX()''
+		: ''skewY()''
+		::
+			1. Return a new {{CSSSkew}} object,
+				whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
+				are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
+				or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|.
+
+		: ''perspective()''
+		::
+			1. Return a new {{CSSPerspective}} object,
+				whose {{CSSPerspective/length}} internal slot
+				is set to the [=normalize a numeric value|normalization=] of the specified length.
+	</dl>
 </div>
 
 {{CSSPositionValue}} normalization {#positionvalue-normalization}
