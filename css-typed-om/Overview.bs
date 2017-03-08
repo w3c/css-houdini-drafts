@@ -1406,14 +1406,9 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 		as appropriate.
 </div>
 
-Note: <<position>> productions accept a complicated combination of keywords
-and values. When specified as such in a stylesheet or via the untyped CSSOM,
-the {{CSSStyleValue/cssText}} attribute will contain the specified
-string. However, this string is normalized as two Lengths into the {{CSSPositionValue/x}} and {{CSSPositionValue/y}} values of the
-{{CSSStyleValue}} object.
-
-
 <div class='example'>
+	<<position>> values accept a complicated combination of keywords and values,
+	but in the Typed OM are always simplified to just two offsets.
 	For example, the following style sheet:
 
 	<pre class='style'>
@@ -1425,14 +1420,13 @@ string. However, this string is normalized as two Lengths into the {{CSSPosition
 	Will produce the following behavior:
 
 	<pre class='lang-javascript'>
-	// "center bottom 10px"
-	document.querySelector('.example').styleMap.get('background-position').cssText;
+	let map = document.querySelector('.example').styleMap;
 
-	// 50% - as a CSSUnitValue
-	document.querySelector('.example').styleMap.get('background-position').x;
+	map.get('background-position').x;
+	// CSSUnitValue(50, "percent")
 
-	// calc(100% - 10px) - as a CSSCalcLength
-	document.querySelector('.example').styleMap.get('background-position').y;
+	map.get('background-position').y;
+	// CSSCalcValue({percent: 100, px: -10})
 	</pre>
 </div>
 
