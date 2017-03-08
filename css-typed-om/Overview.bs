@@ -531,6 +531,8 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 		CSSNumericValue mul(double value);
 		CSSNumericValue div(double value);
 
+		boolean equals(CSSNumericValue value);
+
 		CSSNumericValue to(DOMString unit);
 
 		static CSSNumericValue parse(DOMString cssText);
@@ -631,6 +633,8 @@ The following are the arithmetic operations you can perform on dimensions:
 		3. Return a new {{CSSCalcValue}}
 			whose [=map entries=] are |newEntries|.
 </div>
+
+Issue: Define {{CSSNumericValue/equals()}}.
 
 <div algorithm="CSSNumericValue.to()">
 	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
@@ -1411,7 +1415,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 	but in the Typed OM are always simplified to just two offsets.
 	For example, the following style sheet:
 
-	<pre class='style'>
+	<pre class='lang-css'>
 	.example {
 		background-position: center bottom 10px;
 	}
