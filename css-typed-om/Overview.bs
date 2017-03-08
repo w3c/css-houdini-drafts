@@ -1312,35 +1312,17 @@ is stored in string form in the <dfn attribute for=CSSTransformComponent>cssText
 </div>
 
 <div class=note>
-    Each {{CSSTransformComponent}} can correspond to one of a number of underlying
-    transform functions. For example, a {{CSSTranslation}} with an x value of "10px"
-    and y &amp; z values of 0 could be:
+	Each {{CSSTransformComponent}} can correspond to
+	one of a number of underlying transform functions.
+	For example, a {{CSSTranslation}}
+	with an x value of ''10px''
+	and y &amp; z values of ''0px'' could represent any of the following:
 
-    *   translate(10px)
-    *   translate(10px, 0)
-    *   translateX(10px)
-    *   translate3d(10px, 0, 0)
+	* translate(10px)
+	* translate(10px, 0)
+	* translateX(10px)
+	* translate3d(10px, 0, 0)
 </div>
-
-When a {{CSSTransformValue}} is read from a {{StylePropertyMap}}, each
-{{CSSTransformComponent}} will maintain the relevant transform function in
-its <code>cssText</code> attribute. However, newly constructed {{CSSTransformValue}}s
-will always generate <code>cssText</code> according to the following rules:
-*   {{CSSSkew}} will always serialize to skew(ax, ay)
-*   {{CSSPerspective}} will always serialize to perspective(length)
-*   {{CSSTranslation}}, {{CSSRotation}}, and {{CSSScale}} each have two
-		constructors. In each case, the constructor with fewer arguments constructs
-		a {{CSSTransformComponent}} for which {{CSSTransformComponent/is2D}} will be true,
-		with <code>cssText</code> employing the 2D version of the relevant transform
-		function (translate, rotate, scale). The constructor with more
-		arguments constructs a {{CSSTransformComponent}} for which
-		{{CSSTransformComponent/is2D}} will be false, with <code>cssText</code>
-		employing the 3D version of the relevant transform function (translate3d,
-		rotate3d, scale3d).
-*   {{CSSMatrixComponent}} objects are constructed around a {{DOMMatrixReadOnly}}, and
-		will serialize to a matrix function if the contained {{DOMMatrixReadOnly}}'s
-		{{DOMMatrixReadOnly/is2D}} attribute is false, and a matrix3d function
-		otherwise.
 
 <!--
 ████████   ███████   ██████  ████ ████████ ████  ███████  ██    ██
