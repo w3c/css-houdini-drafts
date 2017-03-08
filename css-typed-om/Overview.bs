@@ -1363,8 +1363,8 @@ Issue(366): Figure out how to define 2d vs 3d matrix.
 {{CSSPositionValue}} objects {#positionvalue-objects}
 --------------------------------------------------
 
-{{CSSPositionValue}} objects represent values for properties that take <<position>> productions,
-such as 'background-position'.
+{{CSSPositionValue}} objects represent <<position>> values,
+used by properties such as 'background-position'.
 
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
