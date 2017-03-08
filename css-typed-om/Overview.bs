@@ -1382,12 +1382,12 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 	when called,
 	perform the following steps:
 
-	1. If |x| or |y| has a [=strong type=] that's not "length",
+	1. If |x| or |y| doesn't match <<length-percentage>>,
 		[=throw=] a {{TypeError}}.
 
 	2. Otherwise, return a new {{CSSPositionValue}}
-		whose internal {{CSSPositionValue/x}} slot is set to |x|,
-		and whose internal {{CSSPositionValue/y}} slot is set to |y|.
+		whose {{CSSPositionValue/x}} internal slot is set to |x|,
+		and whose {{CSSPositionValue/y}} internal slot is set to |y|.
 </div>
 
 <div algorithm="CSSPositionValue.x">
@@ -1395,14 +1395,14 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 	on setting a value |value|,
 	perform the following steps:
 
-	1. If |value| has a [=strong type=] that's not "length",
+	1. If |value| doesn't match <<length-percentage>>,
 		[=throw=] a {{TypeError}}.
 
-	2. Otherwise, set |this|’s internal {{CSSPositionValue/x}} or {{CSSPositionValue/y}} slot,
+	2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
 		as appropriate,
 		to |value|.
 
-	On reading, the attributes must return the value of the internal {{CSSPositionValue/x}} or {{CSSPositionValue/y}} slot,
+	On reading, the attributes must return the value of the {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
 		as appropriate.
 </div>
 
