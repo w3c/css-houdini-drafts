@@ -10,6 +10,7 @@ Abstract: Converting CSSOM value strings into meaningfully typed JavaScript repr
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Repository: w3c/css-houdini-drafts
+Inline Github Issues: title
 Ignored Vars: type, unit
 Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS
 Markup Shorthands: markdown yes
@@ -553,12 +554,19 @@ The following are the arithmetic operations you can perform on dimensions:
 	2. If |this| and |value| are both {{CSSUnitValue}}s:
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
-		with the same unit
-		and a value equal to the sum of |this|’s and |value|’s values.
+		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot set to the sum of
+		|this|’s and |value|’s {{CSSUnitValue/value}} internal slots.
 
-	3. Otherwise,
-		return a {{CSSCalcValue}}
-		representing the sum of the |this| and |value|.
+	3. Otherwise:
+		1. Let |newEntries| be a copy of |this|’s [=map entries=].
+		2. [=map/For each=] |unit| → |val| in |value|’s [=map entries=]:
+			1. If |newEntries|[|unit|] [=map/exists=],
+				set |newEntries|[|unit|] to |newEntries|[|unit|] plus |val|.
+			2. Otherwise,
+				set |newEntries|[|unit|] to |val|.
+		3. Return a new {{CSSCalcValue}}
+			whose [=map entries=] are |newEntries|.
 </div>
 
 <div algorithm="CSSNumericValue.sub()">
@@ -573,12 +581,19 @@ The following are the arithmetic operations you can perform on dimensions:
 	2. If |this| and |value| are both {{CSSUnitValue}}s:
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
-		with the same unit
-		and a value equal to the difference of |this|’s and |value|’s values.
+		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot set to the difference of
+		|this|’s and |value|’s {{CSSUnitValue/value}} internal slots.
 
-	3. Otherwise,
-		return a {{CSSCalcValue}}
-		representing the difference of the |this| and |value|.
+	3. Otherwise:
+		1. Let |newEntries| be a copy of |this|’s [=map entries=].
+		2. [=map/For each=] |unit| → |val| in |value|’s [=map entries=]:
+			1. If |newEntries|[|unit|] [=map/exists=],
+				set |newEntries|[|unit|] to |newEntries|[|unit|] minus |val|.
+			2. Otherwise,
+				set |newEntries|[|unit|] to -|val|.
+		3. Return a new {{CSSCalcValue}}
+			whose [=map entries=] are |newEntries|.
 </div>
 
 <div algorithm="CSSNumericValue.mul()">
@@ -588,13 +603,15 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	1. If |this| is a {{CSSUnitValue}},
 		return a new {{CSSUnitValue}}
-		with the same unit
-		and a value equal to |this|’s value times |value|.
+		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}} internal slot times |value|.
 
-	2. Otherwise,
-		return a new {{CSSCalcValue}}
-		containing the same keys,
-		but with each value multiplied by |value|.
+	2. Otherwise:
+		1. Let |newEntries| be a copy of |this|’s [=map entries=].
+		2. [=map/For each=] |unit| → |val| in |newEntries|,
+			set |newEntries|[|unit|] to |val| times |value|.
+		3. Return a new {{CSSCalcValue}}
+			whose [=map entries=] are |newEntries|.
 </div>
 
 <div algorithm="CSSNumericValue.div()">
@@ -604,17 +621,19 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	1. If |this| is a {{CSSUnitValue}},
 		return a new {{CSSUnitValue}}
-		with the same unit
-		and a value equal to |this|’s value divided by |value|.
+		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}} internal slot divided by |value|.
 
-	2. Otherwise,
-		return a new {{CSSCalcValue}}
-		containing the same keys,
-		but with each value divided by |value|.
+	2. Otherwise:
+		1. Let |newEntries| be a copy of |this|’s [=map entries=].
+		2. [=map/For each=] |unit| → |val| in |newEntries|,
+			set |newEntries|[|unit|] to |val| divided by |value|.
+		3. Return a new {{CSSCalcValue}}
+			whose [=map entries=] are |newEntries|.
 </div>
 
 <div algorithm="CSSNumericValue.to()">
-	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}}
+	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
 	into another one with the specified |unit|.
 	When called, it must perform the following steps:
 
@@ -623,24 +642,21 @@ The following are the arithmetic operations you can perform on dimensions:
 		and abort this algorithm.
 
 	2. If |this| is a {{CSSUnitValue}}
-		and |this|’s unit and |unit| are [=compatible units=],
+		and |this|’s {{CSSUnitValue/unit}} internal slot and |unit| are [=compatible units=],
 		return a new {{CSSUnitValue}}
-		with its unit set to |unit|
-		and its value set to |this|’s value
+		with its {{CSSUnitValue/unit}} internal slot set to |unit|
+		and its {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}}
 		multiplied by the conversion ratio between the two units.
 
-	3. If |this| is a {{CSSCalcValue}}
-		and all of its keys
-		are [=compatible units=] with |unit|,
-		return a new {{CSSUnitValue}}
-		with its unit set to |unit|
-		and its value to the sum of
-		each of |this|’s values
-		multiplied by the corresponding conversion ratios
-		between their key and |unit|.
-
-	4. Otherwise,
-		[=throw=] a {{TypeError}}.
+	3. If |this| is a {{CSSCalcValue}}:
+		1. Let |sum| be 0.
+		2. [=map/For each=] |oldUnit| → |value| in |this|’s [=map entries=]:
+			1. If |oldUnit| and |unit| are not [=compatible units=],
+				[=throw=] a {{TypeError}}.
+			2. Increment |sum| by |value| times the conversion ratio between |oldUnit| and |unit|.
+		3. Return a new {{CSSUnitValue}}
+			with its {{CSSUnitValue/unit}} internal slot set to |unit|
+			and its {{CSSUnitValue/value}} internal slot set to |sum|.
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
@@ -667,17 +683,24 @@ rather than on {{CSSNumericValue}} instances.
 
 	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
 		return a new {{CSSUnitValue}} object
-		with its value set to the token's value,
-		and the unit set to the token's unit if it's a <<dimension-token>>,
-		or `"number"` if it is a <<number-token>>,
-		or `"percentage"` if it is a <<percentage-token>>.
+		with its {{CSSUnitValue/value}} internal slot set to the token's value,
+		and its {{CSSUnitValue/value}} internal slot set to the token's unit if it's a <<dimension-token>>,
+		or `"number"` if it's a <<number-token>>,
+		or `"percentage"` if it's a <<percentage-token>>.
 
-	4. If |result| is a <<calc()>>,
-		normalize the ''calc()'' argument
-		into a sum of values with unique units,
-		then return a {{CSSCalcValue}} object,
-		with keys for each unit in the calc,
-		and values set to the corresponding numeric values.
+	4. If |result| is a <<calc()>>:
+		1. Normalize the ''calc()'' argument
+			into a sum of values with unique units |calcEntries|.
+		2. Let |newEntries| be an empty [=ordered map=].
+		3. If |calcEntries| contains a <<number>> term,
+			set |newEntries|["number"] to the value of that term.
+		4. For each <<dimension>> term in |calcEntries|,
+			ordered [=ASCII case-insensitive=] alphabetically by their |unit|,
+			set |newEntries|[|unit|] to the term's value.
+		5. If |calcEntries| contains a <<percentage>> term,
+			set |newEntries|["percentage"] to the value of that term.
+		6. Return a new {{CSSCalcValue}} object
+			with its [=map entries=] set to |newEntries|.
 </div>
 
 {{CSSNumericValue}}s can be <dfn>strongly typed</dfn>
@@ -744,8 +767,8 @@ are represented as {{CSSUnitValue}}s.
 		and abort this algorithm.
 
 	2. Return a new {{CSSUnitValue}}
-		with its value set to |value|
-		and its unit set to |unit|.
+		with its {{CSSUnitValue/value}} internal slot set to |value|
+		and its {{CSSUnitValue/unit}} set to |unit|.
 </div>
 
 <div algorithm="CSSUnitValue.unit">
@@ -757,10 +780,10 @@ are represented as {{CSSUnitValue}}s.
 		[=throw=] a {{TypeError}}.
 
 	2. Otherwise,
-		set |this|’s internal {{CSSUnitValue/unit}} slot to |unit|.
+		set |this|’s {{CSSUnitValue/unit}} internal slot to |unit|.
 
 	On reading,
-	it must return the value of |this|’s internal {{CSSUnitValue/unit}} slot.
+	it must return the value of |this|’s {{CSSUnitValue/unit}} internal slot.
 </div>
 
 <div algorithm="CSSUnitValue.type">
@@ -1305,6 +1328,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 	Note: ''perspective()'' functions always represent 3D transforms.
 </div>
+
+Issue(366): Figure out how to define 2d vs 3d matrix.
 
 <div class=note>
 	Each {{CSSTransformComponent}} can correspond to
