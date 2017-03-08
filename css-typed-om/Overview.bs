@@ -1013,6 +1013,12 @@ partial namespace CSS {
 	is set to |value|
 	and whose {{CSSUnitValue/unit}} internal slot
 	is set to the name of the method as defined here.
+
+	Note: The unit used does not depend on the *current* name of the function,
+	if it's stored in another variable;
+	`let foo = CSS.px; let val = foo(5);` does not return a `{value: 5, unit: "foo"}` {{CSSUnitValue}}.
+	The above talk about names is just a shorthand
+	to avoid defining the unit individually for all ~20 functions.
 </div>
 
 <div class=example>
