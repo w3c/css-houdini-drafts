@@ -1079,11 +1079,10 @@ is a [=list=] of {{CSSTransformComponent}}s.
 <xmp class=idl>
     interface CSSTransformComponent {
     	readonly attribute DOMString cssText;
-    	readonly attribute boolean is2D;
+    	attribute boolean is2D;
     };
 
-    [Constructor(CSSNumericValue x, CSSNumericValue y),
-     Constructor(CSSNumericValue x, CSSNumericValue y, CSSNumericValue z)]
+    [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
     interface CSSTranslation : CSSTransformComponent {
     	attribute CSSNumericValue x;
     	attribute CSSNumericValue y;
@@ -1099,8 +1098,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     	attribute CSSNumericValue angle;
     };
 
-    [Constructor(double x, double y),
-     Constructor(double x, double y, double z)]
+    [Constructor(double x, double y, optional double z)]
     interface CSSScale : CSSTransformComponent {
     	attribute double x;
     	attribute double y;
@@ -1126,23 +1124,192 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 {{CSSTransformComponent}} objects have the following properties:
 
-<div algorithm="CSSTransformComponent/is2D">
-	The <dfn attribute for=CSSTransformComponent>is2D</dfn> attribute is
-	true if the component represents a 2D transform function,
-	and false otherwise.
-
-	This is only true for:
-
-	* {{CSSTranslation}} objects if their {{CSSTranslation/z}} attribute is 0
-	* {{CSSRotation}} objects if their {{CSSRotation/x}} and {{CSSRotation/y}} attributes are 0
-	* {{CSSScale}} objects if their {{CSSScale/z}} attribute is 1
-	* {{CSSSkew}} objects at all times
-	* {{CSSPerspective}} objects never.
-	* {{CSSMatrixComponent}} objects if their {{CSSMatrixComponent/matrix}}’s [=DOMMatrixReadOnly/is2D=] flag is true.
-</div>
-
 The transform function which the component represents
 is stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</dfn> attribute.
+
+<div algorithm="CSSTransformComponent.numericValues">
+	Unless otherwise specified,
+	all {{CSSTransformComponent}} subclass attributes that have a {{CSSNumericValue}} or {{DOMMatrix}} type must,
+	on getting,
+	return a new {{CSSNumericValue}} or {{DOMMatrix}}
+	equivalent to the one stored in the corresponding internal slot.
+
+	Unless otherwise specified,
+	they must,
+	on setting,
+	store a new {{CSSNumericValue}} or {{DOMMatrix}}
+	equivalent to the value being set.
+</div>
+
+<div algorithm="CSSTransformComponent 3D stuff">
+	If a {{CSSTransformComponent}}’s {{CSSTransformComponent/is2D}} internal slot is `true`,
+	the attributes in the following list must,
+	on setting,
+	do nothing;
+	on getting,
+	they must return the value specified in the following list:
+
+	: {{CSSTranslation/z|CSSTranslation.z}}
+	:: A new {{CSSUnitValue}} representing ''0px''.
+
+	: {{CSSRotation/x|CSSRotation.x}}
+	: {{CSSRotation/y|CSSRotation.y}}
+	:: The number `0`.
+
+	: {{CSSRotation/z|CSSRotation.z}}
+	:: The number `1`.
+
+	: {{CSSScale/z|CSSScale.z}}
+	:: The number `1`.
+</div>
+
+<details class=note>
+	<summary>{{CSSTransformComponent/is2D}} Design Considerations</summary>
+
+	For legacy reasons,
+	2D and 3D transforms are distinct,
+	even if they have identical effects;
+	a ''translateZ(0px)'' has observable effects on a page,
+	even tho it's defined to be an identity transform,
+	as the UA activates some 3D-based optimizations for the element.
+
+	There were several possible ways to reflect this--
+	nullable 3D-related attributes,
+	separate 2D and 3D interfaces,
+	etc--
+	but we chose the current design
+	(an author-flippable switch that dictates the behavior)
+	because it allows authors to,
+	in most circumstances,
+	operate on transforms without having to care whether they're 2D or 3D,
+	but also prevents "accidentally" flipping a 2D transform into becoming 3D.
+</details>
+
+<div algorithm="CSSTranslation()">
+	The <dfn constructor for=CSSTranslation>CSSTranslation(|x|, |y|, |z|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. If |x|, |y| don't match <<length-percentage>>,
+		or |z| (if passed) doesn't match <<length-percentage>>,
+		[=throw=] a {{TypeError}}.
+
+	2. Let |this| be a new {{CSSTranslation}} object,
+		with its internal {{CSSTranslation/x}} and {{CSSTranslation/y}} slots
+		set to new {{CSSNumericValue}} objects
+		equivalent to |x| and |y|.
+
+	3. If |z| was passed,
+		set |this|’s {{CSSTranslation/z}} internal slot
+		to a new {{CSSNumericValue}} object
+		equivalent to |z|,
+		and set |this|’s {{CSSTransformComponent/is2D}} internal slot
+		to `false`.
+
+	4. If |z| was not passed,
+		set |this|’s {{CSSTranslation/z}} internal slot
+		to a new {{CSSNumericValue}} object
+		representing ''0px'',
+		and set |this|’s {{CSSTransformComponent/is2D}} internal slot
+		to `true`.
+
+	5. Return |this|.
+</div>
+
+<div algorithm="CSSRotation(angle)">
+	The <dfn constructor for=CSSRotation>CSSRotation(|angle|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. If |angle| doesn't match <<angle>>,
+		[=throw=] a {{TypeError}}.
+
+	2. Return a new {{CSSRotation}}
+		with its {{CSSRotation/angle}} internal slot
+		set to a new {{CSSNumericValue}} equivalent to |angle|,
+		its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots set to `0`,
+		its {{CSSRotation/z}} internal slot set to `1`,
+		and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+</div>
+
+<div algorithm="CSSRotation(x, y, z, angle)">
+	The <dfn constructor for=CSSRotation>CSSRotation(|x|, |y|, |z|, |angle|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. If |angle| doesn't match <<angle>>,
+		[=throw=] a {{TypeError}}.
+
+	2. Return a new {{CSSRotation}}
+		with its {{CSSRotation/angle}} internal slot
+		set to a new {{CSSNumericValue}} equivalent to |angle|,
+		its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
+		and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
+</div>
+
+<div algorithm="CSSScale()">
+	The <dfn constructor for=CSSScale>CSSScale(|x|, |y|, |z|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. Let |this| be a new {{CSSScale}} object,
+		with its {{CSSScale/x}} and {{CSSScale/y}} internal slots
+		set to |x| and |y|.
+
+	2. If |z| was passed,
+		set |this|’s {{CSSScale/z}} internal slot to |z|,
+		and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `false`.
+
+	3. If |z| was not passed,
+		set |this|’s {{CSSScale/z}} internal slot to `1`,
+		and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
+
+	4. Return |this|.
+</div>
+
+<div algorithm="CSSSkew()">
+	The <dfn constructor for=CSSSkew>CSSSkew(|ax|, |ay|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. If |ax| or |ay| do not match <<angle>>,
+		[=throw=] a {{TypeError}}.
+
+	2. Return a new {{CSSSkew}} object
+		with its {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
+		set to new {{CSSNumericValue}}s equivalent to |ax| and |ay|,
+		and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+</div>
+
+<div algorithm="CSSSkew.is2D">
+	The <dfn attribute for=CSSSkew>is2D</dfn> attribute of a {{CSSSkew}} object must,
+	on setting,
+	do nothing.
+
+	Note: ''skew()'' functions always represent 2D transforms.
+</div>
+
+<div algorithm="CSSPerspective()">
+	The <dfn constructor for=CSSPerspective>CSSPerspective(|length|)</dfn> constructor must,
+	when invoked,
+	perform the following steps:
+
+	1. If |length| does not match <<length>>,
+		[=throw=] a {{TypeError}}.
+
+	2. Return a new {{CSSPerspective}} object
+		with its {{CSSPerspective/length}} internal slot
+		set to a new {{CSSNumericValue}} equivalent to |length|,
+		and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
+</div>
+
+<div algorithm="CSSPerspective.is2D">
+	The <dfn attribute for=CSSPerspective>is2D</dfn> attribute of a {{CSSPerspective}} object must,
+	on setting,
+	do nothing.
+
+	Note: ''perspective()'' functions always represent 3D transforms.
+</div>
 
 <div class=note>
     Each {{CSSTransformComponent}} can correspond to one of a number of underlying
@@ -1563,7 +1730,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 			1. Return a new {{CSSMatrixComponent}} object,
 				whose {{CSSMatrixComponent/matrix}} internal slot
 				is set to a 4x4 matrix representing the same information
-				as |func|.
+				as |func|,
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `true` if |func| is ''matrix()'',
+				and `false` otherwise.
 
 		: ''translate()''
 		: ''translateX()''
@@ -1574,7 +1744,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 			1. Return a new {{CSSTranslation}} object,
 				whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
 				are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
-				or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|.
+				or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
+				and `false` otherwise.
 
 		: ''scale()''
 		: ''scaleX()''
@@ -1585,7 +1758,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 			1. Return a new {{CSSScale}} object,
 				whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
 				are set to the specified x/y/z scales,
-				or to ''1'' if not specified in |func|.
+				or to ''1'' if not specified in |func|
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `true` if |func| is ''scale()'', ''scaleX()'', or ''scaleY()'',
+				and `false` otherwise.
 
 		: ''rotate()''
 		: ''rotate3d()''
@@ -1598,7 +1774,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 				is set to the [=normalize a numeric value|normalization=] of the specified angle,
 				and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
 				are set to the specified rotation axis coordinates,
-				or the implicit axis coordinates if not specified in |func|.
+				or the implicit axis coordinates if not specified in |func|
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `true` if |func| is ''rotate()'',
+				and `false` otherwise.
 
 		: ''skew()''
 		: ''skewX()''
@@ -1607,13 +1786,17 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 			1. Return a new {{CSSSkew}} object,
 				whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
 				are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
-				or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|.
+				or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `true`.
 
 		: ''perspective()''
 		::
 			1. Return a new {{CSSPerspective}} object,
 				whose {{CSSPerspective/length}} internal slot
-				is set to the [=normalize a numeric value|normalization=] of the specified length.
+				is set to the [=normalize a numeric value|normalization=] of the specified length
+				and whose {{CSSTransformComponent/is2D}} internal slot
+				is `false`.
 	</dl>
 </div>
 
