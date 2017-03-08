@@ -1122,11 +1122,6 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 </xmp>
 
-{{CSSTransformComponent}} objects have the following properties:
-
-The transform function which the component represents
-is stored in string form in the <dfn attribute for=CSSTransformComponent>cssText</dfn> attribute.
-
 <div algorithm="CSSTransformComponent.numericValues">
 	Unless otherwise specified,
 	all {{CSSTransformComponent}} subclass attributes that have a {{CSSNumericValue}} or {{DOMMatrix}} type must,
