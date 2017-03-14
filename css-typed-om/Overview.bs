@@ -634,7 +634,9 @@ The following are the arithmetic operations you can perform on dimensions:
 			whose [=map entries=] are |newEntries|.
 </div>
 
-Issue: Define {{CSSNumericValue/equals()}}.
+<div class=issue>
+	Define {{CSSNumericValue/equals()}}.
+</div>
 
 <div algorithm="CSSNumericValue.to()">
 	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
