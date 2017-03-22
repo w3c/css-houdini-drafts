@@ -379,12 +379,12 @@ Any write on the outputStyle map, updates the effective value of the used style 
 proxied element. This happens asynchronously.
 
 
-Issue: We now longer allow direct construction of ElementProxy. Remove it.
+Issue: Todo: Remove this as we no longer allow direct construction of ElementProxy. 
 
-Issue: Explain what happens when a proxied element is removed.
-    In other houdini APIs (e.g., paint and layout) the painter is only invocated if the
-    element is alive. In <a>Animation Worklet</a> this is not the case so proxied element may get
-    removed while worklet has a handle on them.
+Issue: Todo: Explain what happens when a proxied element is removed. In other houdini APIs (e.g.,
+    paint and layout) the painter is only invocated if the element is alive. In <a>Animation
+    Worklet</a> this is not the case so proxied element may get removed while worklet has a handle
+    on them.
 
 
 When the user agent wants to <dfn>update proxy input style map</dfn> given |proxy|, and
@@ -433,7 +433,7 @@ scope list</a> as |scope|:
         <a>animator name to instance map</a>. If |animatorInstance| is null run the following
         substeps:
 
-        Issue: TODO: Add steps to create new animation instance given the animator definition.
+        Issue: Todo: Add steps to create new animation instance given the animator definition.
 
   6. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
@@ -452,13 +452,13 @@ scope list</a> as |scope|:
 Note: It is legal for the user agent to <a>run an animator</a> multiple times in the same
 frame.
 
-Issue: We should add provision that allows user agents to skip calling <a>animate</a> 
+Issue: Todo: add provision that allows user agents to skip calling <a>animate</a> 
     on any <a>animators</a> whose proxies are not within the visual viewport or whose attributes
     are not mutated.
 
 Closing an Animator {#closing-animator}
 ====================================================
-TODO: Define a close function that ends the animator. It can be called from document context or
+Todo: Define a close function that ends the animator. It can be called from document context or
 animation context.
 
 
@@ -520,7 +520,7 @@ Animatable: no
       If no <a>animator definition</a> exists with that name, then the element gets assigned as soon
       as one is registered.
 
-      Issue: TODO: If no ancestor animator instance exists with that name then we should create one
+      Issue: Todo: If no ancestor animator instance exists with that name then we should create one
       with document root element as its root.
 </dl>
 
