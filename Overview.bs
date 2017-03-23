@@ -160,9 +160,6 @@ write its explicitly exposed <a>animatable attribute</a>s . It consists of:
 
  - A map of proxies output properties to their values.
 
-An <dfn>animator object</dfn> provides a handle in the <a>browsing context</a> for 
-a given <a>animator instance</a>. This may later be used to provide Javascript APIs for animators.
-
 Registering an Animator Definition {#registering-animator-definition}
 ============================================================
 The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
@@ -246,63 +243,12 @@ the user agent <em>must</em> run the following steps:
 
 Creating an Animator {#creating-animator}
 ====================================================
-Each <a>animator instance</a> lives in a {{AnimationWorkletGlobalScope}} and has a dual 
-<a>animator object</a> that lives in <a>browsing context</a>
-
-The <a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
+Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}. The
+<a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state.
 
-The {{AnimationWorkletGlobalScope}} has a <dfn>animator instance list</dfn>. Anytime a new 
+The {{AnimationWorkletGlobalScope}} has an <dfn>animator instance list</dfn>. Anytime a new 
 <a>animator instance</a> is constructed in that scope, it gets  added to the list.
-
-
-<pre class='idl'>
-[
-    Exposed=(Window),
-    RaisesException=Constructor,
-    Constructor(DOMString name)
-] interface Animator {
-    [RaisesException]  void postMessage(any message, optional sequence&lt;Transferable&gt; transfer);
-    attribute EventHandler onmessage;
-};
-</pre>
-
-
-When the {{Animator}} constructor is called the user agent <em>must</em> run the following
-steps:
-    1. Let |name| be the first argument of the constructor.
-
-    2. Let |workletGlobalScope| be a {{AnimationWorkletGlobalScope}} from the list of
-        <a>worklet's WorkletGlobalScopes</a> from the animation {{Worklet}}.
-
-    3. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
-
-        If |definition| does not exist, <a>throw</a> a <a>NotSupportedError</a> and abort
-        the following steps.
-
-    4. <a>Create a new {{MessagePort}} object</a>. Let this be the |outside port|.
-
-    5. Let |animatorObj| be a new {{Animator}} with:
-
-        - <a>animator name</a> being |name|
-
-        - <a>message port</> being |outside port|
-
-    6. <a>Queue a task</a> to run the following substeps:
-
-        1. Use dark magic to pick the right animationWorklet scope. Let this be
-            |workletGlobalScope|.
-
-        2. <a>Create a new animator instance</a> with |name|, |outside port|, and
-            |workletGlobalScope|. Let this be the |animatorInstance|.
-
-        3. Associate |animatorInstance| with |animatorObj|.
-
-    7. Return |animatorObj|.
-
-
-
 
 To <dfn>create a new animator instance</dfn> given |name|, |outside port|, and |workletGlobalScope|,
 the user agent <em>must</em> run the following steps:
@@ -321,26 +267,19 @@ the user agent <em>must</em> run the following steps:
 
           Issue: handle invalid construction.
       
-    4. <a>Create a new {{MessagePort}} object</a> owned by |instance|. Let |inside port| be this
-        new object.
-
-    5. <a>Entangle</a> |outside port| and |inside port|.
-
-    6. Set the following on |animatorInstance| with:
+    4. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
 
         - <a>animation request flag</a> being <a>frame-current</a>
 
-        - <a>port</a> being |inside port|
-
-    7. Add |animatorInstance| to <a>animator instance list</a>.
+    5. Add |animatorInstance| to <a>animator instance list</a>.
 
 
 Creating an Element Proxy {#creating-element-proxy}
 ====================================================
 An <a>element proxy</a> can be constructed in the document scope using the {{ElementProxy}}
 constructor. <a>element proxy</a> is a <a>clonable object</a> and thus can be serialized in a
-message and posted to any <a>animator instance</a> via the <a>animator object</a> port.
+message and delivered to any <a>animator instance</a>.
 
 The {{ElementProxy}} constructor takes two parameters, first the element which is being proxied,
 and second a list of {{DOMString}} identifying all of the <a>animatable attribute</a>
@@ -363,21 +302,19 @@ mutable offset on each proxy but the new idea is to have readonly ScrollTimeline
 When the {{ElementProxy}} constructor is called the user agent <em>must</em> run the following
 steps:
 
-    1. Let |animatorObj|, and |element| be the first, and second arguments of the constructor.
+    1. Let |element| be the first argument of the constructor.
 
     2. If |element| is null or not an instance of {{Element}} abort the following steps.
 
-    3. If |animatorObj| is null or not an instance of {{Animator}} abort the following steps.
-
-    4. <a>Create an element proxy</a> with |animatorObj| and |element|.
+    4. <a>Create an element proxy</a> with |element|.
 
 Issue: Todo: Remove this as we no longer allow direct construction of ElementProxy. 
 
 
-When user agent wants to <dfn>create an element proxy</dfn> given |animatorObj| and |element|, it
+When user agent wants to <dfn>create an element proxy</dfn> given |element|, it
 <em>must</em> run the following steps:
 
-    1. Let |animatorInstance| be the <a>animator instance</a> associated with |animatorObj|
+    1. Let |animatorInstance| be the <a>animator instance</a> associated with |element|
 
     2. Let |workletGlobalScope| be the scope associated with |animatorInstance|.
 
@@ -594,33 +531,6 @@ Issue: Todo: the animators output style values have the highest order in animati
 their composite operation is "replace" which is going to allow them to run independent on other
 animations and in a different thread. Supporting other composite operation is not in scope at this
 point.
-
-
-Receiving and Sending Message {#receiving-and-sending-message}
-=============================================================
-
-Each <a>animator object</a> has an implicit {{MessagePort}} associated with it. This port
-is created when the animator object is created and should have a lifetime that is as long as the
-animator instance's lifetime.
-
-Similarly, each <a>animator instance</a> has a {{MessagePort}} which is entangled with the
-associated <a>animator object</a> port. Together, these ports create an implicit <a>message
-channel</a> which can be used to communicate between the animator object and its instance.
-
-All messages received by the <a>animator object</a>'s port <em>should</em> immediately be re-
-targeted at the <a>animator object</a>. Similarly any invocation of {{postMessage()}} on the
-animator object <em>must</em> immediately invoke the method of the same name on the port, with
-the same arguments, and return the same return value.
-
-All messages received by the <a>animator instance</a>'s port <em>should</em> immediately be re-
-targeted at an <a>animation instance</a>. Similarly any invocation of {{postMessage()}} on the 
-<a>animator instance</a> must immediately invoke the method of the same name on the port, with 
-the same arguments, and return the same return value.
-
-
-Note: It is legal for a user agents to only deliver messages to an animator instance
-immediately before running that animator. Similarly messages to an animator object may be deferred
-to any appropriate time in the document lifecycle.
 
 
 
