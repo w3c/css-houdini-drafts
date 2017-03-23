@@ -413,10 +413,10 @@ When the user agent wants to <dfn>update proxy input style map</dfn> given |prox
     2. Set |proxy|'s inputStyleMap to |styleMap|.
 
 
-Issue: Todo: Explain what happens when a proxied element is removed. In other houdini APIs (e.g.,
-    paint and layout) the painter is only invoked if the element is alive. In <a>Animation
-    Worklet</a> this is not the case so proxied element may get removed while worklet has a handle
-    for them.
+When an element is removed, all proxies of that element are considered to be disconnected.
+A disconnected proxy continues to have the last value from the <a>computed value</a>
+of the <a>proxied element</a> properties, but setting values on its ouputStyleMap will have no
+effect.
 
 
 Requesting Animation Frames {#requesting-animation-frames}
