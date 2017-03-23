@@ -8,6 +8,7 @@ Shortname: css-animation-api
 Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com
+Editor: Stephen McGruer, smcgruer@chromium.com
 
 </pre>
 
