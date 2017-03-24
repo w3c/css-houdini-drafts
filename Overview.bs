@@ -428,7 +428,7 @@ either <dfn>frame-requested</dfn>, <dfn>frame-current</dfn>. It is initially set
 When a new element proxy is assigned to or removed from an <a>animator instance</a>, that 
 <a>animator instance</a>'s<a>animation requested flag</a> should be set to <a>frame-requested</a>.
 
-When the computed style for an element changes, the user agent <em>must</a> run the following steps:
+When the computed style for an element changes, the user agent <em>must</em> run the following steps:
 
 For each <a>element proxy</a> for that element, perform the following steps:
 
