@@ -9,6 +9,7 @@ Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com
 Editor: Robert Flack, flackr@chromium.org
+Editor: Stephen McGruer, smcgruer@chromium.com
 
 </pre>
 
@@ -429,7 +430,7 @@ either <dfn>frame-requested</dfn>, <dfn>frame-current</dfn>. It is initially set
 When a new element proxy is assigned to or removed from an <a>animator instance</a>, that 
 <a>animator instance</a>'s<a>animation requested flag</a> should be set to <a>frame-requested</a>.
 
-When the computed style for an element changes, the user agent <em>must</a> run the following steps:
+When the computed style for an element changes, the user agent <em>must</em> run the following steps:
 
 For each <a>element proxy</a> for that element, perform the following steps:
 
@@ -464,7 +465,9 @@ associated <a>animation request flag</a> is <a>frame-requested</a> then the the 
 
 Note: The user agent is not required to run animations on every frame. It is legal to defer
       <a>generating an animation frame<a> until a later frame. This allow the user agent to
-      provide a different service level according to their policy. 
+      provide a different service level according to their policy. For example, a user agent
+      may choose not to service an animation whose proxies will not be visible within the visual
+      viewport on the current frame.
 
 
 When the user agent wants to <dfn>run animators</dfn>, it <em>must</em> iterates over <a>animator
@@ -505,10 +508,6 @@ instance list</a> as |instance|:
 
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times 
 in the same frame.
-
-Issue: Todo: add provision that allows user agents to skip calling <a>animate</a> 
-    on any <a>animators</a> whose proxies are not within the visual viewport or whose attributes
-    are not mutated.
 
 Closing an Animator {#closing-animator}
 ====================================================
