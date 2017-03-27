@@ -279,39 +279,28 @@ the user agent <em>must</em> run the following steps:
 
 Creating an Element Proxy {#creating-element-proxy}
 ====================================================
-An <a>element proxy</a> can be constructed in the document scope using the {{ElementProxy}}
-constructor. <a>element proxy</a> is a <a>clonable object</a> and thus can be serialized in a
-message and delivered to any <a>animator instance</a>.
+<a>Element Proxy</a> objects are created by the user agent for elements which have either 'animator'
+or 'animator-root' CSS properties. They cannot be constructed from user script. A single element may
+have multiple <a>Element Proxy</a> objects associated with it; one per <a>animator instance</a>.
 
-The {{ElementProxy}} constructor takes two parameters, first the element which is being proxied,
-and second a list of {{DOMString}} identifying all of the <a>animatable attribute</a>
-which may be read or mutated using this proxy.
+The {{ElementProxy}} interface exposes two maps: a read only map of proxied input properties to their
+values, and a map of proxied output properties to their values. The input and output properties in
+the maps are those specified in <a>registerAnimator</a> for the given <a>animator instance</a>.
 
 <pre class='idl'>
 [
-    Exposed=(Window,AnimationWorklet),
-    RaisesException=Constructor,
-    Constructor(Animator animator, Element element, sequence<DOMString> proxiedAttributes)
+    Exposed=(AnimationWorklet),
 ] interface ElementProxy {
     attribute StylePropertyMapReadOnly inputStyleMap;
     attribute StylePropertyMapReadOnly outputStyleMap;
 };
 </pre>
 
+Issue: Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
+cannot be constructed via javascript?
+
 Issue: Todo: Need to figure out how we are handling scroll offsets. Previous approach was to have 
 mutable offset on each proxy but the new idea is to have readonly ScrollTimeline.
-
-When the {{ElementProxy}} constructor is called the user agent <em>must</em> run the following
-steps:
-
-    1. Let |element| be the first argument of the constructor.
-
-    2. If |element| is null or not an instance of {{Element}} abort the following steps.
-
-    4. <a>Create an element proxy</a> with |element|.
-
-Issue: Todo: Remove this as we no longer allow direct construction of ElementProxy. 
-
 
 When user agent wants to <dfn>create an element proxy</dfn> given |element|, it
 <em>must</em> run the following steps:
