@@ -444,14 +444,14 @@ Issue: Todo: Define when we may get rid of the animator.
 CSS Animator Notation {#css-animator-notation}
 ==============================================
 
-Two CSS properties 'animator' and 'animator-root' may be used to 
+Two CSS properties 'animator-root' and 'animator' may be used to
 assign an HTML elements to an animator instance either as a root element or a child element.
 
 
 <pre class='propdef'>
-Name: animator
+Name: animator-root
 Value:  [ none |  <<ident>> ]#
-Initial: auto
+Initial: none
 Applies to: all elements
 Inherited: no
 Computed value: as specified
@@ -476,9 +476,9 @@ Animatable: no
 
 
 <pre class='propdef'>
-Name: animator-root
+Name: animator
 Value:  [ none |  <<ident>> ]#
-Initial: none
+Initial: auto
 Applies to: all elements
 Inherited: no
 Computed value: as specified
