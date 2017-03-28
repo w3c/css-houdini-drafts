@@ -9,7 +9,7 @@ Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com
 Editor: Robert Flack, flackr@chromium.org
-Editor: Stephen McGruer, smcgruer@chromium.com
+Editor: Stephen McGruer, smcgruer@chromium.org
 
 </pre>
 
