@@ -401,6 +401,9 @@ instance list</a> as |instance|:
         or the proxies belonging to the |instance| will not be visible within the visual viewport
         of the current frame the user agent <em>may</em> abort all the following steps.
 
+        Issue: Consider giving user agents permission to skip running animator instances to throttle
+        slow animators.
+
   2. Let |name| be the <a>animator name</a> of |instance|.
 
   3. Let |workletGlobalScope| be a {{AnimationWorkletGlobalScope}} from the list of <a>worklet's
@@ -429,7 +432,6 @@ instance list</a> as |instance|:
 
   13. <a>Invoke</a> |animateFunction| with arguments «|root|, |children|, |timeline|»,
         and with |animatorInstance| as the <a>callback this value</a>.
-
 
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times 
 in the same frame.
