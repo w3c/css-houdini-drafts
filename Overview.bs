@@ -249,32 +249,32 @@ Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}. The
 <a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state.
 
-The {{AnimationWorkletGlobalScope}} has an <dfn>animator instance list</dfn>. Anytime a new 
+The {{AnimationWorkletGlobalScope}} has an <dfn>animator instance list</dfn>. Anytime a new
 <a>animator instance</a> is constructed in that scope, it gets  added to the list.
 
-To <dfn>create a new animator instance</dfn> given |name|, |outside port|, and |workletGlobalScope|,
+To <dfn>create a new animator instance</dfn> given a |root element|, |name|, and |workletGlobalScope|,
 the user agent <em>must</em> run the following steps:
 
-    1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-            <a>animator name to animator definition map</a>.
+    1. If an |animatorInstance| with the same |name| and |root element| exists within the <a>animator
+          instance list</a> then abort the following steps.
+
+    2. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
+          <a>animator name to animator definition map</a>.
 
           If |definition| does not exist abort the following steps.
 
-          Issue: We should check the animator instance list to make sure we don't create duplicate
-          instances for the same name and element.
+    3. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
 
-    2. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
-
-    3. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+    4. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
 
           Issue: handle invalid construction.
-      
-    4. Set the following on |animatorInstance| with:
+
+    5. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
 
         - <a>animation request flag</a> being <a>frame-current</a>
 
-    5. Add |animatorInstance| to <a>animator instance list</a>.
+    6. Add |animatorInstance| to <a>animator instance list</a>.
 
 
 Creating an Element Proxy {#creating-element-proxy}
