@@ -36,12 +36,15 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: IsCallable
     text: IsConstructor
     text: HasProperty
+    url: ecmascript-data-types-and-values; text: Type
     url: map-objects; text:map object
     url: get-o-p; text: Get
     url: set-o-p-v-throw; text: Set
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
+urlPrefix: https://www.w3.org/TR/hr-time-2/#dom-; type: dfn
+    text: DOMHighResTimeStamp
 </pre>
 
 <pre class=biblio>
@@ -89,15 +92,19 @@ animations. The worklet can be accessed via {{animationWorklet}} attribute.
 The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
 
 <pre class='idl'>
+interface AnimationWorklet {
+  [NewObject] Promise&lt;void> import(USVString moduleURL);
+};
+
 partial interface Window {
-    [SameObject] readonly attribute Worklet animationWorklet;
+    [SameObject] readonly attribute AnimationWorklet animationWorklet;
 };
 </pre>
 
 <pre class='idl'>
 callback VoidFunction = void ();
 
-[Global=(Worklet,AnimationWorklet),Exposed=AnimationWorklet]
+[Exposed=AnimationWorklet]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
 };
@@ -142,7 +149,7 @@ An <dfn>animator instance</dfn> describes a fully realized custom animation inst
 context and links an <a>animator definition</a> with the instance specific state such as its element
 proxies. It consists of:
 
- - A <a>animator name</a>.
+ - A <dfn>animator name</dfn>.
 
  - An <a>animation requested flag</a>.
 
@@ -151,8 +158,8 @@ proxies. It consists of:
  - A list of associated <dfn>children element proxies</dfn>.
 
 
-An <dfn>element proxy</dfn> defines a handle to an <a>element</a> which can be used to read or
-write its explicitly exposed <a>animatable attribute</a>s . It consists of:
+An <dfn>element proxy</dfn> defines a handle to an element which can be used to read or
+write its explicitly exposed animatable attributes. It consists of:
 
  - An <a>animator instance</a>.
 
@@ -223,7 +230,7 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
         - <a>animator root output property list</a> being |rootOutputProperties|
 
 
-    13. Add the key-value pair (|name| - |definition|) to the <a>animator name to animation
+    13. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
         definition map</a> of the associated <a>document</a>.
 
 
@@ -233,7 +240,7 @@ it as an input / output property of proxies but the new idea is to have a readon
 The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to instance map</dfn>. The map is
 populated when the user agent constructs a new <a>animator instance</a>.
 
-When <dfn>parsing a property list</dfn> with name <a>name</a> for <a>animatorCtor</a>, 
+When <dfn>parsing a property list</dfn> with name <em>name</em> for {{animatorCtor}},
 the user agent <em>must</em> run the following steps:
 
     1. Let |properties| be an empty <code>sequence&lt;DOMString></code>
@@ -241,7 +248,7 @@ the user agent <em>must</em> run the following steps:
     2. Let |propertiesIterable| be the result of <a>Get</a>(|animatorCtor|, |name|).
 
     3. If |propertiesIterable| is not undefined, then set |properties| to the result of
-        <a>converting</a> |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
+        converting |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
         exception is thrown, rethrow the exception and abort all these steps.
 
 
@@ -275,7 +282,7 @@ the user agent <em>must</em> run the following steps:
     5. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
 
-        - <a>animation request flag</a> being <a>frame-current</a>
+        - <a>animation requested flag</a> being <a>frame-current</a>
 
     6. Add |animatorInstance| to <a>animator instance list</a>.
 
@@ -288,7 +295,7 @@ have multiple <a>Element Proxy</a> objects associated with it; one per <a>animat
 
 The {{ElementProxy}} interface exposes two maps: a read only map of proxied input properties to their
 values, and a map of proxied output properties to their values. The input and output properties in
-the maps are those specified in <a>registerAnimator</a> for the given <a>animator instance</a>.
+the maps are those specified in registerAnimator for the given <a>animator instance</a>.
 
 <pre class='idl'>
 [
@@ -318,7 +325,7 @@ When user agent wants to <dfn>create an element proxy</dfn> given |element|, it
 
         - <a>proxied element</a> being |element|.
 
-        - <a>outputStyleMap</a> being a new {{StylePropertyMap}}.
+        - {{outputStyleMap}} being a new {{StylePropertyMap}}.
 
     4. <a>update proxy input style map</a> with |proxy| and |inputProperties|.
 
@@ -375,8 +382,7 @@ For each <a>element proxy</a> for that element, perform the following steps:
         set the <a>animation requested flag</a> on the |animator| to <a>frame-requested</a>.
 
 
-<a>Running animators</a> sets <a>animation requested flag</a> on animators to 
-<a>frame-current</a>.
+[[#running-animators]] sets <a>animation requested flag</a> on animators to <a>frame-current</a>.
 
 
 Issue: Todo: Animators that have Timeline as an explicit input will need to request frame
@@ -386,11 +392,11 @@ Running Animators {#running-animators}
 ======================================================
 
 When a user agent wants to produce a new animation frame, if for any <a>animator instance</a> the
-associated <a>animation request flag</a> is <a>frame-requested</a> then the the user agent
+associated <a>animation requested flag</a> is <a>frame-requested</a> then the the user agent
 <em>must</em> <a>run animators</a> for the current frame.
 
 Note: The user agent is not required to run animations on every frame. It is legal to defer
-      <a>generating an animation frame<a> until a later frame. This allow the user agent to
+      generating an animation frame until a later frame. This allow the user agent to
       provide a different service level according to their policy.
 
 
@@ -422,9 +428,9 @@ instance list</a> as |instance|:
 
   6. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  9. Let |timestamp| be a {{DOMHighResTimeStamp}} indicating the current frame start time.
+  9. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
 
-  10. Let |timeline| be a new {{AnimationTimline}} with its "currentTime" set to |timestamp|.
+  10. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
 
   11. Let |root| be a <a>root element proxy</a> of |instance|.
 
@@ -523,6 +529,15 @@ animations and in a different thread. Supporting other composite operation is no
 point.
 
 
+Security Considerations {#security-considerations}
+==================================================
+
+Issue: Need to decide what security considerations there are for this spec.
+
+Privacy Considerations {#privacy-considerations}
+================================================
+
+Issue: Need to decide what privacy considerations there are for this spec.
 
 Examples {#examples}
 ====================
