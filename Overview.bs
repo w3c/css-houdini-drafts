@@ -227,6 +227,9 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
         definition map</a> of the associated <a>document</a>.
 
 
+Issue: Todo: Describe how we can read scroll offsets. The previous approach was to list
+it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.
+
 The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to instance map</dfn>. The map is
 populated when the user agent constructs a new <a>animator instance</a>.
 
@@ -298,9 +301,6 @@ the maps are those specified in <a>registerAnimator</a> for the given <a>animato
 
 Issue: Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
 cannot be constructed via javascript?
-
-Issue: Todo: Need to figure out how we are handling scroll offsets. Previous approach was to have 
-mutable offset on each proxy but the new idea is to have readonly ScrollTimeline.
 
 When user agent wants to <dfn>create an element proxy</dfn> given |element|, it
 <em>must</em> run the following steps:
