@@ -391,16 +391,15 @@ associated <a>animation request flag</a> is <a>frame-requested</a> then the the 
 
 Note: The user agent is not required to run animations on every frame. It is legal to defer
       <a>generating an animation frame<a> until a later frame. This allow the user agent to
-      provide a different service level according to their policy. For example, a user agent
-      may choose not to service an animation whose proxies will not be visible within the visual
-      viewport on the current frame.
+      provide a different service level according to their policy.
 
 
 When the user agent wants to <dfn>run animators</dfn>, it <em>must</em> iterates over <a>animator
 instance list</a> as |instance|:
 
   1. If the <a>animation requested flag</a> for the instance is <a>frame-current</a>
-        the user agent <em>may</em> abort all the following steps.
+        or the proxies belonging to the |instance| will not be visible within the visual viewport
+        of the current frame the user agent <em>may</em> abort all the following steps.
 
   2. Let |name| be the <a>animator name</a> of |instance|.
 
