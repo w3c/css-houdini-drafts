@@ -242,13 +242,14 @@ future without breaking code that relies on calling
 <div algorithm>
     To <dfn>get a value from a StylePropertyMap</dfn>, run these steps:
 
-    Issue: write this.
+    Issue(148): Write this
+
 </div>
 
 <div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
 
-    Issue: write this.
+    Issue(148): Write this
 </div>
 
 The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
