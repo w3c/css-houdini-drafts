@@ -389,7 +389,7 @@ They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
 which is a [=list=] of alternating {{DOMString}} and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
-The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{UnparsedValue}}.
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
 
 The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
 
@@ -1680,7 +1680,14 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}
 		[=normalize a calc() expression=] from |num|
 		and return the result.
 
-	2. Return a new {{CSSUnitValue}}
+	2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
+		return a new {{CSSUnitValue}}
+		with its {{CSSUnitValue/value}} internal slot
+		set to 0,
+		and its {{CSSUnitValue/unit}} internal slot
+		set to "px".
+
+	3. Return a new {{CSSUnitValue}}
 		with its {{CSSUnitValue/value}} internal slot
 		set to the numeric value of |num|,
 		and its {{CSSUnitValue/unit}} internal slot
