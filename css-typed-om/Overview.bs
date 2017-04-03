@@ -180,7 +180,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 	void append(DOMString property, (CSSStyleValue or DOMString)... values);
 	void delete(DOMString property);
 	void set(DOMString property, (CSSStyleValue or DOMString)... values);
-        void update(DOMString property, UpdateFunction updateFunction);
+	void update(DOMString property, UpdateFunction updateFunction);
 };
 </pre>
 
@@ -203,10 +203,13 @@ future without breaking code that relies on calling
 {{StylePropertyMap/set()}} for those properties.
 </div>
 
-<div algorithm="append to a StylePropertyMap">
-	The <dfn method for=StylePropertyMap>append(DOMString <var>property</var> (CSSStyleValue or DOMString)... <var>values</var>)</dfn> method,
-	when invoked,
-	must run these steps:
+The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>, 
+(CSSStyleValue or DOMString)... <var>values</var>)</dfn> method, when invoked, must 
+[=append to a StylePropertyMap=] with property <var>property</var> and values <var>values</var>.
+
+<div algorithm>
+	To <dfn>append to a StylePropertyMap</dfn> given a <var>property</var> and a list of
+	<var>values</var>, run these steps:
 
 	1. If |property| does not start with two dashes (U+002D HYPHEN),
 		let |property| be |property| [=ASCII lowercased=].
@@ -258,7 +261,7 @@ UpdateFunction <var>updateFunction</var>)</dfn> method, when invoked, must
 <var>property</var>, update function <var>updateFunction</var>, and property
 map set to the object this method was invoked on .
 
-<div algorith>
+<div algorithm>
     To <dfn>update a value in a StylePropertyMap</dfn> given a <var>property
     name</var>, <var>update function</var>, and <var>property map</var>, run these
     steps:
