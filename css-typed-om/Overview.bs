@@ -1509,9 +1509,9 @@ interface CSSImageValue : CSSResourceValue {
 	readonly attribute double? intrinsicRatio;
 };
 
-[Constructor(DOMString url)]
+[Constructor(USVString url)]
 interface CSSURLImageValue : CSSImageValue {
-	readonly attribute DOMString url;
+	readonly attribute USVString url;
 };
 
 </pre>
