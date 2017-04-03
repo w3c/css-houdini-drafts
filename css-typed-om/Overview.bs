@@ -165,6 +165,10 @@ and parseMultiple set to true.
 
 </div>
 
+Issue(305): appropriate failure indicators for this algorithm
+
+Issue(325): .equals methods for CSSStyleValue subclasses
+
 <!--
  ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
 ██    ██    ██     ██  ██  ██       ██       ███   ███   ██ ██   ██     ██
@@ -305,6 +309,14 @@ Issue(148): add detailed descriptions of the rest of the methods on {{StylePrope
 
 Issue(149): describe that these are not live objects
 
+Issue(268): stringification
+
+Issue(276): interaction with custom properties
+
+Issue(309): should StylePropertyMaps be case sensitive?
+
+Issue(310): consider using properties in addition to get/set 
+
 Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
 
@@ -313,6 +325,8 @@ partial interface Window {
 	StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
+
+Issue(350): getComputedStyleMap needs to move to CSS
 
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
@@ -968,6 +982,8 @@ A {{CSSCalcValue}} matches a CSS type production,
 such as <<number>> or <<length-percentage>>,
 if its equivalent CSS ''calc()'' value matches that production.
 
+Issue(359): Need to be able to deal with min()/max() too
+
 <!--
 ██    ██ ██     ██ ██     ██        ██████   ██████   ██████
 ███   ██ ██     ██ ███   ███       ██    ██ ██    ██ ██    ██
@@ -1094,7 +1110,7 @@ which represent individual <<transform-function>> values.
     };
 </xmp>
 
-Issue: This *should* be an Array-like,
+Issue(358): This *should* be an Array-like,
 pending proper resolution of [the GitHub issue](https://github.com/heycam/webidl/issues/291).
 
 A {{CSSTransformValue}}’s [=values to iterate over=]
@@ -1180,6 +1196,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
     	attribute DOMMatrix matrix;
     };
 </xmp>
+
+Issue(365): why don't these accept CSSUnitValues?
 
 <div algorithm="CSSTransformComponent.numericValues">
 	Unless otherwise specified,
@@ -1396,6 +1414,8 @@ Issue(366): Figure out how to define 2d vs 3d matrix.
 {{CSSPositionValue}} objects represent <<position>> values,
 used by properties such as 'background-position'.
 
+Issue(312): background-position is a shorthand
+
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
@@ -1503,6 +1523,8 @@ in a visual change until the image data is fetched. {{CSSResourceValue}} objects
 providing values that track loaded state via the {{CSSResourceState}} enum.
 </div>
 
+Issue(186): CSSResourceValues constructed within Worklets should be "unloaded".
+
 <!--
 ████ ██     ██    ███     ██████   ████████
  ██  ███   ███   ██ ██   ██    ██  ██
@@ -1567,6 +1589,8 @@ interface CSSFontFaceValue : CSSResourceValue {
 };
 
 </pre>
+
+Issue(293): Add a src?
 
 {{CSSFontFaceValue}} objects are opaque representations of the contents of
 @font-face rules. They are used to pass font information into [=paint image definition=]s,
