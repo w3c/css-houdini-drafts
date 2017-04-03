@@ -107,7 +107,7 @@ Some particular considerations:
 
 <pre class='idl'>
 interface CSSStyleValue {
-	readonly attribute DOMString cssText;
+	stringifier;
 	static CSSStyleValue? parse(DOMString property, DOMString cssText);
 	static sequence&lt;CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
 };
@@ -117,9 +117,8 @@ interface CSSStyleValue {
 Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
 are also represented as {{CSSStyleValue}} objects.
 
-The <dfn attribute for=CSSStyleValue>cssText</dfn> attribute,
-on getting,
-returns a normalized representation
+The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects is to
+return a normalized representation
 (see [[#stylevalue-normalization]])
 of the value the {{CSSStyleValue}} object represents.
 
@@ -1138,7 +1137,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 <xmp class=idl>
     interface CSSTransformComponent {
-    	readonly attribute DOMString cssText;
+	stringifier;
     	attribute boolean is2D;
     };
 
@@ -1595,8 +1594,8 @@ This section describes how Typed OM objects are constructed from CSS values.
 
 If a property's grammar is more complex than one of the types listed here,
 it produces a raw {{CSSStyleValue}},
-with its {{CSSStyleValue/cssText}}
-set to the CSSOM serialization of the property.
+with a <a for=CSSStyleValue>stringification behavior</a> 
+that produces the CSSOM serialization of the property.
 
 Issue: Better to define a full table of properties and what types they normalize to.
 
@@ -1961,14 +1960,14 @@ For example:
 
 <pre class='lang-javascript'>
 var length1 = CSSNumericValue.from("42.0px");
-length1.cssText; // "42.0px"
+length1.toString(); // "42.0px"
 
 var length2 = CSSNumericValue.from(42.0, "px");
-length2.cssText; // "42px";
+length2.toString(); // "42px";
 
 element.style.width = "42.0px";
 var length3 = element.styleMap.get('width');
-length3.cssText; // "42px";
+length3.toString(); // "42px";
 </pre>
 
 </div>
