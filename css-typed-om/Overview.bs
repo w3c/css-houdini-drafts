@@ -367,8 +367,11 @@ The value for a given property is the last valid value provided in the string.
 ----------------------------------------------
 
 <pre class='idl'>
+[Constructor((DOMString or CSSVariableReferenceValue)... members)]
 interface CSSUnparsedValue : CSSStyleValue {
 	iterable<(DOMString or CSSVariableReferenceValue)>;
+	readonly attribute unsigned long length;
+	getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
 };
 
 interface CSSVariableReferenceValue {
@@ -377,6 +380,8 @@ interface CSSVariableReferenceValue {
 };
 </pre>
 
+Issue(239): Is this the best representation for this object?
+
 {{CSSUnparsedValue}} objects represent values that reference custom properties.
 They represent a list of string fragments and variable references.
 
@@ -384,6 +389,9 @@ They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
 which is a [=list=] of alternating {{DOMString}} and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{UnparsedValue}}.
+
+The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
 
 <!--
 ██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████
