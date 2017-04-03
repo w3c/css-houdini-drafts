@@ -219,7 +219,7 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
         :: Return |workletGlobalScope|.
 
         : The <a>responsible browsing context</a>
-        :: Return |inheritedResponsibleBrowsingContext|. 
+        :: Return |inheritedResponsibleBrowsingContext|.
 
         : The <a>responsible event loop</a>
         :: Return |workletEventLoop|.
@@ -371,27 +371,29 @@ Examples {#examples}
 
 For these examples we'll use a fake worklet on window.
 
-<pre class='idl'>
-partial interface Window {
-  [SameObject] readonly attribute Worklet fakeWorklet1;
-  [SameObject] readonly attribute Worklet fakeWorklet2;
-};
-</pre>
+<div class=example>
+    <pre class='idl'>
+    partial interface Window {
+      [SameObject] readonly attribute Worklet fakeWorklet1;
+      [SameObject] readonly attribute Worklet fakeWorklet2;
+    };
+    </pre>
 
-<pre class='idl'>
-callback Function = any (any... arguments);
+    <pre class='idl'>
+    callback Function = any (any... arguments);
 
-[Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
-interface FakeWorkletGlobalScope : WorkletGlobalScope {
-    void registerAnArbitaryClass(DOMString type, Function classConstructor);
-};
-</pre>
+    [Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
+    interface FakeWorkletGlobalScope : WorkletGlobalScope {
+        void registerAnArbitaryClass(DOMString type, Function classConstructor);
+    };
+    </pre>
 
-Each {{FakeWorkletGlobalScope}} has a map of the <dfn>registered class constructors map</dfn>.
+    Each {{FakeWorkletGlobalScope}} has a map of the <dfn>registered class constructors map</dfn>.
 
-When the <dfn method for=FakeWorkletGlobalScope>
-registerAnArbitaryClass(|type|, |classConstructor|)</dfn> method is called, the user agent will add
-the |classConstructor| of |type| to the map of <a>registered class constructors map</a>.
+    When the <dfn method for=FakeWorkletGlobalScope>
+    registerAnArbitaryClass(|type|, |classConstructor|)</dfn> method is called, the user agent will add
+    the |classConstructor| of |type| to the map of <a>registered class constructors map</a>.
+</div>
 
 Loading scripts into a worklet. {#example-single}
 -------------------------------------------------
