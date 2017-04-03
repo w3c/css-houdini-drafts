@@ -283,8 +283,6 @@ the [=property model=]. This list of properties is sorted in the following manne
 
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
-Issue(147): need a robust description of what "a type that <var ignore>property</var> can't accept" means.
-
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
 Issue(149): describe that these are not live objects
