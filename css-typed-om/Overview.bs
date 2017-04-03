@@ -108,7 +108,8 @@ Some particular considerations:
 <pre class='idl'>
 interface CSSStyleValue {
 	readonly attribute DOMString cssText;
-	static (CSSStyleValue or sequence&lt;CSSStyleValue>)? parse(DOMString property, DOMString cssText);
+	static CSSStyleValue? parse(DOMString property, DOMString cssText);
+	static sequence&lt;CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
 };
 </pre>
 
@@ -122,10 +123,17 @@ returns a normalized representation
 (see [[#stylevalue-normalization]])
 of the value the {{CSSStyleValue}} object represents.
 
+The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
+when invoked, must [=parse a CSSStyleValue=] with property <var>property</var>, cssText <var>cssText</var>,
+and parseMultiple set to false.
+
+The <dfn method for=CSSStyleValue>parseAll(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
+when invoked, must [=parse a CSSStyleValue=] with property <var>property</var>, cssText <var>cssText</var>,
+and parseMultiple set to true.
+
 <div algorithm="parse a CSSStyleValue">
-	The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
-	when invoked,
-	must run these steps:
+	To <dfn>parse a CSSStyleValue</dfn> given a <var>property</var>, <var>cssText</var>, and a
+	<var>parseMultiple</var> flag, run these steps:
 
 	1. Attempt to parse |property| as an <<ident>>.
 		If this fails,
@@ -143,12 +151,19 @@ of the value the {{CSSStyleValue}} object represents.
 		Otherwise,
 		let |value| be the parsed result.
 
-	4. If |property| is a [=list-valued property=],
+	4. If |property| is a [=list-valued property=], and |parseMultiple| is true,
 		subdivide |value| into a list of {{CSSStyleValue}} objects,
 		each representing one [=list-valued property iteration=],
-		and let |value| be the result.
+		and let |value| be the result. Return |value| as a sequence of
+		{{CSSStyleValue}} objects.
 
-	5. Return a {{CSSStyleValue}} representing |value|.
+	5. If |property| is a [=list-valued property=], and |parseMultiple| is false
+		subdivide |value| into a list of {{CSSStyleValue}} objects,
+		each representing one [=list-valued property iteration=],
+		and let |value| be the first entry in this list.
+
+	6. return a {{CSSStyleValue}} representing |value|.
+
 </div>
 
 <!--
