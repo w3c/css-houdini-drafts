@@ -139,7 +139,6 @@ global execution context of a {{Worklet}}.
 <pre class='idl'>
 [Exposed=Worklet]
 interface WorkletGlobalScope {
-    attribute Console console;
 };
 </pre>
 
