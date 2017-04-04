@@ -12,9 +12,12 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
-    text: DOMException
-    text: SyntaxError
-    text: inherit
+    urlPrefix: #dfn-;
+        text: DOMException
+        text: SyntaxError
+        text: inherit
+    urlPrefix: #es-;
+        text: invoking callback functions
 urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
     urlPrefix: #concept-;
         text: fetch
@@ -34,6 +37,7 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: document environment
     text: environment settings object
     text: event loop
+    text: event loop processing model
     text: fetch a module script tree
     text: global object
     text: https state
@@ -155,6 +159,11 @@ Each {{WorkletGlobalScope}} object has a distinct <a>event loop</a>. This <a>eve
 associated <a>browsing context</a>, and only its <a>microtask queue</a> is used (all other <a>task
 queues</a> are not used). The <a>event loop</a> is created by the <a>create a
 WorkletGlobalScope</a> algorithm.
+
+Note:
+    Even through the <a>event loop processing model</a> specifies that it loops continually,
+    practically implementations aren't expected to do this. The <a>microtask queue</a> is the only
+    queue used and is emptied while <a>invoking callback functions</a> provided by the author.
 
 ### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
