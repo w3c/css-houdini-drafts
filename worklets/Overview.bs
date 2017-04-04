@@ -52,7 +52,6 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
 urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
     text: cors setting attribute
     text: in parallel
-    text: javascript global environment
     urlPrefix: #js-;
         text: syntaxerror;
     url: resolve-a-url; text: resolve;
@@ -94,7 +93,7 @@ Worklets are similar to <a>web workers</a> however they:
     parallelism.
  - Are not event API based. Instead classes are registered on the global scope, whose methods are to
     be invoked by the user agent.
- - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
+ - Have a reduced API surface on the global scope.
  - Have a lifetime for the global scope which is defined by subsequent specifications or user
     agents. They aren't tied to the lifetime of the document.
 
