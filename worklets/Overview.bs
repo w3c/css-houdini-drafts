@@ -365,6 +365,33 @@ the user agent <em>must</em> run the following steps:
 
     7. Return |promise|.
 
+<div class=example>
+    When an author imports code into a {{Worklet}} the code may run against multiple
+    {{WorkletGlobalScope}}s, for example:
+    <pre class='lang-javascript'>
+        // script.js
+        console.log('Hello from a WorkletGlobalScope!');
+    </pre>
+
+    <pre class='lang-javascript'>
+        // main.js
+        await CSS.paintWorklet.import('script.js');
+    </pre>
+
+    Behind the scenes the user-agent may load the <code class='lang-javascript'>script.js</code>
+    into 4 global scopes, in which case the debugging tools for the user-agent would print:
+    <pre class='lang-javascript'>
+        [paintWorklet#1] Hello from a WorkletGlobalScope!
+        [paintWorklet#4] Hello from a WorkletGlobalScope!
+        [paintWorklet#2] Hello from a WorkletGlobalScope!
+        [paintWorklet#3] Hello from a WorkletGlobalScope!
+    </pre>
+
+    If the user-agent decided to kill and restart a {{WorkletGlobalScope}} number 3 in this example,
+    it would print <code class='lang-javascript'>[paintWorklet#3] Hello from a
+    WorkletGlobalScope!</code> again in the debugging tools when this occurs.
+</div>
+
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlobalScope}}
     declaratively.
 
