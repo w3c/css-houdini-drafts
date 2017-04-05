@@ -198,7 +198,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
             |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
             |settingsObject|.
 
-        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
+        Note: Worklets follow <a>web workers</a> here in not allowing "use-credentials" for
             fetching resources.
 
         3. <a>Run a module script</a> given |script|.
