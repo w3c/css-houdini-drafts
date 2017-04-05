@@ -11,10 +11,12 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
 <pre class="anchors">
-urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
-    urlPrefix: #dfn-;
+urlPrefix: http://heycam.github.io/webidl/; type: dfn;
+    text: AbortError
+    text: SyntaxError
+    urlPrefix: #idl-;
         text: DOMException
-        text: SyntaxError
+    urlPrefix: #dfn-;
         text: inherit
     urlPrefix: #es-;
         text: invoking callback functions
@@ -283,6 +285,15 @@ The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s cr
 times contain the same set of script source text and have the same behaviour. The creation of
 additional {{WorkletGlobalScope}}s should be transparent to the author.
 
+Note:
+    Practically user-agents aren't expected to implement the following algorithm using a
+    thread-safe map. Instead when {{Worklet/import}} is called user-agents can fetch the module
+    graph on the main thread, and send the fetched sources (the data contained in the <a>module
+    responses map</a>) to each thread which has a {{WorkletGlobalScope}}.
+
+    If the user agent wishes to create a new {{WorkletGlobalScope}} it can simply sent the list of
+    all fetched sources from the main thread to the thread which owns the {{WorkletGlobalScope}}.
+
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
@@ -339,13 +350,16 @@ the user agent <em>must</em> run the following steps:
             3. Let |script| be the result of <a>fetch a module script tree</a> when it
                 asynchronously completes.
 
+                If |script| is <em>null</em> reject |promise| with a "<a>AbortError</a>"
+                <a>DOMException</a> and abort all these steps.
+
             4. <a>Run a module script</a> given |script|.
 
         2. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
                 and loaded into the global scopes), resolve |promise|.
                 <br>Otherwise, reject |promise|.
 
-        Note: Specifically, if a script fails to parse or fails to load over the network, it should
+        Note: Specifically, if a script fails to parse or fails to load over the network, it will
             reject the promise; if the script throws an error while first evaluating the promise
             should resolve as a classes may have been registered correctly.
 
