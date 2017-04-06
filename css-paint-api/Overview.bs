@@ -547,7 +547,7 @@ loaded.
 &lt;/style>
 
 &lt;script>
-    document.registerProperty({
+    CSS.registerProperty({
         name: '--image',
         syntax: '&lt;image&gt;'
     });
