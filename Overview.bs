@@ -451,13 +451,12 @@ Issue: Todo: Define when we may get rid of the animator.
 CSS Animator Notation {#css-animator-notation}
 ==============================================
 
-Two CSS properties 'animator-root' and 'animator' may be used to
-assign an HTML elements to an animator instance either as a root element or a child element.
-
+Two CSS properties 'animator-root' and 'animator' may be used to assign an HTML elements to an
+<a>animator instance</a> either as a root element or a child element.
 
 <pre class='propdef'>
 Name: animator-root
-Value:  [ none |  <<ident>> ]#
+Value:  none | <<ident>>#
 Initial: none
 Applies to: all elements
 Inherited: no
@@ -470,22 +469,27 @@ Animatable: no
 <dl dfn-type=value dfn-for=animator-root>
     <dt><dfn>none</dfn>
     <dd>
-        There will be no animators.
-    <dt><dfn><<ident>></dfn>
+      There will be no <a>animator instance</a> that has this element as its
+      <a>root element proxy</a>.
+    <dt><dfn><<ident>>#</dfn>
     <dd>
-       If there is a <a>animator definition</a> registered with that name, then a new
-       <a>animator instance</a> will be created with this element as its <a>root element proxy</a>.
-       The new <a>animator instance</a> lifetime is tied to this root element's lifetime. If no <a>animator
-       definition</a> exists with that name, then the instance will be created as soon as one is
-       registered.
+      For each <<ident>> specified in the list, the following applies for each animation frame:
+
+      * If there is no <a>animator definition</a> registered with the given <<ident>>, the inclusion
+        of that <<ident>> as a value has no effect.
+
+      * Otherwise, an <a>animator instance</a> with this element as its <a>root element proxy</a>
+        will exist and will have its <a>animation function</a> called (with respect to the rules
+        laid out in [[#running-animators]]).
+
+      If the same <<ident>> occurs multiple times in the list, only the first occurrence of that
+      <<ident>> is processed.
 </dl>
-
-
 
 <pre class='propdef'>
 Name: animator
-Value:  [ none |  <<ident>> ]#
-Initial: auto
+Value:  none | <<ident>>#
+Initial: none
 Applies to: all elements
 Inherited: no
 Computed value: as specified
@@ -494,30 +498,26 @@ Media: interactive
 Animatable: no
 </pre>
 
-
 <dl dfn-type=value dfn-for=animator>
     <dt><dfn>none</dfn>
     <dd>
-        There will be no animators.
-    <dt><dfn><<ident>></dfn>
+      This element will not be passed into any <a>animate function</a> as one of the
+      <a>children element proxies</a>.
+    <dt><dfn><<ident>>#</dfn>
     <dd>
-      If there is a <a>animator definition</a> registered with that name, then this element is
-      assigned to the first ancestor animator instance of the given name as a child element proxy.
-      If no <a>animator definition</a> exists with that name, then the element gets assigned as soon
-      as one is registered.
+      For each <<ident>> specified in the list, the following applies for each animation frame:
 
-      Issue: Todo: If no ancestor animator instance exists with that name then we should create one
-      with document root element as its root.
+      * If there is no <a>animator definition</a> registered with the given <<ident>>, the inclusion
+        of that <<ident>> as a value has no effect.
+
+      * Otherwise, an <a>element proxy</a> for this element will be passed into the
+        <a>animate function</a> of the closest ancestor <a>animator instance</a> with the given
+        <<ident>> as one of the <a>children element proxies</a>. If no such <a>animator instance</a>
+        exists, one is created with the document root element as it's <a>root element proxy</a>.
+
+      If the same <<ident>> occurs multiple times in the list, only the first occurrence of that
+      <<ident>> is processed.
 </dl>
-
-
-Note: All the elements in the root element's DOM sub-tree that get associated with the same animator
- name will get assigned to the the animator instance linked with this root element.
-
-
-Issue: Todo: Write the algorithm for element assignments. It will include construction of a new
-{{ElementProxy}}, looking up or creating animator instance, and assigning the animator. We probably
-need a diagram here too.
 
 
 Effect Stack {#effect-stack}
