@@ -18,7 +18,7 @@ spec:css-break-3; type:dfn; text:fragment
 
 <pre class="anchors">
 urlPrefix: https://heycam.github.io/webidl/; type: dfn;
-    text: NotSupportedError
+    text: InvalidModificationError
     urlPrefix: #dfn-;
         url: throw; text: thrown
     urlPrefix: #idl-;
@@ -164,7 +164,7 @@ called, the user agent <em>must</em> run the following steps:
         map.
 
     3. If |paintImageDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
-        "<a>NotSupportedError</a>" <a>DOMException</a> and abort all these steps.
+        "<a>InvalidModificationError</a>" <a>DOMException</a> and abort all these steps.
 
     4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>
 
