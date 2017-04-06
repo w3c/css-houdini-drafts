@@ -1,10 +1,34 @@
 CSS Paint API Explained
 =======================
 
-The CSS Paint API is being developered to improve the extensibility of CSS.
+The CSS Paint API is being developed to improve the extensibility of CSS.
 
-Specifically
+Specifically this allows developers to write a paint function which allows us to draw directly into
+an elements background, border, or content.
 
+This work was motivated for a couple of reasons:
+
+### Reduction of DOM ###
+
+We noticed that developers are using an increasing amount of DOM to create visual effects. As an
+example the [<paper-button>](https://www.webcomponents.org/element/PolymerElements/paper-button/paper-button)
+uses multiple divs to achieve the "ripple" effect.
+
+Instead of using addition divs the developer could just draw directly into the background-image of
+the element instead.
+
+This means that the memory and cpu usage of the page would go down, the rendering engine doesn't
+have to keep in memory the additional DOM nodes, in addition to performing style-recalc, layout,
+painting for all these additional divs.
+
+### Extensibility of CSS ###
+
+We believe that allowing developers to extend CSS is good for the ecosystem. As an example if a
+developer wanted an additional feature they could implement it themselves. E.g. if the developer
+wanted a new type of dashed border, they shouldn't have to wait for browsers to implement this.
+
+They should have the power to implement this themselves with the same capability as the rendering
+engine.
 
 Getting Started
 ---------------
