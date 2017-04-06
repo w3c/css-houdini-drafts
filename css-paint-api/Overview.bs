@@ -235,6 +235,9 @@ called, the user agent <em>must</em> run the following steps:
             2. If |existingInputProperties| and |inputProperties| are not equivalent, <a
                 for=map>set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
 
+            3. The user agent <em>should</em> log an error to the debugging console stating that the
+                same class was registered with different <code>inputProperties</code>.
+
         3. Otherwise, <a for=map>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
@@ -415,6 +418,9 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |c
                 properties</a> map.
 
             2. <a for=map>Set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+
+            3. The user agent <em>should</em> log an error to the debugging console stating that a
+                class wasn't registered in all {{PaintWorkletGlobalScope}}s.
 
         2. Let the image output be an <a>invalid image</a> and abort all these steps.
 
