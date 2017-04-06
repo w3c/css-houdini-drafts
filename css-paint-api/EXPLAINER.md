@@ -12,8 +12,8 @@ Getting Started
 First you'll need to import a script into the paint worklet.
 
 ```js
-if ('paintWorklet' in window) {
-  window.paintWorklet.import('my-paint-script.js').then(() => {
+if ('paintWorklet' in CSS) {
+  CSS.paintWorklet.import('my-paint-script.js').then(() => {
     console.log('paint script installed!');
   }
 }

@@ -98,7 +98,7 @@ which are related to painting.
 The {{paintWorklet}}'s <a>worklet global scope type</a> is {{PaintWorkletGlobalScope}}.
 
 <pre class='idl'>
-partial interface Window {
+partial interface CSS {
     [SameObject] readonly attribute Worklet paintWorklet;
 };
 </pre>
@@ -503,7 +503,7 @@ Example 1: A colored circle. {#example-1}
 &lt;/style>
 
 &lt;script>
-    paintWorklet.import('circle.js');
+    CSS.paintWorklet.import('circle.js');
 &lt;/script>
 </pre>
 
@@ -551,7 +551,7 @@ loaded.
         name: '--image',
         syntax: '&lt;image&gt;'
     });
-    paintWorklet.import('image-placeholder.js');
+    CSS.paintWorklet.import('image-placeholder.js');
 &lt;/script>
 </pre>
 
@@ -604,7 +604,7 @@ h1 {
 &lt;/style>
 
 &lt;script>
-    paintWorklet.import('heading-color.js');
+    CSS.paintWorklet.import('heading-color.js');
 &lt;/script>
 </pre>
 
