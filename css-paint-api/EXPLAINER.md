@@ -11,7 +11,7 @@ This work was motivated for a couple of reasons:
 ### Reduction of DOM ###
 
 We noticed that developers are using an increasing amount of DOM to create visual effects. As an
-example the [<paper-button>](https://www.webcomponents.org/element/PolymerElements/paper-button/paper-button)
+example the [&lt;paper-button&gt;](https://www.webcomponents.org/element/PolymerElements/paper-button/paper-button)
 uses multiple divs to achieve the "ripple" effect.
 
 Instead of using addition divs the developer could just draw directly into the background-image of
