@@ -68,8 +68,8 @@ Each <<paint()>> function for a box has an associated <dfn>paint valid flag</dfn
 When the size (as determined by layout) of a |box| changes, each <<paint()>> function's <a>paint
 valid flag</a> should be set to <a>paint-invalid</a>.
 
-When the computed style for a |box| changes, the user agent must run the following steps:
-    1. For each <<paint()>> function on the |box|, perform the following substeps:
+When the computed style for a |box| changes, the user agent <em>must</em> run the following steps:
+    1. For each <<paint()>> function on the |box|, perform the following steps:
         1. Let |paintFunction| be the current <<paint()>> function on the |box|.
 
         2. Let |name| be the first argument of the <<paint()>> function.
@@ -227,7 +227,7 @@ called, the user agent <em>must</em> run the following steps:
         1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
             properties</a> map.
 
-        2. If |paintInputPropertiesMap|[|name|] <a for=map>exists</a> run the following substeps:
+        2. If |paintInputPropertiesMap|[|name|] <a for=map>exists</a>, run the following steps:
 
             1. Let |existingInputProperties| be the result of <a>get</a>
                 |paintInputPropertiesMap|[|name|].
@@ -308,7 +308,7 @@ correct resolution. This also allows user agents to re-use the same output of th
 bitmap</a> repeatably while the visual viewport is being zoomed for example.
 
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
-|height| and |alpha| it <em>must</em> run the following steps:
+|height|, and |alpha|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
     2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to |width| and |height|.
     3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |alpha|.
@@ -405,14 +405,13 @@ following steps:
             it should select a paint worklet global scope which can be used on that thread.
 
 When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |concreteObjectSize|,
-|workletGlobalScope|, it <em>must</em> run the following steps:
+and |workletGlobalScope|, it <em>must</em> run the following steps:
 
     1. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint image definitions</a> map.
 
-    2. If |paintImageDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following
-        substeps:
+    2. If |paintImageDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following steps:
 
-        1. <a>Queue a task</a> to run the following substeps:
+        1. <a>Queue a task</a> to run the following steps:
 
             1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
                 properties</a> map.
@@ -434,7 +433,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |c
     4. Let |paintClassInstanceMap| be |workletGlobalScope|'s <a>paint class instances</a> map.
 
     5. Let |paintInstance| be the result of <a>get</a> |paintClassInstanceMap|[|name]|. If
-        |paintInstance| is null run the following substeps:
+        |paintInstance| is null, run the following steps:
 
         1. If the <a>paint constructor valid flag</a> on |definition| is false, let the image output
             be an <a>invalid image</a> and abort all these steps.
