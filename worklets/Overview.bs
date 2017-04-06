@@ -10,10 +10,6 @@ Abstract:  This specification defines an API for running scripts in stages of th
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
-<pre class="link-defaults">
-spec:infra; type:dfn; text:list
-</pre>
-
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/; type: dfn;
     text: AbortError
@@ -310,6 +306,12 @@ additional {{WorkletGlobalScope}}s should be transparent to the author.
     all fetched sources from the main thread to the thread which owns the {{WorkletGlobalScope}}.
 </div>
 
+A <dfn>pending tasks struct</dfn> is a <a>struct</a> consiting of:
+    - A <dfn for=pending-tasks-struct>counter</dfn>.
+This is used by the algorithms below.
+
+<hr>
+
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
@@ -341,16 +343,16 @@ the user agent <em>must</em> run the following steps:
 
         Wait for this step to complete before continuing.
 
-    10. Let |pendingTaskList| be a new <a>list</a>.
+    10. Let |pendingTaskStruct| be a new <a>pending tasks struct</a> with <a
+        for=pending-tasks-struct>counter</a> initialized to the length of <a>worklet's
+        WorkletGlobalScopes</a>.
 
-    11. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, run these
-        substeps:
+    11. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, run the following
+        substep:
 
-        1. <a for=list>Append</a> |workletGlobalScope| to |pendingTaskList|.
-
-        2. <a>Queue a task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet
+        1. <a>Queue a task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet
             script</a> given |workletGlobalScope|, |moduleURLRecord|, |moduleResponsesMap|,
-            |outsideSettings|, |pendingTaskList|, and |promise|.
+            |outsideSettings|, |pendingTaskStruct|, and |promise|.
 
     Note: The rejecting and resolving of the |promise| occurs within the <a>fetch and invoke a
         worklet script</a> algorithm.
@@ -358,7 +360,7 @@ the user agent <em>must</em> run the following steps:
 <hr>
 
 When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |workletGlobalScope|,
-|moduleURLRecord|, |moduleResponsesMap|, |outsideSettings|, |pendingTaskList|, and |promise|, the
+|moduleURLRecord|, |moduleResponsesMap|, |outsideSettings|, |pendingTaskStruct|, and |promise|, the
 user agent <em>must</em> run the following steps:
 
 Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
@@ -371,17 +373,24 @@ Note: This algorithm is to be run within the <a>worklet global scope execution e
 3. If |script| is <em>null</em>, then <a>queue a task</a> on |outsideSettings|'s <a>responsible
     event loop</a> to run these steps:
 
-    1. <a for=list>Remove</a> |workletGlobalScope| from |pendingTaskList|.
+    1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is not <b>-1</b>, then
+        run these steps:
 
-    2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
+        1. Set |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> to <b>-1</b>.
+
+        2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
 
 4. <a>Run a module script</a> given |script|.
 
 5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
 
-    1. <a for=list>Remove</a> |workletGlobalScope| from |pendingTaskList|.
+    1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is not <b>-1</b>, then run
+        these steps:
 
-    2. If |pendingTaskList| <a for=list>is empty</a>, then resolve |promise|.
+        1. Decrement |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> by <b>1</b>.
+
+        1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is <b>0</b>, then
+            resolve |promise|.
 
 <hr>
 
