@@ -20,40 +20,28 @@ spec:css-break-3; type:dfn; text:fragment
 urlPrefix: https://heycam.github.io/webidl/; type: dfn;
     text: NotSupportedError
     urlPrefix: #dfn-;
-        text: callback this value
-        text: exception
-        text: throw
         url: throw; text: thrown
     urlPrefix: #idl-;
         text: boolean
-    url: es-invoking-callback-functions; text: Invoke
+        text: DOMException
     url: es-type-mapping; text: converting
 urlPrefix: https://html.spec.whatwg.org/multipage/; type: dfn;
     urlPrefix: scripting.html
         text: reset the rendering context to its default state
         text: output bitmap
-        text: queue a task
         text: set bitmap dimensions
         url: concept-canvas-alpha; text: alpha
-    urlPrefix: infrastructure.html
-        text: in parallel
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
     text: IsArray
     text: IsCallable
     text: IsConstructor
-    text: HasProperty
     url: ecmascript-data-types-and-values; text: type
     url: get-o-p; text: Get
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
-urlPrefix: https://infra.spec.whatwg.org/#; type: dfn;
-    url: ordered-map; text: map
-    urlPrefix: map-
-        url: exists; text: exist
-        url: set; text: set
 </pre>
 
 Introduction {#intro}
@@ -175,8 +163,8 @@ called, the user agent <em>must</em> run the following steps:
     2. Let |paintImageDefinitionMap| be {{PaintWorkletGlobalScope}}'s <a>paint image definitions</a>
         map.
 
-    3. If |paintImageDefinitionMap|[|name|] <a>exists</a> <a>throw</a> a <a>NotSupportedError</a>
-        and abort all these steps.
+    3. If |paintImageDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
+        "<a>NotSupportedError</a>" <a>DOMException</a> and abort all these steps.
 
     4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>
 
@@ -184,7 +172,7 @@ called, the user agent <em>must</em> run the following steps:
 
     6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
         <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is thrown, rethrow the exception and abort all these steps.
+        exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
     Note: The list of CSS properties provided by the input properties getter can either be custom or
         native CSS properties.
@@ -198,8 +186,8 @@ called, the user agent <em>must</em> run the following steps:
     7. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
 
     8. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the result
-        of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is thrown, rethrow
-        the exception and abort all these steps.
+        of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is <a>thrown</a>,
+        rethrow the exception and abort all these steps.
 
         Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
             an addition to performing "visibility" optimizations, e.g. not painting an image behind
@@ -232,22 +220,22 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>paint context alpha flag</a> being |alpha|.
 
-    15. <a>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
+    15. <a for=map>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
 
     16. <a>Queue a task</a> to run the following steps:
 
         1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
             properties</a> map.
 
-        2. If |paintInputPropertiesMap|[|name|] <a>exists</a> run the following substeps:
+        2. If |paintInputPropertiesMap|[|name|] <a for=map>exists</a> run the following substeps:
 
             1. Let |existingInputProperties| be the result of <a>get</a>
                 |paintInputPropertiesMap|[|name|].
 
-            2. If |existingInputProperties| and |inputProperties| are not equivalent, <a>set</a>
-                |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+            2. If |existingInputProperties| and |inputProperties| are not equivalent, <a
+                for=map>set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
 
-        3. Otherwise, <a>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
+        3. Otherwise, <a for=map>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
     opportunity to dynamically change its input properties.
@@ -299,8 +287,8 @@ PaintRenderingContext2D implements CanvasPath;
 </pre>
 
 Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderingContext2D}} API.
-    Specifically it doesn't implement the {{CanvasHitRegion}}, {{CanvasImageData}},
-    {{CanvasUserInterface}}, {{CanvasText}} or {{CanvasTextDrawingStyles}} APIs.
+    Specifically it doesn't implement the {{CanvasImageData}}, {{CanvasUserInterface}},
+    {{CanvasText}}, or {{CanvasTextDrawingStyles}} APIs.
 
 A {{PaintRenderingContext2D}} object has a <a>output bitmap</a>. This is initialised when the
 object is created. The size of the <a>output bitmap</a> is the size of the fragment it is
@@ -391,8 +379,8 @@ following steps:
     5. Let |paintInputPropertiesMap| be the associated <a>document's</a> <a>paint input
         properties</a> map.
 
-    6. If |paintInputPropertiesMap|[|name|] does not <a>exist</a>, let the image output be an
-        <a>invalid image</a> and abort all these steps.
+    6. If |paintInputPropertiesMap|[|name|] does not <a for=map>exist</a>, let the image output be
+        an <a>invalid image</a> and abort all these steps.
 
     7. If the result of <a>get</a> |paintInputPropertiesMap|[|name|] is <code>"invalid"</code>, let
         the image output be an <a>invalid image</a> and abort all these steps.
@@ -418,14 +406,15 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |c
 
     1. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint image definitions</a> map.
 
-    2. If |paintImageDefinitionMap|[|name|] does not <a>exist</a>, run the following substeps:
+    2. If |paintImageDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following
+        substeps:
 
         1. <a>Queue a task</a> to run the following substeps:
 
             1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
                 properties</a> map.
 
-            2. <a>Set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+            2. <a for=map>Set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
 
         2. Let the image output be an <a>invalid image</a> and abort all these steps.
 
@@ -452,7 +441,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |c
             valid flag</a> to false, let the image output be an <a>invalid image</a> and abort all
             these steps.
 
-        4. <a>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
+        4. <a for=map>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
 
     6. Let |inputProperties| be |definition|'s <a>paint input property list</a>.
 
