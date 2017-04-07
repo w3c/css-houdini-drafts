@@ -347,12 +347,10 @@ the user agent <em>must</em> run the following steps:
         for=pending-tasks-struct>counter</a> initialized to the length of <a>worklet's
         WorkletGlobalScopes</a>.
 
-    11. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, run the following
-        substep:
-
-        1. <a>Queue a task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet
-            script</a> given |workletGlobalScope|, |moduleURLRecord|, |moduleResponsesMap|,
-            |outsideSettings|, |pendingTaskStruct|, and |promise|.
+    11. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, <a>queue a
+        task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet script</a> given
+        |workletGlobalScope|, |moduleURLRecord|, |moduleResponsesMap|, |outsideSettings|,
+        |pendingTaskStruct|, and |promise|.
 
     Note: The rejecting and resolving of the |promise| occurs within the <a>fetch and invoke a
         worklet script</a> algorithm.
