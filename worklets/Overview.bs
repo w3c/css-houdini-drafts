@@ -307,7 +307,7 @@ additional {{WorkletGlobalScope}}s should be transparent to the author.
 </div>
 
 A <dfn>pending tasks struct</dfn> is a <a>struct</a> consiting of:
-    - A <dfn for=pending-tasks-struct>counter</dfn>.
+    - A <dfn for="pending tasks struct">counter</dfn>.
 This is used by the algorithms below.
 
 <hr>
@@ -344,7 +344,7 @@ the user agent <em>must</em> run the following steps:
         Wait for this step to complete before continuing.
 
     10. Let |pendingTaskStruct| be a new <a>pending tasks struct</a> with <a
-        for=pending-tasks-struct>counter</a> initialized to the length of <a>worklet's
+        for="pending tasks struct">counter</a> initialized to the length of <a>worklet's
         WorkletGlobalScopes</a>.
 
     11. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, <a>queue a
@@ -371,10 +371,10 @@ Note: This algorithm is to be run within the <a>worklet global scope execution e
 3. If |script| is <em>null</em>, then <a>queue a task</a> on |outsideSettings|'s <a>responsible
     event loop</a> to run these steps:
 
-    1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is not <b>-1</b>, then
+    1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
         run these steps:
 
-        1. Set |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> to <b>-1</b>.
+        1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
 
         2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
 
@@ -382,12 +382,12 @@ Note: This algorithm is to be run within the <a>worklet global scope execution e
 
 5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
 
-    1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is not <b>-1</b>, then run
+    1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then run
         these steps:
 
-        1. Decrement |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> by <b>1</b>.
+        1. Decrement |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> by <b>1</b>.
 
-        1. If |pendingTaskStruct|'s <a for=pending-tasks-struct>counter</a> is <b>0</b>, then
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is <b>0</b>, then
             resolve |promise|.
 
 <hr>
