@@ -237,9 +237,6 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 Issue: Todo: Describe how we can read scroll offsets. The previous approach was to list
 it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.
 
-The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to instance map</dfn>. The map is
-populated when the user agent constructs a new <a>animator instance</a>.
-
 When <dfn>parsing a property list</dfn> with name <em>name</em> for {{animatorCtor}},
 the user agent <em>must</em> run the following steps:
 
@@ -259,32 +256,36 @@ Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}. The
 <a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state.
 
-The {{AnimationWorkletGlobalScope}} has an <dfn>animator instance list</dfn>. Anytime a new
-<a>animator instance</a> is constructed in that scope, it gets  added to the list.
+The {{AnimationWorkletGlobalScope}} has an <dfn>(animator name, root element) to instance map</dfn>.
+The map is populated when the user agent constructs a new <a>animator instance</a> in that scope.
 
-To <dfn>create a new animator instance</dfn> given a |root element|, |name|, and |workletGlobalScope|,
+To <dfn>create a new animator instance</dfn> given a |name|, |root element|, and |workletGlobalScope|,
 the user agent <em>must</em> run the following steps:
 
-    1. If an |animatorInstance| with the same |name| and |root element| exists within the <a>animator
-          instance list</a> then abort the following steps.
-
-    2. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-          <a>animator name to animator definition map</a>.
+    1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
+         <a>animator name to animator definition map</a>.
 
           If |definition| does not exist abort the following steps.
 
-    3. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
+    2. Let |animatorInstanceMap| be |workletGlobalScope|'s <a>(animator name, root element) to
+         instance map</a>.
 
-    4. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+    3. If an entry exists for |name| and |root element| within |animatorInstanceMap| then abort the
+         following steps.
 
-          Issue: handle invalid construction.
+    4. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
 
-    5. Set the following on |animatorInstance| with:
+    5. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+
+          If <a>Construct</a> throws an exception, set the result of looking up |name| and
+	    |root element| in |animatorInstanceMap| to <b>null</b>, and abort the following steps.
+
+    6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
-
         - <a>animation requested flag</a> being <a>frame-current</a>
 
-    6. Add |animatorInstance| to <a>animator instance list</a>.
+    7. Set the result of looking up |name| and |root element| in |animatorInstanceMap| to
+         |animatorInstance|.
 
 
 Creating an Element Proxy {#creating-element-proxy}
@@ -400,46 +401,44 @@ Note: The user agent is not required to run animations on every frame. It is leg
       provide a different service level according to their policy.
 
 
-When the user agent wants to <dfn>run animators</dfn>, it <em>must</em> iterates over <a>animator
-instance list</a> as |instance|:
+When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
+<em>must</em> iterate over all pairs of animator name and root element as (|animatorName|,
+|rootElement|). For each such pair:
 
-  1. If the <a>animation requested flag</a> for the instance is <a>frame-current</a>
-        or the proxies belonging to the |instance| will not be visible within the visual viewport
-        of the current frame the user agent <em>may</em> abort all the following steps.
+  1. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
+        <a>animator name to animator definition map</a>.
+
+      If |definition| does not exist then abort the following steps.
+
+  2. Let |instance| be the result of looking up (|animatorName|, |rootElement|) in the
+        |workletGlobalScope|'s <a>(animator name, root element) to instance map</a>.
+
+      If |instance| does not exist then <a>create a new animator instance</a> for |animatorName|,
+      |rootElement|, and |workletGlobalScope|, and let |instance| be the result of that.
+
+  3. If |instance| still does not exist or |instance| is <b>null</b> then abort the following steps.
+
+  4. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the proxies
+        belonging to |instance| will not be visible within the visual viewport of the current frame
+	the user agent <em>may</em> abort all the following steps.
 
         Issue: Consider giving user agents permission to skip running animator instances to throttle
         slow animators.
 
-  2. Let |name| be the <a>animator name</a> of |instance|.
+  5. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  3. Let |workletGlobalScope| be a {{AnimationWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the animation {{Worklet}}.
+  6. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
 
-  4. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
+  7. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
 
-      If |definition| does not exist abort the following steps.
+  8. Let |root| be a <a>root element proxy</a> of |instance|.
 
-  5. Let |animatorInstance| be the result of looking up |name| on |workletGlobalScope|'s
-        <a>animator name to instance map</a>. If |animatorInstance| is null run the following
-        substeps:
+  9. Let |children| be a <a>children element proxies</a> of |instance|.
 
-        Issue: Todo: Add steps to create new animatorInstance given the animator definition.
+  10. <a>Invoke</a> |animateFunction| with arguments «|root|, |children|, |timeline|»,
+        and with |instance| as the <a>callback this value</a>.
 
-  6. Let |animateFunction| be |definition|'s <a>animate function</a>.
-
-  9. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
-
-  10. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
-
-  11. Let |root| be a <a>root element proxy</a> of |instance|.
-
-  12. Let |children| be a <a>children element proxies</a> of |instance|.
-
-  13. <a>Invoke</a> |animateFunction| with arguments «|root|, |children|, |timeline|»,
-        and with |animatorInstance| as the <a>callback this value</a>.
-
-Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times 
+Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
 in the same frame.
 
 Closing an Animator {#closing-animator}
