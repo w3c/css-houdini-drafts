@@ -478,7 +478,7 @@ Animatable: no
         of that <<ident>> as a value has no effect.
 
       * Otherwise, an <a>animator instance</a> with this element as its <a>root element proxy</a>
-        will exist and will have its <a>animation function</a> called (with respect to the rules
+        will exist and will have its <a>animate function</a> called (with respect to the rules
         laid out in [[#running-animators]]).
 
       If the same <<ident>> occurs multiple times in the list, only the first occurrence of that
