@@ -4,8 +4,8 @@
 #
 # Use "make REMOTE=1" to use remote bikeshed
 
-SOURCEFILE=Overview.bs
-OUTPUTFILE=Overview.html
+SOURCEFILE=index.bs
+OUTPUTFILE=index.html
 PREPROCESSOR=bikeshed.py
 REMOTE_PREPROCESSOR_URL=https://api.csswg.org/bikeshed/
 
