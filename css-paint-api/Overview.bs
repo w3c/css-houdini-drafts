@@ -61,9 +61,6 @@ Note: In a future version of the spec, support may be added for defining the cli
 Paint Invalidation {#paint-invalidation}
 ========================================
 
-A <a>document</a> has a <a>map</a> of <dfn>paint input properties</dfn>. Initially it is empty and
-is populated when {{registerPaint(name, paintCtor)}} is called.
-
 Each <<paint()>> function for a box has an associated <dfn>paint valid flag</dfn>. It may be either
 <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
 
@@ -76,12 +73,16 @@ When the computed style for a |box| changes, the user agent <em>must</em> run th
 
         2. Let |name| be the first argument of the <<paint()>> function.
 
-        3. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
-            properties</a> map.
+        3. Let |documentPaintDefinitionMap| be the associated <a>document</a>'s <a>document paint
+            definitions</a> map.
 
-        4. Let |inputProperties| be the result of <a>get</a> |paintInputPropertiesMap|[|name|].
+        4. Let |documentDefinition| be the result of <a>get</a>
+            |documentPaintDefinitionMap|[|name|].
 
-        5. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
+        5. Let |inputProperties| be |documentDefinition|'s <a for="document paint definition">input
+            properties</a> list.
+
+        6. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
             changed, set the <a>paint valid flag</a> on the |paintFunction| to <a>paint-invalid</a>.
 
 Performing <a>draw a paint image</a> results in the <a>paint valid flag</a> for a <<paint()>>
@@ -119,7 +120,9 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
     <pre class='lang-javascript'>
         class MyPaint {
             static get inputProperties() { return ['--foo']; }
+            static get inputArguments() { return ['&lt;color>']; }
             static get alpha() { return true; }
+
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
             }
@@ -130,25 +133,43 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
 Concepts {#concepts}
 ====================
 
-A <dfn>paint image definition</dfn> is a <a>struct</a> which describes an author defined <<image>>
-which can be referenced by the <<paint()>> function. It consists of:
+A <dfn>paint definition</dfn> is a <a>struct</a> which describes the information needed by the
+{{PaintWorkletGlobalScope}} about the author defined <<image>> (which can be referenced by the
+<<paint()>> function). It consists of:
 
- - <dfn for="paint image definition">class constructor</dfn> which is the class <a>constructor</a>.
+ - <dfn for="paint definition">class constructor</dfn> which is the class <a>constructor</a>.
 
- - <dfn for="paint image definition">paint function</dfn> which is the paint <a>function</a>
-     callback.
+ - <dfn for="paint definition">paint function</dfn> which is the paint <a>function</a> callback.
 
- - <dfn for="paint image definition">constructor valid flag</dfn>.
+ - <dfn for="paint definition">constructor valid flag</dfn>.
 
- - <dfn for="paint image definition">input properties</dfn> which is a <a>list</a> of
-     <code>DOMStrings</code>.
+ - <dfn for="paint definition">input properties</dfn> which is a <a>list</a> of
+    <code>DOMStrings</code>.
 
- - A <dfn for="paint image definition">context alpha flag</dfn>.
+ - A <dfn for="paint definition">input argument types</dfn> which is a <a>list</a> of parsed
+    [[css-properties-values-api-1#supported-syntax-strings]].
+
+ - A <dfn for="paint definition">context alpha flag</dfn>.
+
+A <dfn>document paint definition</dfn> is a <a>struct</a> which describes the information
+needed by the <a>document</a> about the author defined <<image>> function (which can be referenced
+by the paint function). It consists of:
+
+ - A <dfn for="document paint definition">input properties</dfn> which is a <a>list</a> of
+    <code>DOMStrings</code>.
+
+ - A <dfn for="document paint definition">input argument types</dfn> which is a <a>list</a> of
+    parsed [[css-properties-values-api-1#supported-syntax-strings]].
+
+ - A <dfn for="document paint definition">context alpha flag</dfn>.
 
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
 
-The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint image definitions</dfn>. Initially
+The <a>document</a> has a <a>map</a> of <dfn>document paint definitions</dfn>. Initially
+this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+
+The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially
 this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
 The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
@@ -162,10 +183,9 @@ When the <dfn method for=PaintWorkletGlobalScope>registerPaint(|name|, |paintCto
 called, the user agent <em>must</em> run the following steps:
     1. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    2. Let |paintImageDefinitionMap| be {{PaintWorkletGlobalScope}}'s <a>paint image definitions</a>
-        map.
+    2. Let |paintDefinitionMap| be {{PaintWorkletGlobalScope}}'s <a>paint definitions</a> map.
 
-    3. If |paintImageDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
+    3. If |paintDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
         "<a>InvalidModificationError</a>" <a>DOMException</a> and abort all these steps.
 
     4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>
@@ -185,30 +205,48 @@ called, the user agent <em>must</em> run the following steps:
         also contains currently invalid properties for the user agent. For example
         <code>margin-bikeshed-property</code>.
 
-    7. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+    7. Let |inputArguments| be an empty <code>sequence&lt;DOMString></code>.
 
-    8. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the result
-        of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is <a>thrown</a>,
-        rethrow the exception and abort all these steps.
+    8. Let |inputArgumentsIterable| be the result of <a>Get</a>(|paintCtor|, "inputArguments").
+
+    9. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
+        <a>converting</a> |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
+        execption is thrown, rethrow the execption and abort all these steps.
+
+    10. Let |inputArgumentTypes| be an <a for=list>empty</a> <a>list</a>.
+
+    11. <a for=list>For each</a> |item| in |inputArguments| perform the following substeps:
+
+        1. Let |parsedItem| be the result of parsing |item| according to the rules in
+            [[css-properties-values-api-1#supported-syntax-strings]]. If it fails to parse
+            <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+        2. <a for=list>Append</a> |parsedItem| to |inputArgumentTypes|.
+
+    12. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+
+    13. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the
+        result of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is
+        <a>thrown</a>, rethrow the exception and abort all these steps.
 
         Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
             an addition to performing "visibility" optimizations, e.g. not painting an image behind
             the paint image as the paint image is opaque.
 
-    9. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    14. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    10. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    15. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    11. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    16. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    12. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    17. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
 
-    13. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
+    18. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    14. Let |definition| be a new <a>paint image definition</a> with:
+    19. Let |definition| be a new <a>paint definition</a> with:
 
         - <a>class constructor</a> being |paintCtor|.
 
@@ -216,29 +254,48 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a>constructor valid flag</a> being <b>true</b>.
 
-        - <a>input properties</a> being |inputProperties|.
+        - <a for="paint definition">input properties</a> being |inputProperties|.
 
-        - <a>context alpha flag</a> being |alpha|.
+        - <a for="paint definition">input argument types</a> being |inputArgumentTypes|.
 
-    15. <a for=map>Set</a> |paintImageDefinitionMap|[|name|] to |definition|.
+        - <a for="paint definition">context alpha flag</a> being |alpha|.
 
-    16. <a>Queue a task</a> to run the following steps:
+    20. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
 
-        1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
-            properties</a> map.
+    21. <a>Queue a task</a> to run the following steps:
 
-        2. If |paintInputPropertiesMap|[|name|] <a for=map>exists</a>, run the following steps:
+        1. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
+            definitions</a> <a>map</a>.
 
-            1. Let |existingInputProperties| be the result of <a>get</a>
-                |paintInputPropertiesMap|[|name|].
+        2. Let |documentDefinition| be a new <a>document paint definition</a> with:
 
-            2. If |existingInputProperties| and |inputProperties| are not equivalent, <a
-                for=map>set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+            - <a for="document paint definition">input properties</a> being |inputProperties|.
 
-            3. The user agent <em>should</em> log an error to the debugging console stating that the
-                same class was registered with different <code>inputProperties</code>.
+            - <a for="document paint definition">input argument types</a> being
+                |inputArgumentTypes|.
 
-        3. Otherwise, <a for=map>set</a> |paintInputPropertiesMap|[|name|] to |inputProperties|.
+            - <a for="document paint definition">context alpha flag</a> being |alpha|.
+
+        3. If |documentPaintDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
+
+            1. Let |existingDocumentDefinition| be the result of <a for=map>get</a>
+                |documentPaintDefinitionMap|[|name|].
+
+            2. If |existingDocumentDefinition| is <code>"invalid"</code>, abort all these steps.
+
+            3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
+                <a for="document paint definition">input properties</a>, <a for="document paint
+                definition">input argument types</a>, and <a for="document paint definition">context
+                alpha flag</a> are different), then:
+
+                <a for=map>Set</a> |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
+
+                Log an error to the debugging console stating that the same class was registered
+                with different <code>inputProperties</code>, <code>inputArguments</code>, or
+                <code>alpha</code>.
+
+        4. Otherwise, <a for=map>set</a> |documentPaintDefinitionMap|[|name|] to
+            |documentDefinition|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
     opportunity to dynamically change its input properties.
@@ -365,7 +422,7 @@ When the user agent wants to <dfn>draw a paint image</dfn> of a <<paint()>> func
 into its appropriate stacking level (as defined by the property the CSS property its associated
 with), given its |concreteObjectSize| (<a>concrete object size</a>) it <em>must</em> run the
 following steps:
-    1. Let |paintFunction| be the <<paint()>>> function on the |box| which the user agent wants to
+    1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
     2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a> the user agent
@@ -379,14 +436,14 @@ following steps:
 
     4. Let |name| be the first argument of the |paintFunction|.
 
-    5. Let |paintInputPropertiesMap| be the associated <a>document's</a> <a>paint input
-        properties</a> map.
+    5. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
+        definitions</a> map.
 
-    6. If |paintInputPropertiesMap|[|name|] does not <a for=map>exist</a>, let the image output be
-        an <a>invalid image</a> and abort all these steps.
+    6. If |documentPaintDefinitionMap|[|name|] does not <a for=map>exist</a>, let the image output
+        be an <a>invalid image</a> and abort all these steps.
 
-    7. If the result of <a>get</a> |paintInputPropertiesMap|[|name|] is <code>"invalid"</code>, let
-        the image output be an <a>invalid image</a> and abort all these steps.
+    7. If the result of <a>get</a> |documentPaintDefinitionMap|[|name|] is <code>"invalid"</code>,
+        let the image output be an <a>invalid image</a> and abort all these steps.
 
     8. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}.
@@ -407,16 +464,16 @@ following steps:
 When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |concreteObjectSize|,
 and |workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint image definitions</a> map.
+    1. Let |paintImageDefinitionMap| be |workletGlobalScope|'s <a>paint definitions</a> map.
 
     2. If |paintImageDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following steps:
 
         1. <a>Queue a task</a> to run the following steps:
 
-            1. Let |paintInputPropertiesMap| be the associated <a>document</a>'s <a>paint input
-                properties</a> map.
+            1. Let |documentPaintDefinitionMap| be the associated <a>document</a>'s <a>document
+                paint definitions</a> map.
 
-            2. <a for=map>Set</a> |paintInputPropertiesMap|[|name|] to <code>"invalid"</code>.
+            2. <a for=map>Set</a> |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
 
             3. The user agent <em>should</em> log an error to the debugging console stating that a
                 class wasn't registered in all {{PaintWorkletGlobalScope}}s.
@@ -448,7 +505,7 @@ and |workletGlobalScope|, it <em>must</em> run the following steps:
 
         4. <a for=map>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
 
-    6. Let |inputProperties| be |definition|'s <a>input properties</a>.
+    6. Let |inputProperties| be |definition|'s <a for="paint definition">input properties</a>.
 
     7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed value</a>'s for properties listed in |inputProperties|.
@@ -457,7 +514,7 @@ and |workletGlobalScope|, it <em>must</em> run the following steps:
         given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
-            - "alpha" - The <a>context alpha flag</a> given by |definition|.
+            - "alpha" - The <a for="paint definition">context alpha flag</a> given by |definition|.
 
         Note: The |renderingContext| must not be re-used between invocations of paint. Implicitly
             this means that there is no stored data, or state on the |renderingContext| between
