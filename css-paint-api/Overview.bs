@@ -6,7 +6,10 @@ ED: https://drafts.css-houdini.org/css-paint-api-1/
 Previous Version: http://www.w3.org/TR/2016/WD-css-paint-api-1-20160607/
 Shortname: css-paint-api
 Level: 1
-Abstract: 
+Abstract:
+    An API for allowing web developers to define a custom CSS <<image>> with javascript, which will
+    respond to style and size changes.
+    See <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-paint-api/EXPLAINER.md">EXPLAINER</a>.
 Editor: Shane Stephens, shanestephens@google.com
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 Editor: Dean Jackson, dino@apple.com
