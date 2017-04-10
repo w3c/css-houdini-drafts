@@ -623,18 +623,33 @@ Example 1: A colored circle. {#example-1}
 -----------------------------------------
 
 <pre class='lang-markup'>
-&lt;div id="myElement">
-    CSS is awesome.
-&lt;/div>
-
+&lt;!DOCTYPE html>
 &lt;style>
-#myElement {
-    --circle-color: red;
+  #example {
+    --circle-color: deepskyblue;
+
     background-image: paint(circle);
-}
+    font-family: sans-serif;
+    font-size: 36px;
+    transition: --circle-color 1s;
+  }
+
+  #example:focus {
+    --circle-color: purple;
+  }
 &lt;/style>
 
+&lt;textarea id="example">
+  CSS is awesome.
+&lt;/textarea>
+
 &lt;script>
+    CSS.registerProperty({
+      name: '--circle-color',
+      syntax: '&lt;color>',
+      initialValue: 'black',
+      inherit: false
+    });
     CSS.paintWorklet.import('circle.js');
 &lt;/script>
 </pre>
@@ -642,22 +657,22 @@ Example 1: A colored circle. {#example-1}
 <pre class='lang-javascript'>
 // circle.js
 registerPaint('circle', class {
-    static get inputProperties() { return ['--circle-color']; }
-    paint(ctx, geom, properties) {
-        // Change the fill color.
-        const color = properties.get('--circle-color');
-        ctx.fillStyle = color;
+  static get inputProperties() { return ['--circle-color']; }
+  paint(ctx, geom, properties) {
+    // Change the fill color.
+    const color = properties.get('--circle-color');
+    ctx.fillStyle = color.cssText;
 
-        // Determine the center point and radius.
-        const x = geom.width / 2;
-        const y = geom.height / 2;
-        const radius = Math.min(x, y);
+    // Determine the center point and radius.
+    const x = geom.width / 2;
+    const y = geom.height / 2;
+    const radius = Math.min(x, y);
 
-        // Draw the circle \o/
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-        ctx.fill();
-    }
+    // Draw the circle \o/
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+    ctx.fill();
+  }
 });
 </pre>
 
