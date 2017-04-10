@@ -121,7 +121,12 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
                 ];
             };
 
-            animate(elementMap, timeline) {
+            static timelines = [
+                'document',
+                'scroll',
+            ];
+
+            animate(elementMap, timelines) {
                 // Animation frame logic goes here
             }
         }
@@ -141,6 +146,8 @@ an <a>animator instance</a>. It consists of:
 
  - An <dfn>animator slot list</dfn> containing a dictionary providing each <dfn>slot name</dfn>,
     its <dfn>input property list</dfn>, and its <dfn>output propert list</dfn>.
+
+ - A <dfn>animator timeline list</dfn>.
 
 
 Each entry in the <a>animator slot list</a> consists of:
@@ -206,8 +213,10 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
     8. Let |elements| be the result of <a>parsing an animator slot list</a> for |animatorCtor|.
         If an exception is thrown, rethrow the exception and abort all these steps.
 
+    9. Let |timelines| be the result of <a>parsing an animator timeline list</a> for |animatorCtor|.
+        If an exception is thrown, rethrow the exception and abort all these steps.
 
-    9. Let |definition| be a new <a>animator definition</a> with:
+    10. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
@@ -217,13 +226,12 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 
         - <a>element proxy map</a> being |elements|
 
+        - <a>animator timeline list</a> being |timelines|
 
-    10. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
+
+    11. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
         definition map</a> of the associated <a>document</a>.
 
-
-Issue: Todo: Describe how we can read scroll offsets. The previous approach was to list
-it as an input / output property of proxies but the new idea is to have a readonly ScrollTimeline.
 
 When <dfn>parsing an animator slot list</dfn> for {{animatorCtor}}, the user agent <em>must</em>
 run the following steps:
@@ -259,6 +267,21 @@ the user agent <em>must</em> run the following steps:
         converting |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
         exception is thrown, rethrow the exception and abort all these steps.
 
+When <dfn>parsing an animator timeline list</dfn> for {{animatorCtor}},
+the user agent <em>must</em> run the following steps:
+
+    1. Let |properties| be an empty <code>sequence&lt;DOMString></code>.
+
+    2. Let |timelinesIterable| be the result of <a>Get</a>(|animatorCtor|, |timelines|).
+
+    3. For each |timeline| in |timelinesIterable|, run the following steps:
+
+        - If |timeline| is not "document" or "scroll", <a>throw</a> a <a>NotSupportedError</a>
+            and abort all these steps.
+
+    4. If |timelinesIterable| is not undefined, then set |timelines| to the result of
+        converting |timelinesIterable| to a <code>sequence&lt;DOMString></code>. If an
+        exception is thrown, rethrow the exception and abort all these steps.
 
 
 Creating an Animator {#creating-animator}
@@ -288,8 +311,8 @@ the user agent <em>must</em> run the following steps:
 
     5. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
 
-          If <a>Construct</a> throws an exception, set the result of looking up |name| and
-	    |root element| in |animatorInstanceMap| to <b>null</b>, and abort the following steps.
+        If <a>Construct</a> throws an exception, set the result of looking up |name| and
+        |root element| in |animatorInstanceMap| to <b>null</b>, and abort the following steps.
 
     6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
@@ -439,20 +462,26 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
 
   4. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the proxies
         belonging to |instance| will not be visible within the visual viewport of the current frame
-	the user agent <em>may</em> abort all the following steps.
+        the user agent <em>may</em> abort all the following steps.
 
         Issue: Consider giving user agents permission to skip running animator instances to throttle
         slow animators.
 
   5. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  6. Let |timestamp| be a <a>DOMHighResTimeStamp</a> indicating the current frame start time.
+  6. Let |timelines| be an empty <code>sequence&lt;AnimationTimeline></code>.
 
-  7. Let |timeline| be a new {{AnimationTimeline}} with its "currentTime" set to |timestamp|.
+  7. For each |timeline| in the <a>animator timeline list</a> of |definition|, do the following:
+
+    - If |timeline| is "document", push a new {{AnimationTimeline}} with its "currentTime" set to
+        a <a>DOMHighResTimeStamp</a> indicating the current frame start time to the |timelines| list.
+
+    - If |timeline| is "scroll", push a new {{AnimationTimeline}} with its "currentTime" set to the
+        scroll position of the nearest non-visible overflow ancestor to the animator's <a>root element</a>.
 
   8. Let |elementMap| be an <a>element proxy map</a> of |instance|.
 
-  9. <a>Invoke</a> |animateFunction| with arguments «|elementMap|, |timeline|»,
+  9. <a>Invoke</a> |animateFunction| with arguments «|elementMap|, |timelines|»,
         and with |instance| as the <a>callback this value</a>.
 
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
@@ -583,11 +612,11 @@ registerAnimator('spring', class {
 
     static elements = [
         {name: 'fadein', inputProperties:  ['--spring-k'], outputProperties =  ['opacity']}];
-    static inputTime = true;
+    static timelines = ['document'];
 
-    animate(elementMap, timeline) {
-        this.startTime_ = this.startTime_ || timeline.currentTime;
-        const deltaT = timeline.currentTime - this.startTime_;
+    animate(elementMap, timelines) {
+        this.startTime_ = this.startTime_ || timelines[0].currentTime;
+        const deltaT = timelines[0].currentTime - this.startTime_;
         elementMap.get('fadein').forEach(elem => {
           // read a custom css property.
           const k = elem.inputStyleMap.get('--spring-k') || 1;
