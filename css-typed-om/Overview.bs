@@ -1105,16 +1105,21 @@ which represent individual <<transform-function>> values.
     [Constructor(optional sequence<CSSTransformComponent> transforms)]
     interface CSSTransformValue : CSSStyleValue {
     	iterable<CSSTransformComponent>;
+	readonly attribute unsigned long length;
+	getter CSSTransformComponent (unsigned long index);
     	readonly attribute boolean is2D;
     	readonly attribute DOMMatrixReadOnly matrix;
     };
 </xmp>
 
-Issue(358): This *should* be an Array-like,
-pending proper resolution of [the GitHub issue](https://github.com/heycam/webidl/issues/291).
-
 A {{CSSTransformValue}}’s [=values to iterate over=]
 is a [=list=] of {{CSSTransformComponent}}s.
+
+The <dfn attribute for=CSSTransformValue>length</dfn> attribute indicates how many {{CSSTransformComponent}} objects
+in the [=values to iterate over=] [=list=].
+
+The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the {{CSSTransformComponent}} object at the provided index
+from the [=values to iterate over=] [=list=].
 
 <div algorithm>
 	The <dfn constructor for=CSSTransformValue>CSSTransformValue(|transforms|)</dfn> constructor must,
