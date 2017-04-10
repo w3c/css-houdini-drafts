@@ -161,9 +161,6 @@ A <dfn>paint definition</dfn> is a <a>struct</a> which describes the information
  - <dfn for="paint definition">input properties</dfn> which is a <a>list</a> of
     <code>DOMStrings</code>.
 
- - A <dfn for="paint definition">input argument syntaxes</dfn> which is a <a>list</a> of parsed
-    [[css-properties-values-api-1#supported-syntax-strings]].
-
  - A <dfn for="paint definition">context alpha flag</dfn>.
 
 A <dfn>document paint definition</dfn> is a <a>struct</a> which describes the information
@@ -272,8 +269,6 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a for="paint definition">input properties</a> being |inputProperties|.
 
-        - <a for="paint definition">input argument syntaxes</a> being |inputArgumentSyntaxes|.
-
         - <a for="paint definition">context alpha flag</a> being |alpha|.
 
     20. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
@@ -326,22 +321,26 @@ Paint Notation {#paint-notation}
 ================================
 
 <pre class='prod'>
-    <dfn>paint()</dfn> = paint( <<ident>> )
+    <dfn>paint()</dfn> = paint( <<ident>>, <<declaration-value>>? )
 </pre>
 
 The <<paint()>> function is an additional notation to be supported by the <<image>> type.
 
 <div class="example">
-    <pre>background-image: paint(my-logo);</pre>
+    <pre class=lang-markup>
+        &ltstyle>
+            .logo { background-image: paint(company-logo); }
+            .chat-bubble { background-image: paint(chat-bubble, blue); }
+        &lt/style>
+    </pre>
 </div>
 
 For the 'cursor' property, the <<paint()>> function should be treated as an <a>invalid image</a> and
 fallback to the next supported <<image>>.
 
-Issue(w3c/css-houdini-drafts#100): Support additional arbitrary arguments for the paint function.
-    This is difficult to specify, as you need to define a sane grammar. A better way would be to
-    expose a token stream which you can parse into Typed OM objects. This would allow a full
-    arbitrary set of function arguments, and be future proof.
+At <a>computed value</a> time the <<paint()>> function does <em>not</em> need to match the grammar
+registered by {{registerPaint()}}. Instead this will result in an <a>invalid image</a> when the
+parsing occurs inside <a>draw a paint image</a>.
 
 The 2D rendering context {#2d-rendering-context}
 ================================================
@@ -462,10 +461,56 @@ following steps:
     6. If |documentPaintDefinitionMap|[|name|] does not <a for=map>exist</a>, let the image output
         be an <a>invalid image</a> and abort all these steps.
 
-    7. If the result of <a>get</a> |documentPaintDefinitionMap|[|name|] is <code>"invalid"</code>,
+    7. Let |documentDefinition| be the result of <a for=map>get</a>
+        |documentPaintDefinitionMap|[|name|].
+
+    8. If |documentDefinition| is <code>"invalid"</code>, let the image output be an <a>invalid
+        image</a> and abort all these steps.
+
+    9. Let |inputArgumentSyntaxes| be |documentDefinition|'s <a for="document paint
+        definition">input argument syntaxes</a>.
+
+    10. Let |inputArguments| be the <a>list</a> of all the |paintFunction| arguments <em>after</em>
+        the "paint name" argument.
+
+    11. If |inputArguments| do not match the registered grammar given by |inputArgumentSyntaxes|,
         let the image output be an <a>invalid image</a> and abort all these steps.
 
-    8. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
+        <div class=example>
+            This step may fail in the following cases:
+
+            <pre class=lang-javascript>
+                // paint.js
+                registerPaint('failing-argument-syntax', class {
+                    static get inputArguments() { return ['&lt;length>']; }
+                    paint(ctx, size, styleMap, args) { /* paint code here. */ }
+                });
+            </pre>
+
+            <pre class=lang-markup>
+                &lt;style>
+                    .example-1 {
+                        background-image: paint(failing-argument-syntax, red);
+                    }
+                    .example-2 {
+                        background-image: paint(failing-argument-syntax, 1px, 2px);
+                    }
+                &lt;/style>
+                &lt;div class=example-1>&lt;/div>
+                &lt;div class=example-2>&lt;/div>
+                &lt;script>
+                    CSS.paintWorklet.import('paint.js');
+                &lt;/script>
+            </pre>
+
+            <code>example-1</code> produces an <a>invalid image</a> as <code>"red"</code> does not
+            match the registered grammar.
+
+            <code>example-2</code> produces an <a>invalid image</a> as there are too many function
+            arguments.
+        </div>
+
+    12. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}.
 
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the paint
@@ -475,10 +520,7 @@ following steps:
             select or create. It may use a single {{PaintWorkletGlobalScope}} or multiple and
             randomly assign between them.
 
-    9. Let |functionArguments| be a <a>list</a> of all the |paintFunction| arguments <em>after</em>
-        the "paint name" argument.
-
-    10. Run <a>invoke a paint callback</a> given |name|, |functionArguments|, |concreteObjectSize|,
+    13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |concreteObjectSize|,
         |workletGlobalScope| optionally <a>in parallel</a>.
 
         Note: If the user agent runs <a>invoke a paint callback</a> on a thread <a>in parallel</a>,
@@ -486,7 +528,7 @@ following steps:
 </div>
 
 <div algorithm>
-When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |functionArguments|,
+When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |inputArguments|,
 |concreteObjectSize|, and |workletGlobalScope|, it <em>must</em> run the following steps:
 
     1. Let |paintDefinitionMap| be |workletGlobalScope|'s <a>paint definitions</a> map.
@@ -535,60 +577,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |f
     7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed value</a>'s for properties listed in |inputProperties|.
 
-    8. Let |inputArgumentSyntaxes| be |definition|'s <a for="paint definition">input argument
-        syntaxes</a>.
-
-    9. Let |inputArguments| be a new <a for=list>empty</a> <a>list</a>.
-
-    10. Let |length| be <a for=list>size</a> of |inputArguments| - 1.
-
-    10. <a for=list>For each</a> |index| in the range 0 to |length|, run the following steps:
-
-        1. Let |inputArgumentSyntax| be |inputArgumentSyntaxes|[|index|].
-
-        2. If |functionArguments|[|index|] does not <a for=list>exist</a>, let the image output be
-            an <a>invalid image</a> and abort all these steps.
-
-        4. Let |functionArgument| be |functionArguments|[|index|].
-
-        3. Let |inputArgument| by the result of running [[css-typed-om-1#stylevalue-normalization]]
-            on |functionArgument| with |inputArgumentSyntax| being the syntax to use to construct
-            the appropriate {{CSSStyleValue}} object.
-
-            If this steps fails, let the image output be an <a>invalid image</a> and abort all these
-            steps.
-
-            <div class=example>
-                This step may fail in the following case:
-
-                <pre class=lang-javascript>
-                    // paint.js
-                    registerPaint('failing-argument-syntax', class {
-                        static get inputArguments() { return ['&lt;length>']; }
-                        paint(ctx, size, styleMap, args) { /* paint code here. */ }
-                    });
-                </pre>
-
-                <pre class=lang-markup>
-                    &lt;style>
-                        .example {
-                            background-image: paint(failing-argument-syntax, red);
-                        }
-                    &lt;/style>
-                    &lt;div class=example>&lt;/div>
-                    &lt;script>
-                        CSS.paintWorklet.import('paint.js');
-                    &lt;/script>
-                </pre>
-
-                As <code>red</code> cannot be normalized to a <<length>> syntax, the background
-                image is an <a>invalid image</a>.
-            </div>
-
-        5. <a for=list>Append</a> |inputArgument| to |inputArguments|.
-
-    11. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a>
-        given:
+    8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
             - "alpha" - The <a for="paint definition">context alpha flag</a> given by |definition|.
@@ -603,15 +592,15 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |f
             invoke methods on it, but this will have no effect on the current image, or subsequent
             images.
 
-    12. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
+    9. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    13. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+    10. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
 
-    14. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+    11. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
         |styleMap|, |inputArguments|», and with |paintInstance| as the <a>callback this value</a>.
 
-    15. The image output is to be produced from the |renderingContext| given to the method.
+    12. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
 
