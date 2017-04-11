@@ -3,6 +3,7 @@ Title:  CSS Painting API Level 1
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-paint-api-1/
+TR: http://www.w3.org/TR/2016/WD-css-paint-api-1-20160607/
 Previous Version: http://www.w3.org/TR/2016/WD-css-paint-api-1-20160607/
 Shortname: css-paint-api
 Level: 1
