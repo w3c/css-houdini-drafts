@@ -26,56 +26,35 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 }
 </style>
 
+<pre class=link-defaults>
+spec:fetch; type:dfn; for:/; text:fetch
+spec:html; type:dfn; for:/; text:browsing context
+spec:html; type:dfn; for:environment settings object;
+    text: global object
+    text: https state
+    text: referrer policy
+spec:html; type:dfn; for:environment; text:id
+spec:webidl; type:dfn; for:interface; text:inherit
+</pre>
+
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/; type: dfn;
     text: AbortError
     text: SyntaxError
     urlPrefix: #idl-;
         text: DOMException
-    urlPrefix: #dfn-;
-        text: inherit
     urlPrefix: #es-;
         text: invoking callback functions
-urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
-    urlPrefix: #concept-;
-        text: fetch
 urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
-    text: effective script origin
     url: #origin-2; text: origin
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
-    text: web workers
     urlPrefix: #dom-workerglobalscope-;
         text: self
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
-    text: api base url
-    text: api url character encoding
-    text: browsing context
-    text: code entry-point
-    text: creation url
     text: document environment
-    text: environment settings object
-    text: event loop
     text: event loop processing model
-    text: global object
-    text: https state
-    text: incumbent settings object
     text: microtask queue
-    text: module script
-    text: perform the request
-    text: realm execution context
-    text: relevant settings object
-    text: responsible browsing context
-    text: responsible document
-    text: responsible event loop
-    text: run a module script
-    text: script execution environment
     text: task queues
-urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
-    text: cors setting attribute
-    text: in parallel
-    url: resolve-a-url; text: resolve;
-urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
-    text: a new promise
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: Construct
     text: InitializeHostDefinedRealm
@@ -162,6 +141,9 @@ interface WorkletGlobalScope {
 
 Each {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
 
+Each {{WorkletGlobalScope}} has an associated <dfn for=WorkletGlobalScope>module map</dfn>. It is a
+<a>module map</a>, initially empty.
+
 Each {{WorkletGlobalScope}} has a <dfn>worklet global scope execution environment</dfn>. This
 execution environment may be parallel (i.e. it may be on a separate thread, process, or other
 equivalent construct), or it may live on the same thread or process as the {{Worklet}} object it
@@ -209,7 +191,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
         - Do not obtain any source texts for scripts or modules.
 
     3. Let |insideSettings| be the result of <a>set up a worklet environment settings object</a>
-        with |realmExecutionContext|.
+        given |realmExecutionContext|, and |outsideSettings|.
 
     4. Associate the |insideSettings| with |workletGlobalScope|.
 
@@ -236,26 +218,46 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
 
 <div algorithm>
 When a user agent is to <dfn>set up a worklet environment settings object</dfn>, given a
-|executionContext|, it must run the following steps:
-    1. Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a>
-        specified by the <a>incumbent settings object</a>.
+|executionContext|, and |outsideSettings|, it must run the following steps:
+    1. Let |inheritedResponsibleBrowsingContext| be |outsideSettings|'s <a>responsible browsing
+        context</a>.
 
-    2. Let |inheritedOrigin| be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+    2. Let |id| be a new unique opaque string.
 
-    3. Let |inheritedAPIBaseURL| be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+    3. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
 
-    4. Let |workletEventLoop| be a newly created <a>event loop</a>.
+    4. Let |inheritedOrigin| be |outsideSettings|'s <a>origin</a>.
 
-    5. Let |workletGlobalScope| be |executionContext|'s <a>global object</a>.
+    5. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
 
-    6. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are
+    6. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
+
+    7. Let |workletEventLoop| be a newly created <a>event loop</a>.
+
+    8. Let |realm| be the value of |executionContext|'s Realm component.
+
+    9. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
+
+    10. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are
         defined as follows:
+
+        : The <a>id</a>
+        :: Return |id|.
+
+        : The <a>Creation URL</a>
+        :: Return |inheritedAPIBaseURL|.
+
+        : The <a>target browsing context</a>
+        :: Return null.
+
+        : The <a>active service worker</a>
+        :: Return null.
 
         : The <a>realm execution context</a>
         :: Return |executionContext|.
 
-        : The <a>global object</a>
-        :: Return |workletGlobalScope|.
+        : The <a>module map</a>.
+        :: Return |workletGlobalScope|'s <a for=WorkletGlobalScope>module map</a>.
 
         : The <a>responsible browsing context</a>
         :: Return |inheritedResponsibleBrowsingContext|.
@@ -265,24 +267,26 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
 
         : The <a>responsible document</a>
         :: Not applicable (the <a>responsible event loop</a> is not a <a>browsing context</a>
-                <a>event loop</a>).
+            <a>event loop</a>).
 
         : The <a>API URL character encoding</a>
-        :: Return UTF-8.
+        :: Return <a>UTF-8</a>.
 
         : The <a>API base URL</a>
         :: Return |inheritedAPIBaseURL|.
 
-        : The <a>origin</a> and <a>effective script origin</a>
+        : The <a>origin</a>
         :: Return |inheritedOrigin|.
 
-        : The <a>creation URL</a>
-        :: Not applicable.
-
         : The <a>HTTPS state</a>
-        :: Return |workletGlobalScope|'s <a>HTTPS state</a>.
+        :: Return |inheritedHTTPSState|.
 
-    7. Return |settingsObject|.
+        : The <a>referrer policy</a>
+        :: Return |inheritedReferrerPolicy|.
+
+    11. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
+
+    12. Return |settingsObject|.
 </div>
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
@@ -422,7 +426,7 @@ Note: This algorithm is to be run within the <a>worklet global scope execution e
 1. <a>Fetch a module worker script graph</a> given |moduleURLRecord|, |outsideSettings|, "script",
     "omit", and |insideSettings|.
 
-    To <a>perform the request</a> given |request|, perform the following steps:
+    To <a>perform the fetch</a> given |request|, perform the following steps:
 
         1. Let |cache| be the |moduleResponsesMap|.
 
