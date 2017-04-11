@@ -507,7 +507,7 @@ Two CSS properties 'animator-root' and 'animator' may be used to assign an HTML 
 
 <pre class='propdef'>
 Name: animator-root
-Value:  none | [<a>animator name</a> <a>animator slot</a>, ]*
+Value:  none | [<a>animator name</a> <a>animator slot</a>, ]* <a>animator name</a> <a>animator slot</a>
 Initial: none
 Applies to: all elements
 Inherited: no
@@ -540,7 +540,7 @@ Animatable: no
 
 <pre class='propdef'>
 Name: animator
-Value:  none | [<a>animator name</a> <a>animator slot</a>, ]*
+Value:  none | [<a>animator name</a> <a>animator slot</a>, ]* <a>animator name</a> <a>animator slot</a>
 Initial: none
 Applies to: all elements
 Inherited: no
