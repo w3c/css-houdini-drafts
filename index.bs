@@ -606,9 +606,9 @@ Example 1: A fade-in animation with spring timing. {#example-1}
 &lt;section class='myFadein'&gt;&lt;/section&gt;
 &lt;section class='myFadein' style="--spring-k: 25;"&gt;&lt;/section&gt;
 
-&lt;scriptlt;
+&lt;script&gt;
 document.animationWorklet.import('spring-timing.js');
-&lt;/scriptlt;
+&lt;/script&gt;
 
 </pre>
 
