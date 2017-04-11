@@ -401,7 +401,7 @@ either <dfn>frame-requested</dfn>, <dfn>frame-current</dfn>. It is initially set
 <a>frame-current</a>.
 
 When a new element proxy is assigned to or removed from an <a>animator instance</a>, that 
-<a>animator instance</a>'s<a>animation requested flag</a> should be set to <a>frame-requested</a>.
+<a>animator instance</a>'s <a>animation requested flag</a> should be set to <a>frame-requested</a>.
 
 When the computed style for an element changes, the user agent <em>must</em> run the following steps:
 
@@ -421,15 +421,21 @@ For each <a>element proxy</a> for that element, perform the following steps:
 
     6. Let |inputProperties| be <a>animator input property list</a> of |slot|.
 
-    6. For each property in |inputProperties|, if the property’s computed value has changed,
+    7. For each property in |inputProperties|, if the property’s computed value has changed,
         set the <a>animation requested flag</a> on the |animator| to <a>frame-requested</a>.
 
+The timelines present in an animator's <a>animator timeline list</a> can also affect the
+<a>animation requested flag</a>:
+
+    * If the string "document" is present in an animator's <a>animator timeline list</a>, then that
+        animator's <a>animation requested flag</a> must be set to <a>frame-requested</a> at the start
+        of each animation frame.
+    * If the string "scroll" is present in an animator's <a>animator timeline list</a>, then when
+        the scroll position of the nearest non-visible overflow ancestor to the animator’s
+        <a>root element</a> changes, that animator's <a>animation requested flag</a> must be set to
+        <a>frame-requested</a>.
 
 [[#running-animators]] sets <a>animation requested flag</a> on animators to <a>frame-current</a>.
-
-
-Issue: Todo: Animators that have Timeline as an explicit input will need to request frame
-on every animation frame. Formulate this here.
 
 Running Animators {#running-animators}
 ======================================================

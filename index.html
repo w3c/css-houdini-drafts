@@ -1423,7 +1423,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-10">10 April 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-11">11 April 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1789,7 +1789,7 @@ effect.</p>
    <h2 class="heading settled" data-level="7" id="requesting-animation-frames"><span class="secno">7. </span><span class="content">Requesting Animation Frames</span><a class="self-link" href="#requesting-animation-frames"></a></h2>
     Each <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-9">animator instance</a> has an associated <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-requested-flag">animation requested flag</dfn>. It must be
 either <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-requested">frame-requested</dfn>, <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-current">frame-current</dfn>. It is initially set to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-2">frame-current</a>. 
-   <p>When a new element proxy is assigned to or removed from an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-10">animator instance</a>, that <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-11">animator instance</a>’s<a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-3">animation requested flag</a> should be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-1">frame-requested</a>.</p>
+   <p>When a new element proxy is assigned to or removed from an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-10">animator instance</a>, that <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-11">animator instance</a>’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-3">animation requested flag</a> should be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-1">frame-requested</a>.</p>
    <p>When the computed style for an element changes, the user agent <em>must</em> run the following steps:</p>
    <p>For each <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-4">element proxy</a> for that element, perform the following steps:</p>
    <ol>
@@ -1809,12 +1809,20 @@ either <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-r
      <p>For each property in <var>inputProperties</var>, if the property’s computed value has changed,
 set the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-4">animation requested flag</a> on the <var>animator</var> to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-2">frame-requested</a>.</p>
    </ol>
-   <p><a href="#running-animators">§8 Running Animators</a> sets <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-5">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
-   <p class="issue" id="issue-5edadb19"><a class="self-link" href="#issue-5edadb19"></a> Todo: Animators that have Timeline as an explicit input will need to request frame
-on every animation frame. Formulate this here.</p>
+   <p>The timelines present in an animator’s <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-2">animator timeline list</a> can also affect the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-5">animation requested flag</a>:</p>
+   <ul>
+    <li data-md="">
+     <p>If the string "document" is present in an animator’s <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-3">animator timeline list</a>, then that
+animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-6">animation requested flag</a> must be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-3">frame-requested</a> at the start
+of each animation frame.</p>
+    <li data-md="">
+     <p>If the string "scroll" is present in an animator’s <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-4">animator timeline list</a>, then when
+the scroll position of the nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-1">root element</a> changes, that animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> must be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-4">frame-requested</a>.</p>
+   </ul>
+   <p><a href="#running-animators">§8 Running Animators</a> sets <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-8">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
    <h2 class="heading settled" data-level="8" id="running-animators"><span class="secno">8. </span><span class="content">Running Animators</span><a class="self-link" href="#running-animators"></a></h2>
    <p>When a user agent wants to produce a new animation frame, if for any <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-12">animator instance</a> the
-associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-6">animation requested flag</a> is <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-3">frame-requested</a> then the the user agent <em>must</em> <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-1">run animators</a> for the current frame.</p>
+associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-9">animation requested flag</a> is <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-5">frame-requested</a> then the the user agent <em>must</em> <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-1">run animators</a> for the current frame.</p>
    <p class="note" role="note"><span>Note:</span> The user agent is not required to run animations on every frame. It is legal to defer
       generating an animation frame until a later frame. This allow the user agent to
       provide a different service level according to their policy.</p>
@@ -1829,7 +1837,7 @@ associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-
     <li data-md="">
      <p>If <var>instance</var> still does not exist or <var>instance</var> is <b>null</b> then abort the following steps.</p>
     <li data-md="">
-     <p>If the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> for <var>instance</var> is <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-4">frame-current</a> or the proxies
+     <p>If the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-10">animation requested flag</a> for <var>instance</var> is <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-4">frame-current</a> or the proxies
     belonging to <var>instance</var> will not be visible within the visual viewport of the current frame
     the user agent <em>may</em> abort all the following steps.</p>
      <p class="issue" id="issue-dc52329c"><a class="self-link" href="#issue-dc52329c"></a> Consider giving user agents permission to skip running animator instances to throttle
@@ -1839,14 +1847,14 @@ associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-
     <li data-md="">
      <p>Let <var>timelines</var> be an empty <code>sequence&lt;AnimationTimeline></code>.</p>
     <li data-md="">
-     <p>For each <var>timeline</var> in the <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-2">animator timeline list</a> of <var>definition</var>, do the following:</p>
+     <p>For each <var>timeline</var> in the <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-5">animator timeline list</a> of <var>definition</var>, do the following:</p>
      <ul>
       <li data-md="">
        <p>If <var>timeline</var> is "document", push a new <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#animationtimeline">AnimationTimeline</a></code> with its "currentTime" set to
 a <a data-link-type="dfn" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp">DOMHighResTimeStamp</a> indicating the current frame start time to the <var>timelines</var> list.</p>
       <li data-md="">
        <p>If <var>timeline</var> is "scroll", push a new <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#animationtimeline">AnimationTimeline</a></code> with its "currentTime" set to the
-scroll position of the nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-1">root element</a>.</p>
+scroll position of the nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-2">root element</a>.</p>
      </ul>
     <li data-md="">
      <p>Let <var>elementMap</var> be an <a data-link-type="dfn" href="#element-proxy-map" id="ref-for-element-proxy-map-2">element proxy map</a> of <var>instance</var>.</p>
@@ -1895,7 +1903,7 @@ in the same frame.</p>
    </table>
    <dl>
     <dt><dfn class="css" data-dfn-for="animator-root" data-dfn-type="value" data-export="" id="valdef-animator-root-none">none<a class="self-link" href="#valdef-animator-root-none"></a></dfn> 
-    <dd> There will be no <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-14">animator instance</a> that has this element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-2">root element</a>. 
+    <dd> There will be no <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-14">animator instance</a> that has this element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-3">root element</a>. 
     <dt><a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-4">animator name</a> <a data-link-type="dfn" href="#animator-slot" id="ref-for-animator-slot-3">animator slot</a> 
     <dd>
       For each <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-5">animator name</a> specified in the list, the following applies for each animation frame: 
@@ -1904,7 +1912,7 @@ in the same frame.</p>
        <p>If there is no <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-3">animator definition</a> registered with the given <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-6">animator name</a>, the inclusion
 of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-7">animator name</a> as a value has no effect.</p>
       <li data-md="">
-       <p>Otherwise, an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a> with this element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-3">root element</a> will exist and will have its <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-3">animate function</a> called (with respect to the rules
+       <p>Otherwise, an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a> with this element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-4">root element</a> will exist and will have its <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-3">animate function</a> called (with respect to the rules
 laid out in <a href="#running-animators">§8 Running Animators</a>) with an <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-6">element proxy</a> for this element passed as
 one of the <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-7">element proxies</a> for the given <a data-link-type="dfn" href="#animator-slot" id="ref-for-animator-slot-4">animator slot</a>.</p>
      </ul>
@@ -1955,7 +1963,7 @@ one of the <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-pro
 of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-14">animator name</a> as a value has no effect.</p>
       <li data-md="">
        <p>Otherwise, an <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-9">element proxy</a> for this element will be passed into the <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-5">animate function</a> of the closest ancestor <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-16">animator instance</a> with the given <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-15">animator name</a> as one of the <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-10">element proxies</a> for the given <a data-link-type="dfn" href="#animator-slot" id="ref-for-animator-slot-7">animator slot</a>. If no
-such <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-17">animator instance</a> exists, one is created with the document root element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-4">root element</a>.</p>
+such <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-17">animator instance</a> exists, one is created with the document root element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-5">root element</a>.</p>
      </ul>
      <p>If the same <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-16">animator name</a> occurs multiple times in the list, only the first occurrence of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-17">animator name</a> is processed.</p>
    </dl>
@@ -2352,8 +2360,6 @@ point.</p>
   <div style="counter-reset:issue">
    <div class="issue"> Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
 cannot be constructed via javascript?<a href="#issue-65c145a8"> ↵ </a></div>
-   <div class="issue"> Todo: Animators that have Timeline as an explicit input will need to request frame
-on every animation frame. Formulate this here.<a href="#issue-5edadb19"> ↵ </a></div>
    <div class="issue"> Consider giving user agents permission to skip running animator instances to throttle
     slow animators.<a href="#issue-dc52329c"> ↵ </a></div>
    <div class="issue"> Todo: Define when we may get rid of the animator.<a href="#issue-d4d8f39c"> ↵ </a></div>
@@ -2437,7 +2443,8 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
    <b><a href="#animator-timeline-list">#animator-timeline-list</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-animator-timeline-list-1">4. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animator-timeline-list-2">8. Running Animators</a>
+    <li><a href="#ref-for-animator-timeline-list-2">7. Requesting Animation Frames</a> <a href="#ref-for-animator-timeline-list-3">(2)</a> <a href="#ref-for-animator-timeline-list-4">(3)</a>
+    <li><a href="#ref-for-animator-timeline-list-5">8. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-slot">
@@ -2482,8 +2489,9 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
   <aside class="dfn-panel" data-for="root-element">
    <b><a href="#root-element">#root-element</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-root-element-1">8. Running Animators</a>
-    <li><a href="#ref-for-root-element-2">10. CSS Animator Notation</a> <a href="#ref-for-root-element-3">(2)</a> <a href="#ref-for-root-element-4">(3)</a>
+    <li><a href="#ref-for-root-element-1">7. Requesting Animation Frames</a>
+    <li><a href="#ref-for-root-element-2">8. Running Animators</a>
+    <li><a href="#ref-for-root-element-3">10. CSS Animator Notation</a> <a href="#ref-for-root-element-4">(2)</a> <a href="#ref-for-root-element-5">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="element-proxy-map">
@@ -2579,15 +2587,15 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
    <ul>
     <li><a href="#ref-for-animation-requested-flag-1">3. Concepts</a>
     <li><a href="#ref-for-animation-requested-flag-2">5. Creating an Animator</a>
-    <li><a href="#ref-for-animation-requested-flag-3">7. Requesting Animation Frames</a> <a href="#ref-for-animation-requested-flag-4">(2)</a> <a href="#ref-for-animation-requested-flag-5">(3)</a>
-    <li><a href="#ref-for-animation-requested-flag-6">8. Running Animators</a> <a href="#ref-for-animation-requested-flag-7">(2)</a>
+    <li><a href="#ref-for-animation-requested-flag-3">7. Requesting Animation Frames</a> <a href="#ref-for-animation-requested-flag-4">(2)</a> <a href="#ref-for-animation-requested-flag-5">(3)</a> <a href="#ref-for-animation-requested-flag-6">(4)</a> <a href="#ref-for-animation-requested-flag-7">(5)</a> <a href="#ref-for-animation-requested-flag-8">(6)</a>
+    <li><a href="#ref-for-animation-requested-flag-9">8. Running Animators</a> <a href="#ref-for-animation-requested-flag-10">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="frame-requested">
    <b><a href="#frame-requested">#frame-requested</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-frame-requested-1">7. Requesting Animation Frames</a> <a href="#ref-for-frame-requested-2">(2)</a>
-    <li><a href="#ref-for-frame-requested-3">8. Running Animators</a>
+    <li><a href="#ref-for-frame-requested-1">7. Requesting Animation Frames</a> <a href="#ref-for-frame-requested-2">(2)</a> <a href="#ref-for-frame-requested-3">(3)</a> <a href="#ref-for-frame-requested-4">(4)</a>
+    <li><a href="#ref-for-frame-requested-5">8. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="frame-current">
