@@ -10,6 +10,21 @@ Abstract:  This specification defines an API for running scripts in stages of th
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
+<style>
+/* Put nice boxes around each algorithm. */
+[data-algorithm]:not(.heading) {
+    padding: .5em;
+    border: thin solid #ddd; border-radius: .5em;
+    margin: .5em calc(-0.5em - 1px);
+}
+[data-algorithm]:not(.heading) > :first-child {
+    margin-top: 0;
+}
+[data-algorithm]:not(.heading) > :last-child {
+    margin-bottom: 0;
+}
+</style>
+
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/; type: dfn;
     text: AbortError
@@ -175,6 +190,7 @@ Note:
 
 ### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
+<div algorithm>
 When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGlobalScopeType|,
 |moduleResponsesMap|, and |outsideSettings|, it <em>must</em> run the following steps:
 
@@ -213,9 +229,11 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
             |script| should never be <em>null</em> here.
 
     6. Run the <a>responsible event loop</a> specified by |insideSettings|.
+</div>
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
+<div algorithm>
 When a user agent is to <dfn>set up a worklet environment settings object</dfn>, given a
 |executionContext|, it must run the following steps:
     1. Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a>
@@ -264,6 +282,7 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
         :: Return |workletGlobalScope|'s <a>HTTPS state</a>.
 
     7. Return |settingsObject|.
+</div>
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
 
@@ -310,8 +329,7 @@ A <dfn>pending tasks struct</dfn> is a <a>struct</a> consiting of:
     - A <dfn for="pending tasks struct">counter</dfn>.
 This is used by the algorithms below.
 
-<hr>
-
+<div algorithm>
 When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
 the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
@@ -354,44 +372,46 @@ the user agent <em>must</em> run the following steps:
 
     Note: The rejecting and resolving of the |promise| occurs within the <a>fetch and invoke a
         worklet script</a> algorithm.
+</div>
 
-<hr>
-
+<div algorithm>
 When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |workletGlobalScope|,
 |moduleURLRecord|, |moduleResponsesMap|, |outsideSettings|, |pendingTaskStruct|, and |promise|, the
 user agent <em>must</em> run the following steps:
 
-Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
+    Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
 
-1. Let |insideSettings| be the |workletGlobalScope|'s associated <a>environment settings object</a>.
+    1. Let |insideSettings| be the |workletGlobalScope|'s associated <a>environment settings
+        object</a>.
 
-2. Let |script| by the result of <a>fetch a worklet script</a> given |moduleURLRecord|,
-    |moduleResponsesMap|, |outsideSettings|, and |insideSettings| when it asynchronously completes.
+    2. Let |script| by the result of <a>fetch a worklet script</a> given |moduleURLRecord|,
+        |moduleResponsesMap|, |outsideSettings|, and |insideSettings| when it asynchronously completes.
 
-3. If |script| is <em>null</em>, then <a>queue a task</a> on |outsideSettings|'s <a>responsible
-    event loop</a> to run these steps:
+    3. If |script| is <em>null</em>, then <a>queue a task</a> on |outsideSettings|'s <a>responsible
+        event loop</a> to run these steps:
 
-    1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
-        run these steps:
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
+            run these steps:
 
-        1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
+            1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
 
-        2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
+            2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
 
-4. <a>Run a module script</a> given |script|.
+    4. <a>Run a module script</a> given |script|.
 
-5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
+    5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
 
-    1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then run
-        these steps:
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
+            run these steps:
 
-        1. Decrement |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> by <b>1</b>.
+            1. Decrement |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> by
+                <b>1</b>.
 
-        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is <b>0</b>, then
-            resolve |promise|.
+            2. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is <b>0</b>, then
+                resolve |promise|.
+</div>
 
-<hr>
-
+<div algorithm>
 When the user agent is to <dfn>fetch a worklet script</dfn> given |moduleURLRecord|,
 |moduleResponsesMap|, |outsideSettings|, and |insideSettings|, the user agent <em>must</em>
 run the following steps:
@@ -453,6 +473,7 @@ Note: Specifically, if a script fails to parse or fails to load over the network
     If the user agent decided to kill and restart a {{WorkletGlobalScope}} number 3 in this example,
     it would print <code class='lang-javascript'>[paintWorklet#3] Hello from a
     WorkletGlobalScope!</code> again in the debugging tools when this occurs.
+</div>
 </div>
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlobalScope}}
