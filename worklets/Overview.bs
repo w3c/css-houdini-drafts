@@ -45,8 +45,6 @@ urlPrefix: http://heycam.github.io/webidl/; type: dfn;
         text: DOMException
     urlPrefix: #es-;
         text: invoking callback functions
-urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
-    url: #origin-2; text: origin
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
     urlPrefix: #dom-workerglobalscope-;
         text: self
@@ -226,7 +224,7 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
 
     3. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
 
-    4. Let |inheritedOrigin| be |outsideSettings|'s <a>origin</a>.
+    4. Let |origin| be a unique <a>opaque origin</a>.
 
     5. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
 
@@ -275,8 +273,8 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
         : The <a>API base URL</a>
         :: Return |inheritedAPIBaseURL|.
 
-        : The <a>origin</a>
-        :: Return |inheritedOrigin|.
+        : The <a for="environment settings object">origin</a>
+        :: Return |origin|.
 
         : The <a>HTTPS state</a>
         :: Return |inheritedHTTPSState|.
