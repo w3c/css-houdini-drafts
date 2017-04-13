@@ -416,17 +416,12 @@ Worklets do not introduce any usable API surface to the web themselves, instead 
 specifications, e.g. [[css-paint-api-1]], [[webaudio]] will extend this specification to provide
 useful functionality.
 
-Worklets are allowed to be used outside <a>SecureContexts</a> as specifications which extend/use
-worklets may be allowed to used outside <a>SecureContexts</a>.
+Specifications which use worklets should decide if their worklet(s) should be allowed outside
+<a>SecureContexts</a>.
 
 Worklets load their module scripts in the same manner that workers load their module scripts. This
 fetches the top-level script by the <a>fetch a single module script</a> algorithm which sets the
 <a for=request>mode</a> to "<code>cors</code>".
-
-The behaviour of loading scripts can be restricted by using <a>child-src</a> [[CSP]] directive. Each
-specification which extends this specification <em>must</em> provide a <a
-for=request>destination</a> which is sent along with requests in the <a>Fetch a module worker script
-graph</a> algorithm.
 
 Issue(w3c/css-houdini-drafts#378): Provide hook for downstream specifications to provide their
     destination type.
