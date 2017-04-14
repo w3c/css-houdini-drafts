@@ -34,6 +34,7 @@ spec:html; type:dfn; for:environment settings object;
     text: https state
     text: referrer policy
 spec:html; type:dfn; for:environment; text:id
+spec:infra; type:dfn; text:list
 spec:webidl; type:dfn; for:interface; text:inherit
 </pre>
 
@@ -497,7 +498,12 @@ Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlob
 Lifetime of the Worklet {#lifetime-of-the-worklet}
 --------------------------------------------------
 
-The lifetime of a {{Worklet}} is tied to the object it belongs to, for example the {{Window}}.
+{{Window}} objects have a <dfn export>\[[Worklets]]</dfn> internal slot. This contains a <a>list</a>
+which is initially empty. When a {{Worklet}} is created it is <a for=list>appended</a> to this list.
+A {{Worklet}} cannot outlive the {{Window}} which it belongs to.
+
+Note: Most {{Worklet}}s will be instantiated lazily when the web developer wants to use them, it is
+    expected that they won't be created eagerly with the {{Window}} object.
 
 The lifetime of a {{WorkletGlobalScope}} should be defined by subsequent specifications which
 inherit from {{WorkletGlobalScope}}.
