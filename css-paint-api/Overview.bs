@@ -684,15 +684,15 @@ It is possible for an author to use paint to draw a placeholder image while an i
 loaded.
 
 <pre class='lang-markup'>
-&lt;div id="myElement">
-&lt;/div>
-
+&lt;!DOCTYPE html>
 &lt;style>
-#myElement {
+#example {
     --image: url('#someUrlWhichIsLoading');
     background-image: paint(image-with-placeholder);
 }
 &lt;/style>
+
+&lt;div id="example">&lt;/div>
 
 &lt;script>
     CSS.registerProperty({
@@ -729,10 +729,90 @@ registerPaint('image-with-placeholder', class {
 });
 </pre>
 
-Example 3: Conic-gradient {#example-3}
---------------------------------------
+Example 3: Arcs {#example-3}
+----------------------------
 
-Issue: Add conic-gradient as a use case once we have function arguments.
+<pre class='lang-markup'>
+&lt;!DOCTYPE html>
+&lt;style>
+#example {
+  width: 200px;
+  height: 200px;
+
+  background-image:
+    paint(arc, purple, 0.4turn, 0.8turn, 40px, 15px),
+    paint(arc, blue, -20deg, 170deg, 30px, 20px),
+    paint(arc, red, 45deg, 220deg, 50px, 10px);
+}
+&lt;/style>
+
+&lt;div id="example">&lt;/div>
+
+&lt;script>
+    CSS.paintWorklet.import('arc.js');
+&lt;/script>
+</pre>
+
+<pre class='lang-javascript'>
+// arc.js
+registerPaint('arc', class {
+  static get inputArguments() {
+    return [
+      '&lt;color>',
+      '&lt;angle>',  // startAngle
+      '&lt;angle>',  // endAngle
+      '&lt;length>', // radius
+      '&lt;length>', // lineWidth
+    ];
+  }
+
+  paint(ctx, geom, _, args) {
+    ctx.strokeStyle = args[0].cssText;
+
+    // Determine the center point.
+		const x = geom.width / 2;
+		const y = geom.height / 2;
+
+    // Convert the start and end angles to radians.
+    const startAngle = this.convertAngle(args[1]) - Math.PI / 2;
+    const endAngle = this.convertAngle(args[2]) - Math.PI / 2;
+
+    // Convert the radius and lineWidth to px.
+    const radius = this.convertLength(args[3]);
+    const lineWidth = this.convertLength(args[4]);
+
+    ctx.lineWidth = lineWidth;
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, startAngle, endAngle, false);
+    ctx.stroke();
+  }
+
+  convertAngle(angle) {
+    switch (angle.unit) {
+      case 'deg':
+        return angle.value * Math.PI / 180;
+      case 'rad':
+        return angle.value;
+      case 'grad':
+        return angle.value * Math.PI / 200;
+      case 'turn':
+        return angle.value * Math.PI / 0.5;
+      default:
+        throw Error(`Unknown angle unit: ${angle.unit}`);
+    }
+  }
+
+  convertLength(length) {
+    switch (length.type) {
+      case 'px':
+        return length.value;
+      default:
+        throw Error(`Unkown length type: ${length.type}`);
+    }
+  }
+});
+</pre>
 
 Example 4: Different color based on size {#example-4}
 -----------------------------------------------------
