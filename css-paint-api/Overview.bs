@@ -34,6 +34,7 @@ Ignored Terms: PaintWorklet
 
 <pre class="link-defaults">
 spec:css-break-3; type:dfn; text:fragment
+spec:css-display-3; type:dfn; text:box
 spec:infra; type:dfn; text:list
 </pre>
 
@@ -634,8 +635,15 @@ Note: The contents of the resulting image are not designed to be accessible. Aut
 Examples {#examples}
 ====================
 
-Example 1: A colored circle. {#example-1}
------------------------------------------
+Example 1: Colored Circle {#example-1}
+--------------------------------------
+
+The example below makes use of the fact that <<paint()>> functions are able to be animated. E.g.
+when the textarea is focused in the example below, the <code>--circle-color</code> property will
+transition from <code>deepskyblue</code> to <code>purple</code>.
+
+This ability isn't limited to just transitions, it also applies to CSS animations, and the Web
+Animations API.
 
 <pre class='lang-markup'>
 &lt;!DOCTYPE html>
@@ -691,8 +699,8 @@ registerPaint('circle', class {
 });
 </pre>
 
-Example 2: Image placeholder. {#example-2}
-------------------------------------------
+Example 2: Image Placeholder {#example-2}
+-----------------------------------------
 
 It is possible for an author to use paint to draw a placeholder image while an image is being
 loaded.
@@ -828,8 +836,8 @@ registerPaint('arc', class {
 });
 </pre>
 
-Example 4: Different color based on size {#example-4}
------------------------------------------------------
+Example 4: Different Colors (based on size) {#example-4}
+--------------------------------------------------------
 
 <pre class='lang-markup'>
 &lt;h1>
