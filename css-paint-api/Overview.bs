@@ -532,12 +532,15 @@ following steps:
     12. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}.
 
-        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the paint
-        {{Worklet}} and use that.
+        The user agent <em>must</em> have, and select from at least two {{PaintWorkletGlobalScope}}s
+        in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>, unless the user agent is under
+        memory constraints.
 
-        Note: The user agent can use any policy for which {{PaintWorkletGlobalScope}} to select or
-            create. For example it could use a single {{PaintWorkletGlobalScope}} or multiple and
-            randomly assign between them.
+        Note: This is to ensure that authors do not rely on being able to store state on the class
+            or global object.
+
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        paint {{Worklet}}.
 
     13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |concreteObjectSize|,
         |workletGlobalScope| optionally <a>in parallel</a>.
