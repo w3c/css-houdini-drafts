@@ -84,10 +84,9 @@ Paint Invalidation {#paint-invalidation}
 Each <<paint()>> function for a box has an associated <dfn>paint valid flag</dfn>. It may be either
 <dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
 
-When the size (as determined by layout) of a |box| changes, each <<paint()>> function's <a>paint
-valid flag</a> should be set to <a>paint-invalid</a>.
-
-When the computed style for a |box| changes, the user agent <em>must</em> run the following steps:
+<div algorithm>
+When the user agent wants to <dfn>invalidate paint functions</dfn> given |box|, the user agent
+<em>must</em> run the following steps:
     1. For each <<paint()>> function on the |box|, perform the following steps:
         1. Let |paintFunction| be the current <<paint()>> function on the |box|.
 
@@ -104,9 +103,13 @@ When the computed style for a |box| changes, the user agent <em>must</em> run th
 
         6. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
             changed, set the <a>paint valid flag</a> on the |paintFunction| to <a>paint-invalid</a>.
+</div>
 
 Performing <a>draw a paint image</a> results in the <a>paint valid flag</a> for a <<paint()>>
 function on a box to be set to <a>paint-valid</a>.
+
+<a>Invalidate paint functions</a> is expected to be run when the user agent recalculates computed
+style for a box.
 
 Note: In a future version of the spec, support could be added for partial invalidation. The user
     agent will be able to specify a region of the rendering context which needs to be re-painted by
@@ -614,12 +617,54 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     9. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
         |concreteObjectSize|.
 
-    10. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+    10. At this stage the user agent may re-use an image from a previous invocation if |paintSize|,
+        |styleMap|, |inputArguments| are equivalent to that previous invocation. If so let the image
+        output be that cached image and abort all these steps.
 
-    11. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+        <div class=note>
+            In the example below, both <code>div-1</code> and <code>div-2</code> have paint
+            functions which have equivalent javascript arguments. A user-agent can cache the result
+            of one invocation and use it for both elements.
+
+            <pre class=lang-javascript>
+                // paint.js
+                registerPaint('simple', class {
+                    paint(ctx, size) {
+                        ctx.fillStyle = 'green';
+                        ctx.fillRect(0, 0, size.width, size.height);
+                    }
+                });
+            </pre>
+
+            <pre class=lang-markup>
+                &lt;style>
+                    .div-1 {
+                        width: 50px;
+                        height: 50px;
+                        background-image: paint(simple);
+                    }
+                    .div-2 {
+                        width: 100px;
+                        height: 100px;
+
+                        background-size: 50% 50%;
+                        background-image: paint(simple);
+                    }
+                &lt;/style>
+                &lt;div class=div-1>&lt;/div>
+                &lt;div class=div-2>&lt;/div>
+                &lt;script>
+                    CSS.paintWorklet.import('paint.js');
+                &lt;/script>
+            </pre>
+        </div>
+
+    11. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+
+    12. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
         |styleMap|, |inputArguments|», and with |paintInstance| as the <a>callback this value</a>.
 
-    12. The image output is to be produced from the |renderingContext| given to the method.
+    13. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
 
