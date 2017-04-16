@@ -384,6 +384,21 @@ the <a>output bitmap</a> such that the user agent can subsequently draw onto a d
 correct resolution. This also allows user agents to re-use the same output of the <a>output
 bitmap</a> repeatably while the visual viewport is being zoomed for example.
 
+Whenever <code>"currentColor"</code> is used as a color in the {{PaintRenderingContext2D}} API, it
+is treated as opaque black.
+
+<div class=example>
+    The code below will produce a solid black rectange.
+    <pre class=lang-javascript>
+        registerPaint('currentcolor', class {
+            paint(ctx, size) {
+                ctx.fillStyle = 'currentColor';
+                ctx.fillRect(0, 0, size.width, size.height);
+            }
+        });
+    </pre>
+</div>
+
 <div algorithm>
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
 |height|, and |alpha|, it <em>must</em> run the following steps:
