@@ -415,11 +415,10 @@ Note: The initial state of the rendering context is set inside the <a>set bitmap
 Drawing an image {#drawing-an-image}
 ====================================
 
-If a <<paint()>> function for a fragment is <a>paint-invalid</a> and the fragment is within the
-visual viewport, then user agent <em>must</em> <a>draw a paint image</a> for the current frame. The
-user agent <em>may not</em> defer the <a>draw a paint image</a> operation until a subsequent frame.
+If a <<paint()>> function for a <a>box</a> is <a>paint-invalid</a> and the <a>box</a> is inside the
+visual viewport, then user agent <em>must</em> <a>draw a paint image</a> for the current frame.
 
-Note: The user agent may choose to <a>draw a paint image</a> for <<paint()>> functions not within
+Note: The user agent can optionally defer drawing images which are <a>paint-invalid</a> and outside
     the visual viewport.
 
 <div class="example">
@@ -429,11 +428,11 @@ Note: The user agent may choose to <a>draw a paint image</a> for <<paint()>> fun
             element.styleMap.set('--custom-prop-invalidates-paint', 42);
         });
     </pre>
-    And the <code>element</code> is inside the visual viewport, the user agent <em>must</em> <a>draw
-    a paint image</a> and display the result on the current frame.
+    And the <code>element</code> is inside the visual viewport, the user agent is required to
+    <a>draw a paint image</a> and display the result for the current frame.
 </div>
 
-The <a>draw a paint image</a> function should be invoked by the user agent during the <a>object size
+The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
 negotiation</a> algorithm which is responsible for rendering an <<image>>.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
