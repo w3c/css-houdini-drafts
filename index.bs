@@ -44,6 +44,12 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
         text: TypeError
 urlPrefix: https://www.w3.org/TR/hr-time-2/#dom-; type: dfn
     text: DOMHighResTimeStamp
+urlPrefix: https://wicg.github.io/scroll-animations/#; type: interface
+    url: scrolltimeline; text: ScrollTimeline
+    url: dictdef-scrolltimelineoptions; text: ScrollTimelineOptions
+    url: dom-scrolltimeline-scrollsource; text: scrollSource
+urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
+    url: current-time-algorithm; text: current time of the ScrollTimeline;
 </pre>
 
 <pre class=biblio>
@@ -123,7 +129,7 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
 
             static timelines = [
                 'document',
-                'scroll',
+                { type: 'scroll', { orientation: 'vertical' } },
             ];
 
             animate(elementMap, timelines) {
@@ -147,7 +153,7 @@ an <a>animator instance</a>. It consists of:
  - An <dfn>animator slot list</dfn> containing a dictionary providing each <dfn>slot name</dfn>,
     its <dfn>input property list</dfn>, and its <dfn>output propert list</dfn>.
 
- - A <dfn>animator timeline list</dfn>.
+ - An <dfn>animator timeline options list</dfn>.
 
 
 Each entry in the <a>animator slot list</a> consists of:
@@ -213,8 +219,8 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
     8. Let |elements| be the result of <a>parsing an animator slot list</a> for |animatorCtor|.
         If an exception is thrown, rethrow the exception and abort all these steps.
 
-    9. Let |timelines| be the result of <a>parsing an animator timeline list</a> for |animatorCtor|.
-        If an exception is thrown, rethrow the exception and abort all these steps.
+    9. Let |timelineOptions| be the result of <a>parsing an animator timeline options list</a> for
+        |animatorCtor|. If an exception is thrown, rethrow the exception and abort all these steps.
 
     10. Let |definition| be a new <a>animator definition</a> with:
 
@@ -226,7 +232,7 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 
         - <a>element proxy map</a> being |elements|
 
-        - <a>animator timeline list</a> being |timelines|
+        - <a>animator timeline options list</a> being |timelineOptions|
 
 
     11. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
@@ -267,22 +273,39 @@ the user agent <em>must</em> run the following steps:
         converting |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
         exception is thrown, rethrow the exception and abort all these steps.
 
-When <dfn>parsing an animator timeline list</dfn> for {{animatorCtor}},
+When <dfn>parsing an animator timeline options list</dfn> for {{animatorCtor}},
 the user agent <em>must</em> run the following steps:
 
-    1. Let |properties| be an empty <code>sequence&lt;DOMString></code>.
+    1. Let |timelineOptions| be an empty <code>sequence&lt;Object></code>.
 
     2. Let |timelinesIterable| be the result of <a>Get</a>(|animatorCtor|, |timelines|).
 
     3. For each |timeline| in |timelinesIterable|, run the following steps:
 
-        - If |timeline| is not "document" or "scroll", <a>throw</a> a <a>NotSupportedError</a>
-            and abort all these steps.
+        1. If <a>Type</a>(|timeline|) is {{DOMString}} let |timelineObject| be <code>{ type:
+             |timeline|, options: {} }</code>, otherwise let |timelineObject| be |timeline|.
 
-    4. If |timelinesIterable| is not undefined, then set |timelines| to the result of
-        converting |timelinesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is thrown, rethrow the exception and abort all these steps.
+        2. Let |type| be the result of <a>Get</a>(|timelineObject|, "type").
 
+        3. Let |options| be the result of <a>Get</a>(|timelineObject|, "options").
+
+        4. Process |type| and |options| according to the first matching condition in the following:
+
+             <div class="switch">
+
+             :  If |type| or |options| is <b>undefined</b>,
+             :: throw a <a>NotSupportedError</a> and abort all remaining steps.
+
+             :  If |type| is "document",
+             :: Push a {{DocumentTimelineOptions}} created from |options| onto |timelineOptions|.
+
+             :  If |type| is "scroll",
+             :: Push a {{ScrollTimelineOptions}} created from |options| onto |timelineOptions|.
+
+             :  Otherwise,
+             :: throw a <a>NotSupportedError</a> and abort all remaining steps.
+
+             </div>
 
 Creating an Animator {#creating-animator}
 ====================================================
@@ -398,10 +421,20 @@ Requesting Animation Frames {#requesting-animation-frames}
 ====================
 Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
 either <dfn>frame-requested</dfn>, <dfn>frame-current</dfn>. It is initially set to
+<a>frame-current</a>. Various events can cause the <a>animation requested flag</a> to be set to
+<a>frame-requested</a>.
+
+[[#running-animators]] resets the <a>animation requested flag</a> on animators to
 <a>frame-current</a>.
+
+Element proxy creation/removal {#requesting-animation-frames-element-proxy}
+------------------------------
 
 When a new element proxy is assigned to or removed from an <a>animator instance</a>, that 
 <a>animator instance</a>'s <a>animation requested flag</a> should be set to <a>frame-requested</a>.
+
+Change in an element's computed style {#requesting-animation-frames-computed-style}
+-------------------------------------
 
 When the computed style for an element changes, the user agent <em>must</em> run the following steps:
 
@@ -424,18 +457,35 @@ For each <a>element proxy</a> for that element, perform the following steps:
     7. For each property in |inputProperties|, if the property’s computed value has changed,
         set the <a>animation requested flag</a> on the |animator| to <a>frame-requested</a>.
 
-The timelines present in an animator's <a>animator timeline list</a> can also affect the
-<a>animation requested flag</a>:
+Animator specifies a DocumentTimeline {#requesting-animation-frames-document-timeline}
+-------------------------------------
 
-    * If the string "document" is present in an animator's <a>animator timeline list</a>, then that
-        animator's <a>animation requested flag</a> must be set to <a>frame-requested</a> at the start
-        of each animation frame.
-    * If the string "scroll" is present in an animator's <a>animator timeline list</a>, then when
-        the scroll position of the nearest non-visible overflow ancestor to the animator’s
-        <a>root element</a> changes, that animator's <a>animation requested flag</a> must be set to
-        <a>frame-requested</a>.
+If a {{DocumentTimelineOptions}} instance is present in an animator's <a>animator timeline options
+list</a> then that animator's <a>animation requested flag</a> <em>must</em> be set to
+<a>frame-requested</a> at the start of each animation frame.
 
-[[#running-animators]] sets <a>animation requested flag</a> on animators to <a>frame-current</a>.
+Animator specifies a ScrollTimeline {#requesting-animation-frames-scroll-timeline}
+-----------------------------------
+
+If a {{ScrollTimelineOptions}} |instance| is present in an animator's <a>animator timeline options
+list</a> then the user agent <em>must</em> run the following steps when the scroll position of the
+nearest non-visible overflow ancestor to the animator’s <a>root element</a> changes:
+
+  1. For each {{ScrollTimelineOptions}} instance |options| in the animator's <a>animator timeline
+       options list</a> do the following steps:
+
+    1. Let |timeline| be a {{ScrollTimeline}} created from |options|, adding the nearest non-visible
+         overflow ancestor of the <a>root element</a> as the {{scrollSource}}.
+
+    2. If the <a>current time of the ScrollTimeline</a> |timeline| would have changed due to the
+         change in scroll position, set the animator's <a>animation requested flag</a> to
+         <a>frame-requested</a>.
+
+Issue: Give each animator instance a re-used set of AnimationTimelines instead of creating them
+       specifically here and when running animations.
+
+Issue: Need to add a definition for 'nearest non-visible overflow ancestor' to make sure all mentions
+       stay in sync.
 
 Running Animators {#running-animators}
 ======================================================
@@ -477,13 +527,15 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
 
   6. Let |timelines| be an empty <code>sequence&lt;AnimationTimeline></code>.
 
-  7. For each |timeline| in the <a>animator timeline list</a> of |definition|, do the following:
+  7. For each |timelineOptions| in the <a>animator timeline options list</a> of |definition|, do the
+       following:
 
-    - If |timeline| is "document", push a new {{AnimationTimeline}} with its "currentTime" set to
-        a <a>DOMHighResTimeStamp</a> indicating the current frame start time to the |timelines| list.
+    - If <a>Type</a>(|timelineOptions|) is {{DocumentTimelineOptions}}, push a new
+        {{DocumentTimeline}} created using |timelineOptions| to the |timelines| list.
 
-    - If |timeline| is "scroll", push a new {{AnimationTimeline}} with its "currentTime" set to the
-        scroll position of the nearest non-visible overflow ancestor to the animator's <a>root element</a>.
+    - If <a>Type</a>(|timelineOptions|) is {{ScrollTimelineOptions}}, push a new {{ScrollTimeline}}
+        created using |timelineOptions| to the |timelines| list, adding the nearest non-visible
+        overflow ancestor of |rootElement| as the {{scrollSource}}.
 
   8. Let |elementMap| be an <a>element proxy map</a> of |instance|.
 
