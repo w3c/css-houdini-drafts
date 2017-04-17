@@ -702,13 +702,13 @@ Example 2: Twitter header. {#example-2}
 <pre class='lang-markup'>
 &lt;style&gt;
 #scroller {
-  --animator-root: twitter-header;
+  animator-root: twitter-header;
 }
 .avatar {
-  --animator: twitter-header avatar;
+  animator: twitter-header avatar;
 }
 .bar {
-  --animator: twitter-header bar;
+  animator: twitter-header bar;
 }
 &lt;/style&gt;
 
@@ -740,18 +740,22 @@ registerAnimator('twitter-header', class {
     {name: 'bar', inputProperties: [], outputProperties: ['opacity']}
   ];
 
-  static timelines = [ 'scroll' ];
+  // maps scroll offset [0, 140px] -> time values [0, 1]
+  static timelines = [ { type: 'scroll', options: {
+      orientation: 'vertical',
+      endScrollOffset: '140px',
+      timeRange: 1
+    }},
+  ];
 
-  static INIT_HEIGHT = 140;
 
   animate(elementMap, timelines) {
-    var scrollPos = timelines[0].currentTime;
-    var progress = Math.min(scrollPos / INIT_HEIGHT, 1);
+    var progress = timelines[0].currentTime;
 
     elementMap.get('avatar').forEach(elem => {
       elem.outputStyleMap.set('transform', new CSSTransformValue([
           new CSSTranslation(new CSSSimpleLength(0, 'px'),
-                             new CSSSimpleLength(tween(INIT_HEIGHT, 45)(progress), 'px')),
+                             new CSSSimpleLength(tween(140, 45)(progress), 'px')),
           new CSSScale(tween(1, 0.5)(progress), tween(1, 0.5)(progress))
           ]));
     });
@@ -778,7 +782,7 @@ Example 3: Parallax backgrounds. {#example-3}
   animator-root: 'parallax';
 }
 .background {
-    animator: 'parallax' 'background';
+  animator: 'parallax' 'background';
 }
 
 &lt;/style&gt;
@@ -807,18 +811,20 @@ registerAnimation('parallax', class {
         { name: 'background', inputProperties: ['--parallax-rate'], outputProperties: ['transform']}
     ];
 
-    static timelines = ['scroll'];
+    static timelines = [{ type: 'scroll', options: { orientation: 'vertical'} }];
+
+    // This can be passed in as an input but we should consider exposing this in ScrollTimeline
+    static SCROLL_SIZE = 1000;
 
     animate(elementMap, timelines) {
         // read root scroller vertical scroll offset.
-        const scrollTop = timelines[0].currentTime;
+        const scrollTop = timelines[0].currentTime * SCROLL_SIZE;
         // update parallax transform
         elementMap.get('background').forEach(elem => {
            const rate = elem.inputStyleMap.get('--parallax-rate') || 0.2;
            elem.outputStyleMap.set('transform', new CSSTransformValue([
             new CSSTranslation(new CSSSimpleLength(0, 'px'), new CSSSimpleLength(rate * scrollTop, 'px'))]));
         });
-
     }
 });
 </pre>

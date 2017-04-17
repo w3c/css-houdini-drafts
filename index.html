@@ -1176,7 +1176,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version fa6d32dea6b39d19cbb9dd6d5e69f189e8bdd53f" name="generator">
+  <meta content="Bikeshed version 32700b5409d3a6f8c5e1e3e2a3a46cddbc5f25e3" name="generator">
+  <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
 <style>/* style-md-lists */
 
             /* This is a weird hack for me not yet following the commonmark spec
@@ -1423,13 +1424,12 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-12">12 April 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-17">17 April 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/WICG/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1439,12 +1439,13 @@ pre.idl.highlight { color: #708090; }
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2015 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
-  <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-  <div class="p-summary" data-fill-with="abstract"></div>
+  <div class="p-summary" data-fill-with="abstract">
+   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+  </div>
   <div data-fill-with="at-risk"></div>
   <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
@@ -2062,13 +2063,13 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    <h3 class="heading settled" data-level="14.2" id="example-2"><span class="secno">14.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
 <pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
 <span class="p">#</span><span class="nn">scroller</span> <span class="p">{</span>
-  --<span class="n">animator-root</span><span class="p">:</span> <span class="n">twitter-header</span><span class="p">;</span>
+  <span class="n">animator-root</span><span class="p">:</span> <span class="n">twitter-header</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="p">.</span><span class="nc">avatar</span> <span class="p">{</span>
-  --<span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">avatar</span><span class="p">;</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">avatar</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="p">.</span><span class="nc">bar</span> <span class="p">{</span>
-  --<span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">bar</span><span class="p">;</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">bar</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
 
@@ -2097,18 +2098,22 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
     <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]</span><span class="p">}</span>
   <span class="p">]</span><span class="p">;</span>
 
-  <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span> <span class="s1">'scroll'</span> <span class="p">]</span><span class="p">;</span>
+  <span class="c1">// maps scroll offset [0, 140px] -> time values [0, 1]
+</span>  <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span>
+      orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">,</span>
+      endScrollOffset<span class="o">:</span> <span class="s1">'140px'</span><span class="p">,</span>
+      timeRange<span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span><span class="p">}</span><span class="p">,</span>
+  <span class="p">]</span><span class="p">;</span>
 
-  <span class="kr">static</span> INIT_HEIGHT <span class="o">=</span> <span class="mi">140</span><span class="p">;</span>
 
   animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> scrollPos <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
-    <span class="kd">var</span> progress <span class="o">=</span> Math<span class="p">.</span>min<span class="p">(</span>scrollPos <span class="o">/</span> INIT_HEIGHT<span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">var</span> progress <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
 
     elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'avatar'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
       elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
           <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span>
-                             <span class="k">new</span> CSSSimpleLength<span class="p">(</span>tween<span class="p">(</span>INIT_HEIGHT<span class="p">,</span> <span class="mi">45</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
+                             <span class="k">new</span> CSSSimpleLength<span class="p">(</span>tween<span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
           <span class="k">new</span> CSSScale<span class="p">(</span>tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">)</span>
           <span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span><span class="p">)</span><span class="p">;</span>
@@ -2130,7 +2135,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
   <span class="n">animator-root</span><span class="p">:</span> <span class="s1">'parallax'</span><span class="p">;</span>
 <span class="p">}</span>
 <span class="p">.</span><span class="nc">background</span> <span class="p">{</span>
-    <span class="n">animator</span><span class="p">:</span> <span class="s1">'parallax'</span> <span class="s1">'background'</span><span class="p">;</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="s1">'parallax'</span> <span class="s1">'background'</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
@@ -2155,18 +2160,20 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
         <span class="p">{</span> name<span class="o">:</span> <span class="s1">'background'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--parallax-rate'</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span>
     <span class="p">]</span><span class="p">;</span>
 
-    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="s1">'scroll'</span><span class="p">]</span><span class="p">;</span>
+    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">}</span> <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+
+    <span class="c1">// This can be passed in as an input but we should consider exposing this in ScrollTimeline
+</span>    <span class="kr">static</span> SCROLL_SIZE <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
 
     animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
         <span class="c1">// read root scroller vertical scroll offset.
-</span>        <span class="kr">const</span> scrollTop <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
+</span>        <span class="kr">const</span> scrollTop <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime <span class="o">*</span> SCROLL_SIZE<span class="p">;</span>
         <span class="c1">// update parallax transform
 </span>        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'background'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
            <span class="kr">const</span> rate <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--parallax-rate'</span><span class="p">)</span> <span class="o">||</span> <span class="mf">0.2</span><span class="p">;</span>
            elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
             <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span> <span class="k">new</span> CSSSimpleLength<span class="p">(</span>rate <span class="o">*</span> scrollTop<span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
         <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-
     <span class="p">}</span>
 <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </pre>
@@ -2183,7 +2190,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
             except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
    <p> Examples in this specification are introduced with the words “for example”
             or are set apart from the normative text with <code>class="example"</code>, like this: </p>
-   <div class="example" id="example-ae2b6bc0"><a class="self-link" href="#example-ae2b6bc0"></a> This is an example of an informative example. </div>
+   <div class="example" id="example-example"><a class="self-link" href="#example-example"></a> This is an example of an informative example. </div>
    <p> Informative notes begin with the word “Note”
             and are set apart from the normative text with <code>class="note"</code>, like this: </p>
    <p class="note" role="note"> Note, this is an informative note. </p>
@@ -2490,26 +2497,26 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    </table>
   </div>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl def"><span class="kt">interface</span> <a class="nv" href="#animationworklet">AnimationWorklet</a> {
-  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <a class="nv" href="#dom-animationworklet-import">import</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl">moduleURL</a>);
+<pre class="idl highlight def"><span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#animationworklet"><span class="nv">AnimationWorklet</span></a> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject"><span class="nv">NewObject</span></a>] <span class="kt"><span class="kt">Promise</span></span>&lt;<span class="kt"><span class="kt">void</span></span>> <a class="nv" href="#dom-animationworklet-import"><span class="nv">import</span></a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt"><span class="kt">USVString</span></span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl"><span class="nv">moduleURL</span></a>);
 };
 
-<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
-    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet">AnimationWorklet</a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet">animationWorklet</a>;
+<span class="kt"><span class="kt">partial</span></span> <span class="kt"><span class="kt">interface</span></span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window"><span class="nv">Window</span></a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><span class="nv">SameObject</span></a>] <span class="kt"><span class="kt">readonly</span></span> <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="#animationworklet"><span class="n">AnimationWorklet</span></a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet"><span class="nv">animationWorklet</span></a>;
 };
 
-<span class="kt">callback</span> <a class="nv" href="#callbackdef-voidfunction">VoidFunction</a> = <span class="kt">void</span> ();
+<span class="kt"><span class="kt">callback</span></span> <a class="nv" href="#callbackdef-voidfunction"><span class="nv">VoidFunction</span></a> = <span class="kt"><span class="kt">void</span></span> ();
 
-[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
-<span class="kt">interface</span> <a class="nv" href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
-    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name</a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction">VoidFunction</a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</a>);
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><span class="nv">Exposed</span></a>=<span class="n"><span class="n">AnimationWorklet</span></span>]
+<span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#animationworkletglobalscope"><span class="nv">AnimationWorkletGlobalScope</span></a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope"><span class="n">WorkletGlobalScope</span></a> {
+    <span class="kt"><span class="kt">void</span></span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator"><span class="nv">registerAnimator</span></a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt"><span class="kt">DOMString</span></span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><span class="nv">name</span></a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction"><span class="n">VoidFunction</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><span class="nv">animatorCtor</span></a>);
 };
 
 [
-    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
-] <span class="kt">interface</span> <a class="nv" href="#elementproxy">ElementProxy</a> {
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap">inputStyleMap</a>;
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap">outputStyleMap</a>;
+    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><span class="nv">Exposed</span></a>=(<span class="n"><span class="n">AnimationWorklet</span></span>),
+] <span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#elementproxy"><span class="nv">ElementProxy</span></a> {
+    <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly"><span class="n">StylePropertyMapReadOnly</span></a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap"><span class="nv">inputStyleMap</span></a>;
+    <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly"><span class="n">StylePropertyMapReadOnly</span></a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap"><span class="nv">outputStyleMap</span></a>;
 };
 
 </pre>
