@@ -1176,8 +1176,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 32700b5409d3a6f8c5e1e3e2a3a46cddbc5f25e3" name="generator">
-  <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
+  <meta content="Bikeshed version fa6d32dea6b39d19cbb9dd6d5e69f189e8bdd53f" name="generator">
 <style>/* style-md-lists */
 
             /* This is a weird hack for me not yet following the commonmark spec
@@ -1424,12 +1423,13 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-17">17 April 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-11">11 April 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
+     <dd><a href="https://github.com/WICG/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1439,13 +1439,12 @@ pre.idl.highlight { color: #708090; }
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2015 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
-  <div class="p-summary" data-fill-with="abstract">
-   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-  </div>
+  <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+  <div class="p-summary" data-fill-with="abstract"></div>
   <div data-fill-with="at-risk"></div>
   <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
@@ -1514,7 +1513,7 @@ document timeline</a>. At the moment we do not expose any API to start, stop, co
 control these animations from outside the worklet however our plan is to leverage existing web 
 animation APIs such as Element::getAnimations().</p>
    <p class="note" role="note"><span>Note:</span> <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
-pointer input) to these animations so that authors can create jank-free input driven animations
+scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.</p>
    <h2 class="heading settled" data-level="2" id="animation-worklet-desc"><span class="secno">2. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
     <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-worklet">Animation Worklet</dfn> is a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code> responsible for all classes related to custom
@@ -1820,13 +1819,9 @@ animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-fo
 of each animation frame.</p>
     <li data-md="">
      <p>If the string "scroll" is present in an animator’s <a data-link-type="dfn" href="#animator-timeline-list" id="ref-for-animator-timeline-list-4">animator timeline list</a>, then when
-the scroll position of the animator <a data-link-type="dfn" href="#root-scroller" id="ref-for-root-scroller-1">root scroller</a> changes, that animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> must be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-4">frame-requested</a>.</p>
+the scroll position of the nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-1">root element</a> changes, that animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> must be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-4">frame-requested</a>.</p>
    </ul>
-   <p class="issue" id="issue-192991d0"><a class="self-link" href="#issue-192991d0"></a> According to the current ScrollTimeline spec, the currentTime should get normalized against
- the animation duration. We shoud match the same semantic here.</p>
    <p><a href="#running-animators">§8 Running Animators</a> sets <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-8">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
-   <p>An animator <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="root-scroller">root scroller</dfn> is the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-1">root element</a> if it has a non-visible
-overflow or otherwise its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-2">root element</a> nearest non-visible overflow ancestor.</p>
    <h2 class="heading settled" data-level="8" id="running-animators"><span class="secno">8. </span><span class="content">Running Animators</span><a class="self-link" href="#running-animators"></a></h2>
    <p>When a user agent wants to produce a new animation frame, if for any <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-12">animator instance</a> the
 associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-9">animation requested flag</a> is <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-5">frame-requested</a> then the the user agent <em>must</em> <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-1">run animators</a> for the current frame.</p>
@@ -1861,7 +1856,7 @@ associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-
 a <a data-link-type="dfn" href="https://www.w3.org/TR/hr-time-2/#dom-domhighrestimestamp">DOMHighResTimeStamp</a> indicating the current frame start time to the <var>timelines</var> list.</p>
       <li data-md="">
        <p>If <var>timeline</var> is "scroll", push a new <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#animationtimeline">AnimationTimeline</a></code> with its "currentTime" set to the
-scroll position of the animator’s <a data-link-type="dfn" href="#root-scroller" id="ref-for-root-scroller-2">root scroller</a>.</p>
+scroll position of the nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-2">root element</a>.</p>
      </ul>
     <li data-md="">
      <p>Let <var>elementMap</var> be an <a data-link-type="dfn" href="#element-proxy-map" id="ref-for-element-proxy-map-2">element proxy map</a> of <var>instance</var>.</p>
@@ -2148,7 +2143,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
             except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
    <p> Examples in this specification are introduced with the words “for example”
             or are set apart from the normative text with <code>class="example"</code>, like this: </p>
-   <div class="example" id="example-example"><a class="self-link" href="#example-example"></a> This is an example of an informative example. </div>
+   <div class="example" id="example-ae2b6bc0"><a class="self-link" href="#example-ae2b6bc0"></a> This is an example of an informative example. </div>
    <p> Informative notes begin with the word “Note”
             and are set apart from the normative text with <code>class="note"</code>, like this: </p>
    <p class="note" role="note"> Note, this is an informative note. </p>
@@ -2328,7 +2323,6 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    <li><a href="#proxied-element">proxied element</a><span>, in §3</span>
    <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §4</span>
    <li><a href="#root-element">root element</a><span>, in §3</span>
-   <li><a href="#root-scroller">root scroller</a><span>, in §7</span>
    <li><a href="#run-animators">run animators</a><span>, in §8</span>
    <li><a href="#slot-name">slot name</a><span>, in §3</span>
    <li><a href="#update-proxy-input-style-map">update proxy input style map</a><span>, in §6</span>
@@ -2455,26 +2449,26 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    </table>
   </div>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl highlight def"><span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#animationworklet"><span class="nv">AnimationWorklet</span></a> {
-  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject"><span class="nv">NewObject</span></a>] <span class="kt"><span class="kt">Promise</span></span>&lt;<span class="kt"><span class="kt">void</span></span>> <a class="nv" href="#dom-animationworklet-import"><span class="nv">import</span></a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt"><span class="kt">USVString</span></span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl"><span class="nv">moduleURL</span></a>);
+<pre class="idl def"><span class="kt">interface</span> <a class="nv" href="#animationworklet">AnimationWorklet</a> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <a class="nv" href="#dom-animationworklet-import">import</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl">moduleURL</a>);
 };
 
-<span class="kt"><span class="kt">partial</span></span> <span class="kt"><span class="kt">interface</span></span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window"><span class="nv">Window</span></a> {
-    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject"><span class="nv">SameObject</span></a>] <span class="kt"><span class="kt">readonly</span></span> <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="#animationworklet"><span class="n">AnimationWorklet</span></a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet"><span class="nv">animationWorklet</span></a>;
+<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet">AnimationWorklet</a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet">animationWorklet</a>;
 };
 
-<span class="kt"><span class="kt">callback</span></span> <a class="nv" href="#callbackdef-voidfunction"><span class="nv">VoidFunction</span></a> = <span class="kt"><span class="kt">void</span></span> ();
+<span class="kt">callback</span> <a class="nv" href="#callbackdef-voidfunction">VoidFunction</a> = <span class="kt">void</span> ();
 
-[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><span class="nv">Exposed</span></a>=<span class="n"><span class="n">AnimationWorklet</span></span>]
-<span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#animationworkletglobalscope"><span class="nv">AnimationWorkletGlobalScope</span></a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope"><span class="n">WorkletGlobalScope</span></a> {
-    <span class="kt"><span class="kt">void</span></span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator"><span class="nv">registerAnimator</span></a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt"><span class="kt">DOMString</span></span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><span class="nv">name</span></a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction"><span class="n">VoidFunction</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><span class="nv">animatorCtor</span></a>);
+[<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
+<span class="kt">interface</span> <a class="nv" href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
+    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name</a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction">VoidFunction</a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</a>);
 };
 
 [
-    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed"><span class="nv">Exposed</span></a>=(<span class="n"><span class="n">AnimationWorklet</span></span>),
-] <span class="kt"><span class="kt">interface</span></span> <a class="nv" href="#elementproxy"><span class="nv">ElementProxy</span></a> {
-    <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly"><span class="n">StylePropertyMapReadOnly</span></a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap"><span class="nv">inputStyleMap</span></a>;
-    <span class="kt"><span class="kt">attribute</span></span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly"><span class="n">StylePropertyMapReadOnly</span></a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap"><span class="nv">outputStyleMap</span></a>;
+    <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
+] <span class="kt">interface</span> <a class="nv" href="#elementproxy">ElementProxy</a> {
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap">inputStyleMap</a>;
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap">outputStyleMap</a>;
 };
 
 </pre>
@@ -2482,8 +2476,6 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
   <div style="counter-reset:issue">
    <div class="issue"> Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
 cannot be constructed via javascript?<a href="#issue-65c145a8"> ↵ </a></div>
-   <div class="issue"> According to the current ScrollTimeline spec, the currentTime should get normalized against
- the animation duration. We shoud match the same semantic here.<a href="#issue-192991d0"> ↵ </a></div>
    <div class="issue"> Consider giving user agents permission to skip running animator instances to throttle
     slow animators.<a href="#issue-dc52329c"> ↵ </a></div>
    <div class="issue"> Todo: Define when we may get rid of the animator.<a href="#issue-d4d8f39c"> ↵ </a></div>
@@ -2613,7 +2605,8 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
   <aside class="dfn-panel" data-for="root-element">
    <b><a href="#root-element">#root-element</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-root-element-1">7. Requesting Animation Frames</a> <a href="#ref-for-root-element-2">(2)</a>
+    <li><a href="#ref-for-root-element-1">7. Requesting Animation Frames</a>
+    <li><a href="#ref-for-root-element-2">8. Running Animators</a>
     <li><a href="#ref-for-root-element-3">10. CSS Animator Notation</a> <a href="#ref-for-root-element-4">(2)</a> <a href="#ref-for-root-element-5">(3)</a>
    </ul>
   </aside>
@@ -2727,13 +2720,6 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
     <li><a href="#ref-for-frame-current-1">5. Creating an Animator</a>
     <li><a href="#ref-for-frame-current-2">7. Requesting Animation Frames</a> <a href="#ref-for-frame-current-3">(2)</a>
     <li><a href="#ref-for-frame-current-4">8. Running Animators</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="root-scroller">
-   <b><a href="#root-scroller">#root-scroller</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-root-scroller-1">7. Requesting Animation Frames</a>
-    <li><a href="#ref-for-root-scroller-2">8. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="run-animators">

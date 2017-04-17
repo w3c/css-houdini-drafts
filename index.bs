@@ -79,7 +79,7 @@ control these animations from outside the worklet however our plan is to leverag
 animation APIs such as Element::getAnimations().
 
 Note: <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
-pointer input) to these animations so that authors can create jank-free input driven animations
+scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.
 
 
@@ -431,16 +431,11 @@ The timelines present in an animator's <a>animator timeline list</a> can also af
         animator's <a>animation requested flag</a> must be set to <a>frame-requested</a> at the start
         of each animation frame.
     * If the string "scroll" is present in an animator's <a>animator timeline list</a>, then when
-        the scroll position of the animator <a>root scroller</a> changes, that animator's
-        <a>animation requested flag</a> must be set to <a>frame-requested</a>.
-
-Issue: According to the current ScrollTimeline spec, the currentTime should get normalized against
- the animation duration. We shoud match the same semantic here.
+        the scroll position of the nearest non-visible overflow ancestor to the animator’s
+        <a>root element</a> changes, that animator's <a>animation requested flag</a> must be set to
+        <a>frame-requested</a>.
 
 [[#running-animators]] sets <a>animation requested flag</a> on animators to <a>frame-current</a>.
-
-An animator <dfn>root scroller</dfn> is the animator’s <a>root element</a> if it has a non-visible
-overflow or otherwise its <a>root element</a> nearest non-visible overflow ancestor.
 
 Running Animators {#running-animators}
 ======================================================
@@ -488,7 +483,7 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
         a <a>DOMHighResTimeStamp</a> indicating the current frame start time to the |timelines| list.
 
     - If |timeline| is "scroll", push a new {{AnimationTimeline}} with its "currentTime" set to the
-        scroll position of the animator's <a>root scroller</a>.
+        scroll position of the nearest non-visible overflow ancestor to the animator's <a>root element</a>.
 
   8. Let |elementMap| be an <a>element proxy map</a> of |instance|.
 
