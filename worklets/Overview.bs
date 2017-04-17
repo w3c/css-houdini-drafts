@@ -50,6 +50,8 @@ urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
     urlPrefix: #dom-workerglobalscope-;
         text: self
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
+    text: abort a running script
+    text: currently running task
     text: document environment
     text: event loop processing model
     text: microtask queue
@@ -195,7 +197,10 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
 
     4. Associate the |insideSettings| with |workletGlobalScope|.
 
-    5. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
+    5. Set |workletGlobalScope|'s <a>owner document</a> be |outsideSettings|'s
+        <a>responsible document</a>.
+
+    6. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
         substeps:
 
         1. Let |moduleURLRecord| be |entry|'s key.
@@ -211,7 +216,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
             point it should have successfully been parsed by another worklet global scope. I.e.
             |script| should never be <em>null</em> here.
 
-    6. Run the <a>responsible event loop</a> specified by |insideSettings|.
+    7. Run the <a>responsible event loop</a> specified by |insideSettings|.
 </div>
 
 ### Script settings for worklets ### {#script-settings-for-worklets}
@@ -498,19 +503,38 @@ Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlob
 Lifetime of the Worklet {#lifetime-of-the-worklet}
 --------------------------------------------------
 
-{{Window}} objects have a <dfn export>\[[Worklets]]</dfn> internal slot. This contains a <a>list</a>
-which is initially empty. When a {{Worklet}} is created it is <a for=list>appended</a> to this list.
-A {{Worklet}} cannot outlive the {{Window}} which it belongs to.
+A {{WorkletGlobalScope}} has a <dfn for=workletglobalscope export>owner document</dfn>.
+
+When the <a>owner document</a> is <a lt="discard a document">discarded</a> the user agent <em>must</em> <a
+lt="destroy a WorkletGlobalScope">destroy</a> all {{WorkletGlobalScope}}s.
+
+<div algorithm>
+When the user agent is to <dfn export>destroy a WorkletGlobalScope</dfn>, given
+|workletGlobalScope|, it must run the following steps:
+    1. <a for=list>Remove</a> |workletGlobalScope| from <a>worklet's WorkletGlobalScopes</a>.
+
+    2. If there are any <a>tasks</a> queued in the |workletGlobalScope|'s <a>event loop</a>, discard
+        them without processing them.
+
+    3. Wait for the |workletGlobalScope|'s <a>event loop</a> to complete the <a>currently running
+        task</a>.
+
+    4. If the above step doesn't complete within a period of time as defined by the user agent,
+        <a lt="abort a running script">abort the script</a> currently running in
+        |workletGlobalScope|.
+
+    5. Destroy |workletGlobalScope|'s <a>event loop</a>.
+
+    6. Clear |workletGlobalScope|'s <a>owner document</a>.
+</div>
 
 Note: Most {{Worklet}}s will be instantiated lazily when the web developer wants to use them, it is
-    expected that they won't be created eagerly with the {{Window}} object.
-
-The lifetime of a {{WorkletGlobalScope}} should be defined by subsequent specifications which
-inherit from {{WorkletGlobalScope}}.
+    expected that they won't be created eagerly.
 
 Subsequent specifications <em>may</em> define that a {{WorkletGlobalScope}} can be terminated at any
 time particularly if there are no pending operations, or detects abnormal operation such as infinite
-loops and callbacks exceeding imposed time limits.
+loops and callbacks exceeding imposed time limits. In such cases the specification should call
+<a>destroy a WorkletGlobalScope</a>.
 
 Security Considerations {#security-considerations}
 ==================================================
