@@ -767,7 +767,7 @@ registerAnimation('parallax', class {
         const scrollTop = timelines[0].currentTime;
         // update parallax transform
         elementMap.get('background').forEach(elem => {
-           const rate = elem.outputStyleMap.get('--parallax-rate') || 0.2;
+           const rate = elem.inputStyleMap.get('--parallax-rate') || 0.2;
            elem.outputStyleMap.set('transform', new CSSTransformValue([
             new CSSTranslation(new CSSSimpleLength(0, 'px'), new CSSSimpleLength(rate * scrollTop, 'px'))]));
         });
