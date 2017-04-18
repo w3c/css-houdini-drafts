@@ -30,12 +30,13 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
 # Motivating Use Cases
 
 * Scroll-linked effects:
-  -   Parallax ([demo](https://flackr.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
-  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://flackr.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
-
+  -   Parallax ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
+  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
+  -  Springy sticky elements ([demo](http://googlechrome.github.io/houdini-samples/animation-worklet/spring-sticky/))
+  
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
-  -   Spring timing function ([demo](https://flackr.github.io/houdini-samples/animation-worklet/spring-timing/))
+  -   Spring timing function ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/spring-timing/))
 
 * Location tracking and positioning:
 
@@ -43,253 +44,23 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
   
 * Procedural animation of multiple elements in sync:
 
+  -   Efficient Expando ([demo](http://googlechrome.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
   -   Compositing growing / shrinking box with border (using 9 patch)
 
 * Animating scroll offsets:
 
   -   Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
-      scroll either ([demo](https://flackr.github.io/houdini-samples/animation-worklet/sync-scroller/))
+      scroll either ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/sync-scroller/))
   -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`
 flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
-# Examples
+# Specification
 
-Below is a set of simple examples to showcase the proposed syntax and API usage.  Like [other Houdini APIs](https://github.com/w3c/css-houdini-drafts/blob/master/css-paint-api/EXPLAINER.md) they all rely on first importing a script into the scope of a [worklet](https://drafts.css-houdini.org/worklets/):
-
-```javascript
-
-if (animationWorklet)
-  animationWorklet.import('animworklet.js');
-else
-  // AnimationWorklet not supported, use legacy animation fallback or polyfill
-```
-
-## Example 1. A fade-in animation with spring timing
-
-
-Register the animator in AnimationWorklet scope:
-
-```javascript
-registerAnimator('spring-fadein', class SpringAnimator {
-  static inputProperties =  ['--spring-k'];
-  static outputProperties =  ['opacity'];
-  static inputTime = true;
-
-  animate(root, children, timeline) {
-    children.forEach(elem => {
-      // read a custom css property.
-      const k = elem.styleMap.get('--spring-k') || 1;
-      // compute progress using a fancy spring timing function.
-      const effectiveValue = this.springTiming(timeline.currentTime, k);
-      // update opacity accordingly.
-      elem.styleMap.opacity = effectiveValue;
-    });
-  }
-
-  springTiming(timestamp, k) {
-    // calculate fancy spring timing curve and return a sample.
-    return 0.42;
-  }
-
-});
-```
-
-Assign elements to the animator declaratively in CSS:
-
-```html
-.myFadein {
-  animator:'spring-fadein';
-}
-
-<section class='myFadein'></section>
-<section class='myFadein' style="--spring-k: 25;"></section></pre>
-
-```
-
-## Example 2. Multiple Parallax animations
-
-
-Register the animator in AnimationWorklet scope:
-
-```javascript
-registerAnimator('parallax', class ParallaxAnimator {
-  static inputProperties = ['transform', '--parallax-rate'];
-  static outputProperties = ['transform'];
-  static rootInputScroll = true;
-
-  animate(root, children) {
-    // read scroller's vertical scroll offset.
-    const scrollTop = root.scrollOffsets.top;
-    children.forEach(background => {
-        // read parallax rate.
-        const rate = background.styleMap.get('--parallax-rate');
-        // update parallax transform.
-        let t = background.styleMap.transform;
-        t.m42 =  rate * scrollTop;
-        background.styleMap.transform = t;
-      });
-    });
-  }
-});
-```
-
-Assign elements to the animator declaratively in CSS:
-
-```html
-<style>
-:root {
-  animator-root: parallax;
-}
-
-.bg {
-  animator: parallax;
-  position: fixed;
-  opacity: 0.5;
-  z-index: -1;
-}
-</style>
-
-<div class='bg' style='--parallax-rate: 0.2'></div>
-<div class='bg' style='--parallax-rate: 0.5'></div>
-```
-
-Define Custom CSS properties in document Scope:
-
-
-```javascript
-CSS.registerProperty({
-  name: '--parallax-rate',
-  inherits: false,
-  initial: 0.2,
-  syntax: '<number>'
-});
-
-```
-
-## Example 3. Position Sticky
-
-
-Register the animator in AnimationWorklet scope:
-
-
-```javascript
-// worklet scope
-
-registerAnimator('top-sticky', class TopStickyAnimator {
-  static inputProperties = ['--trigger-point'];
-  static outputProperties = ['transform'];
-  static rootInputScroll = true;
-
-  animate(root, children) {
-    // read scroller's vertical scroll offset.
-    const scrollTop = root.scrollOffsets.top;
-
-   children.forEach(sticky => {
-        const triggerPoint = child.styleMap.get('--trigger-point');
-        // if we have scrolled passed the trigger point the sticky element needs
-        // to behave as if fixed. We do this by using a transform to position
-        // the element relative to its container.
-        const stickyOffset = Math.max(0 , scrollTop - triggerPoint);
-        sticky.styleMap.transform = new CSSTransformMatrix({m42: stickyOffset});
-      });
-    });
-  }
-});
-```
-
-Assign elements to the animator in document scope:
-
-```html
-
-<style>
-.sticky_container {
-  animator-root: top-sticky;
-  overflow: scroll;
-
-}
-.sticky {
-  animator: top-sticky;
-}
-
-</style>
-
-<div class="sticky_container">
-   <!-- Next element is both a sticky root and a sticky child. :) -->
-   <div class="sticky_container sticky">
-      <div class="sticky"></div>
-    </div>
-</div>
-
-<script>
-onload = (e) => {
-  document.querySelectorAll('.sticky').forEach(stickyEl => {
-
-  const scrollerEl = findAncestorScroller(stickyEl);
-  // calculate scroll trigger point based on stickyEl BCR and scrollerEl BCR and scrollHeight
-  const triggerPoint = calculateLimits(stickyEl, scrollerEl); // e.g., 100
-
-  stickyEl.style = '--trigger-point: ' + triggerPoint + 'px';
-}
-
-</script>
-```
-
-## Example 4. Synced Scroller
-
-Register the animator in AnimationWorklet scope:
-
-```javascript
-// worklet scope
-
-registerAnimator('sync-scroller', class SyncScrollerAnimator {
-  static get inputProperties = ['--scroller-type'];
-  static get inputScroll = true;
-  static get outputScroll = true;
-
-  animate(root, children) {
-    var input = children.filter(e => { return e.styleMap.get("--scroller-type") == "input"})[0];
-    var outputs = children.filter(e => { return e.styleMap.get("--scroller-type") == "output"});
-
-    if (!input)
-      return;
-
-    outputs.forEach(elem => {
-      elem.scrollOffsets.top = input.scrollOffsets.top;
-      elem.scrollOffsets.left = input.scrollOffsets.left;
-    });
-  }
-});
-```
-
-Assign elements to the animator in document scope:
-
-```html
-<style>
-  .scroller {
-    overflow-y: scroll;
-  }
-
-  #main_scroller {
-    --animator: sync-scroller;
-    --scroller-type: input;
-  }
-
-  #alt_scroller {
-    --animator: sync-scroller;
-    --scroller-type: output;
-  }
-</style>
-
-<div id="main_scroller" class="scroller">
-  <div>main content.</div>
-</div>
-<div id="alt_scroller" class="scroller">
-  <div>some other content that scroll in sync.</div>
-</div>
-```
+We know have an initial [draft specification](https://wicg.github.io/animation-worklet).
+In particular you can se the CSS Notation, Web IDL, and [examples](https://wicg.github.io/animation-worklet/#examples).
 
 # Key Concepts
 
@@ -303,7 +74,7 @@ Two CSS properties (`animator` and `animator-root`) may be used to assign an HTM
 animator instance either as a root or a child.
 
 The ability to operate (read/write attributes) on many elements in a single callback enables
-powerful effects that are very hard to achieve if an animator was to operate on a single element.
+powerful effects that are difficult to achieve if an animator was to operate on a single element.
 
 ### Root Element
 
@@ -346,119 +117,30 @@ elements. Assigning an element to an animator instance involves the following:
 
 All input and output of the animation are declared explicitly. This allows implementations to do
 optimizations such as not calling the *animate *callback if no input has changed or if no outputs
-have any visible effect. The following inputs and outputs may be declared on the animator class
-using static attributes:
+have any visible effect.
 
-**Input**
-
-*   Regular and Custom CSS Properties - `inputProperties` and `rootInputProperties` (list of
-    identifiers)
-*   Scroll Offset - `inputScroll` and `rootInputScroll` (boolean)
-*   Time - `inputTime` (boolean)
-
-**Output**
-
-
-*   [“Fast” CSS Properties](#limiting-mutations-to-fast-subset) - `outputProperties` and
-    `rootOutputProperties` (list of identifiers)
-*   Scroll Offset - `outputProperties` and `rootOutputProperties` (boolean)
+## Scroll Input as a Timeline
+Each animator may declare an scroll timeline as an input. The animator root element (or its nearest scroller ancestor) will be the source for this scroll timeline.
 
 ## Falling Out of Sync
 
 The API is designed to allow animation worklets to run on threads other than the main thread. In
 particular, it is recommended to run them in a dedicated thread and provide a best-effort attempt
-to run in sync with frame production. This ensures the animations will not be impacted by jank on
+to run in sync with visual frame production. This ensures the animations will not be impacted by jank on
 main thread. It is still possible for such animation to slip in relation with frame production if
-*animate* callback cannot be completed in time. We believe such slippage is going to be rare
-because:
+*animate* callback cannot be completed in time. We believe such slippage is going to be rare in 
+particular if animators are running on their dedicated thread and the effect avoid layout inducing
+attributes.
 
-- There are no other tasks running on the thread.
-- The exposed features are limited to the fast subset (see below).
-
-## Limiting Mutations to Fast Subset
-
-We initially plan to limit the mutable attributes to a  "fast" subset which can be mutated on the
-fast path of almost all modern browsers.
-
-Proposed Mutable Attributes:
-
-*   Scroll Offsets
-*   Transform
-*   Opacity
-
-This is necessary to ensure animations can run on the the fast path. In future we may consider
-supporting all animatable properties which means running the worklet on main thread. The animator
-definition surfaces enough information that makes it possible to decide the target executing thread
-in advance.
 
 ## Relationship to Web-Animation/CSS Transition
 
 Effective values from animator gets synced back to the main thread. These values sit at the top of
 the animation [effect stack][effect-stack] meaning that they overrides all values from other
-animations (except CSS transitions). The value is to be treated as a forward-filling animation with
-a single key-frame i.e., the effective value remains in effect until there is a new value from
-animator.
-
-# CSS Syntax
+animations. The value is to be treated as a forward-filling animation with a single key-frame 
+i.e., the effective value remains in effect until there is a new value from animator.
 
 
-```
-animator: [ <animator-id> ]#
-animator-root: [ <animator-id> ]#
-
-where <animator-id> is a <custom-ident>
-```
-
-# Web IDL
-
-
-```webidl
-partial interface Window {
-    [SameObject] readonly attribute Worklet animationWorklet;
-};
-```
-
-```webidl
-callback VoidFunction = void (); // a JS class
-
-[Global=(Worklet,AnimationWorklet),Exposed=AnimationWorklet]
-interface AnimationWorkletGlobalScope : WorkletGlobalScope {
-    void registerAnimator(DOMString name, VoidFunction animatorCtor);
-};
-```
-
-
-
-```webidl
-// animationCtor should be a class with the following structure
-callback interface AnimatorCtor {
-    static boolean inputTime = false;
-    static inputProperties = [];
-    static outputProperties = [];
-    static rootInputProperties = [];
-    static rootOutputProperties = [];
-    static boolean inputScroll = false;
-    static boolean outputScroll = false;
-    static boolean rootInputScroll = false;
-    static boolean rootOutputScroll = false;
-    void animate(AnimationProxy root, sequence<AnimationProxy> children, optional AnimationTimeline timeline);
-};
-```
-
-
-```webidl
-dictionary ScrollOffests {
-    unrestricted double left;
-    unrestricted double top;
-};
-
-[
-    Exposed=(AnimationWorklet),
-] interface AnimationProxy {
-    attribute ScrollOffests scrollOffsets;
-    attribute StylePropertyMap styleMap;
-};
-```
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md

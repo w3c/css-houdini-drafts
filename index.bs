@@ -651,9 +651,12 @@ Example 1: A fade-in animation with spring timing. {#example-1}
 -----------------------------------------
 
 <pre class='lang-markup'>
+&lt;style&gt;
 .myFadein {
   animator: 'spring' 'fadein';
 }
+&lt;/style&gt;
+
 
 &lt;section class='myFadein'&gt;&lt;/section&gt;
 &lt;section class='myFadein' style="--spring-k: 25;"&gt;&lt;/section&gt;
@@ -690,3 +693,140 @@ registerAnimator('spring', class {
     }
 });
 </pre>
+
+
+Example 2: Twitter header. {#example-2}
+--------------------------
+
+
+<pre class='lang-markup'>
+&lt;style&gt;
+#scroller {
+  animator-root: twitter-header;
+}
+.avatar {
+  animator: twitter-header avatar;
+}
+.bar {
+  animator: twitter-header bar;
+}
+&lt;/style&gt;
+
+&lt;div id="scroller"&gt;
+  &lt;section class="bar"&gt;&lt;/section&gt;
+  &lt;header&gt;
+    &lt;picture class="avatar"&gt;
+      &lt;img src="avatar.jpg"&gt;
+    &lt;/picture&gt;
+    &lt;section&gt;
+      &lt;button&gt;Friends&lt;/button&gt;
+      &lt;button&gt;Edit Profile&lt;/button&gt;
+    &lt;/section&gt;
+  &lt;/header&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+document.animationWorklet.import('tweeter-header.js');
+&lt;/script&gt;
+
+</pre>
+
+<pre class='lang-javascript'>
+// Inside AnimationWorkletGlobalScope.
+registerAnimator('twitter-header', class {
+
+  static elements =  [
+    {name: 'avatar', inputProperties: [], outputProperties: ['transform']},
+    {name: 'bar', inputProperties: [], outputProperties: ['opacity']}
+  ];
+
+  // maps scroll offset [0, 140px] -> time values [0, 1]
+  static timelines = [ { type: 'scroll', options: {
+      orientation: 'vertical',
+      endScrollOffset: '140px',
+      timeRange: 1
+    }},
+  ];
+
+
+  animate(elementMap, timelines) {
+    var progress = timelines[0].currentTime;
+
+    elementMap.get('avatar').forEach(elem => {
+      elem.outputStyleMap.set('transform', new CSSTransformValue([
+          new CSSTranslation(new CSSSimpleLength(0, 'px'),
+                             new CSSSimpleLength(tween(140, 45)(progress), 'px')),
+          new CSSScale(tween(1, 0.5)(progress), tween(1, 0.5)(progress))
+          ]));
+    });
+    elementMap.get('bar').forEach(elem => {
+      elem.outputStyleMap.set('opacity', progress);
+    });
+  }
+
+  tween(begin, end) {
+    return function lerp(progress) {
+        return begin + (end - begin) * progress;
+    }
+  }
+});
+
+</pre>
+
+Example 3: Parallax backgrounds. {#example-3}
+-----------------------------------------
+
+<pre class='lang-markup'>
+&lt;style&gt;
+#scroller {
+  animator-root: 'parallax';
+}
+.background {
+  animator: 'parallax' 'background';
+}
+
+&lt;/style&gt;
+
+&lt;div id="scroller"&gt;
+    &lt;div class="background" style="--parallax-rate: 0.6" &gt;
+    &lt;/div&gt;
+    &lt;div class="background" style="--parallax-rate: 0.3" &gt;
+    &lt;/div&gt;
+
+    overflowing content!
+&lt;/div&gt;
+
+&lt;script&gt;
+document.animationWorklet.import('parallax.js');
+&lt;/script&gt;
+
+
+</pre>
+
+<pre class='lang-javascript'>
+// Inside AnimationWorkletGlobalScope
+registerAnimation('parallax', class {
+
+    static elements =  [
+        { name: 'background', inputProperties: ['--parallax-rate'], outputProperties: ['transform']}
+    ];
+
+    static timelines = [{ type: 'scroll', options: { orientation: 'vertical'} }];
+
+    // This can be passed in as an input but we should consider exposing this in ScrollTimeline
+    static SCROLL_SIZE = 1000;
+
+    animate(elementMap, timelines) {
+        // read root scroller vertical scroll offset.
+        const scrollTop = timelines[0].currentTime * SCROLL_SIZE;
+        // update parallax transform
+        elementMap.get('background').forEach(elem => {
+           const rate = elem.inputStyleMap.get('--parallax-rate') || 0.2;
+           elem.outputStyleMap.set('transform', new CSSTransformValue([
+            new CSSTranslation(new CSSSimpleLength(0, 'px'), new CSSSimpleLength(rate * scrollTop, 'px'))]));
+        });
+    }
+});
+</pre>
+
+

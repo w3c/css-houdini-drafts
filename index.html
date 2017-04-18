@@ -1424,13 +1424,12 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-17">17 April 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-18">18 April 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/WICG/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1486,6 +1485,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <a href="#examples"><span class="secno">14</span> <span class="content">Examples</span></a>
      <ol class="toc">
       <li><a href="#example-1"><span class="secno">14.1</span> <span class="content">Example 1: A fade-in animation with spring timing.</span></a>
+      <li><a href="#example-2"><span class="secno">14.2</span> <span class="content">Example 2: Twitter header.</span></a>
+      <li><a href="#example-3"><span class="secno">14.3</span> <span class="content">Example 3: Parallax backgrounds.</span></a>
      </ol>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
@@ -2020,9 +2021,12 @@ point.</p>
    <p class="issue" id="issue-19f9ed9b"><a class="self-link" href="#issue-19f9ed9b"></a> Need to decide what privacy considerations there are for this spec.</p>
    <h2 class="heading settled" data-level="14" id="examples"><span class="secno">14. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
    <h3 class="heading settled" data-level="14.1" id="example-1"><span class="secno">14.1. </span><span class="content">Example 1: A fade-in animation with spring timing.</span><a class="self-link" href="#example-1"></a></h3>
-<pre class="lang-markup highlight">.myFadein {
-  animator: 'spring' 'fadein';
-}
+<pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
+<span class="p">.</span><span class="nc">myFadein</span> <span class="p">{</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="s1">'spring'</span> <span class="s1">'fadein'</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+
 
 <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
 <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span> <span class="na">style</span><span class="o">=</span><span class="s">"--spring-k: 25;"</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
@@ -2054,6 +2058,123 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
     springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">)</span> <span class="p">{</span>
         <span class="c1">// simulate the spring effect and return a progress value between [-1, 1];
 </span>    <span class="p">}</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
+   <h3 class="heading settled" data-level="14.2" id="example-2"><span class="secno">14.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
+<pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
+<span class="p">#</span><span class="nn">scroller</span> <span class="p">{</span>
+  <span class="n">animator-root</span><span class="p">:</span> <span class="n">twitter-header</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">avatar</span> <span class="p">{</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">avatar</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">bar</span> <span class="p">{</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">bar</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"scroller"</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">"bar"</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">header</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="nt">picture</span> <span class="na">class</span><span class="o">=</span><span class="s">"avatar"</span><span class="p">></span>
+      <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"avatar.jpg"</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="p">/</span><span class="nt">picture</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="nt">section</span><span class="p">></span>
+      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Friends<span class="p">&lt;</span><span class="p">/</span><span class="nt">button</span><span class="p">></span>
+      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Edit Profile<span class="p">&lt;</span><span class="p">/</span><span class="nt">button</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="p">/</span><span class="nt">header</span><span class="p">></span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
+document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'tweeter-header.js'</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">></span>
+</pre>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope.
+</span>registerAnimator<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+
+  <span class="kr">static</span> elements <span class="o">=</span>  <span class="p">[</span>
+    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'avatar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span><span class="p">,</span>
+    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]</span><span class="p">}</span>
+  <span class="p">]</span><span class="p">;</span>
+
+  <span class="c1">// maps scroll offset [0, 140px] -> time values [0, 1]
+</span>  <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span>
+      orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">,</span>
+      endScrollOffset<span class="o">:</span> <span class="s1">'140px'</span><span class="p">,</span>
+      timeRange<span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span><span class="p">}</span><span class="p">,</span>
+  <span class="p">]</span><span class="p">;</span>
+
+
+  animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> progress <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
+
+    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'avatar'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
+          <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span>
+                             <span class="k">new</span> CSSSimpleLength<span class="p">(</span>tween<span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
+          <span class="k">new</span> CSSScale<span class="p">(</span>tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">)</span>
+          <span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'bar'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'opacity'</span><span class="p">,</span> progress<span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  tween<span class="p">(</span>begin<span class="p">,</span> end<span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kd">function</span> lerp<span class="p">(</span>progress<span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> begin <span class="o">+</span> <span class="p">(</span>end <span class="o">-</span> begin<span class="p">)</span> <span class="o">*</span> progress<span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
+   <h3 class="heading settled" data-level="14.3" id="example-3"><span class="secno">14.3. </span><span class="content">Example 3: Parallax backgrounds.</span><a class="self-link" href="#example-3"></a></h3>
+<pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
+<span class="p">#</span><span class="nn">scroller</span> <span class="p">{</span>
+  <span class="n">animator-root</span><span class="p">:</span> <span class="s1">'parallax'</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="nc">background</span> <span class="p">{</span>
+  <span class="n">animator</span><span class="p">:</span> <span class="s1">'parallax'</span> <span class="s1">'background'</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"scroller"</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"background"</span> <span class="na">style</span><span class="o">=</span><span class="s">"--parallax-rate: 0.6"</span> <span class="p">></span>
+    <span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"background"</span> <span class="na">style</span><span class="o">=</span><span class="s">"--parallax-rate: 0.3"</span> <span class="p">></span>
+    <span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+
+    overflowing content!
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
+document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'parallax.js'</span><span class="p">)</span><span class="p">;</span>
+<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">></span>
+</pre>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope
+</span>registerAnimation<span class="p">(</span><span class="s1">'parallax'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+
+    <span class="kr">static</span> elements <span class="o">=</span>  <span class="p">[</span>
+        <span class="p">{</span> name<span class="o">:</span> <span class="s1">'background'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--parallax-rate'</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span>
+    <span class="p">]</span><span class="p">;</span>
+
+    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">}</span> <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+
+    <span class="c1">// This can be passed in as an input but we should consider exposing this in ScrollTimeline
+</span>    <span class="kr">static</span> SCROLL_SIZE <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+
+    animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// read root scroller vertical scroll offset.
+</span>        <span class="kr">const</span> scrollTop <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime <span class="o">*</span> SCROLL_SIZE<span class="p">;</span>
+        <span class="c1">// update parallax transform
+</span>        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'background'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+           <span class="kr">const</span> rate <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--parallax-rate'</span><span class="p">)</span> <span class="o">||</span> <span class="mf">0.2</span><span class="p">;</span>
+           elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
+            <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span> <span class="k">new</span> CSSSimpleLength<span class="p">(</span>rate <span class="o">*</span> scrollTop<span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    <span class="p">}</span>
 <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 </pre>
   </main>
