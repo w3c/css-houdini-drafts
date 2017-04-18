@@ -187,7 +187,7 @@ write its explicitly exposed animatable attributes. It consists of:
 
  - A read only map of proxied input properties their values.
 
- - A map of proxies output properties to their values.
+ - A map of proxied output properties to their values.
 
 Registering an Animator Definition {#registering-animator-definition}
 ============================================================
