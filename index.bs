@@ -69,19 +69,19 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 Introduction {#intro}
 =====================
 This document introduces a new primitive for creating scroll-linked and other high performance 
-procedural animations on the web. For details on the rational and motivation see [[explainer]].
+procedural animations on the web. For details on the rationale and motivation see [[explainer]].
 
 The <a>Animation Worklet</a> provides a method to create scripted animations that can mutate a set
-of user visible animatable attributes. The API is designed to make it possible such animations to
-run in performance critical parts of rendering pipeline. Although the specification does not
+of user visible animatable attributes. The API is designed to make it possible for such animations to
+run in performance-critical parts of the rendering pipeline. Although the specification does not
 require certain performance guarantees (e.g., running in sync with every frame produced or in
 isolation from main thread) but the API is designed to facilitate and encourage this.
 
 
 <strong>Relationship to Web Animation API</strong>: Animations running on <a>Animation
-Worklet</a> do not necessarily run on main thread and thus are not synchronized with <a>default
+Worklet</a> do not necessarily run on the main thread and thus are not synchronized with <a>default
 document timeline</a>. At the moment we do not expose any API to start, stop, compose or otherwise
-control these animations from outside the worklet however our plan is to leverage existing web 
+control these animations from outside the worklet, however our plan is to leverage existing web 
 animation APIs such as Element::getAnimations().
 
 Note: <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
@@ -151,7 +151,7 @@ an <a>animator instance</a>. It consists of:
  - An <dfn>animate function</dfn>.
 
  - An <dfn>animator slot list</dfn> containing a dictionary providing each <dfn>slot name</dfn>,
-    its <dfn>input property list</dfn>, and its <dfn>output propert list</dfn>.
+    its <dfn>input property list</dfn>, and its <dfn>output property list</dfn>.
 
  - An <dfn>animator timeline options list</dfn>.
 
@@ -185,7 +185,7 @@ write its explicitly exposed animatable attributes. It consists of:
 
  - A <dfn>proxied element</dfn>.
 
- - A read only map of proxied input properties their values.
+ - A read only map of proxied input properties to their values.
 
  - A map of proxied output properties to their values.
 
@@ -413,14 +413,14 @@ When the user agent wants to <dfn>update proxy input style map</dfn> given |prox
 
 When an element is removed, all proxies of that element are considered to be disconnected.
 A disconnected proxy continues to have the last value from the <a>computed value</a>
-of the <a>proxied element</a> properties, but setting values on its ouputStyleMap will have no
+of the <a>proxied element</a> properties, but setting values on its outputStyleMap will have no
 effect.
 
 
 Requesting Animation Frames {#requesting-animation-frames}
 ====================
 Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
-either <dfn>frame-requested</dfn>, <dfn>frame-current</dfn>. It is initially set to
+either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
 <a>frame-current</a>. Various events can cause the <a>animation requested flag</a> to be set to
 <a>frame-requested</a>.
 
