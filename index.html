@@ -1176,7 +1176,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version c4abe0090f3070a4b5855ba5c075f1e5099bbf6d" name="generator">
+  <meta content="Bikeshed version 977818befb9e8ed77b00b31e184be9cac1dc0922" name="generator">
   <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
 <style>/* style-md-lists */
 
@@ -1424,12 +1424,13 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-18">18 April 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-04-19">19 April 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
+     <dd><a href="https://github.com/WICG/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1439,7 +1440,7 @@ pre.idl.highlight { color: #708090; }
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2015 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -1508,7 +1509,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </nav>
   <main>
    <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
-    This document introduces a new primitive for creating scroll-linked and other high performance 
+    This document introduces a new primitive for creating scroll-linked and other high performance
 procedural animations on the web. For details on the rationale and motivation see <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a>. 
    <p>The <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-1">Animation Worklet</a> provides a method to create scripted animations that can mutate a set
 of user visible animatable attributes. The API is designed to make it possible for such animations to
@@ -1518,11 +1519,22 @@ isolation from main thread) but the API is designed to facilitate and encourage 
    <p><strong>Relationship to Web Animation API</strong>: Animations running on <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-2">Animation
 Worklet</a> do not necessarily run on the main thread and thus are not synchronized with <a data-link-type="dfn" href="https://www.w3.org/TR/web-animations/#the-documents-default-timeline">default
 document timeline</a>. At the moment we do not expose any API to start, stop, compose or otherwise
-control these animations from outside the worklet, however our plan is to leverage existing web 
+control these animations from outside the worklet, however our plan is to leverage existing web
 animation APIs such as Element::getAnimations().</p>
    <p class="note" role="note"><span>Note:</span> <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
 scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.</p>
+   <p class="note" role="note"><span>Note:</span> <strong>Threading Model</strong>: The API is designed to allow animation worklets to run on
+threads other  than the main thread. In particular, it is recommended that if it is possible to run
+them in a dedicated thread and  provide a best-effort attempt to run in sync with visual frame
+production. This ensures the animations will not be impacted by jank on main thread.
+This means that when querying those animations running on the worklet in main thread, the data may
+be staled until such time that the animation effects are synced back to main thread (Not dissimilar
+to how async scrolling can lead to stale scroll offsets).
+It is still possible for such animation to slip in relation with visual frame production if
+*animate* callback cannot be completed in time. We believe such slippage is going to be rare in
+particular if animators are running on their dedicated thread and the effect avoid layout inducing
+attributes.</p>
    <h2 class="heading settled" data-level="2" id="animation-worklet-desc"><span class="secno">2. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
     <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-worklet">Animation Worklet</dfn> is a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code> responsible for all classes related to custom
 animations. The worklet can be accessed via <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-1">animationWorklet</a></code> attribute. 
@@ -2045,7 +2057,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
     animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
         <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">=</span> <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">||</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
         <span class="kr">const</span> deltaT <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime <span class="o">-</span> <span class="k">this</span><span class="p">.</span>startTime_<span class="p">;</span>
-        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'fadein'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="o">=></span> <span class="p">{</span>
+        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'fadein'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
           <span class="c1">// read a custom css property.
 </span>          <span class="kr">const</span> k <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--spring-k'</span><span class="p">)</span> <span class="o">||</span> <span class="mi">1</span><span class="p">;</span>
           <span class="c1">// compute progress using a fancy spring timing function.

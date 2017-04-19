@@ -68,7 +68,7 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 
 Introduction {#intro}
 =====================
-This document introduces a new primitive for creating scroll-linked and other high performance 
+This document introduces a new primitive for creating scroll-linked and other high performance
 procedural animations on the web. For details on the rationale and motivation see [[explainer]].
 
 The <a>Animation Worklet</a> provides a method to create scripted animations that can mutate a set
@@ -81,12 +81,26 @@ isolation from main thread) but the API is designed to facilitate and encourage 
 <strong>Relationship to Web Animation API</strong>: Animations running on <a>Animation
 Worklet</a> do not necessarily run on the main thread and thus are not synchronized with <a>default
 document timeline</a>. At the moment we do not expose any API to start, stop, compose or otherwise
-control these animations from outside the worklet, however our plan is to leverage existing web 
+control these animations from outside the worklet, however our plan is to leverage existing web
 animation APIs such as Element::getAnimations().
 
 Note: <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
 scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.
+
+
+Note: <strong>Threading Model</strong>: The API is designed to allow animation worklets to run on
+threads other  than the main thread. In particular, it is recommended that if it is possible to run
+them in a dedicated thread and  provide a best-effort attempt to run in sync with visual frame
+production. This ensures the animations will not be impacted by jank on main thread.
+This means that when querying those animations running on the worklet in main thread, the data may
+be staled until such time that the animation effects are synced back to main thread (Not dissimilar
+to how async scrolling can lead to stale scroll offsets).
+It is still possible for such animation to slip in relation with visual frame production if
+*animate* callback cannot be completed in time. We believe such slippage is going to be rare in
+particular if animators are running on their dedicated thread and its effects avoid layout inducing
+attributes.
+
 
 
 Animation Worklet {#animation-worklet-desc}
@@ -430,7 +444,7 @@ either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially s
 Element proxy creation/removal {#requesting-animation-frames-element-proxy}
 ------------------------------
 
-When a new element proxy is assigned to or removed from an <a>animator instance</a>, that 
+When a new element proxy is assigned to or removed from an <a>animator instance</a>, that
 <a>animator instance</a>'s <a>animation requested flag</a> should be set to <a>frame-requested</a>.
 
 Change in an element's computed style {#requesting-animation-frames-computed-style}
