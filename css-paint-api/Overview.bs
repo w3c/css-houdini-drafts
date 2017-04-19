@@ -108,7 +108,7 @@ When the user agent wants to <dfn>invalidate paint functions</dfn> given |box|, 
 Performing <a>draw a paint image</a> results in the <a>paint valid flag</a> for a <<paint()>>
 function on a box to be set to <a>paint-valid</a>.
 
-<a>Invalidate paint functions</a> is expected to be run when the user agent recalculates computed
+<a>Invalidate paint functions</a> <em>must</em> be run when the user agent recalculates the computed
 style for a box.
 
 Note: In a future version of the spec, support could be added for partial invalidation. The user
