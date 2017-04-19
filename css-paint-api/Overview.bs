@@ -521,7 +521,7 @@ following steps:
                 &lt;div class=example-1>&lt;/div>
                 &lt;div class=example-2>&lt;/div>
                 &lt;script>
-                    CSS.paintWorklet.import('paint.js');
+                    CSS.paintWorklet.addModule('paint.js');
                 &lt;/script>
             </pre>
 
@@ -657,7 +657,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
                 &lt;div class=div-1>&lt;/div>
                 &lt;div class=div-2>&lt;/div>
                 &lt;script>
-                    CSS.paintWorklet.import('paint.js');
+                    CSS.paintWorklet.addModule('paint.js');
                 &lt;/script>
             </pre>
         </div>
@@ -724,7 +724,7 @@ Animations API.
       initialValue: 'black',
       inherit: false
     });
-    CSS.paintWorklet.import('circle.js');
+    CSS.paintWorklet.addModule('circle.js');
 &lt;/script>
 </pre>
 
@@ -772,7 +772,7 @@ loaded.
         name: '--image',
         syntax: '&lt;image&gt;'
     });
-    CSS.paintWorklet.import('image-placeholder.js');
+    CSS.paintWorklet.addModule('image-placeholder.js');
 &lt;/script>
 </pre>
 
@@ -822,7 +822,7 @@ Example 3: Arcs {#example-3}
 &lt;div id="example">&lt;/div>
 
 &lt;script>
-    CSS.paintWorklet.import('arc.js');
+    CSS.paintWorklet.addModule('arc.js');
 &lt;/script>
 </pre>
 
@@ -905,7 +905,7 @@ h1 {
 &lt;/style>
 
 &lt;script>
-    CSS.paintWorklet.import('heading-color.js');
+    CSS.paintWorklet.addModule('heading-color.js');
 &lt;/script>
 </pre>
 

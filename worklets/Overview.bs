@@ -162,7 +162,7 @@ WorkletGlobalScope</a> algorithm.
 
 The <a>event loop</a> is run on the <a>worklet global scope execution environment</a> defined above.
 
-It is expected that only tasks associated {{Worklet/import()}}, the user agent invoking author
+It is expected that only tasks associated {{Worklet/addModule()}}, the user agent invoking author
 defined callbacks, and <a>microtasks</a> will use this <a>event loop</a>.
 
 Note:
@@ -293,13 +293,13 @@ Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-u
 Worklet {#worklet-section}
 --------------------------
 
-The {{Worklet}} object provides the capability to import module scripts into its associated
+The {{Worklet}} object provides the capability to add module scripts into its associated
 {{WorkletGlobalScope}}s. The user agent can then create classes registered on the
 {{WorkletGlobalScope}}s and invoke their methods.
 
 <pre class='idl'>
 interface Worklet {
-    [NewObject] Promise&lt;void> import(USVString moduleURL, optional WorkletOptions options);
+    [NewObject] Promise&lt;void> addModule(USVString moduleURL, optional WorkletOptions options);
 };
 
 dictionary WorkletOptions {
@@ -325,7 +325,7 @@ additional {{WorkletGlobalScope}}s should be transparent to the author.
 
 <div class='note'>
     Practically user agents aren't expected to implement the following algorithm using a
-    thread-safe map. Instead when {{Worklet/import()}} is called user agents can fetch the module
+    thread-safe map. Instead when {{Worklet/addModule()}} is called user agents can fetch the module
     graph on the main thread, and send the fetched sources (the data contained in the <a>module
     responses map</a>) to each thread which has a {{WorkletGlobalScope}}.
 
@@ -338,7 +338,7 @@ A <dfn>pending tasks struct</dfn> is a <a>struct</a> consiting of:
 This is used by the algorithms below.
 
 <div algorithm>
-When the <dfn method for=Worklet>import(|moduleURL|, |options|)</dfn> method is called on a
+When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method is called on a
 {{Worklet}} object, the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
@@ -464,7 +464,7 @@ Note: Specifically, if a script fails to parse or fails to load over the network
     classes may have been registered correctly.
 
 <div class=example>
-    When an author imports code into a {{Worklet}} the code may run against multiple
+    When an author adds code into a {{Worklet}} the code may run against multiple
     {{WorkletGlobalScope}}s, for example:
     <pre class='lang-javascript'>
         // script.js
@@ -473,7 +473,7 @@ Note: Specifically, if a script fails to parse or fails to load over the network
 
     <pre class='lang-javascript'>
         // main.js
-        await CSS.paintWorklet.import('script.js');
+        await CSS.paintWorklet.addModule('script.js');
     </pre>
 
     Behind the scenes the user agent may load the <code class='lang-javascript'>script.js</code>
@@ -546,8 +546,8 @@ Loading scripts into a worklet. {#example-single}
 -------------------------------------------------
 
 <pre class='lang-javascript'>
-window.fakeWorklet1.import('script1.js');
-window.fakeWorklet1.import('script2.js');
+window.fakeWorklet1.addModule('script1.js');
+window.fakeWorklet1.addModule('script2.js');
 
 // Assuming no other calls to fakeWorklet1 valid script loading orderings are:
 // 1. 'script1.js', 'script2.js'
@@ -559,8 +559,8 @@ Loading scripts into multiple worklets. {#example-multiple}
 
 <pre class='lang-javascript'>
 Promise.all([
-    window.fakeWorklet1.import('script1.js'),
-    window.fakeWorklet2.import('script2.js')
+    window.fakeWorklet1.addModule('script1.js'),
+    window.fakeWorklet2.addModule('script2.js')
 ]).then(function() {
     // Both scripts now have loaded code, can do a task which relies on this.
 });

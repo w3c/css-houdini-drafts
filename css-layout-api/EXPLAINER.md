@@ -41,20 +41,19 @@ coordinates is:
 Getting Started
 ---------------
 
-First you'll need to import a script into the layout worklet.
+First you'll need to add a module script into the layout worklet.
 
 ```js
 if ('layoutWorklet' in CSS) {
-  CSS.layoutWorklet.import('my-layout-script.js').then(() => {
-    console.log('layout script installed!');
-  });
+  await CSS.layoutWorklet.addModule('my-layout-script.js');
+  console.log('layout script installed!');
 }
 ```
 
 See the worklets [explainer](../worklets/EXPLAINER.md) for a more involved explanation of worklets.
 
-After the promise returned from the `import` method resolves the layouts defined in the script will
-apply to the page.
+After the promise returned from the `addModule` method resolves the layouts defined in the script
+will apply to the page.
 
 A Centering Layout
 ------------------

@@ -33,7 +33,7 @@ CSS.registerProperty({
 });
 
 (async function() {
-  await (CSS.paintWorklet || paintWorklet).import('chat.js');
+  await (CSS.paintWorklet.addModule || paintWorkle.import)('chat.js');
   
   const elem = document.getElementById('example');
   const add = document.getElementById('add');

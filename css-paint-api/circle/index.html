@@ -25,6 +25,6 @@
       initialValue: 'black',
       inherit: false
     });
-    (CSS.paintWorklet || paintWorklet).import('circle.js');
+    (CSS.paintWorklet.addModule || paintWorkle.import)('circle.js');
 </script>
 
