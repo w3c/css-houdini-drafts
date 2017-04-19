@@ -7,11 +7,11 @@
 
 ```js
 animationWorklet.import('twitter-header-animator.js').then( _ => {
-	var anim = new WorkletAnimation('twitter-header',
-	  [
+  var anim = new WorkletAnimation('twitter-header',
+    [
       new KeyFrameEffect($avatarEl,
                          [{ transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
-                         {duration: 100, iteration: infinite}),
+                         {duration: 100, iterations: infinite }),
       new KeyFrameEffect($headerEl,
                          { opacity: 0, opacity: 1 },
                          {duration: 100})
@@ -19,14 +19,15 @@ animationWorklet.import('twitter-header-animator.js').then( _ => {
       document.timeline,
       // ScrollTimeline: https://wicg.github.io/scroll-animations/#scroll-timelines
       new ScrollingTimeline(scrollingElement, {timeRange: 100})
-  	],
-  	{
-  	  some_awesome_data: 42
-  	}
+    ],
+    {
+      some_awesome_data: 42
+    }
   );
 
   // Same instance shared by animation targets
   anim == $avatarEl.getAnimations()[0] == $headerEl.getAnimations()[0];
+});
 
 ```
 
@@ -38,27 +39,27 @@ registerAnimator('twitter-header', class {
     // options == { some_awesome_data: 42 }
   }
 
-	animate(timelines, outputEffects) {
-		const time = timelines[1].currentTime; // [0...timeRange]
+  animate(timelines, outputEffects) {
+    const time = timelines[1].currentTime; // [0...timeRange]
     // drive the output effects by setting their local times.
-		outputEffects[0].localTime = time;  // Sets the time used in the first output effect.
-		outputEffects[1].localTime = Math.min(1, time * 10); // Clamps the input time range.
-		// TODO: at some point allow querying the Effect current value. This is needed for
-		// effects where output of one effects affects others.
-	}
+    outputEffects[0].localTime = time;  // Sets the time used in the first output effect.
+    outputEffects[1].localTime = Math.min(1, time * 10); // Clamps the input time range.
+    // TODO: at some point allow querying the Effect current value. This is needed for
+    // effects where output of one effects affects others.
+  }
 
-	// If reverse is provided, allows developer to customize reversing.
-	// Default behavior is to
-	reverse(timelines) {
-	  this.reversingFrom = timelines[0].currentTime;
-	}
+  // If reverse is provided, allows developer to customize reversing.
+  // Default behavior is to
+  reverse(timelines) {
+    this.reversingFrom = timelines[0].currentTime;
+  }
 
-	dispose() {
-	 // gives a chance to animator to provide option to be used when it needs
+  dispose() {
+   // gives a chance to animator to provide option to be used when it needs
    // to be restarted in a different thread/context. This way stateful animations
    // can be migrated safely.
-	  return this.options;
-	}
+    return this.options;
+  }
 
   update(options) {
     // this is a V2 concept,
@@ -73,6 +74,7 @@ registerAnimator('twitter-header', class {
 
  * What should happen if an animation is created before the animator is registered?
  * Should the document.timeline be updated to offset by startTime & scale by playbackRate?
+ * What is the behavior
 
 ## WEB IDL
 
@@ -145,15 +147,15 @@ For some effects we need to be able to add new participating elements without
 restarting the effect. Here are some thoughts on how this can work.
 
 ```js
-    // Effects and data can change after some time.
-    // We might want to break this out into separate functions or optional
-    // updates so you can just update options or just effects and options
-    // without having to pass other parameters again.
-    anim.update({
-        [ /* new list of effects? */],
-        [ /* new list of timelines */],
-        {/* options */}
-    });
+// Effects and data can change after some time.
+// We might want to break this out into separate functions or optional
+// updates so you can just update options or just effects and options
+// without having to pass other parameters again.
+anim.update({
+    [ /* new list of effects? */],
+    [ /* new list of timelines */],
+    {/* options */}
+});
 ```
 
 ## CSS Notation
@@ -195,20 +197,19 @@ This is equivalent to calling:
 
 ```js
 new WorkletAnimation('twitter-header',
-   [
-	      new KeyFrameEffect(.header[0], [<keyframe animation1>], {<options1>}),
-	      new KeyFrameEffect(.avatar,    [<keyframe animation2>], {<options2>}),
-	      new KeyFrameEffect(.header[1], [<keyframe animation1>], {<options1>}),
-   ],
-	 [new ScrollingTimeline(#selector, {...})],
-   { elements: [
-      /* This is admittedly a bit magical. */
-      {'name': 'header'},
-      {'name': 'avatar'},
-      {'name': 'header'},
-	 ]}
-	});
- }
+  [
+    new KeyFrameEffect(.header[0], [<keyframe animation1>], {<options1>}),
+    new KeyFrameEffect(.avatar,    [<keyframe animation2>], {<options2>}),
+    new KeyFrameEffect(.header[1], [<keyframe animation1>], {<options1>}),
+  ],
+  [new ScrollingTimeline(#selector, {...})],
+  { elements: [
+    /* This is admittedly a bit magical. */
+    {'name': 'header'},
+    {'name': 'avatar'},
+    {'name': 'header'},
+  ]}
+).play();
 
 ```
 
