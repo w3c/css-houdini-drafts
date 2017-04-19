@@ -535,12 +535,15 @@ following steps:
     12. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}.
 
-        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> given the paint
-        {{Worklet}} and use that.
+        The user agent <em>must</em> have, and select from at least two {{PaintWorkletGlobalScope}}s
+        in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>, unless the user agent is under
+        memory constraints.
 
-        Note: The user agent can use any policy for which {{PaintWorkletGlobalScope}} to select or
-            create. For example it could use a single {{PaintWorkletGlobalScope}} or multiple and
-            randomly assign between them.
+        Note: This is to ensure that authors do not rely on being able to store state on the class
+            or global object.
+
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        paint {{Worklet}}.
 
     13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |concreteObjectSize|,
         |workletGlobalScope| optionally <a>in parallel</a>.
@@ -664,14 +667,17 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     12. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
         |styleMap|, |inputArguments|», and with |paintInstance| as the <a>callback this value</a>.
 
+        If |paintFunctionCallback| does not complete within an acceptable time (as determined by the
+        user agent, i.e. it is a "long running script") the user agent <em>may</em> terminate the
+        script, let the image output be an <a>invalid image</a>, and abort all these steps.
+
+        Note: User agents could provide tooling within their debugging tools to show authors how
+            expensive their paint classes are. User agents could also how an "unresponsive script"
+            dialog in this case if appropriate.
+
     13. The image output is to be produced from the |renderingContext| given to the method.
 
         If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
-
-Note: The user agent can consider long running paint functions similar to long running script in the
-    main execution context. For example, they could show a "unresponsive script" dialog or similar.
-    In addition user agents could provide tooling within their debugging tools to show authors how
-    expensive their paint classes are.
 
 Note: The contents of the resulting image are not designed to be accessible. Authors can communicate
     any useful information through the standard accessibility APIs.

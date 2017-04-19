@@ -36,7 +36,7 @@ registerPaint('arc', class {
   }
 
   convertAngle(angle) {
-    const value = angle.value || convertFloat(angle.cssText);
+    const value = angle.value || parseFloat(angle.cssText);
     const unit = angle.unit || angle.cssText.match(this.regex)[0];
 
     switch (unit) {
