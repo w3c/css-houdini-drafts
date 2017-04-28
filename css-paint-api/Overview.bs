@@ -770,7 +770,8 @@ loaded.
 &lt;script>
     CSS.registerProperty({
         name: '--image',
-        syntax: '&lt;image&gt;'
+        syntax: '&lt;image&gt; | none',
+        initialValue: 'none',
     });
     CSS.paintWorklet.addModule('image-placeholder.js');
 &lt;/script>
