@@ -39,10 +39,6 @@ spec:webidl; type:dfn; for:interface; text:inherit
 
 <pre class="anchors">
 urlPrefix: http://heycam.github.io/webidl/; type: dfn;
-    text: AbortError
-    text: SyntaxError
-    urlPrefix: #idl-;
-        text: DOMException
     urlPrefix: #es-;
         text: invoking callback functions
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
@@ -154,6 +150,12 @@ Note:
     {{WorkletGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
     will allow authors to register classes for the user agent create and invoke methods on.
 
+When asked to <a>report an exception</a>, do nothing instead, or optionally report the exception to
+a developer console.
+
+Issue(whatwg/html#2611): HTML's <a>report an exception</a> needs updating to work with
+    non-EventTarget global objects.
+
 ### The event loop ### {#the-event-loop}
 
 Each {{WorkletGlobalScope}} object has a distinct <a>event loop</a>. This <a>event loop</a> has no
@@ -187,8 +189,6 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
 
         - Let |realmExecutionContext| be the created JavaScript execution context.
 
-        - Do not obtain any source texts for scripts or modules.
-
     3. Let |insideSettings| be the result of <a>set up a worklet environment settings object</a>
         given |realmExecutionContext|, and |outsideSettings|.
 
@@ -208,7 +208,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
         Note: <a>Fetch a worklet script</a> won't actually perform a network request as it will hit
             the worklet's <a>module responses map</a>. It also won't have a parsing error as at this
             point it should have successfully been parsed by another worklet global scope. I.e.
-            |script| should never be <em>null</em> here.
+            |script| should never be null here.
 
     6. Run the <a>responsible event loop</a> specified by |insideSettings|.
 </div>
@@ -221,36 +221,22 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
     1. Let |inheritedResponsibleBrowsingContext| be |outsideSettings|'s <a>responsible browsing
         context</a>.
 
-    2. Let |id| be a new unique opaque string.
+    2. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
 
-    3. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
+    3. Let |origin| be a unique <a>opaque origin</a>.
 
-    4. Let |origin| be a unique <a>opaque origin</a>.
+    4. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
 
-    5. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
+    5. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
 
-    6. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
+    6. Let |workletEventLoop| be a newly created <a>event loop</a>.
 
-    7. Let |workletEventLoop| be a newly created <a>event loop</a>.
+    7. Let |realm| be the value of |executionContext|'s Realm component.
 
-    8. Let |realm| be the value of |executionContext|'s Realm component.
+    8. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
 
-    9. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
-
-    10. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are
-        defined as follows:
-
-        : The <a>id</a>
-        :: Return |id|.
-
-        : The <a>Creation URL</a>
-        :: Return |inheritedAPIBaseURL|.
-
-        : The <a>target browsing context</a>
-        :: Return null.
-
-        : The <a>active service worker</a>
-        :: Return null.
+    9. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
+        as follows:
 
         : The <a>realm execution context</a>
         :: Return |executionContext|.
@@ -282,6 +268,10 @@ When a user agent is to <dfn>set up a worklet environment settings object</dfn>,
 
         : The <a>referrer policy</a>
         :: Return |inheritedReferrerPolicy|.
+
+    10. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
+        <a>creation URL</a> to |inheritedAPIBaseURL|, |settingsObject|'s <a>target browsing
+        context</a> to null, and |settingsObject|'s <a>active service worker</a> to null.
 
     11. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
 
@@ -333,7 +323,7 @@ additional {{WorkletGlobalScope}}s should be transparent to the author.
     all fetched sources from the main thread to the thread which owns the {{WorkletGlobalScope}}.
 </div>
 
-A <dfn>pending tasks struct</dfn> is a <a>struct</a> consiting of:
+A <dfn>pending tasks struct</dfn> is a <a>struct</a> consisting of:
     - A <dfn for="pending tasks struct">counter</dfn>.
 This is used by the algorithms below.
 
@@ -342,19 +332,19 @@ When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method 
 {{Worklet}} object, the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
-    2. Let |worklet| be the current {{Worklet}}.
+    2. Let |worklet| be this {{Worklet}}.
 
-    3. Let |moduleURLRecord| be the result of <a>parsing</a> the |moduleURL| argument relative to
-        the <a>relevant settings object</a> of <b>this</b>.
+    3. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
 
-    4. If |moduleURLRecord| is failure, then reject promise with a "<a>SyntaxError</a>"
-        <a>DOMException</a> and return |promise|.
+    4. Let |moduleURLRecord| be the result of <a>parsing</a> the |moduleURL| argument relative to
+        |outsideSettings|.
 
-    5. Return |promise|, and then continue running this algorithm <a>in parallel</a>.
+    5. If |moduleURLRecord| is failure, then reject promise with a "{{SyntaxError}}"
+        {{DOMException}} and return |promise|.
 
-    6. Let |credentialOptions| be the {{WorkletOptions/credentials}} member of |options|.
+    6. Return |promise|, and then continue running this algorithm <a>in parallel</a>.
 
-    7. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
+    7. Let |credentialOptions| be the {{WorkletOptions/credentials}} member of |options|.
 
     8. Let |moduleResponsesMap| be |worklet|'s <a>module responses map</a>.
 
@@ -402,15 +392,15 @@ When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |wo
         |moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and |insideSettings| when it
         asynchronously completes.
 
-    3. If |script| is <em>null</em>, then <a>queue a task</a> on |outsideSettings|'s <a>responsible
-        event loop</a> to run these steps:
+    3. If |script| is null, then <a>queue a task</a> on |outsideSettings|'s <a>responsible event
+        loop</a> to run these steps:
 
         1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
             run these steps:
 
             1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
 
-            2. Reject |promise| with an "<a>AbortError</a>" <a>DOMException</a>.
+            2. Reject |promise| with an "{{AbortError}}" {{DOMException}}.
 
     4. <a>Run a module script</a> given |script|.
 
