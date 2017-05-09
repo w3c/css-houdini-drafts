@@ -222,8 +222,8 @@ future without breaking code that relies on calling
 {{StylePropertyMap/set()}} for those properties.
 </div>
 
-The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>, 
-(CSSStyleValue or DOMString)... <var>values</var>)</dfn> method, when invoked, must 
+The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
+(CSSStyleValue or DOMString)... <var>values</var>)</dfn> method, when invoked, must
 [=append to a StylePropertyMap=] with property <var>property</var> and values <var>values</var>.
 
 <div algorithm>
@@ -316,7 +316,7 @@ Issue(276): interaction with custom properties
 
 Issue(309): should StylePropertyMaps be case sensitive?
 
-Issue(310): consider using properties in addition to get/set 
+Issue(310): consider using properties in addition to get/set
 
 Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
@@ -524,7 +524,8 @@ Numeric Values: {#numeric-objects}
 
 * {{CSSUnitValue}} objects represent values that contain a single unit type
 	(for example "42px").
-* {{CSSCalcValue}} objects represent values that contain multiple units
+* {{CSSMathValue}} objects represent math expressions,
+	which can contain more than one value/unit
 	(for example "calc(56em + 10%)").
 
 {{CSSNumericValue}} objects are not range-restricted.
@@ -748,21 +749,31 @@ rather than on {{CSSNumericValue}} instances.
 			with its [=map entries=] set to |newEntries|.
 </div>
 
-{{CSSNumericValue}}s can be <dfn>strongly typed</dfn>
-or <dfn>weakly typed</dfn> to a type,
-or <dfn>untyped</dfn>.
+{{CSSNumericValue}}s can be <dfn export for=CSSNumericValue lt="strong type|strongly typed">strongly typed</dfn> to a type
+and/or <dfn export for=CSSNumericValue lt="weak type|weakly typed">weakly typed</dfn> to one or more types,
+or <dfn export for=CSSNumericValue>untyped</dfn>.
 
-A {{CSSUnitValue}} is [=weakly typed=] to its [=CSS type=]
+A {{CSSUnitValue}} is [=weakly typed=] to the [=CSS type=] of its {{CSSUnitValue/unit}} internal slot’s value
 if that [=CSS type=] is "percent" or "number".
-It's [=strongly typed=] to its [=CSS type=] otherwise.
+It's [=strongly typed=] to that [=CSS type=] otherwise.
 It's never [=untyped=].
 
-A {{CSSCalcValue}} is [=strongly typed=] if its [=CSS type set=]
-contains a value other than "percent" or "number",
-to that value.
-It's [=weakly typed=] if it's not [=strongly typed=],
-but its [=CSS type set=] [=set/is not empty=].
-It's [=untyped=] if its [=CSS type set=] [=set/is empty=].
+A {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}}
+is [=strongly typed=]
+if any of the values in its {{CSSMathSum/values}} internal slot
+are [=strongly typed=],
+to that same [=strong type=].
+It's [=weakly typed=] to the union of the [=weak types=]
+of all of the values in its {{CSSMathSum/values}} internal slot.
+It's [=untyped=] if its {{CSSMathSum/values}} internal slot [=list/is empty=].
+
+A {{CSSMathNegate}} or {{CSSMathInvert}}
+is [=strongly typed=],
+[=weakly typed=],
+or [=untyped=]
+identically to the value in its {{CSSMathNegate/value}} internal slot.
+
+
 
 
 <!--
@@ -834,7 +845,7 @@ are represented as {{CSSUnitValue}}s.
 <div algorithm="CSSUnitValue.type">
     The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
     on reading,
-    return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}}.
+    return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}} internal slot’s value.
 </div>
 
 <div algorithm="CSS type of a unit">
@@ -880,110 +891,189 @@ matches that production.
  ██████  ██     ██ ████████  ██████    ███ ███
 -->
 
-### Complex Numeric Values: {{CSSCalcValue}} objects ### {#complex-numeric}
+### Complex Numeric Values: {{CSSMathValue}} objects ### {#complex-numeric}
 
-Numeric values that can only be expressed with a combination of units
-are represented as {{CSSCalcValue}}.
-This is a Map-like value,
-where each entry represents the value of one unit,
-and the object as a whole represents the sum of its units.
+Numeric values that are more complicated than a single value+unit
+are represented by a tree of {{CSSMathValue}} subclasses,
+eventually terminating in {{CSSUnitValue}} objects at the leaf nodes.
+The ''calc()'', ''min()'', and ''max()'' functions in CSS
+are represented in this way.
 
 <div class=example>
     For example,
     the CSS value ''calc(1em + 5px)''
-    will be represented by a {{CSSCalcValue}}
-    [=map/contains|containing=] <nobr>«[ "em" → 1, "px" → 5 ]»</nobr>.
+    will be represented by a {{CSSMathSum}}
+    like <code>CSSMathSum(CSS.em(1), CSS.px(5))</code>.
+
+    A more complex expression,
+    like ''calc(1em + 5px * 2)'',
+    will be represented by a nested structure
+    like <code>CSSMathSum(CSS.em(1), CSSMathProduct(CSS.px(5), 2))</code>.
 </div>
 
 <xmp class=idl>
-[Constructor(record<DOMString, double> recordValue)]
-interface CSSCalcValue : CSSNumericValue {
-    maplike<DOMString, double>;
-    CSSCalcValue set(DOMString unit, double value);
+interface CSSMathValue : CSSNumericValue {
+	readonly attribute CSSMathOperator operator;
     readonly attribute DOMString type;
+};
+
+[Constructor(CSSNumericValue... args)]
+interface CSSMathSum : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
+[Constructor(CSSNumericValue... args)]
+interface CSSMathProduct : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
+[Constructor(CSSNumericValue... args)]
+interface CSSMathMin : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
+[Constructor(CSSNumericValue... args)]
+interface CSSMathMax : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
+[Constructor(CSSNumericValue arg)]
+interface CSSMathNegate : CSSMathValue {
+	attribute CSSNumericValue value;
+};
+
+[Constructor(CSSNumericValue arg)]
+interface CSSMathInvert : CSSMathValue {
+	attribute CSSNumericValue value;
+};
+
+interface CSSNumericArray {}; // See issue below
+
+enum CSSMathOperator {
+	"+",
+	"-",
+	"*",
+	"/",
+	"min",
+	"max",
 };
 </xmp>
 
-<div algorithm="CSSCalcValue(recordValue)">
-	The <dfn constructor for=CSSCalcValue>CSSCalcValue(|recordValue|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+Issue: {{CSSNumericArray}} will be an Array-like
+restricted to containing CSSNumericValue objects.
+This is dependent on [WebIDL#345](https://github.com/heycam/webidl/issues/345) getting resolved properly.
 
-	1. Let |strongType| be initially null.
+Note: CSSMathValue, being a pure superclass,
+cannot be directly constructed.
+It exists solely to host the common attributes
+of all the "math" operations.
 
-	2. [=map/For each=] unit → value of |recordValue|:
+<div algorithm="CSSMathValue.operator">
+	The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">operator</dfn> attribute
+	of a {{CSSMathValue}} |this| must,
+	on getting,
+	return the following string,
+	depending on the interface of |this|:
 
-		1. If |unit| does not have a [=CSS type=],
-			[=throw=] a {{TypeError}}.
-		2. If |unit| is a [=strong type=],
-			and |strongType| is null,
-			let |strongType| be |unit|’s [=CSS type=].
-		3. If |unit| is a [=strong type=],
-			and |strongType| is not equal to that type,
-			[=throw=] a {{TypeError}}.
+	<dl class=switch>
+		: {{CSSMathSum}}
+		:: <code>"+"</code>
 
-	3. Return a new {{CSSCalcValue}} whose <a>map entries</a> are |recordValue|.
+		: {{CSSMathProduct}}
+		:: <code>"*"</code>
+
+		: {{CSSMathMin}}
+		:: <code>"min"</code>
+
+		: {{CSSMathMax}}
+		:: <code>"max"</code>
+
+		: {{CSSMathNegate}}
+		:: <code>"-"</code>
+
+		: {{CSSMathInvert}}
+		:: <code>"/"</code>
+	</dl>
+
+	Note: These are all instances of the {{CSSMathOperator}} enum.
 </div>
 
-Issue: When IDL grows a map-iterator concept,
-add a constructor that takes one.
-It's supremely awkward to handle one manually right now.
-
-<div algorithm="CSSCalcValue.set()">
-    The <dfn method for=CSSCalcValue>set(|unit|, |value|)</dfn> method,
-    when called on a {{CSSCalcValue}} |this|,
-    must perform the following steps:
-
-    1. Let |newType| be the [=CSS type=] of |unit|.
-        If |unit| does not have a [=CSS type=],
-        [=throw=] a {{TypeError}}.
-
-    2. If |this| has no [=strong type=],
-        or if |newType| is "percent", "number",
-        or equal to |this|’s [=strong type=],
-        [=map/set=] the key |unit| to the value |value| in |this|’s [=map entries=],
-        and return |this|.
-
-    3. Otherwise, [=throw=] a {{TypeError}}.
-</div>
-
-<div algorithm="CSSCalcValue.type">
-    The <dfn attribute for=CSSCalcValue>type</dfn> attribute
-    of a {{CSSCalcValue}} |this| must,
+<div algorithm="CSSMathValue.type">
+    The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">type</dfn> attribute
+    of a {{CSSMathValue}} |this| must,
     on reading,
-    must return the concatenation of the entries in |this|’s [=CSS type set=],
-    each separated by a U+002D HYPHEN-MINUS (-) character.
-    If there are multiple entries,
-    they must be concatenated in the order:
-    [=strong type=],
-    "percent",
-    "number".
+    perform the following steps:
 
-    Note: This implies that if the [=CSS type set=] is empty
-    (because |this| [=map/is empty=]),
+    1. Let |types| initially be an empty [=ordered set=].
+
+    2. If |this| has a [=strong type=],
+    	[=ordered set/append=] its [=strong type=] to |types|.
+
+    3. If |this| has the "percent" [=weak type=],
+    	[=ordered set/append=] "percent" to |types|.
+
+    4. If |this| has the "number" [=weak type=],
+    	[=ordered set/append=] "number" to |types|.
+
+    5. Return the concatenation of the strings in |types|,
+    	each separated by a U+002D HYPHEN-MINUS (-) character.
+
+    Note: This implies that if |this| is [=untyped=],
     this attribute returns the empty string.
 </div>
 
-<div algorithm="CSS type set">
-    The <dfn for=CSSCalcValue>CSS type set</dfn> of a {{CSSCalcValue}} |this|
-    is an [=ordered set=]
-    that contains the [=CSS types=] of every key
-    [=map/contains|contained=] in |this|’s [=map entries=].
+<div algorithm="CSSMathSum(...args)">
+	The <dfn constructor for="CSSMathSum">CSSMathSum(...|args|)</dfn> constructor must,
+	when called,
+	perform the following steps:
 
-    Note: The [=CSS type set=] will contain at most 3 entries;
-    "percent", "number",
-    and this {{CSSCalcValue}}’s [=strong type=].
+	1. If |args| [=list/is empty=],
+		[=throw=] a {{SyntaxError}}.
+
+	2. Let |strongType| initially be null.
+
+	3. Let |values| be an initially empty [=list=].
+
+	4. [=list/For each=] |arg| of |args|:
+
+		1. If |arg| has a [=strong type=], and |strongType| is null,
+			let |strongType| by |arg|’s [=strong type=].
+
+		2. If |arg| has a [=strong type=],
+			and |strongType| is not equal to that type,
+			[=throw=] a {{TypeError}}.
+
+		3. [=list/Append=] |arg| to |values|.
+
+	5. Return a new {{CSSMathSum}}
+		whose {{CSSMathSum/values}} internal slot
+		is set to |values|.
+
+	The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn>,
+	<dfn constructor for="CSSMathMin">CSSMathMin(...|args|)</dfn>,
+	and <dfn constructor for="CSSMathMax">CSSMathMax(...|args|)</dfn> constructors
+	are defined identically to the above,
+	except that in the last step
+	they return a new {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}} object,
+	respectively.
 </div>
 
-A {{CSSCalcValue}} has a <dfn for=CSSCalcValue>strong type</dfn>
-if its [=CSS type set=] [=set/contains=] a value other than "percent" or "number",
-equal to that other value.
+<div algorithm="CSSMathNegate(arg)">
+	The <dfn constructor for="CSSMathNegate">CSSMathNegate(|arg|)</dfn> constructor must,
+	when called,
+	perform the following steps:
 
-A {{CSSCalcValue}} matches a CSS type production,
-such as <<number>> or <<length-percentage>>,
-if its equivalent CSS ''calc()'' value matches that production.
+	1. Return a new {{CSSMathNegate}}
+		whose {{CSSMathNegate/value}} internal slot
+		is set to |arg|.
 
-Issue(359): Need to be able to deal with min()/max() too
+	The <dfn constructor for="CSSMathInvert">CSSMathInvert(|arg|)</dfn> constructor
+	is defined identically to the above,
+	except that in the last step
+	it returns a new {{CSSMathInvert}} object.
+</div>
+
+
 
 <!--
 ██    ██ ██     ██ ██     ██        ██████   ██████   ██████
@@ -1624,7 +1714,7 @@ This section describes how Typed OM objects are constructed from CSS values.
 
 If a property's grammar is more complex than one of the types listed here,
 it produces a raw {{CSSStyleValue}},
-with a <a for=CSSStyleValue>stringification behavior</a> 
+with a <a for=CSSStyleValue>stringification behavior</a>
 that produces the CSSOM serialization of the property.
 
 Issue: Better to define a full table of properties and what types they normalize to.
