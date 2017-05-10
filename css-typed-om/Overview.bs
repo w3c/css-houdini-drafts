@@ -804,16 +804,8 @@ rather than on {{CSSNumericValue}} instances.
 		[=throw=] a {{SyntaxError}}
 		and abort this algorithm.
 
-	3. If |result| is a <<dimension-token>>, <<number-token>>, or <<percentage-token>>,
-		return a new {{CSSUnitValue}} object
-		with its {{CSSUnitValue/value}} internal slot set to the token's value,
-		and its {{CSSUnitValue/value}} internal slot set to the token's unit if it's a <<dimension-token>>,
-		or `"number"` if it's a <<number-token>>,
-		or `"percentage"` if it's a <<percentage-token>>.
-
-	4. If |result| is a <<calc()>>:
-
-		Issue: TODO
+	3. [=Normalize a numeric value=] |result|,
+		and return the result.
 </div>
 
 {{CSSNumericValue}}s can be <dfn export for=CSSNumericValue lt="strong type|strongly typed">strongly typed</dfn> to a type
@@ -1877,8 +1869,8 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}
 <div algorithm>
 	To <dfn export>normalize a numeric value</dfn> |num|:
 
-	1. If |num| is a ''calc()'' expression,
-		[=normalize a calc() expression=] from |num|
+	1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
+		[=normalize a math expression=] from |num|
 		and return the result.
 
 	2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
@@ -1898,34 +1890,81 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}
 </div>
 
 <div algorithm>
-	To <dfn export>normalize a ''calc()'' expression</dfn> |num|
+	To <dfn for=CSSMath export local-lt="normalize">normalize a math expression</dfn> |num|:
 
-	1. Simplify |num| into an equivalent summation of terms with unique units
-		(preserving terms with a zero value).
+	1. If |num| is a ''min()'' or ''max()'' expression:
+		1. Let |values| be the result of [=CSSMath/normalizing=]
+			the arguments to the expression,
+			treating each argument as if it were the contents of a ''calc()'' expression.
 
-	2. If |num| is a [=computed value=] and |num| contains only a single term,
-		[=normalize a numeric value=] from that single term
-		and return the result.
+		2. Return a new {{CSSMathMin}} or {{CSSMathMax}} object, respectively,
+			with its {{CSSMathMin/values}} internal slot
+			set to |values|.
 
-	3. Return a {{CSSCalcValue}},
-		whose [=map entries=] is an ordered map which contains, in order:
+	2. Assert: Otherwise, |num| is a ''calc()''.
 
-		1. If |num| contains a <<number>> term,
-			the [=map/entry=] «[ "number" → |val| ]»,
-			where |val| is the value of that term.
-		2. If |num| contains any <<dimension>> terms,
-			the [=map/entries=] «[ |unit| → |val| ]» for each term,
-			where |unit| is the term's unit and |val| is the term's value,
-			sorted in [=ASCII case-insensitive=] alphabetical order by their |unit|.
-		3. If |num| contains a <<percentage>> term,
-			the [=map/entry=] «[ "percent" → |val| ]»,
-			where |val| is the value of that term.
+	3. Turn |num|’s argument
+		into an expression tree
+		using standard PEMDAS precedence rules,
+		with the following exceptions/clarification:
+
+		* Treat subtraction as instead being addition,
+			with the RHS argument instead wrapped in a special "negate" node.
+		* Treat division as instead being multiplication,
+			with the RHS argument instead wrapped in a special "invert" node.
+		* Addition and multiplication are N-ary;
+			each node can have any number of arguments.
+		* If an expression has only a single value in it,
+			and no operation,
+			treat it as an addition node with the single argument.
+
+	4. Recursively transform the expression tree into objects,
+		as follows:
+
+		<dl class=switch>
+			: addition node
+			:: becomes a new {{CSSMathSum}} object,
+				with its {{CSSMathSum/values}} internal slot
+				set to its list of arguments
+			: multiplication node
+			:: becomes a new {{CSSMathProduct}} object,
+				with its {{CSSMathProduct/values}} internal slot
+				set to its list of arguments
+			: negate node
+			:: becomes a new {{CSSMathNegate}} object,
+				with its {{CSSMathNegate/value}} internal slot
+				set to its argument
+			: invert node
+			:: becomes a new {{CSSMathInvert}} object,
+				with its {{CSSMathInvert/value}} internal slot
+				set to its argument
+			: leaf node
+			:: normalized as appropriate
+		</dl>
+
+	<div class=example>
+		For example, ''calc(1px - 2 * 3em)''
+		produces the structure:
+
+		<pre>
+			CSSMathSum(
+				CSS.px(1),
+				CSSMathNegate(
+					CSSMathProduct(
+						2,
+						CSS.em(3)
+					)
+				)
+			)
+		</pre>
+	</div>
 
 	Note: The value computation process may transform different units into identical ones,
 	simplifying the resulting expression.
 	For example, ''calc(1px + 2em)'' as a specified value
-	results in a {{CSSCalcValue}} with <nobr>«[ "em" → 2, "px" → 1 ]»</nobr>,
-	but as a computed value will give a {{CSSUnitValue}} something like <code>{unit: "px", value: 33}</code>.
+	results in a <nobr><code>CSSMathSum(CSS.px(1), CSS.em(2))</code></nobr>,
+	but as a computed value will give <nobr><code>CSS.px(33)</code></nobr> or similar
+	(depending on the value of an ''em'' in that context).
 </div>
 
 
