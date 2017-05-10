@@ -566,12 +566,12 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
 	interface CSSNumericValue : CSSStyleValue {
-		CSSNumericValue add(CSSNumericValue value);
-		CSSNumericValue sub(CSSNumericValue value);
-		CSSNumericValue mul(double value);
-		CSSNumericValue div(double value);
+		CSSNumericValue add(CSSNumericValue... values);
+		CSSNumericValue sub(CSSNumericValue... values);
+		CSSNumericValue mul(CSSNumericValue... values);
+		CSSNumericValue div(CSSNumericValue... values);
 
-		boolean equals(CSSNumericValue value);
+		boolean equals(CSSNumericValue... value);
 
 		CSSNumericValue to(DOMString unit);
 
@@ -585,93 +585,170 @@ represent operations that all numeric values can perform.
 The following are the arithmetic operations you can perform on dimensions:
 
 <div algorithm="CSSNumericValue.add()">
-	The <dfn for=CSSNumericValue method>add(|value|)</dfn> method,
+	The <dfn for=CSSNumericValue method>add(...|values|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. If |this| and |value| are both [=strongly typed=],
-		but to different types,
+	1. Prepend |this| to |values|.
+
+	2. If there are at least two different [=strong types=]
+		among the [=list/items=] in |values|,
 		[=throw=] a {{TypeError}}.
 
-	2. If |this| and |value| are both {{CSSUnitValue}}s:
+	3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
 		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot set to the sum of
-		|this|’s and |value|’s {{CSSUnitValue/value}} internal slots.
+		and {{CSSUnitValue/value}} internal slot is set to the sum of
+		the {{CSSUnitValue/value}} internal slots
+		of the [=list/items=] in |values|.
 
-	3. Otherwise:
-		1. Let |newEntries| be a copy of |this|’s [=map entries=].
-		2. [=map/For each=] |unit| → |val| in |value|’s [=map entries=]:
-			1. If |newEntries|[|unit|] [=map/exists=],
-				set |newEntries|[|unit|] to |newEntries|[|unit|] plus |val|.
-			2. Otherwise,
-				set |newEntries|[|unit|] to |val|.
-		3. Return a new {{CSSCalcValue}}
-			whose [=map entries=] are |newEntries|.
+	4. If |this| is a {{CSSMathSum}} object,
+		remove |this| from |values|,
+		and then [=list/append=] the remaining |values|
+		to |this|’s {{CSSMathSum/values}} internal slot.
+
+	5. Otherwise,
+		return a new {{CSSMathSum}} object
+		whose {{CSSMathSum/values}} internal slot
+		is set to |values|.
 </div>
 
 <div algorithm="CSSNumericValue.sub()">
-	The <dfn for=CSSNumericValue method>sub(|value|)</dfn> method,
+	The <dfn for=CSSNumericValue method>sub(...|values|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. If |this| and |value| are both [=strongly typed=],
-		but to different types,
+	1. Let |thisAndValues| be |this| prepended to |values|.
+
+	1. If there are at least two different [=strong types=]
+		among the [=list/items=] in |thisAndValues|,
 		[=throw=] a {{TypeError}}.
 
-	2. If |this| and |value| are both {{CSSUnitValue}}s:
+	2. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
 		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot set to the difference of
-		|this|’s and |value|’s {{CSSUnitValue/value}} internal slots.
+		and {{CSSUnitValue/value}} internal slot is set to
+		the value of |this|’s {{CSSUnitValue/value}} internal slot
+		minus the sum of the {{CSSUnitValue/value}} internal slots
+		of the [=list/items=] in |values|.
 
-	3. Otherwise:
-		1. Let |newEntries| be a copy of |this|’s [=map entries=].
-		2. [=map/For each=] |unit| → |val| in |value|’s [=map entries=]:
-			1. If |newEntries|[|unit|] [=map/exists=],
-				set |newEntries|[|unit|] to |newEntries|[|unit|] minus |val|.
-			2. Otherwise,
-				set |newEntries|[|unit|] to -|val|.
-		3. Return a new {{CSSCalcValue}}
-			whose [=map entries=] are |newEntries|.
+	3. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
+
+	4. If |this| is a {{CSSMathSum}} object,
+		[=list/append=] |values|
+		to |this|’s {{CSSMathSum/values}} internal slot.
+
+	5. Otherwise,
+		prepend |this| to |values|,
+		then return a new {{CSSMathSum}} object
+		whose {{CSSMathSum/values}} internal slot
+		is set to |values|.
+</div>
+
+<div algorithm>
+	To <dfn noexport for=CSSMath>negate</dfn> a {{CSSNumericValue}} |this|:
+
+	1. If |this| is a {{CSSMathNegate}} object,
+		return |this|’s {{CSSMathNegate/value}} internal slot.
+
+	2. Otherwise,
+		return a new {{CSSMathNegate}} object
+		whose {{CSSMathNegate/value}} internal slot
+		is set to |this|.
 </div>
 
 <div algorithm="CSSNumericValue.mul()">
-	The <dfn for=CSSNumericValue method>mul(|value|)</dfn> method,
+	The <dfn for=CSSNumericValue method>mul(...|values|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. If |this| is a {{CSSUnitValue}},
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}} internal slot times |value|.
+	1. Let |thisAndValues| be |this| prepended to |values|.
 
-	2. Otherwise:
-		1. Let |newEntries| be a copy of |this|’s [=map entries=].
-		2. [=map/For each=] |unit| → |val| in |newEntries|,
-			set |newEntries|[|unit|] to |val| times |value|.
-		3. Return a new {{CSSCalcValue}}
-			whose [=map entries=] are |newEntries|.
+	2. Let |mainValue| initially be null.
+
+	3. [=list/For each=] |item| of |thisAndValues|:
+		1. If |item| has a [=strong type=],
+			or a [=weak type=] other than "number":
+
+			1. If |mainValue| is null,
+				set |mainValue| to |item|.
+			2. Otherwise,
+				[=throw=] a {{TypeError}}.
+
+	4. If |mainValue| is still null,
+		set |mainValue| to |this|.
+
+	5. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
+		return a new {{CSSUnitValue}}
+		whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot is set to
+		the product of the {{CSSUnitValue/value}} internal slots
+		of the [=list/items=] in |thisAndValues|.
+
+	6. If |this| is a {{CSSMathProduct}} object,
+		[=list/append=] the [=list/items=] of |values|
+		to |this|’s {{CSSMathProduct/values}} internal slot.
+
+	7. Otherwise,
+		and return a new {{CSSMathProduct}}
+		whose {{CSSMathProduct/values}} internal slot
+		is set to |thisAndValues|.
 </div>
 
 <div algorithm="CSSNumericValue.div()">
-	The <dfn for=CSSNumericValue method>div(|value|)</dfn> method,
+	The <dfn for=CSSNumericValue method>div(...|values|)</dfn> method,
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. If |this| is a {{CSSUnitValue}},
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}} internal slot divided by |value|.
+	1. Let |thisAndValues| be |this| prepended to |values|.
 
-	2. Otherwise:
-		1. Let |newEntries| be a copy of |this|’s [=map entries=].
-		2. [=map/For each=] |unit| → |val| in |newEntries|,
-			set |newEntries|[|unit|] to |val| divided by |value|.
-		3. Return a new {{CSSCalcValue}}
-			whose [=map entries=] are |newEntries|.
+	2. Let |mainValue| initially be null.
+
+	3. [=list/For each=] |item| of |thisAndValues|:
+		1. If |item| has a [=strong type=],
+			or a [=weak type=] other than "number":
+
+			1. If |mainValue| is null,
+				set |mainValue| to |item|.
+			2. Otherwise,
+				[=throw=] a {{TypeError}}.
+
+	4. If |mainValue| is still null,
+		set |mainValue| to |this|.
+
+	6. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s,
+		return a new {{CSSUnitValue}}
+		whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
+		and {{CSSUnitValue/value}} internal slot is set to
+		the {{CSSUnitValue/value}} internal slot of |this|
+		divided by the product of the {{CSSUnitValue/value}} internal slots
+		of the [=list/items=] in |values|.
+
+	7. [=CSSMath/Invert=] all of the [=list/items=] in |values|.
+
+	2. If |this| is a {{CSSMathProduct}} object,
+		[=list/append=] the [=list/items=] of |values|
+		to |this|’s {{CSSMathProduct/values}} internal slot.
+
+	3. Otherwise,
+		prepend |this| to |values|,
+		then return a new {{CSSMathProduct}} object
+		whose {{CSSMathProduct/values}} internal slot
+		is set to |values|.
+</div>
+
+<div algorithm>
+	To <dfn noexport for=CSSMath>invert</dfn> a {{CSSNumericValue}} |this|:
+
+	1. If |this| is a {{CSSMathInvert}} object,
+		return |this|’s {{CSSMathInvert/value}} internal slot.
+
+	2. Otherwise,
+		return a new {{CSSMathInvert}} object
+		whose {{CSSMathInvert/value}} internal slot
+		is set to |this|.
 </div>
 
 <div class=issue>
@@ -735,18 +812,8 @@ rather than on {{CSSNumericValue}} instances.
 		or `"percentage"` if it's a <<percentage-token>>.
 
 	4. If |result| is a <<calc()>>:
-		1. Normalize the ''calc()'' argument
-			into a sum of values with unique units |calcEntries|.
-		2. Let |newEntries| be an empty [=ordered map=].
-		3. If |calcEntries| contains a <<number>> term,
-			set |newEntries|["number"] to the value of that term.
-		4. For each <<dimension>> term in |calcEntries|,
-			ordered [=ASCII case-insensitive=] alphabetically by their |unit|,
-			set |newEntries|[|unit|] to the term's value.
-		5. If |calcEntries| contains a <<percentage>> term,
-			set |newEntries|["percentage"] to the value of that term.
-		6. Return a new {{CSSCalcValue}} object
-			with its [=map entries=] set to |newEntries|.
+
+		Issue: TODO
 </div>
 
 {{CSSNumericValue}}s can be <dfn export for=CSSNumericValue lt="strong type|strongly typed">strongly typed</dfn> to a type
@@ -927,16 +994,6 @@ interface CSSMathProduct : CSSMathValue {
 	attribute CSSNumericArray values;
 };
 
-[Constructor(CSSNumericValue... args)]
-interface CSSMathMin : CSSMathValue {
-	attribute CSSNumericArray values;
-};
-
-[Constructor(CSSNumericValue... args)]
-interface CSSMathMax : CSSMathValue {
-	attribute CSSNumericArray values;
-};
-
 [Constructor(CSSNumericValue arg)]
 interface CSSMathNegate : CSSMathValue {
 	attribute CSSNumericValue value;
@@ -947,13 +1004,23 @@ interface CSSMathInvert : CSSMathValue {
 	attribute CSSNumericValue value;
 };
 
+[Constructor(CSSNumericValue... args)]
+interface CSSMathMin : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
+[Constructor(CSSNumericValue... args)]
+interface CSSMathMax : CSSMathValue {
+	attribute CSSNumericArray values;
+};
+
 interface CSSNumericArray {}; // See issue below
 
 enum CSSMathOperator {
-	"+",
-	"-",
-	"*",
-	"/",
+	"sum",
+	"product",
+	"negate",
+	"invert",
 	"min",
 	"max",
 };
@@ -977,10 +1044,10 @@ of all the "math" operations.
 
 	<dl class=switch>
 		: {{CSSMathSum}}
-		:: <code>"+"</code>
+		:: <code>"sum"</code>
 
 		: {{CSSMathProduct}}
-		:: <code>"*"</code>
+		:: <code>"product"</code>
 
 		: {{CSSMathMin}}
 		:: <code>"min"</code>
@@ -989,10 +1056,10 @@ of all the "math" operations.
 		:: <code>"max"</code>
 
 		: {{CSSMathNegate}}
-		:: <code>"-"</code>
+		:: <code>"negate"</code>
 
 		: {{CSSMathInvert}}
-		:: <code>"/"</code>
+		:: <code>"invert"</code>
 	</dl>
 
 	Note: These are all instances of the {{CSSMathOperator}} enum.
@@ -1007,13 +1074,13 @@ of all the "math" operations.
     1. Let |types| initially be an empty [=ordered set=].
 
     2. If |this| has a [=strong type=],
-    	[=ordered set/append=] its [=strong type=] to |types|.
+    	[=set/append=] its [=strong type=] to |types|.
 
     3. If |this| has the "percent" [=weak type=],
-    	[=ordered set/append=] "percent" to |types|.
+    	[=set/append=] "percent" to |types|.
 
     4. If |this| has the "number" [=weak type=],
-    	[=ordered set/append=] "number" to |types|.
+    	[=set/append=] "number" to |types|.
 
     5. Return the concatenation of the strings in |types|,
     	each separated by a U+002D HYPHEN-MINUS (-) character.
