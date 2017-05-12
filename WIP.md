@@ -6,7 +6,7 @@
 ## Creating and using a worklet animation
 
 ```js
-animationWorklet.import('twitter-header-animator.js').then( _ => {
+animationWorklet.addModule('twitter-header-animator.js').then( _ => {
   var anim = new WorkletAnimation('twitter-header',
     [
       new KeyFrameEffect($avatarEl,
