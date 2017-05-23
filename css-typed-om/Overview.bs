@@ -34,47 +34,47 @@ Markup Shorthands: markdown yes
 
 <pre class=anchors>
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec: ecma-262
-	text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
+    text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
 </pre>
 
 <pre class=link-defaults>
 spec:dom; type:interface;
-	text:Document
-	text:Element;
+    text:Document
+    text:Element;
 spec:css-color-3; type:property; text:color;
 spec:css-speech-1; type:property;
-	text:cue-after;
-	text:cue-before;
-	text:pause-after;
-	text:pause-before;
-	text:speak;
-	text:voice-family;
+    text:cue-after;
+    text:cue-before;
+    text:pause-after;
+    text:pause-before;
+    text:speak;
+    text:voice-family;
 spec:css21; type:property;
-	text:max-height;
-	text:max-width;
-	text:min-height;
-	text:min-width;
+    text:max-height;
+    text:max-width;
+    text:min-height;
+    text:min-width;
 spec:css-tables-3; type:property;
-	text:border-collapse;
-	text:caption-side;
-	text:empty-cells;
-	text:table-layout;
+    text:border-collapse;
+    text:caption-side;
+    text:empty-cells;
+    text:table-layout;
 spec:css-position-3; type:value; for:left; text:auto;
 spec:css-transforms-1;
-	type:type;
-		text:<transform-list>;
-		text:<transform-function>;
-	type:property;
-		text:transform;
-		text:backface-visibility;
-		text:perspective;
-		text:perspective-origin;
-		text:transform-origin;
-		text:transform-style;
+    type:type;
+        text:<transform-list>;
+        text:<transform-function>;
+    type:property;
+        text:transform;
+        text:backface-visibility;
+        text:perspective;
+        text:perspective-origin;
+        text:transform-origin;
+        text:transform-style;
 spec:css-syntax-3;
-	type:dfn; text:identifier
+    type:dfn; text:identifier
 spec:infra;
-	type: dfn; text: list
+    type: dfn; text: list
 </pre>
 
 Introduction {#intro}
@@ -87,11 +87,11 @@ as typed JavaScript objects to facilitate their performant manipulation.
 The API exposed by this specification is designed for performance rather than ergonomics.
 Some particular considerations:
 *   retrieved JavaScript representations of CSS values are not mutable - instead updates
-		must explicitly be set using the API.
+        must explicitly be set using the API.
 *   objects are organized for consistency rather than ease of access. For example, even
-		though lengths are often numeric pixel values, a declared {{CSSNumericValue}} can't be
-		treated as a number without first explicitly casting it to a {{CSSUnitValue}}, as calc
-		expressions and keywords are also valid lengths.
+        though lengths are often numeric pixel values, a declared {{CSSNumericValue}} can't be
+        treated as a number without first explicitly casting it to a {{CSSUnitValue}}, as calc
+        expressions and keywords are also valid lengths.
 
 <!--
  ██████   ██████   ██████   ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ██       ██     ██ ████████
@@ -108,9 +108,9 @@ Some particular considerations:
 
 <pre class='idl'>
 interface CSSStyleValue {
-	stringifier;
-	static CSSStyleValue? parse(DOMString property, DOMString cssText);
-	static sequence&lt;CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
+    stringifier;
+    static CSSStyleValue? parse(DOMString property, DOMString cssText);
+    static sequence&lt;CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
 };
 </pre>
 
@@ -132,37 +132,37 @@ when invoked, must [=parse a CSSStyleValue=] with property <var>property</var>, 
 and parseMultiple set to true.
 
 <div algorithm="parse a CSSStyleValue">
-	To <dfn>parse a CSSStyleValue</dfn> given a <var>property</var>, <var>cssText</var>, and a
-	<var>parseMultiple</var> flag, run these steps:
+    To <dfn>parse a CSSStyleValue</dfn> given a <var>property</var>, <var>cssText</var>, and a
+    <var>parseMultiple</var> flag, run these steps:
 
-	1. Attempt to parse |property| as an <<ident>>.
-		If this fails,
-		[=throw=] a {{SyntaxError}} and exit this algorithm.
-		Otherwise, let |property| be the parsed result.
-		If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| [=ASCII lowercased=].
+    1. Attempt to parse |property| as an <<ident>>.
+        If this fails,
+        [=throw=] a {{SyntaxError}} and exit this algorithm.
+        Otherwise, let |property| be the parsed result.
+        If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
 
-	2. If |property| is not a [=supported property name=],
-		[=throw=] a {{TypeError}} and exit this algorithm.
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-	3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
-		If this fails,
-		[=throw=] a {{SyntaxError}} and exit this algorithm.
-		Otherwise,
-		let |value| be the parsed result.
+    3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
+        If this fails,
+        [=throw=] a {{SyntaxError}} and exit this algorithm.
+        Otherwise,
+        let |value| be the parsed result.
 
-	4. If |property| is a [=list-valued property=], and |parseMultiple| is true,
-		subdivide |value| into a list of {{CSSStyleValue}} objects,
-		each representing one [=list-valued property iteration=],
-		and let |value| be the result. Return |value| as a sequence of
-		{{CSSStyleValue}} objects.
+    4. If |property| is a [=list-valued property=], and |parseMultiple| is true,
+        subdivide |value| into a list of {{CSSStyleValue}} objects,
+        each representing one [=list-valued property iteration=],
+        and let |value| be the result. Return |value| as a sequence of
+        {{CSSStyleValue}} objects.
 
-	5. If |property| is a [=list-valued property=], and |parseMultiple| is false
-		subdivide |value| into a list of {{CSSStyleValue}} objects,
-		each representing one [=list-valued property iteration=],
-		and let |value| be the first entry in this list.
+    5. If |property| is a [=list-valued property=], and |parseMultiple| is false
+        subdivide |value| into a list of {{CSSStyleValue}} objects,
+        each representing one [=list-valued property iteration=],
+        and let |value| be the first entry in this list.
 
-	6. return a {{CSSStyleValue}} representing |value|.
+    6. return a {{CSSStyleValue}} representing |value|.
 
 </div>
 
@@ -185,21 +185,21 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 
 <pre class='idl'>
 interface StylePropertyMapReadOnly {
-	CSSStyleValue? get(DOMString property);
-	sequence&lt;CSSStyleValue> getAll(DOMString property);
-	boolean has(DOMString property);
-	iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue>)>;
-	sequence&lt;DOMString> getProperties();
-	stringifier;
+    CSSStyleValue? get(DOMString property);
+    sequence&lt;CSSStyleValue> getAll(DOMString property);
+    boolean has(DOMString property);
+    iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue>)>;
+    sequence&lt;DOMString> getProperties();
+    stringifier;
 };
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
 interface StylePropertyMap : StylePropertyMapReadOnly {
-	void append(DOMString property, (CSSStyleValue or DOMString)... values);
-	void delete(DOMString property);
-	void set(DOMString property, (CSSStyleValue or DOMString)... values);
-	void update(DOMString property, UpdateFunction updateFunction);
+    void append(DOMString property, (CSSStyleValue or DOMString)... values);
+    void delete(DOMString property);
+    void set(DOMString property, (CSSStyleValue or DOMString)... values);
+    void update(DOMString property, UpdateFunction updateFunction);
 };
 </pre>
 
@@ -227,38 +227,38 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 [=append to a StylePropertyMap=] with property <var>property</var> and values <var>values</var>.
 
 <div algorithm>
-	To <dfn>append to a StylePropertyMap</dfn> given a <var>property</var> and a list of
-	<var>values</var>, run these steps:
+    To <dfn>append to a StylePropertyMap</dfn> given a <var>property</var> and a list of
+    <var>values</var>, run these steps:
 
-	1. If |property| does not start with two dashes (U+002D HYPHEN),
-		let |property| be |property| [=ASCII lowercased=].
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
 
-	2. If |property| is not a [=supported property name=],
-		[=throw=] a {{TypeError}} and exit this algorithm.
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-	3. If |property| is not a [=list-valued property=],
-		[=throw=] a {{TypeError}} and exit this algorithm.
+    3. If |property| is not a [=list-valued property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-	4. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
-		let |entry| be that entry.
-		Otherwise, create a new entry for |property| with an empty list,
-		add it to the [=property model=],
-		and let |entry| be the newly-created entry.
+    4. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+        let |entry| be that entry.
+        Otherwise, create a new entry for |property| with an empty list,
+        add it to the [=property model=],
+        and let |entry| be the newly-created entry.
 
-	5. Let |values to append| be the empty list.
+    5. Let |values to append| be the empty list.
 
-	6. For each |value| in |values|:
-		: If |value| is a {{CSSStyleValue}},
-		:: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
-			[=throw=] a {{TypeError}} and exit this algorithm.
-			Otherwise, append |value| to the end of |values to append|.
-		: If |value| is a {{DOMString}},
-		::	[=Parse a CSSStyleValue=] with property |property| and value |value|.
-			If the result is null,
-			[=throw=] a {{TypeError}} and exit this algorithm.
-			Otherwise, append each [=list-valued property iteration=] in the result to the end of |values to append|.
+    6. For each |value| in |values|:
+        : If |value| is a {{CSSStyleValue}},
+        :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
+            [=throw=] a {{TypeError}} and exit this algorithm.
+            Otherwise, append |value| to the end of |values to append|.
+        : If |value| is a {{DOMString}},
+        ::    [=Parse a CSSStyleValue=] with property |property| and value |value|.
+            If the result is null,
+            [=throw=] a {{TypeError}} and exit this algorithm.
+            Otherwise, append each [=list-valued property iteration=] in the result to the end of |values to append|.
 
-	7. Append |values to append| to the end of |entry|’s list.
+    7. Append |values to append| to the end of |entry|’s list.
 </div>
 
 <div algorithm>
@@ -323,7 +323,7 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 
 <pre class='idl'>
 partial interface Window {
-	StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+    StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
 
@@ -337,15 +337,15 @@ When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
 Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
-			not resolved style. In this regard it provides different values than those
-			in objects returned by getComputedStyle.
+            not resolved style. In this regard it provides different values than those
+            in objects returned by getComputedStyle.
 
 Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-	[SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
@@ -365,7 +365,7 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface Element {
-	[SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
@@ -398,14 +398,14 @@ The value for a given property is the last valid value provided in the string.
 <pre class='idl'>
 [Constructor((DOMString or CSSVariableReferenceValue)... members)]
 interface CSSUnparsedValue : CSSStyleValue {
-	iterable<(DOMString or CSSVariableReferenceValue)>;
-	readonly attribute unsigned long length;
-	getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
+    iterable<(DOMString or CSSVariableReferenceValue)>;
+    readonly attribute unsigned long length;
+    getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
 };
 
 interface CSSVariableReferenceValue {
-	attribute DOMString variable;
-	attribute CSSUnparsedValue? fallback;
+    attribute DOMString variable;
+    attribute CSSUnparsedValue? fallback;
 };
 </pre>
 
@@ -440,68 +440,68 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 <pre class='idl'>
 [Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
-	attribute DOMString value;
+    attribute DOMString value;
 };
 </pre>
 
 <div algorithm>
-	The <dfn constructor for=CSSKeywordValue>CSSKeywordValue(|value|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for=CSSKeywordValue>CSSKeywordValue(|value|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
-	1. [=Parse a component value=] from |value|,
-		and let |keyword| be the result.
+    1. [=Parse a component value=] from |value|,
+        and let |keyword| be the result.
 
-	2. If |keyword| is a syntax error,
-		[=throw=] a {{SyntaxError}}.
+    2. If |keyword| is a syntax error,
+        [=throw=] a {{SyntaxError}}.
 
-	3. If |keyword| is anything but an [=identifier=],
-		[=throw=] a {{SyntaxError}}.
+    3. If |keyword| is anything but an [=identifier=],
+        [=throw=] a {{SyntaxError}}.
 
-	4. Otherwise, return a new {{CSSKeywordValue}}
-		with its {{CSSKeywordValue/value}} internal slot
-		set to the serialization of |keyword|.
+    4. Otherwise, return a new {{CSSKeywordValue}}
+        with its {{CSSKeywordValue/value}} internal slot
+        set to the serialization of |keyword|.
 </div>
 
 <div class=issue>
-	It's intentional that this does a CSS parse,
-	rather than just taking the string literally.
+    It's intentional that this does a CSS parse,
+    rather than just taking the string literally.
 
-	Goals are (1) allow .value to round-trip thru the constructor,
-	and (2) allow .value to work when stitched directly into a string
-	that's then fed to CSS.
-	#2 requires us to have .value contain the appropriate CSS escapes,
-	and #1 then requires us to parse those escapes.
+    Goals are (1) allow .value to round-trip thru the constructor,
+    and (2) allow .value to work when stitched directly into a string
+    that's then fed to CSS.
+    #2 requires us to have .value contain the appropriate CSS escapes,
+    and #1 then requires us to parse those escapes.
 
-	On the other hand,
-	I think this conflicts with the most desirable handling of CSS strings;
-	a CSSStringValue should take the value literally, I think.
-	(Otherwise we have to do some weird things around quotes, I think.)
-	Need to evaluate this holistically.
+    On the other hand,
+    I think this conflicts with the most desirable handling of CSS strings;
+    a CSSStringValue should take the value literally, I think.
+    (Otherwise we have to do some weird things around quotes, I think.)
+    Need to evaluate this holistically.
 
-	Possible solution: different behavior between .value
-	and the stringifier.
+    Possible solution: different behavior between .value
+    and the stringifier.
 </div>
 
 <div algorithm for="CSSKeywordValue.value">
-	The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
-	on setting a value |value|,
-	perform the following steps:
+    The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
+    on setting a value |value|,
+    perform the following steps:
 
-	1. [=Parse a component value=] from |value|,
-		and let |keyword| be the result.
+    1. [=Parse a component value=] from |value|,
+        and let |keyword| be the result.
 
-	2. If |keyword| is a syntax error,
-		[=throw=] a {{SyntaxError}}.
+    2. If |keyword| is a syntax error,
+        [=throw=] a {{SyntaxError}}.
 
-	3. If |keyword| is anything but an [=identifier=],
-		[=throw=] a {{SyntaxError}}.
+    3. If |keyword| is anything but an [=identifier=],
+        [=throw=] a {{SyntaxError}}.
 
-	4. Otherwise, set |this|’s internal {{CSSKeywordValue/value}} slot
-		to the serialization of |keyword|.
+    4. Otherwise, set |this|’s internal {{CSSKeywordValue/value}} slot
+        to the serialization of |keyword|.
 
-	On reading, {{CSSKeywordValue/value}}
-	must return the serialization of |this|’s internal {{CSSKeywordValue/value}} slot.
+    On reading, {{CSSKeywordValue/value}}
+    must return the serialization of |this|’s internal {{CSSKeywordValue/value}} slot.
 </div>
 
 
@@ -523,10 +523,10 @@ Numeric Values: {#numeric-objects}
 (<<number>>s, <<percentage>>s, <<dimension>>s).
 
 * {{CSSUnitValue}} objects represent values that contain a single unit type
-	(for example "42px").
+    (for example "42px").
 * {{CSSMathValue}} objects represent math expressions,
-	which can contain more than one value/unit
-	(for example "calc(56em + 10%)").
+    which can contain more than one value/unit
+    (for example "calc(56em + 10%)").
 
 {{CSSNumericValue}} objects are not range-restricted.
 Any valid numeric value can be represented by a {{CSSNumericValue}},
@@ -535,22 +535,22 @@ when set on a [=declared StylePropertyMap=] or [=inline StylePropertyMap=].
 Instead, clamping and/or rounding will occur during computation of style.
 
 <div class='example'>
-	The following code is valid
+    The following code is valid
 
-	<pre class=lang-js>
-		myElement.styleMap.set("opacity", CSS.number(3));
-		myElement.styleMap.set("z-index", CSS.number(15.4));
+    <pre class=lang-js>
+        myElement.styleMap.set("opacity", CSS.number(3));
+        myElement.styleMap.set("z-index", CSS.number(15.4));
 
-		console.log(myElement.styleMap.get("opacity").value); // 3
-		console.log(myElement.styleMap.get("z-index").value); // 15.4
+        console.log(myElement.styleMap.get("opacity").value); // 3
+        console.log(myElement.styleMap.get("z-index").value); // 15.4
 
-		var computedStyle = getComputedStyleMap(myElement);
-		var opacity = computedStyle.get("opacity");
-		var zIndex = computedStyle.get("z-index");
-	</pre>
+        var computedStyle = getComputedStyleMap(myElement);
+        var opacity = computedStyle.get("opacity");
+        var zIndex = computedStyle.get("z-index");
+    </pre>
 
-	After execution, the value of `opacity` is `1` ('opacity' is range-restricted),
-	and the value of `zIndex` is `15` ('z-index' is rounded to an integer value).
+    After execution, the value of `opacity` is `1` ('opacity' is range-restricted),
+    and the value of `zIndex` is `15` ('z-index' is rounded to an integer value).
 </div>
 
 Note: "Numeric values" which incorporate variable references
@@ -586,18 +586,18 @@ All numeric CSS values
 are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
-	interface CSSNumericValue : CSSStyleValue {
-		CSSNumericValue add(CSSNumberish... values);
-		CSSNumericValue sub(CSSNumberish... values);
-		CSSNumericValue mul(CSSNumberish... values);
-		CSSNumericValue div(CSSNumberish... values);
+    interface CSSNumericValue : CSSStyleValue {
+        CSSNumericValue add(CSSNumberish... values);
+        CSSNumericValue sub(CSSNumberish... values);
+        CSSNumericValue mul(CSSNumberish... values);
+        CSSNumericValue div(CSSNumberish... values);
 
-		boolean equals(CSSNumberish... value);
+        boolean equals(CSSNumberish... value);
 
-		CSSNumericValue to(DOMString unit);
+        CSSNumericValue to(DOMString unit);
 
-		static CSSNumericValue parse(DOMString cssText);
-	};
+        static CSSNumericValue parse(DOMString cssText);
+    };
 </xmp>
 
 The methods on the {{CSSNumericValue}} superclass
@@ -606,213 +606,213 @@ represent operations that all numeric values can perform.
 The following are the arithmetic operations you can perform on dimensions:
 
 <div algorithm="CSSNumericValue.add()">
-	The <dfn for=CSSNumericValue method>add(...|values|)</dfn> method,
-	when called on a {{CSSNumericValue}} |this|,
-	must perform the following steps:
+    The <dfn for=CSSNumericValue method>add(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Prepend |this| to |values|.
+    2. Prepend |this| to |values|.
 
-	3. If there are at least two different [=strong types=]
-		among the [=list/items=] in |values|,
-		[=throw=] a {{TypeError}}.
+    3. If there are at least two different [=strong types=]
+        among the [=list/items=] in |values|,
+        [=throw=] a {{TypeError}}.
 
-	4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
-		and have the same {{CSSUnitValue/unit}},
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot is set to the sum of
-		the {{CSSUnitValue/value}} internal slots
-		of the [=list/items=] in |values|.
+    4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+        and have the same {{CSSUnitValue/unit}},
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to the sum of
+        the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
 
-	5. If |this| is a {{CSSMathSum}} object,
-		remove |this| from |values|,
-		and then [=list/append=] the remaining |values|
-		to |this|’s {{CSSMathSum/values}} internal slot.
+    5. If |this| is a {{CSSMathSum}} object,
+        remove |this| from |values|,
+        and then [=list/append=] the remaining |values|
+        to |this|’s {{CSSMathSum/values}} internal slot.
 
-	6. Otherwise,
-		return a new {{CSSMathSum}} object
-		whose {{CSSMathSum/values}} internal slot
-		is set to |values|.
+    6. Otherwise,
+        return a new {{CSSMathSum}} object
+        whose {{CSSMathSum/values}} internal slot
+        is set to |values|.
 </div>
 
 <div algorithm="CSSNumericValue.sub()">
-	The <dfn for=CSSNumericValue method>sub(...|values|)</dfn> method,
-	when called on a {{CSSNumericValue}} |this|,
-	must perform the following steps:
+    The <dfn for=CSSNumericValue method>sub(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Let |thisAndValues| be |this| prepended to |values|.
+    2. Let |thisAndValues| be |this| prepended to |values|.
 
-	3. If there are at least two different [=strong types=]
-		among the [=list/items=] in |thisAndValues|,
-		[=throw=] a {{TypeError}}.
+    3. If there are at least two different [=strong types=]
+        among the [=list/items=] in |thisAndValues|,
+        [=throw=] a {{TypeError}}.
 
-	4. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
-		and have the same {{CSSUnitValue/unit}},
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot is set to
-		the value of |this|’s {{CSSUnitValue/value}} internal slot
-		minus the sum of the {{CSSUnitValue/value}} internal slots
-		of the [=list/items=] in |values|.
+    4. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
+        and have the same {{CSSUnitValue/unit}},
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to
+        the value of |this|’s {{CSSUnitValue/value}} internal slot
+        minus the sum of the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
 
-	5. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
+    5. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
 
-	6. If |this| is a {{CSSMathSum}} object,
-		[=list/append=] |values|
-		to |this|’s {{CSSMathSum/values}} internal slot.
+    6. If |this| is a {{CSSMathSum}} object,
+        [=list/append=] |values|
+        to |this|’s {{CSSMathSum/values}} internal slot.
 
-	7. Otherwise,
-		prepend |this| to |values|,
-		then return a new {{CSSMathSum}} object
-		whose {{CSSMathSum/values}} internal slot
-		is set to |values|.
+    7. Otherwise,
+        prepend |this| to |values|,
+        then return a new {{CSSMathSum}} object
+        whose {{CSSMathSum/values}} internal slot
+        is set to |values|.
 </div>
 
 <div algorithm>
-	To <dfn noexport for=CSSMath>negate</dfn> a {{CSSNumericValue}} |this|:
+    To <dfn noexport for=CSSMath>negate</dfn> a {{CSSNumericValue}} |this|:
 
-	1. If |this| is a {{CSSMathNegate}} object,
-		return |this|’s {{CSSMathNegate/value}} internal slot.
+    1. If |this| is a {{CSSMathNegate}} object,
+        return |this|’s {{CSSMathNegate/value}} internal slot.
 
-	2. Otherwise,
-		return a new {{CSSMathNegate}} object
-		whose {{CSSMathNegate/value}} internal slot
-		is set to |this|.
+    2. Otherwise,
+        return a new {{CSSMathNegate}} object
+        whose {{CSSMathNegate/value}} internal slot
+        is set to |this|.
 </div>
 
 <div algorithm="CSSNumericValue.mul()">
-	The <dfn for=CSSNumericValue method>mul(...|values|)</dfn> method,
-	when called on a {{CSSNumericValue}} |this|,
-	must perform the following steps:
+    The <dfn for=CSSNumericValue method>mul(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Let |thisAndValues| be |this| prepended to |values|.
+    2. Let |thisAndValues| be |this| prepended to |values|.
 
-	3. Let |mainValue| initially be null.
+    3. Let |mainValue| initially be null.
 
-	4. [=list/For each=] |item| of |thisAndValues|:
-		1. If |item| has a [=strong type=],
-			or a [=weak type=] other than "number":
+    4. [=list/For each=] |item| of |thisAndValues|:
+        1. If |item| has a [=strong type=],
+            or a [=weak type=] other than "number":
 
-			1. If |mainValue| is null,
-				set |mainValue| to |item|.
-			2. Otherwise,
-				[=throw=] a {{TypeError}}.
+            1. If |mainValue| is null,
+                set |mainValue| to |item|.
+            2. Otherwise,
+                [=throw=] a {{TypeError}}.
 
-	5. If |mainValue| is still null,
-		set |mainValue| to |this|.
+    5. If |mainValue| is still null,
+        set |mainValue| to |this|.
 
-	6. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot is set to
-		the product of the {{CSSUnitValue/value}} internal slots
-		of the [=list/items=] in |thisAndValues|.
+    6. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to
+        the product of the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |thisAndValues|.
 
-	7. If |this| is a {{CSSMathProduct}} object,
-		[=list/append=] the [=list/items=] of |values|
-		to |this|’s {{CSSMathProduct/values}} internal slot.
+    7. If |this| is a {{CSSMathProduct}} object,
+        [=list/append=] the [=list/items=] of |values|
+        to |this|’s {{CSSMathProduct/values}} internal slot.
 
-	8. Otherwise,
-		and return a new {{CSSMathProduct}}
-		whose {{CSSMathProduct/values}} internal slot
-		is set to |thisAndValues|.
+    8. Otherwise,
+        and return a new {{CSSMathProduct}}
+        whose {{CSSMathProduct/values}} internal slot
+        is set to |thisAndValues|.
 </div>
 
 <div algorithm="CSSNumericValue.div()">
-	The <dfn for=CSSNumericValue method>div(...|values|)</dfn> method,
-	when called on a {{CSSNumericValue}} |this|,
-	must perform the following steps:
+    The <dfn for=CSSNumericValue method>div(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Let |thisAndValues| be |this| prepended to |values|.
+    2. Let |thisAndValues| be |this| prepended to |values|.
 
-	3. Let |mainValue| initially be null.
+    3. Let |mainValue| initially be null.
 
-	4. [=list/For each=] |item| of |thisAndValues|:
-		1. If |item| has a [=strong type=],
-			or a [=weak type=] other than "number":
+    4. [=list/For each=] |item| of |thisAndValues|:
+        1. If |item| has a [=strong type=],
+            or a [=weak type=] other than "number":
 
-			1. If |mainValue| is null,
-				set |mainValue| to |item|.
-			2. Otherwise,
-				[=throw=] a {{TypeError}}.
+            1. If |mainValue| is null,
+                set |mainValue| to |item|.
+            2. Otherwise,
+                [=throw=] a {{TypeError}}.
 
-	5. If |mainValue| is still null,
-		set |mainValue| to |this|.
+    5. If |mainValue| is still null,
+        set |mainValue| to |this|.
 
-	6. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s,
-		return a new {{CSSUnitValue}}
-		whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
-		and {{CSSUnitValue/value}} internal slot is set to
-		the {{CSSUnitValue/value}} internal slot of |this|
-		divided by the product of the {{CSSUnitValue/value}} internal slots
-		of the [=list/items=] in |values|.
+    6. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s,
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to
+        the {{CSSUnitValue/value}} internal slot of |this|
+        divided by the product of the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
 
-	7. [=CSSMath/Invert=] all of the [=list/items=] in |values|.
+    7. [=CSSMath/Invert=] all of the [=list/items=] in |values|.
 
-	8. If |this| is a {{CSSMathProduct}} object,
-		[=list/append=] the [=list/items=] of |values|
-		to |this|’s {{CSSMathProduct/values}} internal slot.
+    8. If |this| is a {{CSSMathProduct}} object,
+        [=list/append=] the [=list/items=] of |values|
+        to |this|’s {{CSSMathProduct/values}} internal slot.
 
-	9. Otherwise,
-		prepend |this| to |values|,
-		then return a new {{CSSMathProduct}} object
-		whose {{CSSMathProduct/values}} internal slot
-		is set to |values|.
+    9. Otherwise,
+        prepend |this| to |values|,
+        then return a new {{CSSMathProduct}} object
+        whose {{CSSMathProduct/values}} internal slot
+        is set to |values|.
 </div>
 
 <div algorithm>
-	To <dfn noexport for=CSSMath>invert</dfn> a {{CSSNumericValue}} |this|:
+    To <dfn noexport for=CSSMath>invert</dfn> a {{CSSNumericValue}} |this|:
 
-	1. If |this| is a {{CSSMathInvert}} object,
-		return |this|’s {{CSSMathInvert/value}} internal slot.
+    1. If |this| is a {{CSSMathInvert}} object,
+        return |this|’s {{CSSMathInvert/value}} internal slot.
 
-	2. Otherwise,
-		return a new {{CSSMathInvert}} object
-		whose {{CSSMathInvert/value}} internal slot
-		is set to |this|.
+    2. Otherwise,
+        return a new {{CSSMathInvert}} object
+        whose {{CSSMathInvert/value}} internal slot
+        is set to |this|.
 </div>
 
 <div class=issue>
-	Define {{CSSNumericValue/equals()}}.
+    Define {{CSSNumericValue/equals()}}.
 </div>
 
 <div algorithm="CSSNumericValue.to()">
-	The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
-	into another one with the specified |unit|.
-	When called, it must perform the following steps:
+    The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
+    into another one with the specified |unit|.
+    When called, it must perform the following steps:
 
-	1. If |unit| does not have a [=CSS type=],
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
+    1. If |unit| does not have a [=CSS type=],
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
 
-	2. If |this| is a {{CSSUnitValue}}
-		and |this|’s {{CSSUnitValue/unit}} internal slot and |unit| are [=compatible units=],
-		return a new {{CSSUnitValue}}
-		with its {{CSSUnitValue/unit}} internal slot set to |unit|
-		and its {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}}
-		multiplied by the conversion ratio between the two units.
+    2. If |this| is a {{CSSUnitValue}}
+        and |this|’s {{CSSUnitValue/unit}} internal slot and |unit| are [=compatible units=],
+        return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/unit}} internal slot set to |unit|
+        and its {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}}
+        multiplied by the conversion ratio between the two units.
 
-	3. If |this| is a {{CSSCalcValue}}:
-		1. Let |sum| be 0.
-		2. [=map/For each=] |oldUnit| → |value| in |this|’s [=map entries=]:
-			1. If |oldUnit| and |unit| are not [=compatible units=],
-				[=throw=] a {{TypeError}}.
-			2. Increment |sum| by |value| times the conversion ratio between |oldUnit| and |unit|.
-		3. Return a new {{CSSUnitValue}}
-			with its {{CSSUnitValue/unit}} internal slot set to |unit|
-			and its {{CSSUnitValue/value}} internal slot set to |sum|.
+    3. If |this| is a {{CSSCalcValue}}:
+        1. Let |sum| be 0.
+        2. [=map/For each=] |oldUnit| → |value| in |this|’s [=map entries=]:
+            1. If |oldUnit| and |unit| are not [=compatible units=],
+                [=throw=] a {{TypeError}}.
+            2. Increment |sum| by |value| times the conversion ratio between |oldUnit| and |unit|.
+        3. Return a new {{CSSUnitValue}}
+            with its {{CSSUnitValue/unit}} internal slot set to |unit|
+            and its {{CSSUnitValue/value}} internal slot set to |sum|.
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
@@ -822,23 +822,23 @@ existing directly on the {{CSSNumericValue}} interface object,
 rather than on {{CSSNumericValue}} instances.
 
 <div algorithm="CSSNumericValue.parse(cssText)">
-	The <dfn method for=CSSNumericValue>parse(|cssText|)</dfn> method,
-	when called,
-	must perform the following steps:
+    The <dfn method for=CSSNumericValue>parse(|cssText|)</dfn> method,
+    when called,
+    must perform the following steps:
 
-	1. [=Parse a component value=] from |cssText|
-		and let |result| be the result.
-		If |result| is a syntax error,
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
+    1. [=Parse a component value=] from |cssText|
+        and let |result| be the result.
+        If |result| is a syntax error,
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
 
-	2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
-		or a <<calc()>>,
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
+    2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
+        or a <<calc()>>,
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
 
-	3. [=Normalize a numeric value=] |result|,
-		and return the result.
+    3. [=Normalize a numeric value=] |result|,
+        and return the result.
 </div>
 
 {{CSSNumericValue}}s can be <dfn export for=CSSNumericValue lt="strong type|strongly typed">strongly typed</dfn> to a type
@@ -885,19 +885,19 @@ Numeric values that can be expressed as a single unit
 are represented as {{CSSUnitValue}}s.
 
 <div class=example>
-	For example, the value ''5px'' in a stylesheet
-	will be represented by a {{CSSUnitValue}}
-	with its `value` attribute set to `5`
-	and its `unit` attribute set to `"px"`.
+    For example, the value ''5px'' in a stylesheet
+    will be represented by a {{CSSUnitValue}}
+    with its `value` attribute set to `5`
+    and its `unit` attribute set to `"px"`.
 
-	Similarly, the value ''10'' in a stylesheet
-	will be represented by a {{CSSUnitValue}}
-	with its `value` attribute set to `10`
-	and its `unit` attribute set to `"number"`.
+    Similarly, the value ''10'' in a stylesheet
+    will be represented by a {{CSSUnitValue}}
+    with its `value` attribute set to `10`
+    and its `unit` attribute set to `"number"`.
 </div>
 
 <xmp class=idl>
-	[Constructor(double value, DOMString unit)]
+    [Constructor(double value, DOMString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
         attribute DOMString unit;
@@ -906,32 +906,32 @@ are represented as {{CSSUnitValue}}s.
 </xmp>
 
 <div algorithm="CSSUnitValue constructor(value, unit)">
-	The <dfn constructor for=CSSUnitValue>CSSUnitValue(|value|, |unit|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for=CSSUnitValue>CSSUnitValue(|value|, |unit|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
-	1. If |unit| does not have a [=CSS type=],
-		[=throw=] a {{SyntaxError}}
-		and abort this algorithm.
+    1. If |unit| does not have a [=CSS type=],
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
 
-	2. Return a new {{CSSUnitValue}}
-		with its {{CSSUnitValue/value}} internal slot set to |value|
-		and its {{CSSUnitValue/unit}} set to |unit|.
+    2. Return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot set to |value|
+        and its {{CSSUnitValue/unit}} set to |unit|.
 </div>
 
 <div algorithm="CSSUnitValue.unit">
-	The <dfn attribute for=CSSUnitValue>unit</dfn> attribute of a {{CSSUnitValue}} |this| must,
-	on setting a value |unit|,
-	perform the following steps:
+    The <dfn attribute for=CSSUnitValue>unit</dfn> attribute of a {{CSSUnitValue}} |this| must,
+    on setting a value |unit|,
+    perform the following steps:
 
-	1. If |unit| does not have a [=CSS type=],
-		[=throw=] a {{TypeError}}.
+    1. If |unit| does not have a [=CSS type=],
+        [=throw=] a {{TypeError}}.
 
-	2. Otherwise,
-		set |this|’s {{CSSUnitValue/unit}} internal slot to |unit|.
+    2. Otherwise,
+        set |this|’s {{CSSUnitValue/unit}} internal slot to |unit|.
 
-	On reading,
-	it must return the value of |this|’s {{CSSUnitValue/unit}} internal slot.
+    On reading,
+    it must return the value of |this|’s {{CSSUnitValue/unit}} internal slot.
 </div>
 
 <div algorithm="CSSUnitValue.type">
@@ -1005,49 +1005,49 @@ are represented in this way.
 
 <xmp class=idl>
 interface CSSMathValue : CSSNumericValue {
-	readonly attribute CSSMathOperator operator;
+    readonly attribute CSSMathOperator operator;
     readonly attribute DOMString type;
 };
 
 [Constructor(CSSNumberish... args)]
 interface CSSMathSum : CSSMathValue {
-	attribute CSSNumericArray values;
+    attribute CSSNumericArray values;
 };
 
 [Constructor(CSSNumberish... args)]
 interface CSSMathProduct : CSSMathValue {
-	attribute CSSNumericArray values;
+    attribute CSSNumericArray values;
 };
 
 [Constructor(CSSNumberish arg)]
 interface CSSMathNegate : CSSMathValue {
-	attribute CSSNumericValue value;
+    attribute CSSNumericValue value;
 };
 
 [Constructor(CSSNumberish arg)]
 interface CSSMathInvert : CSSMathValue {
-	attribute CSSNumericValue value;
+    attribute CSSNumericValue value;
 };
 
 [Constructor(CSSNumberish... args)]
 interface CSSMathMin : CSSMathValue {
-	attribute CSSNumericArray values;
+    attribute CSSNumericArray values;
 };
 
 [Constructor(CSSNumberish... args)]
 interface CSSMathMax : CSSMathValue {
-	attribute CSSNumericArray values;
+    attribute CSSNumericArray values;
 };
 
 interface CSSNumericArray {}; // See issue below
 
 enum CSSMathOperator {
-	"sum",
-	"product",
-	"negate",
-	"invert",
-	"min",
-	"max",
+    "sum",
+    "product",
+    "negate",
+    "invert",
+    "min",
+    "max",
 };
 </xmp>
 
@@ -1061,33 +1061,33 @@ It exists solely to host the common attributes
 of all the "math" operations.
 
 <div algorithm="CSSMathValue.operator">
-	The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">operator</dfn> attribute
-	of a {{CSSMathValue}} |this| must,
-	on getting,
-	return the following string,
-	depending on the interface of |this|:
+    The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">operator</dfn> attribute
+    of a {{CSSMathValue}} |this| must,
+    on getting,
+    return the following string,
+    depending on the interface of |this|:
 
-	<dl class=switch>
-		: {{CSSMathSum}}
-		:: <code>"sum"</code>
+    <dl class=switch>
+        : {{CSSMathSum}}
+        :: <code>"sum"</code>
 
-		: {{CSSMathProduct}}
-		:: <code>"product"</code>
+        : {{CSSMathProduct}}
+        :: <code>"product"</code>
 
-		: {{CSSMathMin}}
-		:: <code>"min"</code>
+        : {{CSSMathMin}}
+        :: <code>"min"</code>
 
-		: {{CSSMathMax}}
-		:: <code>"max"</code>
+        : {{CSSMathMax}}
+        :: <code>"max"</code>
 
-		: {{CSSMathNegate}}
-		:: <code>"negate"</code>
+        : {{CSSMathNegate}}
+        :: <code>"negate"</code>
 
-		: {{CSSMathInvert}}
-		:: <code>"invert"</code>
-	</dl>
+        : {{CSSMathInvert}}
+        :: <code>"invert"</code>
+    </dl>
 
-	Note: These are all instances of the {{CSSMathOperator}} enum.
+    Note: These are all instances of the {{CSSMathOperator}} enum.
 </div>
 
 <div algorithm="CSSMathValue.type">
@@ -1099,76 +1099,76 @@ of all the "math" operations.
     1. Let |types| initially be an empty [=ordered set=].
 
     2. If |this| has a [=strong type=],
-    	[=set/append=] its [=strong type=] to |types|.
+        [=set/append=] its [=strong type=] to |types|.
 
     3. If |this| has the "percent" [=weak type=],
-    	[=set/append=] "percent" to |types|.
+        [=set/append=] "percent" to |types|.
 
     4. If |this| has the "number" [=weak type=],
-    	[=set/append=] "number" to |types|.
+        [=set/append=] "number" to |types|.
 
     5. Return the concatenation of the strings in |types|,
-    	each separated by a U+002D HYPHEN-MINUS (-) character.
+        each separated by a U+002D HYPHEN-MINUS (-) character.
 
     Note: This implies that if |this| is [=untyped=],
     this attribute returns the empty string.
 </div>
 
 <div algorithm="CSSMathSum(...args)">
-	The <dfn constructor for="CSSMathSum">CSSMathSum(...|args|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for="CSSMathSum">CSSMathSum(...|args|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
     1. Replace each [=list/item=] of |args|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. If |args| [=list/is empty=],
-		[=throw=] a {{SyntaxError}}.
+    2. If |args| [=list/is empty=],
+        [=throw=] a {{SyntaxError}}.
 
-	3. Let |strongType| initially be null.
+    3. Let |strongType| initially be null.
 
-	4. Let |values| be an initially empty [=list=].
+    4. Let |values| be an initially empty [=list=].
 
-	5. [=list/For each=] |arg| of |args|:
+    5. [=list/For each=] |arg| of |args|:
 
-		1. If |arg| has a [=strong type=], and |strongType| is null,
-			let |strongType| by |arg|’s [=strong type=].
+        1. If |arg| has a [=strong type=], and |strongType| is null,
+            let |strongType| by |arg|’s [=strong type=].
 
-		2. If |arg| has a [=strong type=],
-			and |strongType| is not equal to that type,
-			[=throw=] a {{TypeError}}.
+        2. If |arg| has a [=strong type=],
+            and |strongType| is not equal to that type,
+            [=throw=] a {{TypeError}}.
 
-		3. [=list/Append=] |arg| to |values|.
+        3. [=list/Append=] |arg| to |values|.
 
-	6. Return a new {{CSSMathSum}}
-		whose {{CSSMathSum/values}} internal slot
-		is set to |values|.
+    6. Return a new {{CSSMathSum}}
+        whose {{CSSMathSum/values}} internal slot
+        is set to |values|.
 
-	The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn>,
-	<dfn constructor for="CSSMathMin">CSSMathMin(...|args|)</dfn>,
-	and <dfn constructor for="CSSMathMax">CSSMathMax(...|args|)</dfn> constructors
-	are defined identically to the above,
-	except that in the last step
-	they return a new {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}} object,
-	respectively.
+    The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn>,
+    <dfn constructor for="CSSMathMin">CSSMathMin(...|args|)</dfn>,
+    and <dfn constructor for="CSSMathMax">CSSMathMax(...|args|)</dfn> constructors
+    are defined identically to the above,
+    except that in the last step
+    they return a new {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}} object,
+    respectively.
 </div>
 
 <div algorithm="CSSMathNegate(arg)">
-	The <dfn constructor for="CSSMathNegate">CSSMathNegate(|arg|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for="CSSMathNegate">CSSMathNegate(|arg|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
     1. Replace |arg|
         with the result of [=rectifying a numberish value=] for |arg|.
 
-	1. Return a new {{CSSMathNegate}}
-		whose {{CSSMathNegate/value}} internal slot
-		is set to |arg|.
+    1. Return a new {{CSSMathNegate}}
+        whose {{CSSMathNegate/value}} internal slot
+        is set to |arg|.
 
-	The <dfn constructor for="CSSMathInvert">CSSMathInvert(|arg|)</dfn> constructor
-	is defined identically to the above,
-	except that in the last step
-	it returns a new {{CSSMathInvert}} object.
+    The <dfn constructor for="CSSMathInvert">CSSMathInvert(|arg|)</dfn> constructor
+    is defined identically to the above,
+    except that in the last step
+    it returns a new {{CSSMathInvert}} object.
 </div>
 
 
@@ -1191,85 +1191,85 @@ than using the constructors directly.
 
 <xmp class=idl>
 partial namespace CSS {
-	CSSUnitValue number(double value);
-	CSSUnitValue percent(double value);
+    CSSUnitValue number(double value);
+    CSSUnitValue percent(double value);
 
-	// <length>
-	CSSUnitValue em(double value);
-	CSSUnitValue ex(double value);
-	CSSUnitValue ch(double value);
-	CSSUnitValue ic(double value);
-	CSSUnitValue rem(double value);
-	CSSUnitValue lh(double value);
-	CSSUnitValue rlh(double value);
-	CSSUnitValue vw(double value);
-	CSSUnitValue vh(double value);
-	CSSUnitValue vi(double value);
-	CSSUnitValue vb(double value);
-	CSSUnitValue vmin(double value);
-	CSSUnitValue vmax(double value);
-	CSSUnitValue cm(double value);
-	CSSUnitValue mm(double value);
-	CSSUnitValue q(double value);
-	CSSUnitValue in(double value);
-	CSSUnitValue pt(double value);
-	CSSUnitValue pc(double value);
-	CSSUnitValue px(double value);
+    // <length>
+    CSSUnitValue em(double value);
+    CSSUnitValue ex(double value);
+    CSSUnitValue ch(double value);
+    CSSUnitValue ic(double value);
+    CSSUnitValue rem(double value);
+    CSSUnitValue lh(double value);
+    CSSUnitValue rlh(double value);
+    CSSUnitValue vw(double value);
+    CSSUnitValue vh(double value);
+    CSSUnitValue vi(double value);
+    CSSUnitValue vb(double value);
+    CSSUnitValue vmin(double value);
+    CSSUnitValue vmax(double value);
+    CSSUnitValue cm(double value);
+    CSSUnitValue mm(double value);
+    CSSUnitValue q(double value);
+    CSSUnitValue in(double value);
+    CSSUnitValue pt(double value);
+    CSSUnitValue pc(double value);
+    CSSUnitValue px(double value);
 
-	// <angle>
-	CSSUnitValue deg(double value);
-	CSSUnitValue grad(double value);
-	CSSUnitValue rad(double value);
-	CSSUnitValue turn(double value);
+    // <angle>
+    CSSUnitValue deg(double value);
+    CSSUnitValue grad(double value);
+    CSSUnitValue rad(double value);
+    CSSUnitValue turn(double value);
 
-	// <time>
-	CSSUnitValue s(double value);
-	CSSUnitValue ms(double value);
+    // <time>
+    CSSUnitValue s(double value);
+    CSSUnitValue ms(double value);
 
-	// <frequency>
-	CSSUnitValue Hz(double value);
-	CSSUnitValue kHz(double value);
+    // <frequency>
+    CSSUnitValue Hz(double value);
+    CSSUnitValue kHz(double value);
 
-	// <resolution>
-	CSSUnitValue dpi(double value);
-	CSSUnitValue dpcm(double value);
-	CSSUnitValue dppx(double value);
+    // <resolution>
+    CSSUnitValue dpi(double value);
+    CSSUnitValue dpcm(double value);
+    CSSUnitValue dppx(double value);
 
-	// <flex>
-	CSSUnitValue fr(double value);
+    // <flex>
+    CSSUnitValue fr(double value);
 };
 </xmp>
 
 <div algorithm="CSS.numeric">
-	All of the above methods must,
-	when called with a double |value|,
-	return a new {{CSSUnitValue}}
-	whose {{CSSUnitValue/value}} internal slot
-	is set to |value|
-	and whose {{CSSUnitValue/unit}} internal slot
-	is set to the name of the method as defined here.
+    All of the above methods must,
+    when called with a double |value|,
+    return a new {{CSSUnitValue}}
+    whose {{CSSUnitValue/value}} internal slot
+    is set to |value|
+    and whose {{CSSUnitValue/unit}} internal slot
+    is set to the name of the method as defined here.
 
-	Note: The unit used does not depend on the *current* name of the function,
-	if it's stored in another variable;
-	`let foo = CSS.px; let val = foo(5);` does not return a `{value: 5, unit: "foo"}` {{CSSUnitValue}}.
-	The above talk about names is just a shorthand
-	to avoid defining the unit individually for all ~20 functions.
+    Note: The unit used does not depend on the *current* name of the function,
+    if it's stored in another variable;
+    `let foo = CSS.px; let val = foo(5);` does not return a `{value: 5, unit: "foo"}` {{CSSUnitValue}}.
+    The above talk about names is just a shorthand
+    to avoid defining the unit individually for all ~20 functions.
 </div>
 
 <div class=example>
-	For example, rather than creating a new {{CSSPositionValue}} with code like:
+    For example, rather than creating a new {{CSSPositionValue}} with code like:
 
-	<pre class=lang-js>
-		let pos = new CSSPositionValue(
-			new CSSUnitValue(5, "px"),
-			new CSSUnitValue(10, "px"));
-	</pre>
+    <pre class=lang-js>
+        let pos = new CSSPositionValue(
+            new CSSUnitValue(5, "px"),
+            new CSSUnitValue(10, "px"));
+    </pre>
 
-	One can instead write:
+    One can instead write:
 
-	<pre class=lang-js>
-		let pos = new CSSPositionValue(CSS.px(5), CSS.px(10));
-	</pre>
+    <pre class=lang-js>
+        let pos = new CSSPositionValue(CSS.px(5), CSS.px(10));
+    </pre>
 </div>
 
 <!--
@@ -1293,11 +1293,11 @@ which represent individual <<transform-function>> values.
 <xmp class='idl'>
     [Constructor(optional sequence<CSSTransformComponent> transforms)]
     interface CSSTransformValue : CSSStyleValue {
-    	iterable<CSSTransformComponent>;
-	readonly attribute unsigned long length;
-	getter CSSTransformComponent (unsigned long index);
-    	readonly attribute boolean is2D;
-    	readonly attribute DOMMatrixReadOnly matrix;
+        iterable<CSSTransformComponent>;
+    readonly attribute unsigned long length;
+    getter CSSTransformComponent (unsigned long index);
+        readonly attribute boolean is2D;
+        readonly attribute DOMMatrixReadOnly matrix;
     };
 </xmp>
 
@@ -1311,285 +1311,285 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the {{CSSTransform
 from the [=values to iterate over=] [=list=].
 
 <div algorithm>
-	The <dfn constructor for=CSSTransformValue>CSSTransformValue(|transforms|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for=CSSTransformValue>CSSTransformValue(|transforms|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
-	1. Return a new {{CSSTransformValue}} whose [=values to iterate over=] is |transforms|.
+    1. Return a new {{CSSTransformValue}} whose [=values to iterate over=] is |transforms|.
 </div>
 
 <div algorithm="CSSTransformValue.is2D">
-	The <dfn attribute for=CSSTransformValue>is2D</dfn> attribute of a {{CSSTransformValue}} |this| must,
-	on getting,
-	return `true` if,
-	[=list/for each=] |func| in |this|’s [=values to iterate over=],
-	the |func|’s {{CSSTransformComponent/is2D}} attribute would return `true`;
-	otherwise,
-	the attribute returns `false`.
+    The <dfn attribute for=CSSTransformValue>is2D</dfn> attribute of a {{CSSTransformValue}} |this| must,
+    on getting,
+    return `true` if,
+    [=list/for each=] |func| in |this|’s [=values to iterate over=],
+    the |func|’s {{CSSTransformComponent/is2D}} attribute would return `true`;
+    otherwise,
+    the attribute returns `false`.
 </div>
 
 <div algorithm="CSSTransformValue.matrix">
-	The <dfn attribute for=CSSTransformValue>matrix</dfn> attribute of a {{CSSTransformValue}} |this| must,
-	on getting,
-	perform the following steps:
+    The <dfn attribute for=CSSTransformValue>matrix</dfn> attribute of a {{CSSTransformValue}} |this| must,
+    on getting,
+    perform the following steps:
 
-	1. Let |matrix| be a 4x4 matrix,
-		initially set to the identity matrix.
+    1. Let |matrix| be a 4x4 matrix,
+        initially set to the identity matrix.
 
-	2. [=list/For each=] |func| in |this|’s [=values to iterate over=],
-		set |matrix| to the result of multiplying |matrix|
-		and |func|’s equivalent 4x4 transform matrix.
+    2. [=list/For each=] |func| in |this|’s [=values to iterate over=],
+        set |matrix| to the result of multiplying |matrix|
+        and |func|’s equivalent 4x4 transform matrix.
 
-	3. Return a new {{DOMMatrixReadOnly}}
-		representing |matrix|.
+    3. Return a new {{DOMMatrixReadOnly}}
+        representing |matrix|.
 </div>
 
 
 <xmp class=idl>
     interface CSSTransformComponent {
-	stringifier;
-    	attribute boolean is2D;
+    stringifier;
+        attribute boolean is2D;
     };
 
     [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
     interface CSSTranslation : CSSTransformComponent {
-    	attribute CSSNumericValue x;
-    	attribute CSSNumericValue y;
-    	attribute CSSNumericValue z;
+        attribute CSSNumericValue x;
+        attribute CSSNumericValue y;
+        attribute CSSNumericValue z;
     };
 
     [Constructor(CSSNumericValue angle),
      Constructor(double x, double y, double z, CSSNumericValue angle)]
     interface CSSRotation : CSSTransformComponent {
-    	attribute double x;
-    	attribute double y;
-    	attribute double z;
-    	attribute CSSNumericValue angle;
+        attribute double x;
+        attribute double y;
+        attribute double z;
+        attribute CSSNumericValue angle;
     };
 
     [Constructor(double x, double y, optional double z)]
     interface CSSScale : CSSTransformComponent {
-    	attribute double x;
-    	attribute double y;
-    	attribute double z;
+        attribute double x;
+        attribute double y;
+        attribute double z;
     };
 
     [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
     interface CSSSkew : CSSTransformComponent {
-    	attribute CSSNumericValue ax;
-    	attribute CSSNumericValue ay;
+        attribute CSSNumericValue ax;
+        attribute CSSNumericValue ay;
     };
 
     [Constructor(CSSNumericValue length)]
     interface CSSPerspective : CSSTransformComponent {
-    	attribute CSSNumericValue length;
+        attribute CSSNumericValue length;
     };
 
     [Constructor(DOMMatrixReadOnly matrix)]
     interface CSSMatrixComponent : CSSTransformComponent {
-    	attribute DOMMatrix matrix;
+        attribute DOMMatrix matrix;
     };
 </xmp>
 
 Issue(365): why don't these accept CSSUnitValues?
 
 <div algorithm="CSSTransformComponent.numericValues">
-	Unless otherwise specified,
-	all {{CSSTransformComponent}} subclass attributes that have a {{CSSNumericValue}} or {{DOMMatrix}} type must,
-	on getting,
-	return a new {{CSSNumericValue}} or {{DOMMatrix}}
-	equivalent to the one stored in the corresponding internal slot.
+    Unless otherwise specified,
+    all {{CSSTransformComponent}} subclass attributes that have a {{CSSNumericValue}} or {{DOMMatrix}} type must,
+    on getting,
+    return a new {{CSSNumericValue}} or {{DOMMatrix}}
+    equivalent to the one stored in the corresponding internal slot.
 
-	Unless otherwise specified,
-	they must,
-	on setting,
-	store a new {{CSSNumericValue}} or {{DOMMatrix}}
-	equivalent to the value being set.
+    Unless otherwise specified,
+    they must,
+    on setting,
+    store a new {{CSSNumericValue}} or {{DOMMatrix}}
+    equivalent to the value being set.
 </div>
 
 <div algorithm="CSSTransformComponent 3D stuff">
-	If a {{CSSTransformComponent}}’s {{CSSTransformComponent/is2D}} internal slot is `true`,
-	the attributes in the following list must,
-	on setting,
-	do nothing;
-	on getting,
-	they must return the value specified in the following list:
+    If a {{CSSTransformComponent}}’s {{CSSTransformComponent/is2D}} internal slot is `true`,
+    the attributes in the following list must,
+    on setting,
+    do nothing;
+    on getting,
+    they must return the value specified in the following list:
 
-	: {{CSSTranslation/z|CSSTranslation.z}}
-	:: A new {{CSSUnitValue}} representing ''0px''.
+    : {{CSSTranslation/z|CSSTranslation.z}}
+    :: A new {{CSSUnitValue}} representing ''0px''.
 
-	: {{CSSRotation/x|CSSRotation.x}}
-	: {{CSSRotation/y|CSSRotation.y}}
-	:: The number `0`.
+    : {{CSSRotation/x|CSSRotation.x}}
+    : {{CSSRotation/y|CSSRotation.y}}
+    :: The number `0`.
 
-	: {{CSSRotation/z|CSSRotation.z}}
-	:: The number `1`.
+    : {{CSSRotation/z|CSSRotation.z}}
+    :: The number `1`.
 
-	: {{CSSScale/z|CSSScale.z}}
-	:: The number `1`.
+    : {{CSSScale/z|CSSScale.z}}
+    :: The number `1`.
 </div>
 
 <details class=note>
-	<summary>{{CSSTransformComponent/is2D}} Design Considerations</summary>
+    <summary>{{CSSTransformComponent/is2D}} Design Considerations</summary>
 
-	For legacy reasons,
-	2D and 3D transforms are distinct,
-	even if they have identical effects;
-	a ''translateZ(0px)'' has observable effects on a page,
-	even tho it's defined to be an identity transform,
-	as the UA activates some 3D-based optimizations for the element.
+    For legacy reasons,
+    2D and 3D transforms are distinct,
+    even if they have identical effects;
+    a ''translateZ(0px)'' has observable effects on a page,
+    even tho it's defined to be an identity transform,
+    as the UA activates some 3D-based optimizations for the element.
 
-	There were several possible ways to reflect this--
-	nullable 3D-related attributes,
-	separate 2D and 3D interfaces,
-	etc--
-	but we chose the current design
-	(an author-flippable switch that dictates the behavior)
-	because it allows authors to,
-	in most circumstances,
-	operate on transforms without having to care whether they're 2D or 3D,
-	but also prevents "accidentally" flipping a 2D transform into becoming 3D.
+    There were several possible ways to reflect this--
+    nullable 3D-related attributes,
+    separate 2D and 3D interfaces,
+    etc--
+    but we chose the current design
+    (an author-flippable switch that dictates the behavior)
+    because it allows authors to,
+    in most circumstances,
+    operate on transforms without having to care whether they're 2D or 3D,
+    but also prevents "accidentally" flipping a 2D transform into becoming 3D.
 </details>
 
 <div algorithm="CSSTranslation()">
-	The <dfn constructor for=CSSTranslation>CSSTranslation(|x|, |y|, |z|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSTranslation>CSSTranslation(|x|, |y|, |z|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. If |x|, |y| don't match <<length-percentage>>,
-		or |z| (if passed) doesn't match <<length-percentage>>,
-		[=throw=] a {{TypeError}}.
+    1. If |x|, |y| don't match <<length-percentage>>,
+        or |z| (if passed) doesn't match <<length-percentage>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Let |this| be a new {{CSSTranslation}} object,
-		with its internal {{CSSTranslation/x}} and {{CSSTranslation/y}} slots
-		set to new {{CSSNumericValue}} objects
-		equivalent to |x| and |y|.
+    2. Let |this| be a new {{CSSTranslation}} object,
+        with its internal {{CSSTranslation/x}} and {{CSSTranslation/y}} slots
+        set to new {{CSSNumericValue}} objects
+        equivalent to |x| and |y|.
 
-	3. If |z| was passed,
-		set |this|’s {{CSSTranslation/z}} internal slot
-		to a new {{CSSNumericValue}} object
-		equivalent to |z|,
-		and set |this|’s {{CSSTransformComponent/is2D}} internal slot
-		to `false`.
+    3. If |z| was passed,
+        set |this|’s {{CSSTranslation/z}} internal slot
+        to a new {{CSSNumericValue}} object
+        equivalent to |z|,
+        and set |this|’s {{CSSTransformComponent/is2D}} internal slot
+        to `false`.
 
-	4. If |z| was not passed,
-		set |this|’s {{CSSTranslation/z}} internal slot
-		to a new {{CSSNumericValue}} object
-		representing ''0px'',
-		and set |this|’s {{CSSTransformComponent/is2D}} internal slot
-		to `true`.
+    4. If |z| was not passed,
+        set |this|’s {{CSSTranslation/z}} internal slot
+        to a new {{CSSNumericValue}} object
+        representing ''0px'',
+        and set |this|’s {{CSSTransformComponent/is2D}} internal slot
+        to `true`.
 
-	5. Return |this|.
+    5. Return |this|.
 </div>
 
 <div algorithm="CSSRotation(angle)">
-	The <dfn constructor for=CSSRotation>CSSRotation(|angle|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSRotation>CSSRotation(|angle|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. If |angle| doesn't match <<angle>>,
-		[=throw=] a {{TypeError}}.
+    1. If |angle| doesn't match <<angle>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Return a new {{CSSRotation}}
-		with its {{CSSRotation/angle}} internal slot
-		set to a new {{CSSNumericValue}} equivalent to |angle|,
-		its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots set to `0`,
-		its {{CSSRotation/z}} internal slot set to `1`,
-		and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+    2. Return a new {{CSSRotation}}
+        with its {{CSSRotation/angle}} internal slot
+        set to a new {{CSSNumericValue}} equivalent to |angle|,
+        its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots set to `0`,
+        its {{CSSRotation/z}} internal slot set to `1`,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
 <div algorithm="CSSRotation(x, y, z, angle)">
-	The <dfn constructor for=CSSRotation>CSSRotation(|x|, |y|, |z|, |angle|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSRotation>CSSRotation(|x|, |y|, |z|, |angle|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. If |angle| doesn't match <<angle>>,
-		[=throw=] a {{TypeError}}.
+    1. If |angle| doesn't match <<angle>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Return a new {{CSSRotation}}
-		with its {{CSSRotation/angle}} internal slot
-		set to a new {{CSSNumericValue}} equivalent to |angle|,
-		its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
-		and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
+    2. Return a new {{CSSRotation}}
+        with its {{CSSRotation/angle}} internal slot
+        set to a new {{CSSNumericValue}} equivalent to |angle|,
+        its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
 <div algorithm="CSSScale()">
-	The <dfn constructor for=CSSScale>CSSScale(|x|, |y|, |z|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSScale>CSSScale(|x|, |y|, |z|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. Let |this| be a new {{CSSScale}} object,
-		with its {{CSSScale/x}} and {{CSSScale/y}} internal slots
-		set to |x| and |y|.
+    1. Let |this| be a new {{CSSScale}} object,
+        with its {{CSSScale/x}} and {{CSSScale/y}} internal slots
+        set to |x| and |y|.
 
-	2. If |z| was passed,
-		set |this|’s {{CSSScale/z}} internal slot to |z|,
-		and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `false`.
+    2. If |z| was passed,
+        set |this|’s {{CSSScale/z}} internal slot to |z|,
+        and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `false`.
 
-	3. If |z| was not passed,
-		set |this|’s {{CSSScale/z}} internal slot to `1`,
-		and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
+    3. If |z| was not passed,
+        set |this|’s {{CSSScale/z}} internal slot to `1`,
+        and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
-	4. Return |this|.
+    4. Return |this|.
 </div>
 
 <div algorithm="CSSSkew()">
-	The <dfn constructor for=CSSSkew>CSSSkew(|ax|, |ay|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSSkew>CSSSkew(|ax|, |ay|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. If |ax| or |ay| do not match <<angle>>,
-		[=throw=] a {{TypeError}}.
+    1. If |ax| or |ay| do not match <<angle>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Return a new {{CSSSkew}} object
-		with its {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-		set to new {{CSSNumericValue}}s equivalent to |ax| and |ay|,
-		and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+    2. Return a new {{CSSSkew}} object
+        with its {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
+        set to new {{CSSNumericValue}}s equivalent to |ax| and |ay|,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
 <div algorithm="CSSSkew.is2D">
-	The <dfn attribute for=CSSSkew>is2D</dfn> attribute of a {{CSSSkew}} object must,
-	on setting,
-	do nothing.
+    The <dfn attribute for=CSSSkew>is2D</dfn> attribute of a {{CSSSkew}} object must,
+    on setting,
+    do nothing.
 
-	Note: ''skew()'' functions always represent 2D transforms.
+    Note: ''skew()'' functions always represent 2D transforms.
 </div>
 
 <div algorithm="CSSPerspective()">
-	The <dfn constructor for=CSSPerspective>CSSPerspective(|length|)</dfn> constructor must,
-	when invoked,
-	perform the following steps:
+    The <dfn constructor for=CSSPerspective>CSSPerspective(|length|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
 
-	1. If |length| does not match <<length>>,
-		[=throw=] a {{TypeError}}.
+    1. If |length| does not match <<length>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Return a new {{CSSPerspective}} object
-		with its {{CSSPerspective/length}} internal slot
-		set to a new {{CSSNumericValue}} equivalent to |length|,
-		and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
+    2. Return a new {{CSSPerspective}} object
+        with its {{CSSPerspective/length}} internal slot
+        set to a new {{CSSNumericValue}} equivalent to |length|,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
 <div algorithm="CSSPerspective.is2D">
-	The <dfn attribute for=CSSPerspective>is2D</dfn> attribute of a {{CSSPerspective}} object must,
-	on setting,
-	do nothing.
+    The <dfn attribute for=CSSPerspective>is2D</dfn> attribute of a {{CSSPerspective}} object must,
+    on setting,
+    do nothing.
 
-	Note: ''perspective()'' functions always represent 3D transforms.
+    Note: ''perspective()'' functions always represent 3D transforms.
 </div>
 
 Issue(366): Figure out how to define 2d vs 3d matrix.
 
 <div class=note>
-	Each {{CSSTransformComponent}} can correspond to
-	one of a number of underlying transform functions.
-	For example, a {{CSSTranslation}}
-	with an x value of ''10px''
-	and y &amp; z values of ''0px'' could represent any of the following:
+    Each {{CSSTransformComponent}} can correspond to
+    one of a number of underlying transform functions.
+    For example, a {{CSSTranslation}}
+    with an x value of ''10px''
+    and y &amp; z values of ''0px'' could represent any of the following:
 
-	* translate(10px)
-	* translate(10px, 0)
-	* translateX(10px)
-	* translate3d(10px, 0, 0)
+    * translate(10px)
+    * translate(10px, 0)
+    * translateX(10px)
+    * translate3d(10px, 0, 0)
 </div>
 
 <!--
@@ -1613,8 +1613,8 @@ Issue(312): background-position is a shorthand
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
-	attribute CSSNumericValue x;
-	attribute CSSNumericValue y;
+    attribute CSSNumericValue x;
+    attribute CSSNumericValue y;
 };
 </pre>
 
@@ -1622,56 +1622,56 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 {{CSSPositionValue/y}} expressions the offset from the top edge of the container.
 
 <div algorithm>
-	The <dfn constructor for=CSSPositionValue>CSSPositionValue(|x|, |y|)</dfn> constructor must,
-	when called,
-	perform the following steps:
+    The <dfn constructor for=CSSPositionValue>CSSPositionValue(|x|, |y|)</dfn> constructor must,
+    when called,
+    perform the following steps:
 
-	1. If |x| or |y| doesn't match <<length-percentage>>,
-		[=throw=] a {{TypeError}}.
+    1. If |x| or |y| doesn't match <<length-percentage>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Otherwise, return a new {{CSSPositionValue}}
-		whose {{CSSPositionValue/x}} internal slot is set to |x|,
-		and whose {{CSSPositionValue/y}} internal slot is set to |y|.
+    2. Otherwise, return a new {{CSSPositionValue}}
+        whose {{CSSPositionValue/x}} internal slot is set to |x|,
+        and whose {{CSSPositionValue/y}} internal slot is set to |y|.
 </div>
 
 <div algorithm="CSSPositionValue.x">
-	The <dfn attribute for=CSSPositionValue>x</dfn> and <dfn attribute for=CSSPositionValue>y</dfn> attribute of a {{CSSPositionValue}} |this| must,
-	on setting a value |value|,
-	perform the following steps:
+    The <dfn attribute for=CSSPositionValue>x</dfn> and <dfn attribute for=CSSPositionValue>y</dfn> attribute of a {{CSSPositionValue}} |this| must,
+    on setting a value |value|,
+    perform the following steps:
 
-	1. If |value| doesn't match <<length-percentage>>,
-		[=throw=] a {{TypeError}}.
+    1. If |value| doesn't match <<length-percentage>>,
+        [=throw=] a {{TypeError}}.
 
-	2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
-		as appropriate,
-		to |value|.
+    2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
+        as appropriate,
+        to |value|.
 
-	On reading, the attributes must return the value of the {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
-		as appropriate.
+    On reading, the attributes must return the value of the {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
+        as appropriate.
 </div>
 
 <div class='example'>
-	<<position>> values accept a complicated combination of keywords and values,
-	but in the Typed OM are always simplified to just two offsets.
-	For example, the following style sheet:
+    <<position>> values accept a complicated combination of keywords and values,
+    but in the Typed OM are always simplified to just two offsets.
+    For example, the following style sheet:
 
-	<pre class='lang-css'>
-	.example {
-		background-position: center bottom 10px;
-	}
-	</pre>
+    <pre class='lang-css'>
+    .example {
+        background-position: center bottom 10px;
+    }
+    </pre>
 
-	Will produce the following behavior:
+    Will produce the following behavior:
 
-	<pre class='lang-javascript'>
-	let map = document.querySelector('.example').styleMap;
+    <pre class='lang-javascript'>
+    let map = document.querySelector('.example').styleMap;
 
-	map.get('background-position').x;
-	// CSSUnitValue(50, "percent")
+    map.get('background-position').x;
+    // CSSUnitValue(50, "percent")
 
-	map.get('background-position').y;
-	// CSSCalcValue({percent: 100, px: -10})
-	</pre>
+    map.get('background-position').y;
+    // CSSCalcValue({percent: 100, px: -10})
+    </pre>
 </div>
 
 <!--
@@ -1691,7 +1691,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 enum CSSResourceState {"unloaded", "loading", "loaded", "error"};
 
 interface CSSResourceValue : CSSStyleValue {
-	readonly attribute CSSResourceState state;
+    readonly attribute CSSResourceState state;
 };
 
 </pre>
@@ -1734,14 +1734,14 @@ Issue(186): CSSResourceValues constructed within Worklets should be "unloaded".
 
 <pre class='idl'>
 interface CSSImageValue : CSSResourceValue {
-	readonly attribute double? intrinsicWidth;
-	readonly attribute double? intrinsicHeight;
-	readonly attribute double? intrinsicRatio;
+    readonly attribute double? intrinsicWidth;
+    readonly attribute double? intrinsicHeight;
+    readonly attribute double? intrinsicRatio;
 };
 
 [Constructor(USVString url)]
 interface CSSURLImageValue : CSSImageValue {
-	readonly attribute USVString url;
+    readonly attribute USVString url;
 };
 
 </pre>
@@ -1779,7 +1779,7 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
 
 [Constructor(DOMString fontFamilyName)]
 interface CSSFontFaceValue : CSSResourceValue {
-	readonly attribute DOMString fontFamilyName;
+    readonly attribute DOMString fontFamilyName;
 };
 
 </pre>
@@ -1831,38 +1831,38 @@ is represented as a [=list=] of [=component values=],
 which becomes a {{CSSUnparsedValue}} in the Typed OM.
 
 <div algorithm>
-	To <dfn export>normalize a list of component values</dfn>
-	from a |list|:
+    To <dfn export>normalize a list of component values</dfn>
+    from a |list|:
 
-	1. Replace all ''var()'' references in |list|
-		with {{CSSVariableReferenceValue}} objects,
-		as described in [[#normalize-var]].
-	2. Replace each remaining maximal subsequence of [=component values=] in |list|
-		with a single string of their concatenated serializations.
-	3. Return a new {{CSSUnparsedValue}}
-		whose {{CSSUnparsedValue/[[tokens]]}} slot is set to |list|.
+    1. Replace all ''var()'' references in |list|
+        with {{CSSVariableReferenceValue}} objects,
+        as described in [[#normalize-var]].
+    2. Replace each remaining maximal subsequence of [=component values=] in |list|
+        with a single string of their concatenated serializations.
+    3. Return a new {{CSSUnparsedValue}}
+        whose {{CSSUnparsedValue/[[tokens]]}} slot is set to |list|.
 </div>
 
 <div class='example'>
 The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
 is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 
-	* the string "calc(42px + "
-	* a {{CSSVariableReferenceValue}} with:
-		* {{CSSVariableReferenceValue/variable}} "--foo"
-		* {{CSSVariableReferenceValue/fallback}} a
-			{{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
-	* the string " + "
-	* a {{CSSVariableReferenceValue}} with:
-		* {{CSSVariableReferenceValue/variable}} "--bar"
-		* {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
-			with a sequence containing:
-			* the string " "
-			* a {{CSSVariableReferenceValue}} with
-				* {{CSSVariableReferenceValue/variable}} "--far"
-				* {{CSSVariableReferenceValue/fallback}} null
-			* the string " + 15px"
-	* the string ")"
+    * the string "calc(42px + "
+    * a {{CSSVariableReferenceValue}} with:
+        * {{CSSVariableReferenceValue/variable}} "--foo"
+        * {{CSSVariableReferenceValue/fallback}} a
+            {{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
+    * the string " + "
+    * a {{CSSVariableReferenceValue}} with:
+        * {{CSSVariableReferenceValue/variable}} "--bar"
+        * {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
+            with a sequence containing:
+            * the string " "
+            * a {{CSSVariableReferenceValue}} with
+                * {{CSSVariableReferenceValue/variable}} "--far"
+                * {{CSSVariableReferenceValue/fallback}} null
+            * the string " + 15px"
+    * the string ")"
 </div>
 
 ''var()'' References {#normalize-var}
@@ -1871,20 +1871,20 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 ''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
 
 <div algorithm>
-	To <dfn export>normalize a ''var()'' reference</dfn> |var|:
+    To <dfn export>normalize a ''var()'' reference</dfn> |var|:
 
-	1. Let |object| be a new {{CSSVariableReferenceValue}}.
+    1. Let |object| be a new {{CSSVariableReferenceValue}}.
 
-	2. Set |object|’s {{CSSVariableReferenceValue/variable}} internal slot
-		to the serialization of the <<custom-ident>> providing the variable name.
+    2. Set |object|’s {{CSSVariableReferenceValue/variable}} internal slot
+        to the serialization of the <<custom-ident>> providing the variable name.
 
-	3. If |var| has a fallback value,
-		set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
-		to the result of [=normalize a list of component values|normalizing the fallback's component values=].
-		Otherwise,
-		set it to `null`.
+    3. If |var| has a fallback value,
+        set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
+        to the result of [=normalize a list of component values|normalizing the fallback's component values=].
+        Otherwise,
+        set it to `null`.
 
-	4. Return |object|.
+    4. Return |object|.
 </div>
 
 [=Identifier=] Values {#normalize-ident}
@@ -1893,11 +1893,11 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 
 <div algorithm>
-	To <dfn export>normalize an [=identifier=]</dfn> |ident|:
+    To <dfn export>normalize an [=identifier=]</dfn> |ident|:
 
-	1. Return a new {{CSSKeywordValue}}
-		with its {{CSSKeywordValue/value}} internal slot
-		set to the serialization of |ident|.
+    1. Return a new {{CSSKeywordValue}}
+        with its {{CSSKeywordValue/value}} internal slot
+        set to the serialization of |ident|.
 </div>
 
 <<number>>, <<percentage>>, and <<dimension>> values {#normalize-numeric}
@@ -1906,104 +1906,104 @@ CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}s or {{CSSCalcValue}}s in the Typed OM.
 
 <div algorithm>
-	To <dfn export>normalize a numeric value</dfn> |num|:
+    To <dfn export>normalize a numeric value</dfn> |num|:
 
-	1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
-		[=normalize a math expression=] from |num|
-		and return the result.
+    1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
+        [=normalize a math expression=] from |num|
+        and return the result.
 
-	2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
-		return a new {{CSSUnitValue}}
-		with its {{CSSUnitValue/value}} internal slot
-		set to 0,
-		and its {{CSSUnitValue/unit}} internal slot
-		set to "px".
+    2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
+        return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot
+        set to 0,
+        and its {{CSSUnitValue/unit}} internal slot
+        set to "px".
 
-	3. Return a new {{CSSUnitValue}}
-		with its {{CSSUnitValue/value}} internal slot
-		set to the numeric value of |num|,
-		and its {{CSSUnitValue/unit}} internal slot
-		set to "number" if |num| is a <<number>>,
-		"percent" if |num| is a <<percentage>>,
-		and |num|’s unit if |num| is a <<dimension>>.
+    3. Return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot
+        set to the numeric value of |num|,
+        and its {{CSSUnitValue/unit}} internal slot
+        set to "number" if |num| is a <<number>>,
+        "percent" if |num| is a <<percentage>>,
+        and |num|’s unit if |num| is a <<dimension>>.
 </div>
 
 <div algorithm>
-	To <dfn for=CSSMath export local-lt="normalize">normalize a math expression</dfn> |num|:
+    To <dfn for=CSSMath export local-lt="normalize">normalize a math expression</dfn> |num|:
 
-	1. If |num| is a ''min()'' or ''max()'' expression:
-		1. Let |values| be the result of [=CSSMath/normalizing=]
-			the arguments to the expression,
-			treating each argument as if it were the contents of a ''calc()'' expression.
+    1. If |num| is a ''min()'' or ''max()'' expression:
+        1. Let |values| be the result of [=CSSMath/normalizing=]
+            the arguments to the expression,
+            treating each argument as if it were the contents of a ''calc()'' expression.
 
-		2. Return a new {{CSSMathMin}} or {{CSSMathMax}} object, respectively,
-			with its {{CSSMathMin/values}} internal slot
-			set to |values|.
+        2. Return a new {{CSSMathMin}} or {{CSSMathMax}} object, respectively,
+            with its {{CSSMathMin/values}} internal slot
+            set to |values|.
 
-	2. Assert: Otherwise, |num| is a ''calc()''.
+    2. Assert: Otherwise, |num| is a ''calc()''.
 
-	3. Turn |num|’s argument
-		into an expression tree
-		using standard PEMDAS precedence rules,
-		with the following exceptions/clarification:
+    3. Turn |num|’s argument
+        into an expression tree
+        using standard PEMDAS precedence rules,
+        with the following exceptions/clarification:
 
-		* Treat subtraction as instead being addition,
-			with the RHS argument instead wrapped in a special "negate" node.
-		* Treat division as instead being multiplication,
-			with the RHS argument instead wrapped in a special "invert" node.
-		* Addition and multiplication are N-ary;
-			each node can have any number of arguments.
-		* If an expression has only a single value in it,
-			and no operation,
-			treat it as an addition node with the single argument.
+        * Treat subtraction as instead being addition,
+            with the RHS argument instead wrapped in a special "negate" node.
+        * Treat division as instead being multiplication,
+            with the RHS argument instead wrapped in a special "invert" node.
+        * Addition and multiplication are N-ary;
+            each node can have any number of arguments.
+        * If an expression has only a single value in it,
+            and no operation,
+            treat it as an addition node with the single argument.
 
-	4. Recursively transform the expression tree into objects,
-		as follows:
+    4. Recursively transform the expression tree into objects,
+        as follows:
 
-		<dl class=switch>
-			: addition node
-			:: becomes a new {{CSSMathSum}} object,
-				with its {{CSSMathSum/values}} internal slot
-				set to its list of arguments
-			: multiplication node
-			:: becomes a new {{CSSMathProduct}} object,
-				with its {{CSSMathProduct/values}} internal slot
-				set to its list of arguments
-			: negate node
-			:: becomes a new {{CSSMathNegate}} object,
-				with its {{CSSMathNegate/value}} internal slot
-				set to its argument
-			: invert node
-			:: becomes a new {{CSSMathInvert}} object,
-				with its {{CSSMathInvert/value}} internal slot
-				set to its argument
-			: leaf node
-			:: normalized as appropriate
-		</dl>
+        <dl class=switch>
+            : addition node
+            :: becomes a new {{CSSMathSum}} object,
+                with its {{CSSMathSum/values}} internal slot
+                set to its list of arguments
+            : multiplication node
+            :: becomes a new {{CSSMathProduct}} object,
+                with its {{CSSMathProduct/values}} internal slot
+                set to its list of arguments
+            : negate node
+            :: becomes a new {{CSSMathNegate}} object,
+                with its {{CSSMathNegate/value}} internal slot
+                set to its argument
+            : invert node
+            :: becomes a new {{CSSMathInvert}} object,
+                with its {{CSSMathInvert/value}} internal slot
+                set to its argument
+            : leaf node
+            :: normalized as appropriate
+        </dl>
 
-	<div class=example>
-		For example, ''calc(1px - 2 * 3em)''
-		produces the structure:
+    <div class=example>
+        For example, ''calc(1px - 2 * 3em)''
+        produces the structure:
 
-		<pre>
-			CSSMathSum(
-				CSS.px(1),
-				CSSMathNegate(
-					CSSMathProduct(
-						2,
-						CSS.em(3)
-					)
-				)
-			)
-		</pre>
-	</div>
+        <pre>
+            CSSMathSum(
+                CSS.px(1),
+                CSSMathNegate(
+                    CSSMathProduct(
+                        2,
+                        CSS.em(3)
+                    )
+                )
+            )
+        </pre>
+    </div>
 
-	Note: The value computation process may transform different units into identical ones,
-	simplifying the resulting expression.
-	For example, ''calc(1px + 2em)'' as a specified value
-	results in a <nobr><code>CSSMathSum(CSS.px(1), CSS.em(2))</code></nobr>,
-	but as a computed value will give <nobr><code>CSS.px(33)</code></nobr> or similar
-	(depending on the value of an ''em'' in that context).
+    Note: The value computation process may transform different units into identical ones,
+    simplifying the resulting expression.
+    For example, ''calc(1px + 2em)'' as a specified value
+    results in a <nobr><code>CSSMathSum(CSS.px(1), CSS.em(2))</code></nobr>,
+    but as a computed value will give <nobr><code>CSS.px(33)</code></nobr> or similar
+    (depending on the value of an ''em'' in that context).
 </div>
 
 
@@ -2014,94 +2014,94 @@ CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
 while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 
 <div algorithm>
-	To <dfn export>normalize a <<transform-list>></dfn> |list|:
+    To <dfn export>normalize a <<transform-list>></dfn> |list|:
 
-	1. Return a new {{CSSTransformValue}}
-		whose [=values to iterate over=]
-		are the result of mapping the [=normalize a &lt;transform-function>=] algorithm
-		over |list|.
+    1. Return a new {{CSSTransformValue}}
+        whose [=values to iterate over=]
+        are the result of mapping the [=normalize a &lt;transform-function>=] algorithm
+        over |list|.
 </div>
 
 <div algorithm>
-	To <dfn export>normalize a <<transform-function>></dfn> |func|,
-	perform the appropriate set of steps below,
-	based on |func|:
+    To <dfn export>normalize a <<transform-function>></dfn> |func|,
+    perform the appropriate set of steps below,
+    based on |func|:
 
-	<dl class=switch>
-		: ''matrix()''
-		: ''matrix3d()''
-		::
-			1. Return a new {{CSSMatrixComponent}} object,
-				whose {{CSSMatrixComponent/matrix}} internal slot
-				is set to a 4x4 matrix representing the same information
-				as |func|,
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `true` if |func| is ''matrix()'',
-				and `false` otherwise.
+    <dl class=switch>
+        : ''matrix()''
+        : ''matrix3d()''
+        ::
+            1. Return a new {{CSSMatrixComponent}} object,
+                whose {{CSSMatrixComponent/matrix}} internal slot
+                is set to a 4x4 matrix representing the same information
+                as |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''matrix()'',
+                and `false` otherwise.
 
-		: ''translate()''
-		: ''translateX()''
-		: ''translateY()''
-		: ''translate3d()''
-		: ''translateZ()''
-		::
-			1. Return a new {{CSSTranslation}} object,
-				whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
-				are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
-				or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
-				and `false` otherwise.
+        : ''translate()''
+        : ''translateX()''
+        : ''translateY()''
+        : ''translate3d()''
+        : ''translateZ()''
+        ::
+            1. Return a new {{CSSTranslation}} object,
+                whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
+                are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
+                or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
+                and `false` otherwise.
 
-		: ''scale()''
-		: ''scaleX()''
-		: ''scaleY()''
-		: ''scale3d()''
-		: ''scaleZ()''
-		::
-			1. Return a new {{CSSScale}} object,
-				whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
-				are set to the specified x/y/z scales,
-				or to ''1'' if not specified in |func|
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `true` if |func| is ''scale()'', ''scaleX()'', or ''scaleY()'',
-				and `false` otherwise.
+        : ''scale()''
+        : ''scaleX()''
+        : ''scaleY()''
+        : ''scale3d()''
+        : ''scaleZ()''
+        ::
+            1. Return a new {{CSSScale}} object,
+                whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
+                are set to the specified x/y/z scales,
+                or to ''1'' if not specified in |func|
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''scale()'', ''scaleX()'', or ''scaleY()'',
+                and `false` otherwise.
 
-		: ''rotate()''
-		: ''rotate3d()''
-		: ''rotateX()''
-		: ''rotateY()''
-		: ''rotateZ()''
-		::
-			1. Return a new {{CSSRotation}} object,
-				whose {{CSSRotation/angle}} internal slot
-				is set to the [=normalize a numeric value|normalization=] of the specified angle,
-				and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
-				are set to the specified rotation axis coordinates,
-				or the implicit axis coordinates if not specified in |func|
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `true` if |func| is ''rotate()'',
-				and `false` otherwise.
+        : ''rotate()''
+        : ''rotate3d()''
+        : ''rotateX()''
+        : ''rotateY()''
+        : ''rotateZ()''
+        ::
+            1. Return a new {{CSSRotation}} object,
+                whose {{CSSRotation/angle}} internal slot
+                is set to the [=normalize a numeric value|normalization=] of the specified angle,
+                and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
+                are set to the specified rotation axis coordinates,
+                or the implicit axis coordinates if not specified in |func|
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''rotate()'',
+                and `false` otherwise.
 
-		: ''skew()''
-		: ''skewX()''
-		: ''skewY()''
-		::
-			1. Return a new {{CSSSkew}} object,
-				whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-				are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
-				or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `true`.
+        : ''skew()''
+        : ''skewX()''
+        : ''skewY()''
+        ::
+            1. Return a new {{CSSSkew}} object,
+                whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
+                are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
+                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
 
-		: ''perspective()''
-		::
-			1. Return a new {{CSSPerspective}} object,
-				whose {{CSSPerspective/length}} internal slot
-				is set to the [=normalize a numeric value|normalization=] of the specified length
-				and whose {{CSSTransformComponent/is2D}} internal slot
-				is `false`.
-	</dl>
+        : ''perspective()''
+        ::
+            1. Return a new {{CSSPerspective}} object,
+                whose {{CSSPerspective/length}} internal slot
+                is set to the [=normalize a numeric value|normalization=] of the specified length
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `false`.
+    </dl>
 </div>
 
 {{CSSPositionValue}} normalization {#positionvalue-normalization}
@@ -2113,36 +2113,36 @@ any sub-process referenced by this process fails, then normalization as a whole 
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
-		the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
-		by the provided value and a horizontal <var>bias</var>.
+        the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
+        by the provided value and a horizontal <var>bias</var>.
 1.  Otherwise, if the provided value consists of a combination of two keywords, then:
 
-		1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
-				first keyword and an auto <var>bias</var>.
-		1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-		1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
+        1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
+                first keyword and an auto <var>bias</var>.
+        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+        1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
 
 1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and
-		calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
-		<var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
-		procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
+        calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
+        <var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
+        procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
 1.  Otherwise:
 
-		1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
-				the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
-				keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
-		1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
-				set to the first component of the provided value and an auto <var>bias</var>.
-		1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-		1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
-				the procedure outlined in
-				[[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
-				<var>bias</var>.
-		1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
-				calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
-				<var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
-				the existing <var>bias</var>.
-		1.  Otherwise, the process fails.
+        1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
+                the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
+                keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
+        1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
+                set to the first component of the provided value and an auto <var>bias</var>.
+        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+        1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
+                the procedure outlined in
+                [[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
+                <var>bias</var>.
+        1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
+                calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
+                <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
+                the existing <var>bias</var>.
+        1.  Otherwise, the process fails.
 
 <h4 id='from-single-keyword'>Determining <var>x</var> or <var>y</var> from a single value</h4>
 
@@ -2150,17 +2150,17 @@ The following process sets a value for either <var>x</var> or <var>y</var>, depe
 and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
 
 1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
-		{{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
+        {{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
 1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a
-		{{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
+        {{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
 1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-		{{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
+        {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-		{{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
+        {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
-		[=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
-		set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
-		horizontal. Exit this process.
+        [=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
+        set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
+        horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
 
 <h4 id='from-keyword-and-length'>Determining <var>x</var> or <var>y</var> from a keyword and a length</h4>
@@ -2170,13 +2170,13 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 <var>length</var>.
 
 1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
-		<var>keyword</var>, using the provided <var>bias</var>
+        <var>keyword</var>, using the provided <var>bias</var>
 1.  let <var>adjustment</var> be the result of
-	[=normalize a numeric value|normalizing |length| as a numeric value=].
+    [=normalize a numeric value|normalizing |length| as a numeric value=].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
-		<var>adjustment</var> from a zero length.
+        <var>adjustment</var> from a zero length.
 1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
-		adding <var>adjustment</var> to it.
+        adding <var>adjustment</var> to it.
 
 {{CSSResourceValue}} normalization {#resourcevalue-normalization}
 --------------------------------------------------------------
@@ -2302,7 +2302,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
     arguments to the relevant constructor. The values of the arguments are given
     by the attributes contained in the {{CSSTransformComponent}}.
 *   {{CSSNumericValue}} attributes serialize using the rules above.
-	Doubles serialize to their string representation.
+    Doubles serialize to their string representation.
 *   {{CSSMatrixComponent}} objects serialize to a list of 6 components if
     {{CSSTransformComponent/is2D}} is set, or 12 components otherwise.
     Component order and format is given by [[CSS-TRANSFORMS-1]].
@@ -2416,15 +2416,15 @@ Computed {{CSSCalcValue}} objects {#computed-calc-objects}
 During computation, {{CSSCalcValue}} objects are reduced accordingly:
 
 1. All non-`number`, non-`percent` values are absolutized
-	into the [=canonical unit=] for the object's associated type.
+    into the [=canonical unit=] for the object's associated type.
 2. If the objects contains exactly one of (the canonical unit, a percent value, a number)
-	with a present, non-zero value,
-	then the computed value is an equivalent computed {{CSSUnitValue}}.
+    with a present, non-zero value,
+    then the computed value is an equivalent computed {{CSSUnitValue}}.
 3. Otherwise,
-	it's a {{CSSCalcValue}}
-	containing the canonical unit, percent value, and number,
-	if those are present and non-zero,
-	and all other fields are `null`.
+    it's a {{CSSCalcValue}}
+    containing the canonical unit, percent value, and number,
+    if those are present and non-zero,
+    and all other fields are `null`.
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
