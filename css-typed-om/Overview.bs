@@ -553,9 +553,30 @@ Instead, clamping and/or rounding will occur during computation of style.
 	and the value of `zIndex` is `15` ('z-index' is rounded to an integer value).
 </div>
 
-Note that "numeric values" which incorporate variable references
+Note: "Numeric values" which incorporate variable references
 will instead be represented as {{CSSUnparsedValue}} objects,
 and keywords as {{CSSKeywordValue}} objects.
+
+Any place that accepts a {{CSSNumericValue}}
+also accepts a raw {{double}},
+by using the following typedef and algorithm:
+
+<pre class=idl>
+typedef (double or CSSNumericValue) CSSNumberish;
+</pre>
+
+<div algorithm>
+    To <dfn export lt="rectify a numberish value | rectifying a numberish value">rectify a numberish value</dfn> |num|,
+    perform the following steps:
+
+    1. If |num| is a {{CSSNumericValue}},
+        return |num|.
+
+    2. If |num| is a {{double}},
+        return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot set to |num|
+        and its {{CSSUnitValue/unit}} internal slot set to "number".
+</div>
 
 
 ### Common Numeric Operations, and the {{CSSNumericValue}} Superclass ### {#numeric-value}
@@ -566,12 +587,12 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
 	interface CSSNumericValue : CSSStyleValue {
-		CSSNumericValue add(CSSNumericValue... values);
-		CSSNumericValue sub(CSSNumericValue... values);
-		CSSNumericValue mul(CSSNumericValue... values);
-		CSSNumericValue div(CSSNumericValue... values);
+		CSSNumericValue add(CSSNumberish... values);
+		CSSNumericValue sub(CSSNumberish... values);
+		CSSNumericValue mul(CSSNumberish... values);
+		CSSNumericValue div(CSSNumberish... values);
 
-		boolean equals(CSSNumericValue... value);
+		boolean equals(CSSNumberish... value);
 
 		CSSNumericValue to(DOMString unit);
 
@@ -589,13 +610,16 @@ The following are the arithmetic operations you can perform on dimensions:
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. Prepend |this| to |values|.
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. If there are at least two different [=strong types=]
+	2. Prepend |this| to |values|.
+
+	3. If there are at least two different [=strong types=]
 		among the [=list/items=] in |values|,
 		[=throw=] a {{TypeError}}.
 
-	3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+	4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
 		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
@@ -603,12 +627,12 @@ The following are the arithmetic operations you can perform on dimensions:
 		the {{CSSUnitValue/value}} internal slots
 		of the [=list/items=] in |values|.
 
-	4. If |this| is a {{CSSMathSum}} object,
+	5. If |this| is a {{CSSMathSum}} object,
 		remove |this| from |values|,
 		and then [=list/append=] the remaining |values|
 		to |this|’s {{CSSMathSum/values}} internal slot.
 
-	5. Otherwise,
+	6. Otherwise,
 		return a new {{CSSMathSum}} object
 		whose {{CSSMathSum/values}} internal slot
 		is set to |values|.
@@ -619,13 +643,16 @@ The following are the arithmetic operations you can perform on dimensions:
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. Let |thisAndValues| be |this| prepended to |values|.
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	1. If there are at least two different [=strong types=]
+	2. Let |thisAndValues| be |this| prepended to |values|.
+
+	3. If there are at least two different [=strong types=]
 		among the [=list/items=] in |thisAndValues|,
 		[=throw=] a {{TypeError}}.
 
-	2. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
+	4. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
 		and have the same {{CSSUnitValue/unit}},
 		return a new {{CSSUnitValue}}
 		whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
@@ -634,13 +661,13 @@ The following are the arithmetic operations you can perform on dimensions:
 		minus the sum of the {{CSSUnitValue/value}} internal slots
 		of the [=list/items=] in |values|.
 
-	3. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
+	5. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
 
-	4. If |this| is a {{CSSMathSum}} object,
+	6. If |this| is a {{CSSMathSum}} object,
 		[=list/append=] |values|
 		to |this|’s {{CSSMathSum/values}} internal slot.
 
-	5. Otherwise,
+	7. Otherwise,
 		prepend |this| to |values|,
 		then return a new {{CSSMathSum}} object
 		whose {{CSSMathSum/values}} internal slot
@@ -664,11 +691,14 @@ The following are the arithmetic operations you can perform on dimensions:
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. Let |thisAndValues| be |this| prepended to |values|.
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Let |mainValue| initially be null.
+	2. Let |thisAndValues| be |this| prepended to |values|.
 
-	3. [=list/For each=] |item| of |thisAndValues|:
+	3. Let |mainValue| initially be null.
+
+	4. [=list/For each=] |item| of |thisAndValues|:
 		1. If |item| has a [=strong type=],
 			or a [=weak type=] other than "number":
 
@@ -677,21 +707,21 @@ The following are the arithmetic operations you can perform on dimensions:
 			2. Otherwise,
 				[=throw=] a {{TypeError}}.
 
-	4. If |mainValue| is still null,
+	5. If |mainValue| is still null,
 		set |mainValue| to |this|.
 
-	5. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
+	6. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
 		return a new {{CSSUnitValue}}
 		whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
 		and {{CSSUnitValue/value}} internal slot is set to
 		the product of the {{CSSUnitValue/value}} internal slots
 		of the [=list/items=] in |thisAndValues|.
 
-	6. If |this| is a {{CSSMathProduct}} object,
+	7. If |this| is a {{CSSMathProduct}} object,
 		[=list/append=] the [=list/items=] of |values|
 		to |this|’s {{CSSMathProduct/values}} internal slot.
 
-	7. Otherwise,
+	8. Otherwise,
 		and return a new {{CSSMathProduct}}
 		whose {{CSSMathProduct/values}} internal slot
 		is set to |thisAndValues|.
@@ -702,11 +732,14 @@ The following are the arithmetic operations you can perform on dimensions:
 	when called on a {{CSSNumericValue}} |this|,
 	must perform the following steps:
 
-	1. Let |thisAndValues| be |this| prepended to |values|.
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-	2. Let |mainValue| initially be null.
+	2. Let |thisAndValues| be |this| prepended to |values|.
 
-	3. [=list/For each=] |item| of |thisAndValues|:
+	3. Let |mainValue| initially be null.
+
+	4. [=list/For each=] |item| of |thisAndValues|:
 		1. If |item| has a [=strong type=],
 			or a [=weak type=] other than "number":
 
@@ -715,7 +748,7 @@ The following are the arithmetic operations you can perform on dimensions:
 			2. Otherwise,
 				[=throw=] a {{TypeError}}.
 
-	4. If |mainValue| is still null,
+	5. If |mainValue| is still null,
 		set |mainValue| to |this|.
 
 	6. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s,
@@ -728,11 +761,11 @@ The following are the arithmetic operations you can perform on dimensions:
 
 	7. [=CSSMath/Invert=] all of the [=list/items=] in |values|.
 
-	2. If |this| is a {{CSSMathProduct}} object,
+	8. If |this| is a {{CSSMathProduct}} object,
 		[=list/append=] the [=list/items=] of |values|
 		to |this|’s {{CSSMathProduct/values}} internal slot.
 
-	3. Otherwise,
+	9. Otherwise,
 		prepend |this| to |values|,
 		then return a new {{CSSMathProduct}} object
 		whose {{CSSMathProduct/values}} internal slot
@@ -976,32 +1009,32 @@ interface CSSMathValue : CSSNumericValue {
     readonly attribute DOMString type;
 };
 
-[Constructor(CSSNumericValue... args)]
+[Constructor(CSSNumberish... args)]
 interface CSSMathSum : CSSMathValue {
 	attribute CSSNumericArray values;
 };
 
-[Constructor(CSSNumericValue... args)]
+[Constructor(CSSNumberish... args)]
 interface CSSMathProduct : CSSMathValue {
 	attribute CSSNumericArray values;
 };
 
-[Constructor(CSSNumericValue arg)]
+[Constructor(CSSNumberish arg)]
 interface CSSMathNegate : CSSMathValue {
 	attribute CSSNumericValue value;
 };
 
-[Constructor(CSSNumericValue arg)]
+[Constructor(CSSNumberish arg)]
 interface CSSMathInvert : CSSMathValue {
 	attribute CSSNumericValue value;
 };
 
-[Constructor(CSSNumericValue... args)]
+[Constructor(CSSNumberish... args)]
 interface CSSMathMin : CSSMathValue {
 	attribute CSSNumericArray values;
 };
 
-[Constructor(CSSNumericValue... args)]
+[Constructor(CSSNumberish... args)]
 interface CSSMathMax : CSSMathValue {
 	attribute CSSNumericArray values;
 };
@@ -1086,14 +1119,17 @@ of all the "math" operations.
 	when called,
 	perform the following steps:
 
-	1. If |args| [=list/is empty=],
+    1. Replace each [=list/item=] of |args|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
+
+	2. If |args| [=list/is empty=],
 		[=throw=] a {{SyntaxError}}.
 
-	2. Let |strongType| initially be null.
+	3. Let |strongType| initially be null.
 
-	3. Let |values| be an initially empty [=list=].
+	4. Let |values| be an initially empty [=list=].
 
-	4. [=list/For each=] |arg| of |args|:
+	5. [=list/For each=] |arg| of |args|:
 
 		1. If |arg| has a [=strong type=], and |strongType| is null,
 			let |strongType| by |arg|’s [=strong type=].
@@ -1104,7 +1140,7 @@ of all the "math" operations.
 
 		3. [=list/Append=] |arg| to |values|.
 
-	5. Return a new {{CSSMathSum}}
+	6. Return a new {{CSSMathSum}}
 		whose {{CSSMathSum/values}} internal slot
 		is set to |values|.
 
@@ -1121,6 +1157,9 @@ of all the "math" operations.
 	The <dfn constructor for="CSSMathNegate">CSSMathNegate(|arg|)</dfn> constructor must,
 	when called,
 	perform the following steps:
+
+    1. Replace |arg|
+        with the result of [=rectifying a numberish value=] for |arg|.
 
 	1. Return a new {{CSSMathNegate}}
 		whose {{CSSMathNegate/value}} internal slot
