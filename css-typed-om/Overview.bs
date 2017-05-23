@@ -1295,7 +1295,7 @@ which represent individual <<transform-function>> values.
 interface CSSTransformValue : CSSStyleValue {
     /*arraylike<CSSTransformComponent>;*/
     readonly attribute boolean is2D;
-    readonly attribute DOMMatrixReadOnly matrix;
+    DOMMatrix toMatrix();
 };
 </xmp>
 
@@ -1323,9 +1323,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
     the attribute returns `false`.
 </div>
 
-<div algorithm="CSSTransformValue.matrix">
-    The <dfn attribute for=CSSTransformValue>matrix</dfn> attribute of a {{CSSTransformValue}} |this| must,
-    on getting,
+<div algorithm="CSSTransformValue.toMatrix()">
+    The <dfn attribute for=CSSTransformValue>toMatrix()</dfn> method of a {{CSSTransformValue}} |this| must,
+    when called,
     perform the following steps:
 
     1. Let |matrix| be a 4x4 matrix,
@@ -1335,7 +1335,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
         set |matrix| to the result of multiplying |matrix|
         and |func|’s equivalent 4x4 transform matrix.
 
-    3. Return a new {{DOMMatrixReadOnly}}
+    3. Return a new {{DOMMatrix}}
         representing |matrix|.
 </div>
 
