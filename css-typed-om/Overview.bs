@@ -1342,7 +1342,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 <xmp class=idl>
     interface CSSTransformComponent {
-    stringifier;
+        stringifier;
         attribute boolean is2D;
     };
 
