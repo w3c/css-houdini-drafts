@@ -1386,42 +1386,13 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 </xmp>
 
-Issue(365): why don't these accept CSSUnitValues?
-
-<div algorithm="CSSTransformComponent.numericValues">
-    Unless otherwise specified,
-    all {{CSSTransformComponent}} subclass attributes that have a {{CSSNumericValue}} or {{DOMMatrix}} type must,
-    on getting,
-    return a new {{CSSNumericValue}} or {{DOMMatrix}}
-    equivalent to the one stored in the corresponding internal slot.
-
-    Unless otherwise specified,
-    they must,
-    on setting,
-    store a new {{CSSNumericValue}} or {{DOMMatrix}}
-    equivalent to the value being set.
-</div>
-
-<div algorithm="CSSTransformComponent 3D stuff">
-    If a {{CSSTransformComponent}}’s {{CSSTransformComponent/is2D}} internal slot is `true`,
-    the attributes in the following list must,
-    on setting,
-    do nothing;
-    on getting,
-    they must return the value specified in the following list:
-
-    : {{CSSTranslation/z|CSSTranslation.z}}
-    :: A new {{CSSUnitValue}} representing ''0px''.
-
-    : {{CSSRotation/x|CSSRotation.x}}
-    : {{CSSRotation/y|CSSRotation.y}}
-    :: The number `0`.
-
-    : {{CSSRotation/z|CSSRotation.z}}
-    :: The number `1`.
-
-    : {{CSSScale/z|CSSScale.z}}
-    :: The number `1`.
+<div algorithm="CSSTransformComponent.is2D">
+    The <dfn attribute for=CSSTransformComponent>is2D</dfn> attribute
+    indicates whether the transform is 2D or 3D.
+    When it's `true`,
+    the attributes of the transform that are relevant to 3D transforms
+    (such as the {{CSSTranslation/z|CSSTranslation.z}} attribute)
+    simply have no effect on the transform they represent.
 </div>
 
 <details class=note>
@@ -1585,6 +1556,12 @@ Issue(366): Figure out how to define 2d vs 3d matrix.
     * translate(10px, 0)
     * translateX(10px)
     * translate3d(10px, 0, 0)
+
+    When stringified, however,
+    it will always print out either ''translate(10px, 0px)'' or ''translate3d(10px, 0px, 0px)'',
+    depending on whether its {{CSSTransformComponent/is2D}} internal slot
+    is `true` or `false`,
+    respectively.
 </div>
 
 <!--
