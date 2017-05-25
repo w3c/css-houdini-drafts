@@ -1397,9 +1397,13 @@ is a [=list=] of {{CSSTransformComponent}}s.
         attribute CSSNumericValue length;
     };
 
-    [Constructor(DOMMatrixReadOnly matrix)]
+    [Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
     interface CSSMatrixComponent : CSSTransformComponent {
         attribute DOMMatrix matrix;
+    };
+
+    dictionary CSSMatrixComponentOptions {
+        boolean is2D;
     };
 </xmp>
 
@@ -1574,7 +1578,26 @@ is a [=list=] of {{CSSTransformComponent}}s.
     Note: ''perspective()'' functions always represent 3D transforms.
 </div>
 
-Issue(366): Figure out how to define 2d vs 3d matrix.
+<div algorithm="CSSMatrixComponent()">
+    The <dfn constructor for=CSSMatrixComponent>CSSMatrixComponent(|matrix|, |options|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
+
+    1. Let |this| be a new {{CSSMatrixComponent}} object
+        with its {{CSSMatrixComponent/matrix}} internal slot
+        set to |matrix|.
+
+    2. If |options| was passed
+        and has a {{CSSMatrixComponentOptions}} field,
+        set |this|’s {{CSSTransformValue/is2D}} internal slot
+        to the value of that field.
+
+    3. Otherwise,
+        set |this|’s {{CSSTransformValue/is2D}} internal slot
+        to the value of |matrix|’s {{DOMMatrixReadOnly/is2D}} internal slot.
+
+    4. Return |this|.
+</div>
 
 <div class=note>
     Each {{CSSTransformComponent}} can correspond to
