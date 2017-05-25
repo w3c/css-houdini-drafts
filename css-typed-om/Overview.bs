@@ -972,6 +972,23 @@ if its equivalent CSS value
 or similar with "number" and "percent")
 matches that production.
 
+<div algorithm>
+    When asked to <dfn export local-lt="new unit value">create a new unit value</dfn>
+    from a numeric value |num|,
+    return a new {{CSSUnitValue}} object
+    with its {{CSSUnitValue/value}} internal slot
+    set to the numeric portion of |num|,
+    and its {{CSSUnitValue/unit}} internal slot
+    set to the unit portion of |num|,
+    or "number" or "percent" if |num| is a plain number or percent.
+
+    <div class=example>
+        For example, creating a [=new unit value=] from ''5px''
+        creates an object equivalent to
+        <code>new CSSUnitValue(5, "px")</code>.
+    </div>
+</div>
+
 
 <!--
  ██████     ███    ██        ██████    ███ ███
@@ -1324,7 +1341,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 </div>
 
 <div algorithm="CSSTransformValue.toMatrix()">
-    The <dfn attribute for=CSSTransformValue>toMatrix()</dfn> method of a {{CSSTransformValue}} |this| must,
+    The <dfn method for=CSSTransformValue>toMatrix()</dfn> method of a {{CSSTransformValue}} |this| must,
     when called,
     perform the following steps:
 
@@ -1354,19 +1371,19 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 
     [Constructor(CSSNumericValue angle),
-     Constructor(double x, double y, double z, CSSNumericValue angle)]
+     Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
     interface CSSRotation : CSSTransformComponent {
-        attribute double x;
-        attribute double y;
-        attribute double z;
+        attribute CSSNumberish x;
+        attribute CSSNumberish y;
+        attribute CSSNumberish z;
         attribute CSSNumericValue angle;
     };
 
-    [Constructor(double x, double y, optional double z)]
+    [Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)]
     interface CSSScale : CSSTransformComponent {
-        attribute double x;
-        attribute double y;
-        attribute double z;
+        attribute CSSNumberish x;
+        attribute CSSNumberish y;
+        attribute CSSNumberish z;
     };
 
     [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
@@ -1422,26 +1439,23 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. If |x|, |y| don't match <<length-percentage>>,
-        or |z| (if passed) doesn't match <<length-percentage>>,
+    1. If |x|, |y|, or |z| (if passed)
+        don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
     2. Let |this| be a new {{CSSTranslation}} object,
-        with its internal {{CSSTranslation/x}} and {{CSSTranslation/y}} slots
-        set to new {{CSSNumericValue}} objects
-        equivalent to |x| and |y|.
+        with its {{CSSTranslation/x}} and {{CSSTranslation/y}} internal slots
+        set to |x| and |y|.
 
     3. If |z| was passed,
         set |this|’s {{CSSTranslation/z}} internal slot
-        to a new {{CSSNumericValue}} object
-        equivalent to |z|,
+        to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `false`.
 
     4. If |z| was not passed,
         set |this|’s {{CSSTranslation/z}} internal slot
-        to a new {{CSSNumericValue}} object
-        representing ''0px'',
+        to a [=new unit value=] of ''0px'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
@@ -1458,9 +1472,11 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     2. Return a new {{CSSRotation}}
         with its {{CSSRotation/angle}} internal slot
-        set to a new {{CSSNumericValue}} equivalent to |angle|,
-        its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots set to `0`,
-        its {{CSSRotation/z}} internal slot set to `1`,
+        set to |angle|,
+        its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots
+        set to [=new unit values=] of ''0'',
+        its {{CSSRotation/z}} internal slot
+        set to a [=new unit value=] of ''1'',
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
@@ -1472,9 +1488,16 @@ is a [=list=] of {{CSSTransformComponent}}s.
     1. If |angle| doesn't match <<angle>>,
         [=throw=] a {{TypeError}}.
 
-    2. Return a new {{CSSRotation}}
+    2. Let |x|, |y|, and |z|
+        be replaced by the result of [=rectifying a numberish value=].
+
+    3. If |x|, |y|, or |z|
+        don't match <<number>>,
+        [=throw=] a {{TypeError}}.
+
+    4. Return a new {{CSSRotation}}
         with its {{CSSRotation/angle}} internal slot
-        set to a new {{CSSNumericValue}} equivalent to |angle|,
+        set to |angle|,
         its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
@@ -1484,19 +1507,27 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. Let |this| be a new {{CSSScale}} object,
+    1. Let |x|, |y|, and |z| (if passed)
+        be replaced by the result of [=rectifying a numberish value=].
+
+    2. If |x|, |y|, or |z| (if passed)
+        don't match <<number>>,
+        [=throw=] a {{TypeError}}.
+
+    3. Let |this| be a new {{CSSScale}} object,
         with its {{CSSScale/x}} and {{CSSScale/y}} internal slots
         set to |x| and |y|.
 
-    2. If |z| was passed,
+    4. If |z| was passed,
         set |this|’s {{CSSScale/z}} internal slot to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `false`.
 
-    3. If |z| was not passed,
-        set |this|’s {{CSSScale/z}} internal slot to `1`,
+    5. If |z| was not passed,
+        set |this|’s {{CSSScale/z}} internal slot
+        to a [=new unit value=] of ''1'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
-    4. Return |this|.
+    6. Return |this|.
 </div>
 
 <div algorithm="CSSSkew()">
@@ -1509,7 +1540,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     2. Return a new {{CSSSkew}} object
         with its {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-        set to new {{CSSNumericValue}}s equivalent to |ax| and |ay|,
+        set to |ax| and |ay|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
@@ -1531,7 +1562,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     2. Return a new {{CSSPerspective}} object
         with its {{CSSPerspective/length}} internal slot
-        set to a new {{CSSNumericValue}} equivalent to |length|,
+        set to |length|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
