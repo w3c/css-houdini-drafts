@@ -66,6 +66,14 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 }
 </pre>
 
+Deprecated {#deprecated}
+========================
+<strong>The contents of this document are out of date and in need of large re-write to cover
+changes to the AnimationWorklet API</strong>.
+
+For now, please refer to our <a href="https://github.com/WICG/animation-worklet/blob/gh-pages/WIP.md">WIP explainer</a>
+for more up-to-date content.
+
 Introduction {#intro}
 =====================
 This document introduces a new primitive for creating scroll-linked and other high performance
