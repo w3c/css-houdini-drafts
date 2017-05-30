@@ -841,30 +841,160 @@ rather than on {{CSSNumericValue}} instances.
         and return the result.
 </div>
 
-{{CSSNumericValue}}s can be <dfn export for=CSSNumericValue lt="strong type|strongly typed">strongly typed</dfn> to a type
-and/or <dfn export for=CSSNumericValue lt="weak type|weakly typed">weakly typed</dfn> to one or more types,
-or <dfn export for=CSSNumericValue>untyped</dfn>.
+### Numeric Value Typing ### {#numeric-typing}
 
-A {{CSSUnitValue}} is [=weakly typed=] to the [=CSS type=] of its {{CSSUnitValue/unit}} internal slot’s value
-if that [=CSS type=] is "percent" or "number".
-It's [=strongly typed=] to that [=CSS type=] otherwise.
-It's never [=untyped=].
+Each {{CSSNumericValue}} has an associated <dfn for=CSSNumericValue>type</dfn>,
+which is a combination of an [=ordered map|map=] of [=base types=] to integers,
+and a [=percent hint=].
+The <dfn for=CSSNumericValue lt="base type">base types</dfn> are
+"length",
+"angle",
+"time",
+"frequency",
+"resolution",
+"flex",
+and "percent".
+The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
+The <dfn for=CSSNumericValue>percent hint</dfn>
+is either null or a [=base type=] other than "percent".
 
-A {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}}
-is [=strongly typed=]
-if any of the values in its {{CSSMathSum/values}} internal slot
-are [=strongly typed=],
-to that same [=strong type=].
-It's [=weakly typed=] to the union of the [=weak types=]
-of all of the values in its {{CSSMathSum/values}} internal slot.
-It's [=untyped=] if its {{CSSMathSum/values}} internal slot [=list/is empty=].
+<div algorithm>
+    To <dfn local-lt="add | addition">add two types</dfn> |type1| and |type2|,
+    perform the following steps:
 
-A {{CSSMathNegate}} or {{CSSMathInvert}}
-is [=strongly typed=],
-[=weakly typed=],
-or [=untyped=]
-identically to the value in its {{CSSMathNegate/value}} internal slot.
+    1. Replace |type1| with a fresh copy of |type1|,
+        and |type2| with a fresh copy of |type2|.
+        Let |finalType| be a new [=type=]
+        with an initially empty [=ordered map=]
+        and an initially null [=percent hint=].
 
+    2.
+        <dl class=switch>
+            : If both |type1| and |type2| have non-null [=percent hints=]
+                with different values
+            :: The types can't be added.
+                Return failure.
+
+            : If |type1| has a non-null [=percent hint=] |hint| and |type2| doesn't
+            :: [=Apply the percent hint=] |hint| to |type2|.
+
+                Vice versa if |type2| has a non-null [=percent hint=] and |type1| doesn't.
+
+            : Otherwise
+            :: Continue to the next step.
+        </dl>
+
+
+    3.
+        <dl class=switch>
+            : If all the [=map/entries=] of |type1| with non-zero values
+                are [=map/contained=] in |type2| with the same value,
+                and vice-versa
+            :: Copy all of |type1|’s [=map/entries=] to |finalType|,
+                and then copy all of |type2|’s [=map/entries=] to |finalType|
+                that |finalType| doesn't already [=map/contain=].
+                Set |finalType|’s [=percent hint=] to |type1|’s [=percent hint=].
+                Return |finalType|.
+
+            : If |type1| and/or |type2| [=map/contain=] "percent" with a non-zero value,
+                and |type1| and/or |type2| [=map/contain=] a key *other than* "percent" with a non-zero value
+            :: For each [=base type=] other than "percent" |hint|:
+
+                1. Provisionally [=apply the percent hint=] |hint| to both |type1| and |type2|.
+
+                2. If, afterwards, all the [=map/entries=] of |type1| with non-zero values
+                    are [=map/contained=] in |type2| with the same value,
+                    and vice versa,
+                    then copy all of |type1|’s [=map/entries=] to |finalType|,
+                    and then copy all of |type2|’s [=map/entries=] to |finalType|
+                    that |finalType| doesn't already [=map/contain=].
+                    Set |finalType|’s [=percent hint=] to |hint|.
+                    Return |finalType|.
+
+                3. Otherwise, revert |type1| and |type2| to their state at the start of this loop.
+
+                If the loop finishes without returning |finalType|,
+                then the types can't be added.
+                Return failure.
+
+                Note: You can shortcut this in some cases
+                by just checking the sum of all the [=map/values=]
+                of |type1| vs |type2|.
+                If the sums are different,
+                the types can't be added.
+
+            : Otherwise
+            :: The types can't be added.
+                Return failure.
+        </dl>
+</div>
+
+<div algorithm>
+    To <dfn>apply the percent hint</dfn> |hint| to a |type|,
+    perform the following steps:
+
+    1. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
+    2. If |type| [=map/contains=] "percent", add |type|["percent"] to |type|[|hint|],
+        then set |type|["percent"] to 0.
+    4. Set |type|’s [=percent hint=] to |hint|.
+</div>
+
+<div algorithm>
+    To <dfn for=CSSNumericValue local-lt="multiply | multiplication">multiply two types</dfn> |type1| and |type2|,
+    perform the following steps:
+
+    1. Replace |type1| with a fresh copy of |type1|,
+        and |type2| with a fresh copy of |type2|.
+        Let |finalType| be a new [=type=]
+        with an initially empty [=ordered map=]
+        and an initially null [=percent hint=].
+
+    2. If both |type1| and |type2| have non-null [=percent hints=]
+        with different values,
+        the types can't be multiplied.
+        Return failure.
+
+    3. If |type1| has a non-null [=percent hint=] |hint| and |type2| doesn't,
+        [=apply the percent hint=] |hint| to |type2|.
+
+        Vice versa if |type2| has a non-null [=percent hint=] and |type1| doesn't.
+
+    4. Copy all of |type1|’s [=map/entries=] to |finalType|,
+        then [=map/for each=] |baseType| → |power| of |type2|:
+
+        1. If |finalType|[|baseType|] [=map/exists=],
+            increment its value by |power|.
+        2. Otherwise, set |finalType|[|baseType|] to |power|.
+
+        Set |finalType|’s [=percent hint=] to |type1|’s [=percent hint=].
+
+    5. Return |finalType|.
+</div>
+
+A [=type=] is said to <dfn for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
+
+* A [=type=] matches <<length>>
+    if its only non-zero [=map/entry=] is «[ "length" → 1 ]»
+    and its [=percent hint=] is null.
+    Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
+* A [=type=] matches <<percentage>>
+    if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
+* A [=type=] matches <<length-percentage>>
+    if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percentage" → 1 ]»
+    Same for <<angle-percentage>>, <<time-percentage>>, etc.
+* A [=type=] matches <<number>>
+    if it has no non-zero [=map/entries=]
+    and its [=percent hint=] is null.
+* A [=type=] matches <<number-percentage>>
+    if it has no non-zero [=map/entries=],
+    or its only non-zero [=map/entry=] is «[ "percentage" → 1 ]».
+
+Many specifications use ''[ <<length>> | <<percentage>> ]''
+instead of ''<<length-percentage>>'' in their grammar,
+and specify in prose that the <<length>> and <<percentage>> can be combined.
+For the purposes of [=matching=],
+these cases should be treated as <<length-percentage>>.
+Similarly for <<angle-percentage>>, etc.
 
 
 
@@ -937,40 +1067,37 @@ are represented as {{CSSUnitValue}}s.
 <div algorithm="CSSUnitValue.type">
     The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
     on reading,
-    return the [=CSS type=] of |this|’s {{CSSUnitValue/unit}} internal slot’s value.
+
+    Issue: Figure out how we're exposing types. This should probably move up to the superclass, then.
 </div>
 
 <div algorithm="CSS type of a unit">
-    The <dfn>CSS type</dfn> of a string |unit| is:
+    The [=type=] of a {{CSSUnitValue}}
+    depends on its {{CSSUnitValue/unit}} as follows:
 
     <dl class=switch>
         : |unit| is "number"
-        :: "number"
+        :: [=type=] is «[ ]» (empty map)
         : |unit| is "percent"
-        :: "percent"
+        :: [=type=] is «[ "percent" → 1 ]»
         : |unit| is a <<length>> unit
-        :: "length"
+        :: [=type=] is «[ "length" → 1 ]»
         : |unit| is an <<angle>> unit
-        :: "angle"
+        :: [=type=] is «[ "angle" → 1 ]»
         : |unit| is a <<time>> unit
-        :: "time"
+        :: [=type=] is «[ "time" → 1 ]»
         : |unit| is a <<frequency>> unit
-        :: "frequency"
+        :: [=type=] is «[ "frequence" → 1 ]»
         : |unit| is a <<resolution>> unit
-        :: "resolution"
+        :: [=type=] is «[ "resolution" → 1 ]»
         : |unit| is a <<flex>> unit
-        :: "flex"
+        :: [=type=] is «[ "flex" → 1 ]»
         : anything else
         :: the string does not have a [=CSS type=]
     </dl>
-</div>
 
-A {{CSSUnitValue}} matches a CSS type production,
-such as <<number>> or <<length>>,
-if its equivalent CSS value
-(with the same value and unit,
-or similar with "number" and "percent")
-matches that production.
+    In all cases, the [=percent hint=] of the [=type=] is null.
+</div>
 
 <div algorithm>
     When asked to <dfn export local-lt="new unit value">create a new unit value</dfn>
@@ -1111,24 +1238,8 @@ of all the "math" operations.
     The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">type</dfn> attribute
     of a {{CSSMathValue}} |this| must,
     on reading,
-    perform the following steps:
 
-    1. Let |types| initially be an empty [=ordered set=].
-
-    2. If |this| has a [=strong type=],
-        [=set/append=] its [=strong type=] to |types|.
-
-    3. If |this| has the "percent" [=weak type=],
-        [=set/append=] "percent" to |types|.
-
-    4. If |this| has the "number" [=weak type=],
-        [=set/append=] "number" to |types|.
-
-    5. Return the concatenation of the strings in |types|,
-        each separated by a U+002D HYPHEN-MINUS (-) character.
-
-    Note: This implies that if |this| is [=untyped=],
-    this attribute returns the empty string.
+    Issue: Figure out how we're outputting .type
 </div>
 
 <div algorithm="CSSMathSum(...args)">
