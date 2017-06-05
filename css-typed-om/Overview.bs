@@ -168,8 +168,6 @@ and parseMultiple set to true.
 
 Issue(305): appropriate failure indicators for this algorithm
 
-Issue(325): .equals methods for CSSStyleValue subclasses
-
 <!--
  ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
 ██    ██    ██     ██  ██  ██       ██       ███   ███   ██ ██   ██     ██
@@ -784,9 +782,19 @@ The following are the arithmetic operations you can perform on dimensions:
         is set to |this|.
 </div>
 
-<div class=issue>
-    Define {{CSSNumericValue/equals()}}.
+<div algorithm="CSSNumericValue.equals(...|value|)">
+    The <dfn for=CSSNumericValue method>equals(...|value|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
+
+    1. If the |value| item is the same type as the {{CSSNumericValue}} the method is being called on continue to step 2, else return false.
+
+    2. If the |value| item has the same type as the {{CSSNumericValue}} continue to the next step, else return false.
+
+    3. If the |value| item has the same unit as the {{CSSNumericValue}} return true, else return false.
+
 </div>
+
 
 <div algorithm="CSSNumericValue.to()">
     The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
