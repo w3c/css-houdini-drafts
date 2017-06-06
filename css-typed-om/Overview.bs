@@ -680,6 +680,11 @@ The following are the arithmetic operations you can perform on dimensions:
     1. If |this| is a {{CSSMathNegate}} object,
         return |this|’s {{CSSMathNegate/value}} internal slot.
 
+    2. If |this| is a {{CSSUnitValue}} object,
+        return a new {{CSSUnitValue}}
+        with the same {{CSSUnitValue/unit}} internal slot as |this|,
+        and a {{CSSUnitValue/value}} internal slot set to the negation of |this|’s.
+
     2. Otherwise,
         return a new {{CSSMathNegate}} object
         whose {{CSSMathNegate/value}} internal slot
