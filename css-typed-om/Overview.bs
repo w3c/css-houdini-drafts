@@ -613,13 +613,13 @@ The following are the arithmetic operations you can perform on dimensions:
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-    2. Prepend |this| to |values|.
+    2. If |this| is a {{CSSMathSum}} object,
+        [=list/prepend=] the [=list/items=] in |this|’s {{CSSMathSum/values}} internal slot
+        to |values|.
+        Otherwise,
+        prepend |this| to |values|.
 
-    3. If there are at least two different [=strong types=]
-        among the [=list/items=] in |values|,
-        [=throw=] a {{TypeError}}.
-
-    4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+    3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
         whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
@@ -627,13 +627,11 @@ The following are the arithmetic operations you can perform on dimensions:
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
 
-    5. If |this| is a {{CSSMathSum}} object,
-        remove |this| from |values|,
-        and then [=list/append=] the remaining |values|
-        to |this|’s {{CSSMathSum/values}} internal slot.
+    4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
 
-    6. Otherwise,
-        return a new {{CSSMathSum}} object
+    5. Return a new {{CSSMathSum}} object
         whose {{CSSMathSum/values}} internal slot
         is set to |values|.
 </div>
@@ -644,34 +642,11 @@ The following are the arithmetic operations you can perform on dimensions:
     must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
-        with the result of [=rectifying a numberish value=] for the [=list/item=].
+        with the result of [=rectifying a numberish value=] for the [=list/item=],
+        then [=CSSMath/negating=] the value.
 
-    2. Let |thisAndValues| be |this| prepended to |values|.
-
-    3. If there are at least two different [=strong types=]
-        among the [=list/items=] in |thisAndValues|,
-        [=throw=] a {{TypeError}}.
-
-    4. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s
-        and have the same {{CSSUnitValue/unit}},
-        return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
-        and {{CSSUnitValue/value}} internal slot is set to
-        the value of |this|’s {{CSSUnitValue/value}} internal slot
-        minus the sum of the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values|.
-
-    5. [=CSSMath/Negate=] all of the [=list/items=] in |values|.
-
-    6. If |this| is a {{CSSMathSum}} object,
-        [=list/append=] |values|
-        to |this|’s {{CSSMathSum/values}} internal slot.
-
-    7. Otherwise,
-        prepend |this| to |values|,
-        then return a new {{CSSMathSum}} object
-        whose {{CSSMathSum/values}} internal slot
-        is set to |values|.
+    2. Return the result of calling the {{CSSNumericValue/add()}} internal algorithm
+        with |this| and |values|.
 </div>
 
 <div algorithm>
