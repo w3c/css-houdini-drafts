@@ -814,7 +814,7 @@ is either null or a [=base type=] other than "percent".
         : |unit| is a <<time>> unit
         :: Return «[ "time" → 1 ]»
         : |unit| is a <<frequency>> unit
-        :: Return «[ "frequence" → 1 ]»
+        :: Return «[ "frequency" → 1 ]»
         : |unit| is a <<resolution>> unit
         :: Return «[ "resolution" → 1 ]»
         : |unit| is a <<flex>> unit
