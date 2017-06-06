@@ -590,7 +590,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         CSSNumericValue mul(CSSNumberish... values);
         CSSNumericValue div(CSSNumberish... values);
 
-        boolean equals(CSSNumberish... value);
+        boolean equals(CSSNumberish value);
 
         CSSNumericValue to(DOMString unit);
 
@@ -782,17 +782,23 @@ The following are the arithmetic operations you can perform on dimensions:
         is set to |this|.
 </div>
 
-<div algorithm="CSSNumericValue.equals(...|value|)">
-    The <dfn for=CSSNumericValue method>equals(...|value|)</dfn> method,
+<div algorithm="CSSNumericValue.equals(value)">
+    The <dfn for=CSSNumericValue method>equals(value)</dfn> method,
     when called on a {{CSSNumericValue}} |this|,
     must perform the following steps:
 
-    1. If the |value| item is the same type as the {{CSSNumericValue}} the method is being called on continue to step 2, else return false.
+    1. If the |value| is not of the same class as |this| return false. Example: both |this| and |value| must be {{CSSUnitValue}}.
 
-    2. If the |value| item has the same type as the {{CSSNumericValue}} continue to the next step, else return false.
+    2. If the |value| has a different {{CSSUnitValue/type}} to that of |this| return false.
 
-    3. If the |value| item has the same unit as the {{CSSNumericValue}} return true, else return false.
+    3. If |this| and the |value| item are both {{CSSUnitValue}}s and have the same {{CSSUnitValue/value}} return true.
 
+    4. If |this| and |value| are both {{CSSMathValue}}s:
+        1. Check that the {{CSSMathValue/operator}} is equal for both |this| and |value|
+        2. If |this| and |value| are both either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}} on both |this| and |value|,
+        	1. For each {{CSSUnitValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on both |this| and |value| are equal.
+    	3. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
+    		1. Go back to step 1 to check that the {{CSSUnitValue}} on both |this| and |value| are equal.
 </div>
 
 
