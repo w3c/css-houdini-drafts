@@ -869,8 +869,8 @@ The <dfn for=CSSNumericValue>percent hint</dfn>
 is either null or a [=base type=] other than "percent".
 
 <div algorithm>
-	To <dfn lt="create a type|creating a type">create a type</dfn> from a string |unit|,
-	follow the appropriate branch of the following:
+    To <dfn lt="create a type|creating a type">create a type</dfn> from a string |unit|,
+    follow the appropriate branch of the following:
 
     <dl class=switch>
         : |unit| is "number"
@@ -1315,25 +1315,25 @@ of all the "math" operations.
 </div>
 
 <div algorithm>
-	The <dfn>[=type=] of a CSSMathValue</dfn>
-	depends on its class:
+    The <dfn>[=type=] of a CSSMathValue</dfn>
+    depends on its class:
 
-	<dl class=switch>
-		: {{CSSMathSum}}
-		: {{CSSMathMin}}
-		: {{CSSMathMax}}
-		:: The [=type=] is the result of [=adding=] the [=types=]
-			of each of the [=list/items=] in its {{CSSMathSum/values}} internal slot.
+    <dl class=switch>
+        : {{CSSMathSum}}
+        : {{CSSMathMin}}
+        : {{CSSMathMax}}
+        :: The [=type=] is the result of [=adding=] the [=types=]
+            of each of the [=list/items=] in its {{CSSMathSum/values}} internal slot.
 
-		: {{CSSMathProduct}}
-		:: The [=type=] is the result of [=multiplying=] the [=types=]
-			of each of the [=list/items=] in its {{CSSMathProduct/values}} internal slot.
+        : {{CSSMathProduct}}
+        :: The [=type=] is the result of [=multiplying=] the [=types=]
+            of each of the [=list/items=] in its {{CSSMathProduct/values}} internal slot.
 
-		: {{CSSMathNegate}}
-		: {{CSSMathInvert}}
-		:: The [=type=] is the same as the [=type=] of its {{CSSMathNegate/value}} internal slot,
-			but with all [=map/values=] negated.
-	</dl>
+        : {{CSSMathNegate}}
+        : {{CSSMathInvert}}
+        :: The [=type=] is the same as the [=type=] of its {{CSSMathNegate/value}} internal slot,
+            but with all [=map/values=] negated.
+    </dl>
 </div>
 
 
