@@ -869,6 +869,34 @@ The <dfn for=CSSNumericValue>percent hint</dfn>
 is either null or a [=base type=] other than "percent".
 
 <div algorithm>
+	To <dfn lt="create a type|creating a type">create a type</dfn> from a string |unit|,
+	follow the appropriate branch of the following:
+
+    <dl class=switch>
+        : |unit| is "number"
+        :: Return «[ ]» (empty map)
+        : |unit| is "percent"
+        :: Return «[ "percent" → 1 ]»
+        : |unit| is a <<length>> unit
+        :: Return «[ "length" → 1 ]»
+        : |unit| is an <<angle>> unit
+        :: Return «[ "angle" → 1 ]»
+        : |unit| is a <<time>> unit
+        :: Return «[ "time" → 1 ]»
+        : |unit| is a <<frequency>> unit
+        :: Return «[ "frequence" → 1 ]»
+        : |unit| is a <<resolution>> unit
+        :: Return «[ "resolution" → 1 ]»
+        : |unit| is a <<flex>> unit
+        :: Return «[ "flex" → 1 ]»
+        : anything else
+        :: Return failure.
+    </dl>
+
+    In all cases, the associated [=percent hint=] is null.
+</div>
+
+<div algorithm>
     To <dfn local-lt="add | addition">add two types</dfn> |type1| and |type2|,
     perform the following steps:
 
@@ -1050,7 +1078,7 @@ are represented as {{CSSUnitValue}}s.
     when called,
     perform the following steps:
 
-    1. If |unit| does not have a [=CSS type=],
+    1. If [=creating a type=] from |unit| returns failure,
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
 
@@ -1064,7 +1092,7 @@ are represented as {{CSSUnitValue}}s.
     on setting a value |unit|,
     perform the following steps:
 
-    1. If |unit| does not have a [=CSS type=],
+    1. If [=creating a type=] from |unit| returns failure,,
         [=throw=] a {{TypeError}}.
 
     2. Otherwise,
@@ -1081,32 +1109,9 @@ are represented as {{CSSUnitValue}}s.
     Issue: Figure out how we're exposing types. This should probably move up to the superclass, then.
 </div>
 
-<div algorithm="CSS type of a unit">
-    The [=type=] of a {{CSSUnitValue}}
-    depends on its {{CSSUnitValue/unit}} as follows:
-
-    <dl class=switch>
-        : |unit| is "number"
-        :: [=type=] is «[ ]» (empty map)
-        : |unit| is "percent"
-        :: [=type=] is «[ "percent" → 1 ]»
-        : |unit| is a <<length>> unit
-        :: [=type=] is «[ "length" → 1 ]»
-        : |unit| is an <<angle>> unit
-        :: [=type=] is «[ "angle" → 1 ]»
-        : |unit| is a <<time>> unit
-        :: [=type=] is «[ "time" → 1 ]»
-        : |unit| is a <<frequency>> unit
-        :: [=type=] is «[ "frequence" → 1 ]»
-        : |unit| is a <<resolution>> unit
-        :: [=type=] is «[ "resolution" → 1 ]»
-        : |unit| is a <<flex>> unit
-        :: [=type=] is «[ "flex" → 1 ]»
-        : anything else
-        :: the string does not have a [=CSS type=]
-    </dl>
-
-    In all cases, the [=percent hint=] of the [=type=] is null.
+<div algorithm>
+    The <dfn>[=type=] of a {{CSSUnitValue}}</dfn>
+    is the result of [=creating a type=] from its {{CSSUnitValue/unit}} internal slot.
 </div>
 
 <div algorithm>
