@@ -844,8 +844,8 @@ rather than on {{CSSNumericValue}} instances.
 ### Numeric Value Typing ### {#numeric-typing}
 
 Each {{CSSNumericValue}} has an associated <dfn for=CSSNumericValue>type</dfn>,
-which is a combination of a [=ordered map|map=] of [=base types=] to integers,
-and a [=percent hint=].
+which is a [=ordered map|map=] of [=base types=] to integers,
+and an associated [=percent hint=].
 The <dfn for=CSSNumericValue lt="base type">base types</dfn> are
 "length",
 "angle",
