@@ -1034,6 +1034,12 @@ For the purposes of [=matching=],
 these cases should be treated as <<length-percentage>>.
 Similarly for <<angle-percentage>>, etc.
 
+Note: [=Types=] form a semi-group under both addition and multiplication,
+meaning that they're associative and commutative.
+Thus the spec can, for example,
+[=add=] an unbounded number of types together unambiguously,
+rather than having to manually [=add=] them pair-wise.
+
 
 
 <!--
@@ -1268,32 +1274,26 @@ of all the "math" operations.
     2. If |args| [=list/is empty=],
         [=throw=] a {{SyntaxError}}.
 
-    3. Let |strongType| initially be null.
+    3. Let |type| be the result of [=adding=] the [=types=] of all the [=list/items=] of |args|.
+    	If |type| is failure,
+    	[=throw=] a {{SyntaxError}}.
 
-    4. Let |values| be an initially empty [=list=].
-
-    5. [=list/For each=] |arg| of |args|:
-
-        1. If |arg| has a [=strong type=], and |strongType| is null,
-            let |strongType| by |arg|’s [=strong type=].
-
-        2. If |arg| has a [=strong type=],
-            and |strongType| is not equal to that type,
-            [=throw=] a {{TypeError}}.
-
-        3. [=list/Append=] |arg| to |values|.
-
-    6. Return a new {{CSSMathSum}}
+    4. Return a new {{CSSMathSum}}
         whose {{CSSMathSum/values}} internal slot
-        is set to |values|.
+        is set to |args|.
 
-    The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn>,
-    <dfn constructor for="CSSMathMin">CSSMathMin(...|args|)</dfn>,
+    The <dfn constructor for="CSSMathMin">CSSMathMin(...|args|)</dfn>
     and <dfn constructor for="CSSMathMax">CSSMathMax(...|args|)</dfn> constructors
     are defined identically to the above,
     except that in the last step
-    they return a new {{CSSMathProduct}}, {{CSSMathMin}}, or {{CSSMathMax}} object,
+    they return a new {{CSSMathMin}} or {{CSSMathMax}} object,
     respectively.
+
+    The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn> constructor
+    is defined identically to the above,
+    except that in step 3 it [=multiplies=] the types instead of [=adding=],
+    and in the last step
+    it returns a {{CSSMathProduct}}.
 </div>
 
 <div algorithm="CSSMathNegate(arg)">
@@ -1314,6 +1314,27 @@ of all the "math" operations.
     it returns a new {{CSSMathInvert}} object.
 </div>
 
+<div algorithm>
+	The <dfn>[=type=] of a CSSMathValue</dfn>
+	depends on its class:
+
+	<dl class=switch>
+		: {{CSSMathSum}}
+		: {{CSSMathMin}}
+		: {{CSSMathMax}}
+		:: The [=type=] is the result of [=adding=] the [=types=]
+			of each of the [=list/items=] in its {{CSSMathSum/values}} internal slot.
+
+		: {{CSSMathProduct}}
+		:: The [=type=] is the result of [=multiplying=] the [=types=]
+			of each of the [=list/items=] in its {{CSSMathProduct/values}} internal slot.
+
+		: {{CSSMathNegate}}
+		: {{CSSMathInvert}}
+		:: The [=type=] is the same as the [=type=] of its {{CSSMathNegate/value}} internal slot,
+			but with all [=map/values=] negated.
+	</dl>
+</div>
 
 
 <!--
