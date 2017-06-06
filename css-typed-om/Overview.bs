@@ -841,6 +841,16 @@ rather than on {{CSSNumericValue}} instances.
         and return the result.
 </div>
 
+<!--
+████████ ██    ██ ████████  ████████  ██████
+   ██     ██  ██  ██     ██ ██       ██    ██
+   ██      ████   ██     ██ ██       ██
+   ██       ██    ████████  ██████    ██████
+   ██       ██    ██        ██             ██
+   ██       ██    ██        ██       ██    ██
+   ██       ██    ██        ████████  ██████
+-->
+
 ### Numeric Value Typing ### {#numeric-typing}
 
 Each {{CSSNumericValue}} has an associated <dfn for=CSSNumericValue>type</dfn>,
