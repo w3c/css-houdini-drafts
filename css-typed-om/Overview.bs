@@ -1275,8 +1275,8 @@ of all the "math" operations.
         [=throw=] a {{SyntaxError}}.
 
     3. Let |type| be the result of [=adding=] the [=types=] of all the [=list/items=] of |args|.
-    	If |type| is failure,
-    	[=throw=] a {{SyntaxError}}.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
 
     4. Return a new {{CSSMathSum}}
         whose {{CSSMathSum/values}} internal slot
