@@ -674,37 +674,19 @@ The following are the arithmetic operations you can perform on dimensions:
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
 
-    2. Let |thisAndValues| be |this| prepended to |values|.
+    2. If |this| is a {{CSSMathProduct}} object,
+        [=list/prepend=] the [=list/items=] in |this|’s {{CSSMathProduct/values}} internal slot
+        to |values|.
+        Otherwise,
+        prepend |this| to |values|.
 
-    3. Let |mainValue| initially be null.
+    3. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
 
-    4. [=list/For each=] |item| of |thisAndValues|:
-        1. If |item| has a [=strong type=],
-            or a [=weak type=] other than "number":
-
-            1. If |mainValue| is null,
-                set |mainValue| to |item|.
-            2. Otherwise,
-                [=throw=] a {{TypeError}}.
-
-    5. If |mainValue| is still null,
-        set |mainValue| to |this|.
-
-    6. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s,
-        return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
-        and {{CSSUnitValue/value}} internal slot is set to
-        the product of the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |thisAndValues|.
-
-    7. If |this| is a {{CSSMathProduct}} object,
-        [=list/append=] the [=list/items=] of |values|
-        to |this|’s {{CSSMathProduct/values}} internal slot.
-
-    8. Otherwise,
-        and return a new {{CSSMathProduct}}
+    5. Return a new {{CSSMathProduct}} object
         whose {{CSSMathProduct/values}} internal slot
-        is set to |thisAndValues|.
+        is set to |values|.
 </div>
 
 <div algorithm="CSSNumericValue.div()">
@@ -713,43 +695,11 @@ The following are the arithmetic operations you can perform on dimensions:
     must perform the following steps:
 
     1. Replace each [=list/item=] of |values|
-        with the result of [=rectifying a numberish value=] for the [=list/item=].
+        with the result of [=rectifying a numberish value=] for the [=list/item=],
+        then [=CSSMath/inverting=] the value.
 
-    2. Let |thisAndValues| be |this| prepended to |values|.
-
-    3. Let |mainValue| initially be null.
-
-    4. [=list/For each=] |item| of |thisAndValues|:
-        1. If |item| has a [=strong type=],
-            or a [=weak type=] other than "number":
-
-            1. If |mainValue| is null,
-                set |mainValue| to |item|.
-            2. Otherwise,
-                [=throw=] a {{TypeError}}.
-
-    5. If |mainValue| is still null,
-        set |mainValue| to |this|.
-
-    6. If all of the [=list/items=] in |thisAndValues| are {{CSSUnitValue}}s,
-        return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |mainValue|’s {{CSSUnitValue/unit}} internal slot,
-        and {{CSSUnitValue/value}} internal slot is set to
-        the {{CSSUnitValue/value}} internal slot of |this|
-        divided by the product of the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values|.
-
-    7. [=CSSMath/Invert=] all of the [=list/items=] in |values|.
-
-    8. If |this| is a {{CSSMathProduct}} object,
-        [=list/append=] the [=list/items=] of |values|
-        to |this|’s {{CSSMathProduct/values}} internal slot.
-
-    9. Otherwise,
-        prepend |this| to |values|,
-        then return a new {{CSSMathProduct}} object
-        whose {{CSSMathProduct/values}} internal slot
-        is set to |values|.
+    2. Return the result of calling the {{CSSNumericValue/mul()}} internal algorithm
+        with |this| and |values|.
 </div>
 
 <div algorithm>
