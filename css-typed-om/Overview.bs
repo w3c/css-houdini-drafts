@@ -598,10 +598,14 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         boolean equals(CSSNumberish... value);
 
         CSSNumericValue to(DOMString unit);
+        // ??? type();
 
         static CSSNumericValue parse(DOMString cssText);
     };
 </xmp>
+
+Issue: Figure out how we want to represent the type of an expression in JS,
+and define the type() method accordingly.
 
 The methods on the {{CSSNumericValue}} superclass
 represent operations that all numeric values can perform.
@@ -1241,13 +1245,6 @@ are represented as {{CSSUnitValue}}s.
     it must return the value of |this|’s {{CSSUnitValue/unit}} internal slot.
 </div>
 
-<div algorithm="CSSUnitValue.type">
-    The <dfn attribute for=CSSUnitValue>type</dfn> attribute of a {{CSSUnitValue}} |this| must,
-    on reading,
-
-    Issue: Figure out how we're exposing types. This should probably move up to the superclass, then.
-</div>
-
 <div algorithm>
     The <dfn>[=type=] of a {{CSSUnitValue}}</dfn>
     is the result of [=creating a type=] from its {{CSSUnitValue/unit}} internal slot.
@@ -1386,14 +1383,6 @@ of all the "math" operations.
     </dl>
 
     Note: These are all instances of the {{CSSMathOperator}} enum.
-</div>
-
-<div algorithm="CSSMathValue.type">
-    The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">type</dfn> attribute
-    of a {{CSSMathValue}} |this| must,
-    on reading,
-
-    Issue: Figure out how we're outputting .type
 </div>
 
 <div algorithm="CSSMathSum(...args)">
