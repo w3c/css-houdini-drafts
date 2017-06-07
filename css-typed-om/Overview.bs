@@ -30,6 +30,9 @@ Markup Shorthands: markdown yes
 [data-algorithm]:not(.heading) > :last-child {
   margin-bottom: 0;
 }
+[data-algorithm] [data-algorithm] {
+    margin: 1em 0;
+}
 </style>
 
 <pre class=anchors>
@@ -723,26 +726,215 @@ The following are the arithmetic operations you can perform on dimensions:
     into another one with the specified |unit|.
     When called, it must perform the following steps:
 
-    1. If |unit| does not have a [=CSS type=],
-        [=throw=] a {{SyntaxError}}
-        and abort this algorithm.
+    1. Let |type| be the result of [=creating a type=] from |unit|.
+        If |type| is failure,
+        [=throw=] a {{SyntaxError}}.
 
-    2. If |this| is a {{CSSUnitValue}}
-        and |this|’s {{CSSUnitValue/unit}} internal slot and |unit| are [=compatible units=],
-        return a new {{CSSUnitValue}}
-        with its {{CSSUnitValue/unit}} internal slot set to |unit|
-        and its {{CSSUnitValue/value}} internal slot set to |this|’s {{CSSUnitValue/value}}
-        multiplied by the conversion ratio between the two units.
+    2. Let |sum| be the result of [=creating a sum value=] from |this|.
+        If |sum| is failure,
+        [=throw=] a {{TypeError}}.
 
-    3. If |this| is a {{CSSCalcValue}}:
-        1. Let |sum| be 0.
-        2. [=map/For each=] |oldUnit| → |value| in |this|’s [=map entries=]:
-            1. If |oldUnit| and |unit| are not [=compatible units=],
-                [=throw=] a {{TypeError}}.
-            2. Increment |sum| by |value| times the conversion ratio between |oldUnit| and |unit|.
-        3. Return a new {{CSSUnitValue}}
-            with its {{CSSUnitValue/unit}} internal slot set to |unit|
-            and its {{CSSUnitValue/value}} internal slot set to |sum|.
+    3. If |sum| has more than one [=list/item=],
+        [=throw=] a {{TypeError}}.
+        Otherwise, let |item| be the sole [=list/item=] in |sum|.
+
+    4. If |item| has more than one [=map/value=] in its [=sum value/unit map=],
+        or that single [=map/value=]’s value is anything other than `1`,
+        [=throw=] a {{TypeError}}.
+        Otherwise, let |item unit| be the sole [=map/key=] in the [=sum value/unit map=],
+        and |item value| be |item|’s [=sum value/value=].
+
+    5. If |unit| and |item unit| are not [=compatible units=],
+        [=throw=] a {{TypeError}}.
+
+    6. Return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot
+        is set to |unit|,
+        and whose {{CSSUnitValue/value}} internal slot
+        is set to |item value|
+        multiplied by the conversion ratio between |item unit|
+        and |unit|.
+</div>
+
+<div algorithm="sum value">
+    A <dfn>sum value</dfn>
+    is an abstract representation of a {{CSSNumericValue}}
+    as a sum of numbers with (possibly complex) units.
+    Not all {{CSSNumericValue}}s can be expressed as a [=sum value=].
+
+    A [=sum value=] is a [=list=].
+    Each entry in the list is a [=tuple=] of a <dfn for="sum value">value</dfn>,
+    which is a number,
+    and a <dfn for="sum value">unit map</dfn>,
+    which is a [=ordered map|map=] of units (strings) to powers (integers).
+
+    <div class=example>
+        Here are a few examples of CSS values,
+        and their equivalent [=sum values=]:
+
+        * ''1px'' becomes `«(1, «"px"→1»)»`
+        * ''calc(1px + 1in)'' becomes `«(97, «"px"→1»)»`
+            (because ''in'' and ''px'' are [=compatible units=],
+            and ''px'' is the [=canonical unit=] for them)
+        * ''calc(1px + 2em)'' becomes `«(1, «"px"→1»), (2, «"em"→»1)»`
+        * ''calc(1px * 2em)'' becomes `«(2, «"em"→1, "px"→1»)»`
+        * ''calc(1px + 1deg)'' can't be represented as a [=sum value=]
+            because it's an invalid computation
+        * ''calc(1px * 1deg)'' becomes `«(2, «"deg"→1, "px"→1»)»`
+    </div>
+
+    To <dfn lt="create a sum value|creating a sum value">create a sum value</dfn> from a {{CSSNumericValue}} |this|,
+    the steps differ based on |this|’s class:
+
+    <dl class=switch>
+        : {{CSSUnitValue}}
+        ::
+            <div algorithm="sum value from CSSUnitValue">
+                1. Let |unit| be the value of |this|’s {{CSSUnitValue/unit}} internal slot,
+                    and |value| be the value of |this|’s {{CSSUnitValue/value}} internal slot.
+                2. If |unit| is a member of a set of [=compatible units=],
+                    and is not the set's [=canonical unit=],
+                    multiply |value| by the conversion ratio between |unit| and the [=canonical unit=],
+                    and change |unit| to the [=canonical unit=].
+                3. If |unit| is `"number"`,
+                    return «(|value|, «»)».
+                3. Otherwise, return <code>«(|value|, «|unit|→1»)»</code>.
+            </div>
+
+        : {{CSSMathSum}}
+        ::
+            <div algorithm="sum value from CSSMathSum">
+                1. Let |values| initially be an empty list.
+
+                2. [=list/For each=] |item| in |this|’s {{CSSMathSum/values}} internal slot:
+
+                    1. Let |value| be the result of [=creating a sum value=] from |item|.
+                        If |value| is failure,
+                        return failure.
+
+                    2. [=list/For each=] |subvalue| of |value|:
+
+                        1. If |values| already contains an [=list/item=]
+                            with the same [=sum value/unit map=] as |subvalue|,
+                            increment that [=list/item=]’s [=sum value/value=]
+                            by the [=sum value/value=] of |subvalue|.
+
+                        2. Otherwise, [=list/append=] |subvalue| to |values|.
+
+                3. [=create a type from a unit map|Create a type=]
+                    from the [=sum value/unit map=]
+                    of each [=list/item=] of |values|,
+                    and [=add=] all the types together.
+                    If the result is failure,
+                    return failure.
+
+                4. Return |values|.
+            </div>
+
+        : {{CSSMathNegate}}
+        ::
+            <div algorithm="sum value from CSSMathNegate">
+                1. Let |values| be the result of [=creating a sum value=]
+                    from |this|’s {{CSSMathNegate/value}} internal slot.
+
+                2. If |values| is failure,
+                    return failure.
+
+                3. Negate the [=sum value/value=] of each [=list/item=] of |values|.
+
+                4. Return |values|.
+            </div>
+
+        : {{CSSMathProduct}}
+        ::
+            <div algorithm="sum value from CSSMathProduct">
+                1. Let |values| initially be the [=sum value=] «(1, «»)».
+                    (I.e. what you'd get from ''1''.)
+
+                2. [=list/For each=] |item| in |this|’s {{CSSMathProduct/values}} internal slot:
+
+                    1. Let |new values| be the result of [=creating a sum value=] from |item|.
+                        Let |temp| initially be an empty [=list=].
+
+                    2. [=list/For each=] |item1| in |values|:
+
+                        1. [=list/For each=] |item2| in |new values|:
+
+                            1. Let |item| be a [=tuple=] with its [=sum value/value=]
+                                set to the product of the [=sum value/values=] of |item1| and |item2|,
+                                and its [=sum value/unit map=]
+                                set to the union of the [=sum value/unit maps=] of |item1| and |item2|,
+                                with all [=map/entries=] with a zero value removed.
+
+                            2. Append |item| to |temp|.
+
+                    3. Set |values| to |temp|.
+
+                3. Return |values|.
+            </div>
+
+        : {{CSSMathInvert}}
+        ::
+            <div algorithm="sum value from CSSMathInvert">
+                1. Let |values| be the result of [=creating a sum value=]
+                    from |this|’s {{CSSMathInvert/value}} internal slot.
+
+                2. If |values| is failure,
+                    return failure.
+
+                3. If the length of [=values=] is more than one,
+                    return failure.
+
+                3. Invert (find the reciprocal of) the [=sum value/value=] of the [=list/item=] in |values|,
+                    and negate the [=map/value=] of each [=map/entry=] in its [=sum value/unit map=].
+
+                4. Return |values|.
+            </div>
+
+        : {{CSSMathMin}}
+        ::
+            <div algorithm="sum value from CSSMathMin">
+                1. Let |args| be the result of [=creating a sum value=]
+                    [=list/for each=] [=list/item=] in |this|’s {{CSSMathMin/values}} internal slot.
+
+                2. If any [=list/item=] of |args| has a length greater than one,
+                    return failure.
+
+                3. If not all of the [=sum value/unit maps=] among the [=list/items=] of |args| are identical,
+                    return failure.
+
+                4. Return the [=list/item=] of |args| whose sole [=list/item=] has the smallest [=sum value/value=].
+            </div>
+
+        : {{CSSMathMax}}
+        ::
+            <div algorithm="sum value from CSSMathMax">
+                1. Let |args| be the result of [=creating a sum value=]
+                    [=list/for each=] [=list/item=] in |this|’s {{CSSMathMax/values}} internal slot.
+
+                2. If any [=list/item=] of |args| has a length greater than one,
+                    return failure.
+
+                3. If not all of the [=sum value/unit maps=] among the [=list/items=] of |args| are identical,
+                    return failure.
+
+                4. Return the [=list/item=] of |args| whose sole [=list/item=] has the largest [=sum value/value=].
+            </div>
+    </dl>
+
+    <div algorithm>
+        To <dfn>create a type from a unit map</dfn> |unit map|:
+
+        1. Let |types| be an initially empty [=list=].
+
+        2. [=map/For each=] |unit| → |power| in |unit map|:
+
+            1. Let |type| be the result of [=creating a type=] from |unit|.
+            2. Set |type|’s sole [=map/value=] to |power|.
+            3. [=list/Append=] |type| to |types|.
+
+        3. Return the result of [=multiplying=] all the [=list/items=] of |types|.
+    </div>
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
