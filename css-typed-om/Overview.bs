@@ -777,6 +777,10 @@ The following are the arithmetic operations you can perform on dimensions:
             (because ''in'' and ''px'' are [=compatible units=],
             and ''px'' is the [=canonical unit=] for them)
         * ''calc(1px + 2em)'' becomes `«(1, «["px" → 1]»), (2, «["em" → 1]»)»`
+        * ''calc(1px + 2%)'' becomes `«(1, «["px" → 1]»), (2, «["percent" → 1]»)»`
+            (percentages are allowed to add to other units,
+            but aren't resolved into another unit,
+            like they are in a [=type=])
         * ''calc(1px * 2em)'' becomes `«(2, «["em" → 1, "px" → 1]»)»`
         * ''calc(1px + 1deg)'' can't be represented as a [=sum value=]
             because it's an invalid computation
