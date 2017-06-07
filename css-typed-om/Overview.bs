@@ -446,6 +446,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 [Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
     attribute DOMString value;
+    stringifier;
 };
 </pre>
 
@@ -454,59 +455,39 @@ interface CSSKeywordValue : CSSStyleValue {
     when called,
     perform the following steps:
 
-    1. [=Parse a component value=] from |value|,
-        and let |keyword| be the result.
-
-    2. If |keyword| is a syntax error,
-        [=throw=] a {{SyntaxError}}.
-
-    3. If |keyword| is anything but an [=identifier=],
-        [=throw=] a {{SyntaxError}}.
-
-    4. Otherwise, return a new {{CSSKeywordValue}}
+    1. Return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
-        set to the serialization of |keyword|.
+        set to |value|.
 </div>
 
-<div class=issue>
-    It's intentional that this does a CSS parse,
-    rather than just taking the string literally.
+<div algorithm="CSSKeywordValue stringification behavior">
+    The <dfn for=CSSKeywordValue>stringification behavior</dfn> of a {{CSSKeywordValue}} |this| is:
 
-    Goals are (1) allow .value to round-trip thru the constructor,
-    and (2) allow .value to work when stitched directly into a string
-    that's then fed to CSS.
-    #2 requires us to have .value contain the appropriate CSS escapes,
-    and #1 then requires us to parse those escapes.
+    1. Let |token| be an <<ident-token>>
+        with its value set to |this|’s {{CSSKeywordValue/value}} internal slot.
 
-    On the other hand,
-    I think this conflicts with the most desirable handling of CSS strings;
-    a CSSStringValue should take the value literally, I think.
-    (Otherwise we have to do some weird things around quotes, I think.)
-    Need to evaluate this holistically.
-
-    Possible solution: different behavior between .value
-    and the stringifier.
+    2. Return the serialization of |token|.
 </div>
 
-<div algorithm for="CSSKeywordValue.value">
-    The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
-    on setting a value |value|,
+Any place that accepts a {{CSSKeywordValue}}
+also accepts a raw {{DOMString}},
+by using the following typedef and algorithm:
+
+<pre class=idl>
+typedef (DOMString or CSSKeywordValue) CSSKeywordish;
+</pre>
+
+<div algorithm>
+    To <dfn export>rectify a keywordish value</dfn> |val|,
     perform the following steps:
 
-    1. [=Parse a component value=] from |value|,
-        and let |keyword| be the result.
+    1. If |val| is a {{CSSKeywordValue}},
+        return |val|.
 
-    2. If |keyword| is a syntax error,
-        [=throw=] a {{SyntaxError}}.
-
-    3. If |keyword| is anything but an [=identifier=],
-        [=throw=] a {{SyntaxError}}.
-
-    4. Otherwise, set |this|’s internal {{CSSKeywordValue/value}} slot
-        to the serialization of |keyword|.
-
-    On reading, {{CSSKeywordValue/value}}
-    must return the serialization of |this|’s internal {{CSSKeywordValue/value}} slot.
+    2. If |val| is a {{DOMString}},
+        return a new {{CSSKeywordValue}}
+        with its {{CSSKeywordValue/value}} internal slot
+        set to |val|.
 </div>
 
 
