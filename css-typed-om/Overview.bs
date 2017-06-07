@@ -810,7 +810,7 @@ The following are the arithmetic operations you can perform on dimensions:
             <div algorithm="sum value from CSSMathSum">
                 1. Let |values| initially be an empty list.
 
-                2. [=list/For each=] |item| in |this|’s {{CSSMathSum/values}} internal slot:
+                2. [=list/For each=] |item| in <var ignore>this</var>’s {{CSSMathSum/values}} internal slot:
 
                     1. Let |value| be the result of [=creating a sum value=] from |item|.
                         If |value| is failure,
@@ -839,7 +839,7 @@ The following are the arithmetic operations you can perform on dimensions:
         ::
             <div algorithm="sum value from CSSMathNegate">
                 1. Let |values| be the result of [=creating a sum value=]
-                    from |this|’s {{CSSMathNegate/value}} internal slot.
+                    from <var ignore>this</var>’s {{CSSMathNegate/value}} internal slot.
 
                 2. If |values| is failure,
                     return failure.
@@ -855,7 +855,7 @@ The following are the arithmetic operations you can perform on dimensions:
                 1. Let |values| initially be the [=sum value=] «(1, «[ ]»)».
                     (I.e. what you'd get from ''1''.)
 
-                2. [=list/For each=] |item| in |this|’s {{CSSMathProduct/values}} internal slot:
+                2. [=list/For each=] |item| in <var ignore>this</var>’s {{CSSMathProduct/values}} internal slot:
 
                     1. Let |new values| be the result of [=creating a sum value=] from |item|.
                         Let |temp| initially be an empty [=list=].
@@ -884,7 +884,7 @@ The following are the arithmetic operations you can perform on dimensions:
         ::
             <div algorithm="sum value from CSSMathInvert">
                 1. Let |values| be the result of [=creating a sum value=]
-                    from |this|’s {{CSSMathInvert/value}} internal slot.
+                    from <var ignore>this</var>’s {{CSSMathInvert/value}} internal slot.
 
                 2. If |values| is failure,
                     return failure.
@@ -902,7 +902,7 @@ The following are the arithmetic operations you can perform on dimensions:
         ::
             <div algorithm="sum value from CSSMathMin">
                 1. Let |args| be the result of [=creating a sum value=]
-                    [=list/for each=] [=list/item=] in |this|’s {{CSSMathMin/values}} internal slot.
+                    [=list/for each=] [=list/item=] in <var ignore>this</var>’s {{CSSMathMin/values}} internal slot.
 
                 2. If any [=list/item=] of |args| is failure,
                     or has a length greater than one,
@@ -918,7 +918,7 @@ The following are the arithmetic operations you can perform on dimensions:
         ::
             <div algorithm="sum value from CSSMathMax">
                 1. Let |args| be the result of [=creating a sum value=]
-                    [=list/for each=] [=list/item=] in |this|’s {{CSSMathMax/values}} internal slot.
+                    [=list/for each=] [=list/item=] in <var ignore>this</var>’s {{CSSMathMax/values}} internal slot.
 
                 2. If any [=list/item=] of |args| is failure,
                     or has a length greater than one,
