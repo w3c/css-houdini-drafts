@@ -77,7 +77,9 @@ spec:css-transforms-1;
 spec:css-syntax-3;
     type:dfn; text:identifier
 spec:infra;
-    type: dfn; text: list
+    type: dfn;
+        text: list
+        text: code point
 </pre>
 
 Introduction {#intro}
@@ -598,6 +600,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         boolean equals(CSSNumberish... value);
 
         CSSNumericValue to(DOMString unit);
+        CSSMathSum toSum(DOMString... units);
         // ??? type();
 
         static CSSNumericValue parse(DOMString cssText);
@@ -743,7 +746,7 @@ The following are the arithmetic operations you can perform on dimensions:
         [=throw=] a {{TypeError}}.
         Otherwise, let |item| be the result of [=create a CSSUnitValue from a sum value item|creating a CSSUnitValue=]
         from the sole [=list/item=] in |sum|,
-        then [=converting a CSSUnitValue|converting=] it to |unit|.
+        then [=convert a CSSUnitValue|converting=] it to |unit|.
         If |item| is failure,
         [=throw=] a {{TypeError}}.
 
@@ -773,6 +776,69 @@ The following are the arithmetic operations you can perform on dimensions:
         is set to that [=map/entry’s=] [=map/key=],
         and whose {{CSSUnitValue/value}} internal slot
         is set to |item|’s [=sum value/value=].
+</div>
+
+<div algorithm="CSSNumericValue.toSum()">
+    The <dfn method for=CSSNumericValue>toSum(...|units|)</dfn> method converts an existing {{CSSNumericValue}} |this|
+    into a {{CSSMathSum}} of only {{CSSUnitValue}}s with the specified units,
+    if possible.
+    (It's like {{CSSNumericValue/to()}},
+    but allows the result to have multiple units in it.)
+    If called without any units,
+    it just simplifies |this| into a minimal sum of {{CSSUnitValue}}s.
+
+    When called, it must perform the following steps:
+
+    1. [=list/For each=] |unit| in |units|,
+        if the result of [=creating a type=] from |unit| is failure,
+        [=throw=] a {{SyntaxError}}.
+
+    2. Let |sum| be the result of [=creating a sum value=] from |this|.
+        If |sum| is failure,
+        [=throw=] a {{TypeError}}.
+
+    3. Let |values| be the result of [=create a CSSUnitValue from a sum value item|creating a CSSUnitValue=]
+        [=list/for each=] [=list/item=] in |sum|.
+        If any [=list/item=] of |values| is failure,
+        [=throw=] a {{TypeError}}.
+
+    4. If |units| is [=list/empty=],
+        sort |values| in [=code point=] order according to the {{CSSUnitValue/unit}} internal slot of its [=list/items=],
+        then return a new {{CSSMathSum}} object
+        whose {{CSSMathSum/values}} internal slot is set to |values|.
+
+
+    5. Otherwise,
+        let |result| initially be an empty [=list=].
+        [=list/For each=] |unit| in |units|:
+
+        1. Let |temp| initially be a new {{CSSUnitValue}}
+            whose {{CSSUnitValue/unit}} internal slot
+            is set to |unit|
+            and whose {{CSSUnitValue/value}} internal slot
+            is set to `0`.
+
+        2. [=list/For each=] |value| in |values|:
+
+            1. Let |value unit| be |value|’s {{CSSUnitValue/unit}} internal slot.
+
+            2. If |value unit| is a [=compatible unit=] with |unit|,
+                then:
+
+                1.[=convert a CSSUnitValue|convert=] |value| to |unit|.
+                2. Increment |temp|’s {{CSSUnitValue/value}} internal slot
+                    by the value of |value|’s {{CSSUnitValue/value}} internal slot.
+                3. [=list/Remove=] |value| from |values|.
+
+        3. [=list/Append=] |temp| to |result|.
+
+    6. If |values| is not [=list/empty=],
+        [=throw=] a {{TypeError}}.
+        <span class=note>|this| had units that you didn't ask for.</span>
+
+    7. Return a new {{CSSMathSum}} object
+        whose {{CSSMathSum/values}} internal slot
+        is set to |result|.
 </div>
 
 <div algorithm="sum value">
