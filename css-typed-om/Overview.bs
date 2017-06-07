@@ -805,7 +805,7 @@ The following are the arithmetic operations you can perform on dimensions:
                     multiply |value| by the conversion ratio between |unit| and the [=canonical unit=],
                     and change |unit| to the [=canonical unit=].
                 3. If |unit| is `"number"`,
-                    return «(|value|, «»)».
+                    return «(|value|, «[ ]»)».
                 3. Otherwise, return <code>«(|value|, «[|unit| → 1]»)»</code>.
             </div>
 
