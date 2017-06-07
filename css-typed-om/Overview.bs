@@ -742,20 +742,12 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If |sum| has more than one [=list/item=],
         [=throw=] a {{TypeError}}.
         Otherwise, let |item| be the result of [=create a CSSUnitValue from a sum value item|creating a CSSUnitValue=]
-        from the sole [=list/item=] in |sum|.
+        from the sole [=list/item=] in |sum|,
+        then [=converting a CSSUnitValue|converting=] it to |unit|.
         If |item| is failure,
         [=throw=] a {{TypeError}}.
 
-    4. If |unit| and |item|’s {{CSSUnitValue/unit}} internal slot are not [=compatible units=],
-        [=throw=] a {{TypeError}}.
-
-    5. If |unit| is not equal to |item|’s {{CSSUnitValue/unit}} internal slot,
-        multiply |item|’s {{CSSUnitValue/value}} internal slot
-        by the conversion ratio between the two units,
-        and set its {{CSSUnitValue/unit}} internal slot
-        to |unit|.
-
-    6. Return |item|.
+    4. Return |item|.
 </div>
 
 <div algorithm>
@@ -1274,7 +1266,7 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm>
-    When asked to <dfn export>create a CSSUnitValue from a string</dfn> |str|,
+    To <dfn export>create a CSSUnitValue from a string</dfn> |str|,
     return a new {{CSSUnitValue}} object
     with its {{CSSUnitValue/value}} internal slot
     set to the numeric portion of |str| parsed into a number,
@@ -1288,6 +1280,25 @@ are represented as {{CSSUnitValue}}s.
         <code>new CSSUnitValue(5, "px")</code>.
     </div>
 </div>
+
+<div algorithm>
+    To <dfn export>convert a CSSUnitValue</dfn> |this| to a unit |unit|,
+    perform the following steps:
+
+    1. Let |old unit| be the value of |this|’s {{CSSUnitValue/unit}} internal slot,
+        and |old value| be the value of |this|’s {{CSSUnitValue/value}} internal slot.
+
+    2. If |old unit| and |unit| are not [=compatible units=],
+        return failure.
+
+    3. Return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot
+        is set to |unit|,
+        and whose {{CSSUnitValue/value}} internal slot
+        is set to |old value| multiplied by
+        the conversation ratio between |old unit| and |unit|.
+</div>
+
 
 
 <!--
