@@ -1827,7 +1827,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     4. If |z| was not passed,
         set |this|’s {{CSSTranslation/z}} internal slot
-        to a [=new unit value=] of ''0px'',
+        to [=create a CSSUnitValue from a string|new unit value=] of ''0px'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
@@ -1846,9 +1846,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
         with its {{CSSRotation/angle}} internal slot
         set to |angle|,
         its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots
-        set to [=new unit values=] of ''0'',
+        set to [=create a CSSUnitValue from a string|new unit values=] of ''0'',
         its {{CSSRotation/z}} internal slot
-        set to a [=new unit value=] of ''1'',
+        set to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
@@ -1896,7 +1896,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     5. If |z| was not passed,
         set |this|’s {{CSSScale/z}} internal slot
-        to a [=new unit value=] of ''1'',
+        to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
     6. Return |this|.
