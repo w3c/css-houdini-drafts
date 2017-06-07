@@ -1962,10 +1962,10 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     let map = document.querySelector('.example').styleMap;
 
     map.get('background-position').x;
-    // CSSUnitValue(50, "percent")
+    // CSS.percent(50)
 
     map.get('background-position').y;
-    // CSSCalcValue({percent: 100, px: -10})
+    // CSSMathSum(CSS.percent(100), CSS.px(-10))
     </pre>
 </div>
 
@@ -2198,7 +2198,7 @@ CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 <<number>>, <<percentage>>, and <<dimension>> values {#normalize-numeric}
 -------------------------------------------------------------------------
 
-CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSUnitValue}}s or {{CSSCalcValue}}s in the Typed OM.
+CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValue}}s in the Typed OM.
 
 <div algorithm>
     To <dfn export>normalize a numeric value</dfn> |num|:
@@ -2569,12 +2569,12 @@ Otherwise,
 to the string representation of their {{CSSUnitValue/value}}
 followed by their {{CSSUnitValue/unit}}.
 
-{{CSSCalcValue}} Serialization {#calc-serialization}
+{{CSSMathValue}} Serialization {#calc-serialization}
 ---------------------------------------------------------
 
-{{CSSCalcValue}} objects are serialized into a ''calc()'' expression,
-per the rules in [[css-values-3#calc-serialize]],
-treating the object as a summation of all the non-`null` values it contains.
+{{CSSMathValue}} objects are serialized into a ''calc()'' expression
+
+Issue: TODO
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
@@ -2705,21 +2705,12 @@ During computation, {{CSSUnitValue}} objects
 are range-restricted or rounded as appropriate to the relevant property,
 but otherwise as specified.
 
-Computed {{CSSCalcValue}} objects {#computed-calc-objects}
+Computed {{CSSMathValue}} objects {#computed-calc-objects}
 -----------------------------------------------------------------
 
-During computation, {{CSSCalcValue}} objects are reduced accordingly:
+During computation, {{CSSMathValue}} objects are reduced accordingly:
 
-1. All non-`number`, non-`percent` values are absolutized
-    into the [=canonical unit=] for the object's associated type.
-2. If the objects contains exactly one of (the canonical unit, a percent value, a number)
-    with a present, non-zero value,
-    then the computed value is an equivalent computed {{CSSUnitValue}}.
-3. Otherwise,
-    it's a {{CSSCalcValue}}
-    containing the canonical unit, percent value, and number,
-    if those are present and non-zero,
-    and all other fields are `null`.
+Issue: TODO
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
