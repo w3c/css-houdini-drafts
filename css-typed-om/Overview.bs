@@ -727,7 +727,8 @@ The following are the arithmetic operations you can perform on dimensions:
 
 <div algorithm="CSSNumericValue.to()">
     The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
-    into another one with the specified |unit|.
+    into another one with the specified |unit|,
+    if possible.
     When called, it must perform the following steps:
 
     1. Let |type| be the result of [=creating a type=] from |unit|.
@@ -740,24 +741,46 @@ The following are the arithmetic operations you can perform on dimensions:
 
     3. If |sum| has more than one [=list/item=],
         [=throw=] a {{TypeError}}.
-        Otherwise, let |item| be the sole [=list/item=] in |sum|.
-
-    4. If |item| has more than one [=map/value=] in its [=sum value/unit map=],
-        or that single [=map/value=]’s value is anything other than `1`,
-        [=throw=] a {{TypeError}}.
-        Otherwise, let |item unit| be the sole [=map/key=] in the [=sum value/unit map=],
-        and |item value| be |item|’s [=sum value/value=].
-
-    5. If |unit| and |item unit| are not [=compatible units=],
+        Otherwise, let |item| be the result of [=create a CSSUnitValue from a sum value item|creating a CSSUnitValue=]
+        from the sole [=list/item=] in |sum|.
+        If |item| is failure,
         [=throw=] a {{TypeError}}.
 
-    6. Return a new {{CSSUnitValue}}
+    4. If |unit| and |item|’s {{CSSUnitValue/unit}} internal slot are not [=compatible units=],
+        [=throw=] a {{TypeError}}.
+
+    5. If |unit| is not equal to |item|’s {{CSSUnitValue/unit}} internal slot,
+        multiply |item|’s {{CSSUnitValue/value}} internal slot
+        by the conversion ratio between the two units,
+        and set its {{CSSUnitValue/unit}} internal slot
+        to |unit|.
+
+    6. Return |item|.
+</div>
+
+<div algorithm>
+    When asked to <dfn export>create a CSSUnitValue from a sum value item</dfn> |item|,
+    perform the following steps:
+
+    1. If |item| has more than one [=map/entry=] in its [=sum value/unit map=],
+        return failure.
+
+    2. If |item| has no [=map/entries=] in its [=sum value/unit map=],
+        return a new {{CSSUnitValue}}
         whose {{CSSUnitValue/unit}} internal slot
-        is set to |unit|,
+        is set to "number",
         and whose {{CSSUnitValue/value}} internal slot
-        is set to |item value|
-        multiplied by the conversion ratio between |item unit|
-        and |unit|.
+        is set to |item|’s [=sum value/value=].
+
+    3. Otherwise, |item| has a single [=map/entry=] in its [=sum value/unit map=].
+        If that [=map/entry’s=] [=map/value=] is anything other than `1`,
+        return failure.
+
+    4. Otherwise, return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot
+        is set to that [=map/entry’s=] [=map/key=],
+        and whose {{CSSUnitValue/value}} internal slot
+        is set to |item|’s [=sum value/value=].
 </div>
 
 <div algorithm="sum value">
@@ -1251,17 +1274,16 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm>
-    When asked to <dfn export local-lt="new unit value">create a new unit value</dfn>
-    from a numeric value |num|,
+    When asked to <dfn export>create a CSSUnitValue from a string</dfn> |str|,
     return a new {{CSSUnitValue}} object
     with its {{CSSUnitValue/value}} internal slot
-    set to the numeric portion of |num|,
+    set to the numeric portion of |str| parsed into a number,
     and its {{CSSUnitValue/unit}} internal slot
-    set to the unit portion of |num|,
-    or "number" or "percent" if |num| is a plain number or percent.
+    set to the unit portion of |str|,
+    or "number" or "percent" if |str| is a plain number or percent.
 
     <div class=example>
-        For example, creating a [=new unit value=] from ''5px''
+        For example, [=create a CSSUnitValue from a string|creating a CSSUnitValue=] from ''5px''
         creates an object equivalent to
         <code>new CSSUnitValue(5, "px")</code>.
     </div>
