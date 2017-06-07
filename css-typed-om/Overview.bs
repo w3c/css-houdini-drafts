@@ -1161,7 +1161,9 @@ For the purposes of [=matching=],
 these cases should be treated as <<length-percentage>>.
 Similarly for <<angle-percentage>>, etc.
 
-Note: [=Types=] form a semi-group under both addition and multiplication,
+Note: [=Types=] form a semi-group under both addition
+and a monoid under multiplication
+(with the multiplicative identity being «[ ]» with a null [=percent hint=]),
 meaning that they're associative and commutative.
 Thus the spec can, for example,
 [=add=] an unbounded number of types together unambiguously,
