@@ -17,13 +17,10 @@ effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and 
 [agree][roc-thread]) that there is a need for a new primitive for creating fast and rich visual
 effects with the ability to respond to user input such as scroll.
 
-This document proposes an API to animate a small subset of accelerated properties inside an
-isolated execution environment, *worklet*. We believe this API hits a sweet spot, one that is
-currently missing in the platform, in balancing among performance, richness, and rationality for
-addressing our key use cases. In particular by limiting ourselves to a subset of accelerated
-properties we give up some richness to gain performance while maintaining rationality. Finally, it
-is possible to fine tune this trade-off in future iteration of this API by exposing additional
-options and without fundamentally reworking this design.
+This document proposes an API to create custom animations that execute inside an isolated execution
+environment, *worklet*. It aims to be compatible with Web Animations and uses existing constructs as
+much as possible. We believe this API hits a sweet spot in balancing among performance, richness,
+and rationality for addressing our key use cases.
 
 This design supersedes our [CompositorWorker proposal][cw-proposal].
 
@@ -59,15 +56,13 @@ flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
 
 
-# Specification
-
-We have an initial [draft specification](https://wicg.github.io/animation-worklet).
-In particular you can see the CSS Notation, Web IDL, and [examples](https://wicg.github.io/animation-worklet/#examples).
-
-
 # WIP Design
 We are actively working on a [newer version](WIP.md) to make the programming model much
 closer to Web Animations model.
+
+# Specification
+The [draft specification](https://wicg.github.io/animation-worklet) is *out dated* we are actively working on updating
+the draft following agreements on Houdini Tokyo F2F meeting on the new direction of WIP design.
 
 
 
