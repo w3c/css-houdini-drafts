@@ -350,8 +350,11 @@ The following syntax strings are supported:
 	It is recommended that idents be restricted to ASCII and written in lower-case,
 	to match CSS conventions.
 
-:   Any one of the preceding strings, followed by '+'
+:   One of the preceding strings, followed by '+'
 ::  A space-separated list of one or more repetitions of the type specified by the string.
+  Note: Since &lt;transform-list> is already a space separated list, &lt;transform-list>+
+  is invalid.
+
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
 
