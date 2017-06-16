@@ -2152,9 +2152,9 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
 
 <pre class='idl'>
 
-[Constructor(DOMString fontFamilyName)]
+[Constructor(DOMString fontFaceName)]
 interface CSSFontFaceValue : CSSResourceValue {
-    readonly attribute DOMString fontFamilyName;
+	readonly attribute DOMString fontFaceName;
 };
 
 </pre>
