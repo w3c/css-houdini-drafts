@@ -331,8 +331,8 @@ The following syntax strings are supported:
 ::  Any valid <<time>> value
 :   "&lt;resolution>"
 ::  Any valid <<resolution>> value
-:   "&lt;transform-function>"
-::  Any valid <<transform-function>> value
+:   "&lt;transform-list>"
+::  A list of valid <<transform-function>> values
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any sequence consisting of a <a>name-start code point</a>,
@@ -421,8 +421,9 @@ computed value is as specified. Calc expressions that are
 &lt;number> and &lt;percentage> values get reduced during computation to simple
 numbers and percentages respectively.
 
-For &lt;transform-function> values, the computed value is as specified but with
-all lengths resolved to their computed values.
+For &lt;&lt;transform-function> values contained in &lt;transform-list> values,
+the computed value is as specified but with all lengths resolved to their
+computed values.
 
 For values specified by a syntax string that include "|" clauses, the computed
 value is given by applying the calculation rules for the first clause that
