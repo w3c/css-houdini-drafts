@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<style>
+  #example {
+    width: 200px;
+    height: 200px;
+
+    background-image:
+      paint(arc, purple, 0.4turn, 0.8turn, 40px, 15px),
+      paint(arc, blue, -20deg, 170deg, 30px, 20px),
+      paint(arc, red, 45deg, 220deg, 50px, 10px);
+  }
+</style>
+
+<div id="example"></div>
+
+<script>
+  (CSS.paintWorklet.addModule || paintWorklet.addModule || paintWorklet.import)('arc.js');
+</script>

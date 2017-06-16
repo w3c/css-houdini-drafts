@@ -285,9 +285,9 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	(because ''url("not-a-color")'' is not a color).
 	At this stage of the CSS pipeline (computation time), the only available fallback is the initial value
 	of the property, which in the case of color is ''inherit''. Although there was a valid usable value
-	(green), this was removed during parsing because it was superceded by the URL.
+	(green), this was removed during parsing because it was superseded by the URL.
 
-	if we call:
+	If we call:
 
 	<pre class='lang-javascript'>
 	CSS.registerProperty({

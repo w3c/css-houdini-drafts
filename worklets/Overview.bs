@@ -3,6 +3,7 @@ Title:  Worklets Level 1
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/worklets/
+TR: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Previous Version: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Shortname: worklets
 Level: 1
@@ -10,54 +11,44 @@ Abstract:  This specification defines an API for running scripts in stages of th
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 </pre>
 
+<style>
+/* Put nice boxes around each algorithm. */
+[data-algorithm]:not(.heading) {
+    padding: .5em;
+    border: thin solid #ddd; border-radius: .5em;
+    margin: .5em calc(-0.5em - 1px);
+}
+[data-algorithm]:not(.heading) > :first-child {
+    margin-top: 0;
+}
+[data-algorithm]:not(.heading) > :last-child {
+    margin-bottom: 0;
+}
+</style>
+
+<pre class=link-defaults>
+spec:fetch; type:dfn; for:/; text:fetch
+spec:html; type:dfn; for:/; text:browsing context
+spec:html; type:dfn; for:environment settings object;
+    text: global object
+    text: https state
+    text: referrer policy
+spec:html; type:dfn; for:environment; text:id
+spec:webidl; type:dfn; for:interface; text:inherit
+</pre>
+
 <pre class="anchors">
-urlPrefix: http://heycam.github.io/webidl/#dfn-; type: dfn;
-    text: DOMException
-    text: SyntaxError
-    text: inherit
-urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
-    urlPrefix: #concept-;
-        text: fetch
-urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
-    text: effective script origin
-    url: #origin-2; text: origin
+urlPrefix: http://heycam.github.io/webidl/; type: dfn;
+    urlPrefix: #es-;
+        text: invoking callback functions
 urlPrefix: https://html.spec.whatwg.org/multipage/workers.html; type: dfn;
-    text: web workers
     urlPrefix: #dom-workerglobalscope-;
         text: self
 urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
-    text: api base url
-    text: api url character encoding
-    text: browsing context
-    text: code entry-point
-    text: creation url
     text: document environment
-    text: environment settings object
-    text: event loop
-    text: fetch a module script tree
-    text: global object
-    text: https state
-    text: incumbent settings object
+    text: event loop processing model
     text: microtask queue
-    text: module script
-    text: perform the request
-    text: realm execution context
-    text: relevant settings object
-    text: responsible browsing context
-    text: responsible document
-    text: responsible event loop
-    text: run a module script
-    text: script execution environment
     text: task queues
-urlPrefix: https://html.spec.whatwg.org/multipage/infrastructure.html; type: dfn;
-    text: cors setting attribute
-    text: in parallel
-    text: javascript global environment
-    urlPrefix: #js-;
-        text: syntaxerror;
-    url: resolve-a-url; text: resolve;
-urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide; type: dfn;
-    text: a new promise
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: Construct
     text: InitializeHostDefinedRealm
@@ -94,7 +85,7 @@ Worklets are similar to <a>web workers</a> however they:
     parallelism.
  - Are not event API based. Instead classes are registered on the global scope, whose methods are to
     be invoked by the user agent.
- - Have a reduced API surface on the <a>javascript global environment</a> (global scope).
+ - Have a reduced API surface on the global scope.
  - Have a lifetime for the global scope which is defined by subsequent specifications or user
     agents. They aren't tied to the lifetime of the document.
 
@@ -104,28 +95,29 @@ expected to be shared between separate scripts. This is similar to the <a>docume
 Code Idempotency {#code-idempotency}
 ------------------------------------
 
-<em>This section is not normative.</em>
+Some specifications which use worklets ([[css-paint-api-1]]), allow user agents to parallelize work
+over multiple threads, or to move work between threads as required.
 
-Multiple instances of {{WorkletGlobalScope}} can be created for each {{Worklet}} that they belong
-to. User agents may choose to do this in order to parallelize work over multiple threads, or to move
-work between threads as required.
-
-Additionally different user agents may invoke a method on a class in a different order to other user
-agents.
+In these specifications user agents might invoke methods on a class in a different order to other
+user agents.
 
 As a result of this, to prevent this compatibility risk between user agents, authors who register
-classes on the global scope should make their code idempotent. That is, a method or set of methods
-on a class should produce the same output given a particular input.
+classes on the global scope using these APIs, should make their code idempotent. That is, a method
+or set of methods on a class should produce the same output given a particular input.
 
-The following techniques should be used in order to encourage authors to write code in an idempotent
-way:
+The following techniques are used in order to encourage authors to write code in an idempotent way:
+
  - No reference to the global object, e.g. <a>self</a> on a {{DedicatedWorkerGlobalScope}}.
+
  - Code is loaded as a <a>module script</a> which resulting in the code being executed in <a>strict
      mode code</a> without a shared this. This prevents two different module scripts sharing
      state be referencing shared objects on the global scope.
- - User agents may choose to always have at least two {{WorkletGlobalScope}}s per {{Worklet}} and
-    randomly assign a method or set of methods on a class to a particular global scope.
- - User agents may create and destroy {{WorkletGlobalScope}}s at any time.
+
+ - These specifications must require user agents to always have at least two {{WorkletGlobalScope}}s
+     per {{Worklet}} and randomly assign a method or set of methods on a class to a particular
+     global scope. These specifications can provide an opt-out under memory constraints.
+
+ - User agents can create and destroy {{WorkletGlobalScope}}s at any time for these specifications.
 
 Infrastructure {#infrastructure}
 ================================
@@ -139,11 +131,18 @@ global execution context of a {{Worklet}}.
 <pre class='idl'>
 [Exposed=Worklet]
 interface WorkletGlobalScope {
-    attribute Console console;
 };
 </pre>
 
-A {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
+Each {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
+
+Each {{WorkletGlobalScope}} has an associated <dfn for=WorkletGlobalScope>module map</dfn>. It is a
+<a>module map</a>, initially empty.
+
+Each {{WorkletGlobalScope}} has a <dfn>worklet global scope execution environment</dfn>. This
+execution environment may be parallel (i.e. it may be on a separate thread, process, or other
+equivalent construct), or it may live on the same thread or process as the {{Worklet}} object it
+belongs to. Which thread or process it lives on is decided by the user agent.
 
 Note:
     The {{WorkletGlobalScope}} has a limited global scope when compared to a
@@ -151,19 +150,36 @@ Note:
     {{WorkletGlobalScope}} with <code class='lang-javascript'>registerAClass</code> methods which
     will allow authors to register classes for the user agent create and invoke methods on.
 
+When asked to <a>report an exception</a>, do nothing instead, or optionally report the exception to
+a developer console.
+
+Issue(whatwg/html#2611): HTML's <a>report an exception</a> needs updating to work with
+    non-EventTarget global objects.
+
 ### The event loop ### {#the-event-loop}
 
 Each {{WorkletGlobalScope}} object has a distinct <a>event loop</a>. This <a>event loop</a> has no
-associated <a>browsing context</a>, and only its <a>microtask queue</a> is used (all other <a>task
-queues</a> are not used). The <a>event loop</a> is created by the <a>create a
+associated <a>browsing context</a>. The <a>event loop</a> is created by the <a>create a
 WorkletGlobalScope</a> algorithm.
+
+The <a>event loop</a> is run on the <a>worklet global scope execution environment</a> defined above.
+
+It is expected that only tasks associated {{Worklet/addModule()}}, the user agent invoking author
+defined callbacks, and <a>microtasks</a> will use this <a>event loop</a>.
+
+Note:
+    Even through the <a>event loop processing model</a> specifies that it loops continually,
+    practically implementations aren't expected to do this. The <a>microtask queue</a> is emptied
+    while <a>invoking callback functions</a> provided by the author.
 
 ### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
-When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |worklet|, it
-<em>must</em> run the following steps:
+<div algorithm>
+When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGlobalScopeType|,
+|moduleResponsesMap|, and |outsideSettings|, it <em>must</em> run the following steps:
 
-    1. Let |workletGlobalScopeType| be the |worklet|'s <a>worklet global scope type</a>.
+    1. Create the <a>worklet global scope execution environment</a> and run the rest of these steps
+        in that context.
 
     2. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
         customizations:
@@ -173,90 +189,111 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, for a given |wor
 
         - Let |realmExecutionContext| be the created JavaScript execution context.
 
-        - Do not obtain any source texts for scripts or modules.
+    3. Let |insideSettings| be the result of <a>set up a worklet environment settings object</a>
+        given |realmExecutionContext|, and |outsideSettings|.
 
-    3. Let |settingsObject| be the result of <a>set up a worklet environment settings object</a>
-        with |realmExecutionContext|.
+    4. Associate the |insideSettings| with |workletGlobalScope|.
 
-    4. Associate the |settingsObject| with |workletGlobalScope|.
+    5. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
+        substeps:
 
-    5. For each |entry| in the given |worklet|'s <a>module responses map</a> (in insertion order),
-        run the following substeps:
+        1. Let |moduleURLRecord| be |entry|'s key.
 
-        1. Let |resolvedModuleURL| be |entry|'s key.
-
-        2. Let |script| be the result of <a>fetch a module script tree</a> given
-            |resolvedModuleURL|, "anonymous" for the <a>CORS setting attribute</a>, and
-            |settingsObject|.
-
-        Note: Worklets follow <a>web workers</a> here in not allowing "use-credientials" for
-            fetching resources.
+        2. Let |script| be the result of <a>fetch a worklet script</a> given |moduleURLRecord|,
+            |moduleResponsesMap|, |outsideSettings|, and |insideSettings| when
+            it asynchronously completes.
 
         3. <a>Run a module script</a> given |script|.
 
+        Note: <a>Fetch a worklet script</a> won't actually perform a network request as it will hit
+            the worklet's <a>module responses map</a>. It also won't have a parsing error as at this
+            point it should have successfully been parsed by another worklet global scope. I.e.
+            |script| should never be null here.
+
+    6. Run the <a>responsible event loop</a> specified by |insideSettings|.
+</div>
+
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
+<div algorithm>
 When a user agent is to <dfn>set up a worklet environment settings object</dfn>, given a
-|executionContext|, it must run the following steps:
-    1. Let |inheritedResponsibleBrowsingContext| be the <a>responsible browsing context</a>
-        specified by the <a>incumbent settings object</a>.
+|executionContext|, and |outsideSettings|, it must run the following steps:
+    1. Let |inheritedResponsibleBrowsingContext| be |outsideSettings|'s <a>responsible browsing
+        context</a>.
 
-    2. Let |inheritedOrigin| be the <a>origin</a> specified by the <a>incumbent settings object</a>.
+    2. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
 
-    3. Let |inheritedAPIBaseURL| be the <a>API base URL</a> specified by the <a>incumbent settings object</a>.
+    3. Let |origin| be a unique <a>opaque origin</a>.
 
-    4. Let |workletEventLoop| be a newly created <a>event loop</a>.
+    4. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
 
-    5. Let |workletGlobalScope| be |executionContext|'s <a>global object</a>.
+    5. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
 
-    6. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are
-        defined as follows:
+    6. Let |workletEventLoop| be a newly created <a>event loop</a>.
+
+    7. Let |realm| be the value of |executionContext|'s Realm component.
+
+    8. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
+
+    9. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
+        as follows:
 
         : The <a>realm execution context</a>
         :: Return |executionContext|.
 
-        : The <a>global object</a>
-        :: Return |workletGlobalScope|.
+        : The <a>module map</a>.
+        :: Return |workletGlobalScope|'s <a for=WorkletGlobalScope>module map</a>.
 
         : The <a>responsible browsing context</a>
-        :: Return |inheritedResponsibleBrowsingContext|. 
+        :: Return |inheritedResponsibleBrowsingContext|.
 
         : The <a>responsible event loop</a>
         :: Return |workletEventLoop|.
 
         : The <a>responsible document</a>
         :: Not applicable (the <a>responsible event loop</a> is not a <a>browsing context</a>
-                <a>event loop</a>).
+            <a>event loop</a>).
 
         : The <a>API URL character encoding</a>
-        :: Return UTF-8.
+        :: Return <a>UTF-8</a>.
 
         : The <a>API base URL</a>
         :: Return |inheritedAPIBaseURL|.
 
-        : The <a>origin</a> and <a>effective script origin</a>
-        :: Return |inheritedOrigin|.
-
-        : The <a>creation URL</a>
-        :: Not applicable.
+        : The <a for="environment settings object">origin</a>
+        :: Return |origin|.
 
         : The <a>HTTPS state</a>
-        :: Return |workletGlobalScope|'s <a>HTTPS state</a>.
+        :: Return |inheritedHTTPSState|.
 
-    7. Return |settingsObject|.
+        : The <a>referrer policy</a>
+        :: Return |inheritedReferrerPolicy|.
+
+    10. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
+        <a>creation URL</a> to |inheritedAPIBaseURL|, |settingsObject|'s <a>target browsing
+        context</a> to null, and |settingsObject|'s <a>active service worker</a> to null.
+
+    11. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
+
+    12. Return |settingsObject|.
+</div>
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
 
 Worklet {#worklet-section}
 --------------------------
 
-The {{Worklet}} object provides the capability to import module scripts into its associated
+The {{Worklet}} object provides the capability to add module scripts into its associated
 {{WorkletGlobalScope}}s. The user agent can then create classes registered on the
 {{WorkletGlobalScope}}s and invoke their methods.
 
 <pre class='idl'>
 interface Worklet {
-    [NewObject] Promise&lt;void> import(USVString moduleURL);
+    [NewObject] Promise&lt;void> addModule(USVString moduleURL, optional WorkletOptions options);
+};
+
+dictionary WorkletOptions {
+    RequestCredentials credentials = "omit";
 };
 </pre>
 
@@ -276,73 +313,173 @@ The <a>module responses map</a> exists to ensure that {{WorkletGlobalScope}}s cr
 times contain the same set of script source text and have the same behaviour. The creation of
 additional {{WorkletGlobalScope}}s should be transparent to the author.
 
-When the <dfn method for=Worklet>import(|moduleURL|)</dfn> method is called on a {{Worklet}} object,
-the user agent <em>must</em> run the following steps:
+<div class='note'>
+    Practically user agents aren't expected to implement the following algorithm using a
+    thread-safe map. Instead when {{Worklet/addModule()}} is called user agents can fetch the module
+    graph on the main thread, and send the fetched sources (the data contained in the <a>module
+    responses map</a>) to each thread which has a {{WorkletGlobalScope}}.
+
+    If the user agent wishes to create a new {{WorkletGlobalScope}} it can simply sent the list of
+    all fetched sources from the main thread to the thread which owns the {{WorkletGlobalScope}}.
+</div>
+
+A <dfn>pending tasks struct</dfn> is a <a>struct</a> consisting of:
+    - A <dfn for="pending tasks struct">counter</dfn>.
+This is used by the algorithms below.
+
+<div algorithm>
+When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method is called on a
+{{Worklet}} object, the user agent <em>must</em> run the following steps:
     1. Let |promise| be <a>a new promise</a>.
 
-    2. Let |resolvedModuleURL| be the result of <a>parsing</a> the |moduleURL| argument relative to
-        the <a>relevant settings object</a> of <b>this</b>.
+    2. Let |worklet| be this {{Worklet}}.
 
-    3. If this fails, reject |promise| with a "<a>SyntaxError</a>" <a>DOMException</a> and abort
-        these steps.
+    3. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
 
-    4. Ensure that there is at least one {{WorkletGlobalScope}} in the <a>worklet's
-        WorkletGlobalScopes</a>. If not <a>create a WorkletGlobalScope</a> given the current
-        {{Worklet}}.
+    4. Let |moduleURLRecord| be the result of <a>parsing</a> the |moduleURL| argument relative to
+        |outsideSettings|.
 
-        The user-agent may also create additional {{WorkletGlobalScope}}s at this time.
+    5. If |moduleURLRecord| is failure, then reject promise with a "{{SyntaxError}}"
+        {{DOMException}} and return |promise|.
 
-    5. Let |outsideSettings| be the <a>relevant settings object</a> of <b>this</b>.
+    6. Return |promise|, and then continue running this algorithm <a>in parallel</a>.
 
-    6. Run the following steps <a>in parallel</a>:
+    7. Let |credentialOptions| be the {{WorkletOptions/credentials}} member of |options|.
 
-        1. For each {{WorkletGlobalScope}} in the <a>worklet's WorkletGlobalScopes</a>, run these
-            substeps:
+    8. Let |moduleResponsesMap| be |worklet|'s <a>module responses map</a>.
 
-            1. Let |insideSettings| be the {{WorkletGlobalScope}}'s associated <a>environment
-                settings object</a>.
+    9. Let |workletGlobalScopeType| be |worklet|'s <a>worklet global scope type</a>.
 
-            2. <a>Fetch a module script tree</a> given |resolvedModuleURL|, "omit", the empty string
-                (as no cryptographic nonce is present for worklets), "not parser-inserted",
-                "script", |outsideSettings|, and |insideSettings|.
+    10. If the <a>worklet's WorkletGlobalScopes</a> is empty, run the following steps:
 
-                To <a>perform the request</a> given |request|, perform the following steps:
+        1. <a>Create a WorkletGlobalScope</a> given |workletGlobalScopeType|, |moduleResponsesMap|,
+            and |outsideSettings|.
 
-                    1. Let |cache| be the current {{Worklet}}'s <a>module responses map</a>.
+        2. Add the {{WorkletGlobalScope}} to <a>worklet's WorkletGlobalScopes</a>.
 
-                    2. Let |url| be |request|'s <a >url</a>.
+        Depending on the type of worklet the user agent may create additional
+        {{WorkletGlobalScope}}s at this time.
 
-                    3. If |cache| contains an entry with key |url| whose value is "fetching", wait
-                        (<a>in parallel</a>) until that entry's value changes, then proceed to the
-                        next step.
+        Note: Specifically the [[css-paint-api-1]] allows for multiple global scopes, while the
+            [[webaudio]] API does not.
 
-                    4. If |cache| contains an entry with key |url|, asynchronously complete this
-                        algorithm with that entry's value, and abort these steps.
+        Wait for this step to complete before continuing.
 
-                    5. Create an entry in |cache| with key |url| and value "fetching".
+    11. Let |pendingTaskStruct| be a new <a>pending tasks struct</a> with <a
+        for="pending tasks struct">counter</a> initialized to the length of <a>worklet's
+        WorkletGlobalScopes</a>.
 
-                    6. <a>Fetch</a> |request|.
+    12. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, <a>queue a
+        task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet script</a> given
+        |workletGlobalScope|, |moduleURLRecord|, |moduleResponsesMap|, |credentialOptions|,
+        |outsideSettings|, |pendingTaskStruct|, and |promise|.
 
-                    7. Let |response| be the result of <a>fetch</a> when it asynchronously
-                        completes.
+    Note: The rejecting and resolving of the |promise| occurs within the <a>fetch and invoke a
+        worklet script</a> algorithm.
+</div>
 
-                    8. Set the value of the entry in |cache| whose key is |url| to |response|, and
-                        asynchronously complete this algorithm with |response|.
+<div algorithm>
+When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |workletGlobalScope|,
+|moduleURLRecord|, |moduleResponsesMap|, |credentialOptions|, |outsideSettings|,
+|pendingTaskStruct|, and |promise|, the user agent <em>must</em> run the following steps:
 
-            3. Let |script| be the result of <a>fetch a module script tree</a> when it
-                asynchronously completes.
+    Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
 
-            4. <a>Run a module script</a> given |script|.
+    1. Let |insideSettings| be the |workletGlobalScope|'s associated <a>environment settings
+        object</a>.
 
-        2. If <em>all</em> the steps above succeeded (in particular, if all of the scripts parsed
-                and loaded into the global scopes), resolve |promise|.
-                <br>Otherwise, reject |promise|.
+    2. Let |script| by the result of <a>fetch a worklet script</a> given |moduleURLRecord|,
+        |moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and |insideSettings| when it
+        asynchronously completes.
 
-        Note: Specifically, if a script fails to parse or fails to load over the network, it should
-            reject the promise; if the script throws an error while first evaluating the promise
-            should resolve as a classes may have been registered correctly.
+    3. If |script| is null, then <a>queue a task</a> on |outsideSettings|'s <a>responsible event
+        loop</a> to run these steps:
 
-    7. Return |promise|.
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
+            run these steps:
+
+            1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
+
+            2. Reject |promise| with an "{{AbortError}}" {{DOMException}}.
+
+    4. <a>Run a module script</a> given |script|.
+
+    5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
+
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
+            run these steps:
+
+            1. Decrement |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> by
+                <b>1</b>.
+
+            2. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is <b>0</b>, then
+                resolve |promise|.
+</div>
+
+<div algorithm>
+When the user agent is to <dfn>fetch a worklet script</dfn> given |moduleURLRecord|,
+|moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and |insideSettings|, the user agent
+<em>must</em> run the following steps:
+
+Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
+
+1. <a>Fetch a module worker script graph</a> given |moduleURLRecord|, |outsideSettings|, "script",
+    |credentialOptions|, and |insideSettings|.
+
+    To <a>perform the fetch</a> given |request|, perform the following steps:
+
+        1. Let |cache| be the |moduleResponsesMap|.
+
+        2. Let |url| be |request|'s <a for=request>url</a>.
+
+        3. If |cache| contains an entry with key |url| whose value is "fetching", wait until that
+            entry's value changes, then proceed to the next step.
+
+        4. If |cache| contains an entry with key |url|, asynchronously complete this algorithm with
+            that entry's value, and abort these steps.
+
+        5. Create an entry in |cache| with key |url| and value "fetching".
+
+        6. <a>Fetch</a> |request|.
+
+        7. Let |response| be the result of <a>fetch</a> when it asynchronously completes.
+
+        8. Set the value of the entry in |cache| whose key is |url| to |response|, and
+            asynchronously complete this algorithm with |response|.
+
+2. Return the result of <a>fetch a module worker script graph</a> when it asynchronously completes.
+
+Note: Specifically, if a script fails to parse or fails to load over the network, it will reject the
+    promise. If the script throws an error while first evaluating the promise it will resolve as a
+    classes may have been registered correctly.
+
+<div class=example>
+    When an author adds code into a {{Worklet}} the code may run against multiple
+    {{WorkletGlobalScope}}s, for example:
+    <pre class='lang-javascript'>
+        // script.js
+        console.log('Hello from a WorkletGlobalScope!');
+    </pre>
+
+    <pre class='lang-javascript'>
+        // main.js
+        await CSS.paintWorklet.addModule('script.js');
+    </pre>
+
+    Behind the scenes the user agent may load the <code class='lang-javascript'>script.js</code>
+    into 4 global scopes, in which case the debugging tools for the user agent would print:
+    <pre class='lang-javascript'>
+        [paintWorklet#1] Hello from a WorkletGlobalScope!
+        [paintWorklet#4] Hello from a WorkletGlobalScope!
+        [paintWorklet#2] Hello from a WorkletGlobalScope!
+        [paintWorklet#3] Hello from a WorkletGlobalScope!
+    </pre>
+
+    If the user agent decided to kill and restart a {{WorkletGlobalScope}} number 3 in this example,
+    it would print <code class='lang-javascript'>[paintWorklet#3] Hello from a
+    WorkletGlobalScope!</code> again in the debugging tools when this occurs.
+</div>
+</div>
 
 Issue(w3c/css-houdini-drafts#47): Need ability to load code into a {{WorkletGlobalScope}}
     declaratively.
@@ -371,34 +508,36 @@ Examples {#examples}
 
 For these examples we'll use a fake worklet on window.
 
-<pre class='idl'>
-partial interface Window {
-  [SameObject] readonly attribute Worklet fakeWorklet1;
-  [SameObject] readonly attribute Worklet fakeWorklet2;
-};
-</pre>
+<div class=example>
+    <pre class='idl'>
+    partial interface Window {
+      [SameObject] readonly attribute Worklet fakeWorklet1;
+      [SameObject] readonly attribute Worklet fakeWorklet2;
+    };
+    </pre>
 
-<pre class='idl'>
-callback Function = any (any... arguments);
+    <pre class='idl'>
+    callback Function = any (any... arguments);
 
-[Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
-interface FakeWorkletGlobalScope : WorkletGlobalScope {
-    void registerAnArbitaryClass(DOMString type, Function classConstructor);
-};
-</pre>
+    [Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
+    interface FakeWorkletGlobalScope : WorkletGlobalScope {
+        void registerAnArbitaryClass(DOMString type, Function classConstructor);
+    };
+    </pre>
 
-Each {{FakeWorkletGlobalScope}} has a map of the <dfn>registered class constructors map</dfn>.
+    Each {{FakeWorkletGlobalScope}} has a map of the <dfn>registered class constructors map</dfn>.
 
-When the <dfn method for=FakeWorkletGlobalScope>
-registerAnArbitaryClass(|type|, |classConstructor|)</dfn> method is called, the user agent will add
-the |classConstructor| of |type| to the map of <a>registered class constructors map</a>.
+    When the <dfn method for=FakeWorkletGlobalScope>
+    registerAnArbitaryClass(|type|, |classConstructor|)</dfn> method is called, the user agent will add
+    the |classConstructor| of |type| to the map of <a>registered class constructors map</a>.
+</div>
 
 Loading scripts into a worklet. {#example-single}
 -------------------------------------------------
 
 <pre class='lang-javascript'>
-window.fakeWorklet1.import('script1.js');
-window.fakeWorklet1.import('script2.js');
+window.fakeWorklet1.addModule('script1.js');
+window.fakeWorklet1.addModule('script2.js');
 
 // Assuming no other calls to fakeWorklet1 valid script loading orderings are:
 // 1. 'script1.js', 'script2.js'
@@ -410,8 +549,8 @@ Loading scripts into multiple worklets. {#example-multiple}
 
 <pre class='lang-javascript'>
 Promise.all([
-    window.fakeWorklet1.import('script1.js'),
-    window.fakeWorklet2.import('script2.js')
+    window.fakeWorklet1.addModule('script1.js'),
+    window.fakeWorklet2.addModule('script2.js')
 ]).then(function() {
     // Both scripts now have loaded code, can do a task which relies on this.
 });
