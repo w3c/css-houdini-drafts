@@ -578,6 +578,9 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         CSSNumericValue mul(CSSNumberish... values);
         CSSNumericValue div(CSSNumberish... values);
 
+        CSSNumericValue min(CSSNumberish... values);
+        CSSNumericValue max(CSSNumberish... values);
+
         boolean equals(CSSNumberish... value);
 
         CSSNumericValue to(DOMString unit);
@@ -703,6 +706,52 @@ The following are the arithmetic operations you can perform on dimensions:
         return a new {{CSSMathInvert}} object
         whose {{CSSMathInvert/value}} internal slot
         is set to |this|.
+</div>
+
+<div algorithm="CSSNumericValue.min()">
+    The <dfn for=CSSNumericValue method>min(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
+
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
+
+    2. If |this| is a {{CSSMathMin}} object,
+        [=list/prepend=] the [=list/items=] in |this|’s {{CSSMathMin/values}} internal slot
+        to |values|.
+        Otherwise,
+        prepend |this| to |values|.
+
+    3. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
+
+    4. Return a new {{CSSMathMin}} object
+        whose {{CSSMathMin/values}} internal slot
+        is set to |values|.
+</div>
+
+<div algorithm="CSSNumericValue.max()">
+    The <dfn for=CSSNumericValue method>max(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
+
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
+
+    2. If |this| is a {{CSSMathMax}} object,
+        [=list/prepend=] the [=list/items=] in |this|’s {{CSSMathMax/values}} internal slot
+        to |values|.
+        Otherwise,
+        prepend |this| to |values|.
+
+    3. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
+
+    4. Return a new {{CSSMathMax}} object
+        whose {{CSSMathMax/values}} internal slot
+        is set to |values|.
 </div>
 
 <div class=issue>
