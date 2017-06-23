@@ -1812,6 +1812,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
     the attributes of the transform that are relevant to 3D transforms
     (such as the {{CSSTranslation/z|CSSTranslation.z}} attribute)
     simply have no effect on the transform they represent.
+
+    Note: This affects the serialization of the object,
+    and concepts such as the object's "equivalent 4x4 matrix".
 </div>
 
 <details class=note>
