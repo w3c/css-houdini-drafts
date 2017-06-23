@@ -1745,13 +1745,18 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     1. Let |matrix| be a 4x4 matrix,
         initially set to the identity matrix.
+        Let |is2D| be a boolean initially set to `true`.
 
-    2. [=list/For each=] |func| in |this|’s [=values to iterate over=],
-        set |matrix| to the result of multiplying |matrix|
-        and |func|’s equivalent 4x4 transform matrix.
+    2. [=list/For each=] |func| in |this|’s [=values to iterate over=]:
+
+        1. Set |matrix| to the result of multiplying |matrix|
+            and |func|’s equivalent 4x4 transform matrix.
+        2. If |func|’s {{CSSTransformComponent/is2D}} internal slot is `false`,
+            set |is2D| to `false`.
 
     3. Return a new {{DOMMatrix}}
-        representing |matrix|.
+        representing |matrix|,
+        and with its internal [=matrix/is 2D=] flag set to |is2D|.
 </div>
 
 
