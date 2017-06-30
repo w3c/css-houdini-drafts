@@ -287,7 +287,7 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	of the property, which in the case of color is ''inherit''. Although there was a valid usable value
 	(green), this was removed during parsing because it was superseded by the URL.
 
-	if we call:
+	If we call:
 
 	<pre class='lang-javascript'>
 	CSS.registerProperty({
@@ -331,8 +331,8 @@ The following syntax strings are supported:
 ::  Any valid <<time>> value
 :   "&lt;resolution>"
 ::  Any valid <<resolution>> value
-:   "&lt;transform-function>"
-::  Any valid <<transform-function>> value
+:   "&lt;transform-list>"
+::  A list of valid <<transform-function>> values
 :   "&lt;custom-ident>"
 ::  Any valid <<custom-ident>> value
 :   Any sequence consisting of a <a>name-start code point</a>,
@@ -350,8 +350,11 @@ The following syntax strings are supported:
 	It is recommended that idents be restricted to ASCII and written in lower-case,
 	to match CSS conventions.
 
-:   Any one of the preceding strings, followed by '+'
+:   One of the preceding strings, followed by '+'
 ::  A space-separated list of one or more repetitions of the type specified by the string.
+  Note: Since &lt;transform-list> is already a space separated list, &lt;transform-list>+
+  is invalid.
+
 :   Any combination of the preceding, separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
 
@@ -421,8 +424,9 @@ computed value is as specified. Calc expressions that are
 &lt;number> and &lt;percentage> values get reduced during computation to simple
 numbers and percentages respectively.
 
-For &lt;transform-function> values, the computed value is as specified but with
-all lengths resolved to their computed values.
+For &lt;transform-function> values contained in &lt;transform-list> values,
+the computed value is as specified but with all lengths resolved to their
+computed values.
 
 For values specified by a syntax string that include "|" clauses, the computed
 value is given by applying the calculation rules for the first clause that
