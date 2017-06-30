@@ -173,8 +173,6 @@ and parseMultiple set to true.
 
 Issue(305): appropriate failure indicators for this algorithm
 
-Issue(325): .equals methods for CSSStyleValue subclasses
-
 <!--
  ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
 ██    ██    ██     ██  ██  ██       ██       ███   ███   ██ ██   ██     ██
@@ -577,7 +575,6 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         CSSNumericValue sub(CSSNumberish... values);
         CSSNumericValue mul(CSSNumberish... values);
         CSSNumericValue div(CSSNumberish... values);
-
         CSSNumericValue min(CSSNumberish... values);
         CSSNumericValue max(CSSNumberish... values);
 
@@ -754,9 +751,27 @@ The following are the arithmetic operations you can perform on dimensions:
         is set to |values|.
 </div>
 
-<div class=issue>
-    Define {{CSSNumericValue/equals()}}.
+<div algorithm="CSSNumericValue.equals(value)">
+    The <dfn for=CSSNumericValue method>equals(...|values|)</dfn> method,
+    when called on a {{CSSNumericValue}} |this|,
+    must perform the following steps:
+
+    1. Replace each [=list/item=] of |values|
+        with the result of [=rectifying a numberish value=] for the [=list/item=].
+
+    2. Let |thisAndValues| be |this| prepended to |values|.
+
+    3. [=list/If all=] |item|s of |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be {{CSSUnitValue}}.
+
+    4. [=list/If all=] |item|s in |thisAndValues| are {{CSSUnitValue}s and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
+
+    5. [=list/If all=] |item|s in |thisAndValues| are {{CSSMathValue}}s :
+        1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
+        	1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
+    	2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
+    		1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
 </div>
+
 
 <div algorithm="CSSNumericValue.to()">
     The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
