@@ -1749,9 +1749,16 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     2. [=list/For each=] |func| in |this|’s [=values to iterate over=]:
 
-        1. Set |matrix| to the result of multiplying |matrix|
-            and |func|’s equivalent 4x4 transform matrix.
-        2. If |func|’s {{CSSTransformComponent/is2D}} internal slot is `false`,
+        1. Let |funcMatrix| be |func|’s equivalent 4x4 transform matrix,
+            as defined in [[css-transforms-1#mathematical-description]].
+
+            As the entries of such a matrix are defined relative to the ''px'' unit,
+            if any <<length>>s in |func| involved in generating the matrix
+            are not [=compatible units=] with ''px'',
+            [=throw=] a {{TypeError}}.
+        2. Set |matrix| to the result of multiplying |matrix|
+            and |funcMatrix|.
+        3. If |func|’s {{CSSTransformComponent/is2D}} internal slot is `false`,
             set |is2D| to `false`.
 
     3. Return a new {{DOMMatrix}}
