@@ -59,17 +59,22 @@ flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
 # Key Concepts
 
-## WrokletAnimation
+## Animation Worklet Scope
+A [worklet global scope](https://drafts.css-houdini.org/worklets/#the-global-scope) that is created
+by Animation Worklet. Note that Animation Worklet creates multiple such scopes and uses them to
+execute user defined effects.
+
+## WorkletAnimation
 `WorkletAnimation` is a subclass of Animation that can be used to create an custom animation effect
-that runs inside the animation worklet scope. A worklet animation has a  corresponding animator
-instance in the animation worklet scope which is responsible to drive its keyframe effects.
+that runs inside a standalone animation worklet scope. A worklet animation has a corresponding
+animator instance in a animation worklet scope which is responsible to drive its keyframe effects.
 Here are the key differences compared to a regular web animation:
-  - AnimationId should match a specific animatior class registered in worklet scope.
-  - WorkletAnimation may have multiple timelines (including ScrollTimelines).
-  - WorkletAnimation may have a custom properties bag that can be cloned and provided to animator
+  - AnimationId should match a specific animator class registered in the animation worklet scope.
+  - `WorkletAnimation` may have multiple timelines (including `ScrollTimeline`s).
+  - `WorkletAnimation` may have a custom properties bag that can be cloned and provided to animator
     constructor when it is being instantiated.
 
-Note that worklet animations expose same API aurface as other web animations and thus they may be
+Note that worklet animations expose same API surface as other web animations and thus they may be
 created, played, paused, inspected, and generally controlled from main document scope. Here is how
 various methods roughly translate:
 
@@ -85,18 +90,21 @@ various methods roughly translate:
 ## ScrollTimeline
 [ScrollTimline](https://wicg.github.io/scroll-animations/#scrolltimeline) is a concept introduced in
 scroll-linked animation proposal. It defines an animation timeline whose time value depends on
-scroll position of a scroll container. ScrollTimeline can be used an an input timeline for
+scroll position of a scroll container. `ScrollTimeline` can be used an an input timeline for
 worklet animations and it is the intended mechanisms to give read access to scroll position.
 
 ## GroupEffect
 [GroupEffect](https://w3c.github.io/web-animations/level-2/#the-animationgroup-interfaces) is a
 concept introduced in Web Animation Level 2 specification. It provides a way to group multiple
-effects in a tree structure. GroupEffect can be used as the output for worklet animations. It
+effects in a tree structure. `GroupEffect` can be used as the output for worklet animations. It
 makes it possible for worklet animation to drive effects spanning multiple elements.
 
-**TODO**: At the moment, group effect define strict rules to translate group effect time to children
-effect times but it given flexibility of children start time. This is not flexible enough for
-worklet animations where it should be possible to set children effect's local time directly.
+**TODO**: At the moment, `GroupEffect` only supports just two different scheduling models (i.e.,
+parallel, sequence). These models governs how the group effect time is translated to its children
+effect times by modifying the child effect start time. AnimationWorklet allows a much more flexible
+scheduling model by making it possible to to set children effect's local time directly. In other
+words we allow arbitrary start time for child effects. This is something that needs to be added to
+level 2 spec.
 
 ## Multiple Timelines
 Unlike typical animations, worklet animations can have multiple timelines. This is necessary to
@@ -131,9 +139,9 @@ new WorklerAnimation('animation-with-local-state', [], [], {value: 1});
 ```js
 registerAnimator('animation-with-local-state', class {
   constructor(options) {
-    // options is:
-    //  1. the user provided options bag to WorkletAnimation constructor on first initialization i.e, {value: 1}.
-    //  2. the object returned by |destory| after each migration i.e. {value: 42}.
+    // |options| may be either:
+    //  - The user provided options bag passed into the WorkletAnimation constructor on first initialization i.e, {value: 1}.
+    //  - The object returned by |destroy| after each migration i.e. {value: 42}.
     this.options_ = options;
   }
 
@@ -276,7 +284,7 @@ registerAnimator('twitter-header', class {
 Its constructor takes:
  -  `animatiorId` which should match the id of an animator which is registered in
 the animation worklet scope.
- - A sequence of effects which are passed into `GroupEffect` constructor to create a GroupEffect.
+ - A sequence of effects which are passed into a `GroupEffect` constructor.
  - A sequence of timelines, the first one of which is considered primary timeline and passed to
    `Animation` constructor.
 
