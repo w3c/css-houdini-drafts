@@ -470,7 +470,7 @@
 		font-style: normal;
 	}
 	dt dfn code, code.idl {
-		font-size: normal;
+		font-size: medium;
 	}
 	dfn var {
 		font-style: normal;
@@ -1176,7 +1176,8 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version fa6d32dea6b39d19cbb9dd6d5e69f189e8bdd53f" name="generator">
+  <meta content="Bikeshed version 872fb1bbb75c7b4e192209b354c34f634da3ac0d" name="generator">
+  <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
 <style>/* style-md-lists */
 
             /* This is a weird hack for me not yet following the commonmark spec
@@ -1363,73 +1364,72 @@ Possible extra rowspan handling
         </style>
 <style>/* style-syntax-highlighting */
 pre.idl.highlight { color: #708090; }
-        .highlight:not(.idl) { background: hsl(24, 20%, 95%); }
-        code.highlight { padding: .1em; border-radius: .3em; }
-        pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
-        .highlight .c { color: #708090 } /* Comment */
-        .highlight .k { color: #990055 } /* Keyword */
-        .highlight .l { color: #000000 } /* Literal */
-        .highlight .n { color: #0077aa } /* Name */
-        .highlight .o { color: #999999 } /* Operator */
-        .highlight .p { color: #999999 } /* Punctuation */
-        .highlight .cm { color: #708090 } /* Comment.Multiline */
-        .highlight .cp { color: #708090 } /* Comment.Preproc */
-        .highlight .c1 { color: #708090 } /* Comment.Single */
-        .highlight .cs { color: #708090 } /* Comment.Special */
-        .highlight .kc { color: #990055 } /* Keyword.Constant */
-        .highlight .kd { color: #990055 } /* Keyword.Declaration */
-        .highlight .kn { color: #990055 } /* Keyword.Namespace */
-        .highlight .kp { color: #990055 } /* Keyword.Pseudo */
-        .highlight .kr { color: #990055 } /* Keyword.Reserved */
-        .highlight .kt { color: #990055 } /* Keyword.Type */
-        .highlight .ld { color: #000000 } /* Literal.Date */
-        .highlight .m { color: #000000 } /* Literal.Number */
-        .highlight .s { color: #a67f59 } /* Literal.String */
-        .highlight .na { color: #0077aa } /* Name.Attribute */
-        .highlight .nc { color: #0077aa } /* Name.Class */
-        .highlight .no { color: #0077aa } /* Name.Constant */
-        .highlight .nd { color: #0077aa } /* Name.Decorator */
-        .highlight .ni { color: #0077aa } /* Name.Entity */
-        .highlight .ne { color: #0077aa } /* Name.Exception */
-        .highlight .nf { color: #0077aa } /* Name.Function */
-        .highlight .nl { color: #0077aa } /* Name.Label */
-        .highlight .nn { color: #0077aa } /* Name.Namespace */
-        .highlight .py { color: #0077aa } /* Name.Property */
-        .highlight .nt { color: #669900 } /* Name.Tag */
-        .highlight .nv { color: #222222 } /* Name.Variable */
-        .highlight .ow { color: #999999 } /* Operator.Word */
-        .highlight .mb { color: #000000 } /* Literal.Number.Bin */
-        .highlight .mf { color: #000000 } /* Literal.Number.Float */
-        .highlight .mh { color: #000000 } /* Literal.Number.Hex */
-        .highlight .mi { color: #000000 } /* Literal.Number.Integer */
-        .highlight .mo { color: #000000 } /* Literal.Number.Oct */
-        .highlight .sb { color: #a67f59 } /* Literal.String.Backtick */
-        .highlight .sc { color: #a67f59 } /* Literal.String.Char */
-        .highlight .sd { color: #a67f59 } /* Literal.String.Doc */
-        .highlight .s2 { color: #a67f59 } /* Literal.String.Double */
-        .highlight .se { color: #a67f59 } /* Literal.String.Escape */
-        .highlight .sh { color: #a67f59 } /* Literal.String.Heredoc */
-        .highlight .si { color: #a67f59 } /* Literal.String.Interpol */
-        .highlight .sx { color: #a67f59 } /* Literal.String.Other */
-        .highlight .sr { color: #a67f59 } /* Literal.String.Regex */
-        .highlight .s1 { color: #a67f59 } /* Literal.String.Single */
-        .highlight .ss { color: #a67f59 } /* Literal.String.Symbol */
-        .highlight .vc { color: #0077aa } /* Name.Variable.Class */
-        .highlight .vg { color: #0077aa } /* Name.Variable.Global */
-        .highlight .vi { color: #0077aa } /* Name.Variable.Instance */
-        .highlight .il { color: #000000 } /* Literal.Number.Integer.Long */
-        </style>
+.highlight:not(.idl) { background: hsl(24, 20%, 95%); }
+code.highlight { padding: .1em; border-radius: .3em; }
+pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
+.highlight .c { color: #708090 } /* Comment */
+.highlight .k { color: #990055 } /* Keyword */
+.highlight .l { color: #000000 } /* Literal */
+.highlight .n { color: #0077aa } /* Name */
+.highlight .o { color: #999999 } /* Operator */
+.highlight .p { color: #999999 } /* Punctuation */
+.highlight .cm { color: #708090 } /* Comment.Multiline */
+.highlight .cp { color: #708090 } /* Comment.Preproc */
+.highlight .c1 { color: #708090 } /* Comment.Single */
+.highlight .cs { color: #708090 } /* Comment.Special */
+.highlight .kc { color: #990055 } /* Keyword.Constant */
+.highlight .kd { color: #990055 } /* Keyword.Declaration */
+.highlight .kn { color: #990055 } /* Keyword.Namespace */
+.highlight .kp { color: #990055 } /* Keyword.Pseudo */
+.highlight .kr { color: #990055 } /* Keyword.Reserved */
+.highlight .kt { color: #990055 } /* Keyword.Type */
+.highlight .ld { color: #000000 } /* Literal.Date */
+.highlight .m { color: #000000 } /* Literal.Number */
+.highlight .s { color: #a67f59 } /* Literal.String */
+.highlight .na { color: #0077aa } /* Name.Attribute */
+.highlight .nc { color: #0077aa } /* Name.Class */
+.highlight .no { color: #0077aa } /* Name.Constant */
+.highlight .nd { color: #0077aa } /* Name.Decorator */
+.highlight .ni { color: #0077aa } /* Name.Entity */
+.highlight .ne { color: #0077aa } /* Name.Exception */
+.highlight .nf { color: #0077aa } /* Name.Function */
+.highlight .nl { color: #0077aa } /* Name.Label */
+.highlight .nn { color: #0077aa } /* Name.Namespace */
+.highlight .py { color: #0077aa } /* Name.Property */
+.highlight .nt { color: #669900 } /* Name.Tag */
+.highlight .nv { color: #222222 } /* Name.Variable */
+.highlight .ow { color: #999999 } /* Operator.Word */
+.highlight .mb { color: #000000 } /* Literal.Number.Bin */
+.highlight .mf { color: #000000 } /* Literal.Number.Float */
+.highlight .mh { color: #000000 } /* Literal.Number.Hex */
+.highlight .mi { color: #000000 } /* Literal.Number.Integer */
+.highlight .mo { color: #000000 } /* Literal.Number.Oct */
+.highlight .sb { color: #a67f59 } /* Literal.String.Backtick */
+.highlight .sc { color: #a67f59 } /* Literal.String.Char */
+.highlight .sd { color: #a67f59 } /* Literal.String.Doc */
+.highlight .s2 { color: #a67f59 } /* Literal.String.Double */
+.highlight .se { color: #a67f59 } /* Literal.String.Escape */
+.highlight .sh { color: #a67f59 } /* Literal.String.Heredoc */
+.highlight .si { color: #a67f59 } /* Literal.String.Interpol */
+.highlight .sx { color: #a67f59 } /* Literal.String.Other */
+.highlight .sr { color: #a67f59 } /* Literal.String.Regex */
+.highlight .s1 { color: #a67f59 } /* Literal.String.Single */
+.highlight .ss { color: #a67f59 } /* Literal.String.Symbol */
+.highlight .vc { color: #0077aa } /* Name.Variable.Class */
+.highlight .vg { color: #0077aa } /* Name.Variable.Global */
+.highlight .vi { color: #0077aa } /* Name.Variable.Instance */
+.highlight .il { color: #000000 } /* Literal.Number.Integer.Long */
+</style>
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-05-26">26 May 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-20">20 July 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/WICG/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1439,12 +1439,13 @@ pre.idl.highlight { color: #708090; }
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2015 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2017 the Contributors to the CSS Animation Worklet API Specification, published by the <a href="https://www.w3.org/community/wicg/">Web Platform Incubator Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
-  <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-  <div class="p-summary" data-fill-with="abstract"></div>
+  <div class="p-summary" data-fill-with="abstract">
+   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+  </div>
   <div data-fill-with="at-risk"></div>
   <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
@@ -1462,31 +1463,32 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <ol class="toc" role="directory">
     <li><a href="#deprecated"><span class="secno">1</span> <span class="content">Deprecated</span></a>
     <li><a href="#intro"><span class="secno">2</span> <span class="content">Introduction</span></a>
-    <li><a href="#animation-worklet-desc"><span class="secno">3</span> <span class="content">Animation Worklet</span></a>
-    <li><a href="#concepts"><span class="secno">4</span> <span class="content">Concepts</span></a>
-    <li><a href="#registering-animator-definition"><span class="secno">5</span> <span class="content">Registering an Animator Definition</span></a>
-    <li><a href="#creating-animator"><span class="secno">6</span> <span class="content">Creating an Animator</span></a>
-    <li><a href="#creating-element-proxy"><span class="secno">7</span> <span class="content">Creating an Element Proxy</span></a>
+    <li><a href="#threading-model"><span class="secno">3</span> <span class="content">Threading Model</span></a>
+    <li><a href="#animation-worklet-desc"><span class="secno">4</span> <span class="content">Animation Worklet</span></a>
+    <li><a href="#concepts"><span class="secno">5</span> <span class="content">Concepts</span></a>
+    <li><a href="#registering-animator-definition"><span class="secno">6</span> <span class="content">Registering an Animator Definition</span></a>
+    <li><a href="#creating-animator"><span class="secno">7</span> <span class="content">Creating an Animator</span></a>
+    <li><a href="#creating-element-proxy"><span class="secno">8</span> <span class="content">Creating an Element Proxy</span></a>
     <li>
-     <a href="#requesting-animation-frames"><span class="secno">8</span> <span class="content">Requesting Animation Frames</span></a>
+     <a href="#requesting-animation-frames"><span class="secno">9</span> <span class="content">Requesting Animation Frames</span></a>
      <ol class="toc">
-      <li><a href="#requesting-animation-frames-element-proxy"><span class="secno">8.1</span> <span class="content">Element proxy creation/removal</span></a>
-      <li><a href="#requesting-animation-frames-computed-style"><span class="secno">8.2</span> <span class="content">Change in an element’s computed style</span></a>
-      <li><a href="#requesting-animation-frames-document-timeline"><span class="secno">8.3</span> <span class="content">Animator specifies a DocumentTimeline</span></a>
-      <li><a href="#requesting-animation-frames-scroll-timeline"><span class="secno">8.4</span> <span class="content">Animator specifies a ScrollTimeline</span></a>
+      <li><a href="#requesting-animation-frames-element-proxy"><span class="secno">9.1</span> <span class="content">Element proxy creation/removal</span></a>
+      <li><a href="#requesting-animation-frames-computed-style"><span class="secno">9.2</span> <span class="content">Change in an element’s computed style</span></a>
+      <li><a href="#requesting-animation-frames-document-timeline"><span class="secno">9.3</span> <span class="content">Animator specifies a DocumentTimeline</span></a>
+      <li><a href="#requesting-animation-frames-scroll-timeline"><span class="secno">9.4</span> <span class="content">Animator specifies a ScrollTimeline</span></a>
      </ol>
-    <li><a href="#running-animators"><span class="secno">9</span> <span class="content">Running Animators</span></a>
-    <li><a href="#closing-animator"><span class="secno">10</span> <span class="content">Closing an Animator</span></a>
-    <li><a href="#css-animator-notation"><span class="secno">11</span> <span class="content">CSS Animator Notation</span></a>
-    <li><a href="#effect-stack"><span class="secno">12</span> <span class="content">Effect Stack</span></a>
-    <li><a href="#security-considerations"><span class="secno">13</span> <span class="content">Security Considerations</span></a>
-    <li><a href="#privacy-considerations"><span class="secno">14</span> <span class="content">Privacy Considerations</span></a>
+    <li><a href="#running-animators"><span class="secno">10</span> <span class="content">Running Animators</span></a>
+    <li><a href="#closing-animator"><span class="secno">11</span> <span class="content">Closing an Animator</span></a>
+    <li><a href="#css-animator-notation"><span class="secno">12</span> <span class="content">CSS Animator Notation</span></a>
+    <li><a href="#effect-stack"><span class="secno">13</span> <span class="content">Effect Stack</span></a>
+    <li><a href="#security-considerations"><span class="secno">14</span> <span class="content">Security Considerations</span></a>
+    <li><a href="#privacy-considerations"><span class="secno">15</span> <span class="content">Privacy Considerations</span></a>
     <li>
-     <a href="#examples"><span class="secno">15</span> <span class="content">Examples</span></a>
+     <a href="#examples"><span class="secno">16</span> <span class="content">Examples</span></a>
      <ol class="toc">
-      <li><a href="#example-1"><span class="secno">15.1</span> <span class="content">Example 1: A fade-in animation with spring timing.</span></a>
-      <li><a href="#example-2"><span class="secno">15.2</span> <span class="content">Example 2: Twitter header.</span></a>
-      <li><a href="#example-3"><span class="secno">15.3</span> <span class="content">Example 3: Parallax backgrounds.</span></a>
+      <li><a href="#example-1"><span class="secno">16.1</span> <span class="content">Example 1: A fade-in animation with spring timing.</span></a>
+      <li><a href="#example-2"><span class="secno">16.2</span> <span class="content">Example 2: Twitter header.</span></a>
+      <li><a href="#example-3"><span class="secno">16.3</span> <span class="content">Example 3: Parallax backgrounds.</span></a>
      </ol>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
@@ -1510,75 +1512,89 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <h2 class="heading settled" data-level="1" id="deprecated"><span class="secno">1. </span><span class="content">Deprecated</span><a class="self-link" href="#deprecated"></a></h2>
     <strong>The contents of this document are out of date and in need of large re-write to cover
 changes to the AnimationWorklet API</strong>. 
-   <p>For now, please refer to our <a href="https://github.com/WICG/animation-worklet/blob/gh-pages/WIP.md">WIP explainer</a> for more up-to-date content.</p>
+   <p>For now, please refer to our <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a> for more up-to-date content.</p>
    <h2 class="heading settled" data-level="2" id="intro"><span class="secno">2. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
     This document introduces a new primitive for creating scroll-linked and other high performance
 procedural animations on the web. For details on the rationale and motivation see <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a>. 
-   <p>The <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-1">Animation Worklet</a> provides a method to create scripted animations that can mutate a set
-of user visible animatable attributes. The API is designed to make it possible for such animations to
-run in performance-critical parts of the rendering pipeline. Although the specification does not
-require certain performance guarantees (e.g., running in sync with every frame produced or in
-isolation from main thread) but the API is designed to facilitate and encourage this.</p>
-   <p><strong>Relationship to Web Animation API</strong>: Animations running on <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-2">Animation
-Worklet</a> do not necessarily run on the main thread and thus are not synchronized with <a data-link-type="dfn" href="https://www.w3.org/TR/web-animations/#the-documents-default-timeline">default
-document timeline</a>. At the moment we do not expose any API to start, stop, compose or otherwise
-control these animations from outside the worklet, however our plan is to leverage existing web
-animation APIs such as Element::getAnimations().</p>
+   <p>The <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-1">Animation Worklet</a> provides a method to create scripted animations that control a set of <a data-link-type="dfn">animation effects</a>. The API is designed to make it possible for user agents to run such
+animations to run in their own dedicated thread to provide a degree of performance isolation
+from main thread.</p>
+   <p><strong>Relationship to Web Animation API</strong>: Animations that are running inside a <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-2">Animation Worklet</a> execution context expose the same <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#animation">Animation</a></code> interface on the main
+javascript execution context. So they can be created, played, canceled, inspected, and generally
+controlled from main thread using Web Animation APIs. However, worklet animations follow a
+different timing model which enables them to be script-driven, statefull, and runnable in a
+parallel worklet execution context. As such Web Animation API that seek or alter the input
+time (reverse, finish, etc.) has a different semantic for worklet animations.</p>
    <p class="note" role="note"><span>Note:</span> <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
 scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.</p>
-   <p class="note" role="note"><span>Note:</span> <strong>Threading Model</strong>: The API is designed to allow animation worklets to run on
-threads other  than the main thread. In particular, it is recommended that if it is possible to run
-them in a dedicated thread and  provide a best-effort attempt to run in sync with visual frame
-production. This ensures the animations will not be impacted by jank on main thread.
-This means that when querying those animations running on the worklet in main thread, the data may
-be staled until such time that the animation effects are synced back to main thread (Not dissimilar
-to how async scrolling can lead to stale scroll offsets).
-It is still possible for such animation to slip in relation with visual frame production if
-*animate* callback cannot be completed in time. We believe such slippage is going to be rare in
-particular if animators are running on their dedicated thread and its effects avoid layout inducing
-attributes.</p>
-   <h2 class="heading settled" data-level="3" id="animation-worklet-desc"><span class="secno">3. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
+   <h2 class="heading settled" data-level="3" id="threading-model"><span class="secno">3. </span><span class="content">Threading Model</span><a class="self-link" href="#threading-model"></a></h2>
+   <p><a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-3">Animation Worklet</a> is thread-agnostic but rendering engines are recommended to create at
+least one parallel worklet execution context and different from the main javascript execution
+context e.g., on its own dedicated thread. Rendering engines may assign any worklet animations to
+run in such parallel execution context which ensures their performance is not impacted by the main
+thread jank.</p>
+   <p>Further, rendering engines are recommended to make a best-effort attempt to execute animate
+callbacks in sync with visual frame production. Note that it is still legal for rendering engines
+to produce visual frames without blocking to receive animation updates from worklet (i.e., letting
+the effects to slip behind). This can happen for example when *animate* callback is not able to
+complete in time to meet the frame deadline.</p>
+   <p>Both above recommendations are intended to help establish an environment for well behaving
+scripted animations to create effects that are consistently smooth and responsive. We believe
+scripted animations that run in a parallel execution environment and limit themselves to animating
+cheaper properties (e.g., none paint or layout inducing properties) will have a much better chance
+of meeting strict frame budgets that are needed for smoothness and avoiding slippage.</p>
+   <p>To ensure relatively up-to-date state on main thread, the latest known state of animation effects
+from any parallel worklet execution context needs to be periodically synced back to the main
+thread. After any such sync, the rendering engine runs a worklet animation update step before <a data-link-type="dfn" href="https://html.spec.whatwg.org/#run-the-animation-frame-callbacks">running the animation frame callbacks</a> as part of its document lifecycle. This step, for
+each worklet animation updates its corresponding <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-value">effect value</a>s on the main thread which
+participates in <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-stack">effect stack</a> and represents the animation’s changes. Note that due to
+asynchronous nature of this animation model, the script running on the main javascript execution
+context reading a worklet animated <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#target-property">target property</a> may see a stale value compared to the
+value in effect at the parallel worklet context (i.e, the one used when producing the frame
+currently visible to the user). This is similar to the effect of asynchronous scrolling on scroll
+offsets on main thread.</p>
+   <h2 class="heading settled" data-level="4" id="animation-worklet-desc"><span class="secno">4. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
     <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-worklet">Animation Worklet</dfn> is a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code> responsible for all classes related to custom
 animations. The worklet can be accessed via <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-1">animationWorklet</a></code> attribute. 
    <p>The <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-2">animationWorklet</a></code>'s <a data-link-type="dfn" href="https://drafts.css-houdini.org/worklets/#worklet-global-scope-type">worklet global scope type</a> is <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-1">AnimationWorkletGlobalScope</a></code>.</p>
-<pre class="idl highlight def"><span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworklet">AnimationWorklet</dfn> {
-  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet" data-dfn-type="method" data-export="" data-lt="import(moduleURL)" id="dom-animationworklet-import">import<a class="self-link" href="#dom-animationworklet-import"></a></dfn>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet/import(moduleURL)" data-dfn-type="argument" data-export="" id="dom-animationworklet-import-moduleurl-moduleurl">moduleURL<a class="self-link" href="#dom-animationworklet-import-moduleurl-moduleurl"></a></dfn>);
+<pre class="idl highlight def"><span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworklet"><code>AnimationWorklet</code></dfn> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet" data-dfn-type="method" data-export="" data-lt="addModule(moduleURL)" id="dom-animationworklet-addmodule"><code>addModule</code><a class="self-link" href="#dom-animationworklet-addmodule"></a></dfn>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorklet/addModule(moduleURL)" data-dfn-type="argument" data-export="" id="dom-animationworklet-addmodule-moduleurl-moduleurl"><code>moduleURL</code><a class="self-link" href="#dom-animationworklet-addmodule-moduleurl-moduleurl"></a></dfn>);
 };
 
-<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
-    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet" id="ref-for-animationworklet-1">AnimationWorklet</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="Window" data-dfn-type="attribute" data-export="" data-readonly="" data-type="AnimationWorklet" id="dom-window-animationworklet">animationWorklet</dfn>;
+<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/window-object.html#window">Window</a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet" id="ref-for-animationworklet-1">AnimationWorklet</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="Window" data-dfn-type="attribute" data-export="" data-readonly="" data-type="AnimationWorklet" id="dom-window-animationworklet"><code>animationWorklet</code></dfn>;
 };
 </pre>
-<pre class="idl highlight def"><span class="kt">callback</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="callback" data-export="" id="callbackdef-voidfunction">VoidFunction</dfn> = <span class="kt">void</span> ();
+<pre class="idl highlight def"><span class="kt">callback</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="callback" data-export="" id="callbackdef-voidfunction"><code>VoidFunction</code></dfn> = <span class="kt">void</span> ();
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
-<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworkletglobalscope">AnimationWorkletGlobalScope</dfn> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
-    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator-1">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name<a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"></a></dfn>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction" id="ref-for-callbackdef-voidfunction-1">VoidFunction</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</dfn>);
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="animationworkletglobalscope"><code>AnimationWorkletGlobalScope</code></dfn> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
+    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator-1">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code>name</code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"></a></dfn>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction" id="ref-for-callbackdef-voidfunction-1">VoidFunction</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export="" id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code>animatorCtor</code></dfn>);
 };
 </pre>
    <div class="note" role="note">
      Note: This is how the class should look. 
 <pre class="lang-javascript highlight"><span class="kr">class</span> FooAnimator <span class="p">{</span>
-    <span class="kr">static</span> get elements<span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">static</span> get elements<span class="p">()</span> <span class="p">{</span>
         <span class="k">return</span> <span class="p">[</span>
-            <span class="p">{</span>name<span class="o">:</span> <span class="s1">'foo'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--foo'</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">}</span><span class="p">,</span>
-            <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span><span class="p">,</span>
-        <span class="p">]</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">;</span>
+            <span class="p">{</span>name<span class="o">:</span> <span class="s1">'foo'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--foo'</span><span class="p">],</span> outputProperties<span class="o">:</span> <span class="p">[]},</span>
+            <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[],</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]},</span>
+        <span class="p">];</span>
+    <span class="p">};</span>
 
     <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span>
         <span class="s1">'document'</span><span class="p">,</span>
-        <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span> <span class="p">}</span> <span class="p">}</span><span class="p">,</span>
-    <span class="p">]</span><span class="p">;</span>
+        <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="p">];</span>
 
     animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Animation frame logic goes here
-</span>    <span class="p">}</span>
+        <span class="c1">// Animation frame logic goes here</span>
+<span class="c1"></span>    <span class="p">}</span>
 <span class="p">}</span>
 </pre>
    </div>
-   <h2 class="heading settled" data-level="4" id="concepts"><span class="secno">4. </span><span class="content">Concepts</span><a class="self-link" href="#concepts"></a></h2>
+   <h2 class="heading settled" data-level="5" id="concepts"><span class="secno">5. </span><span class="content">Concepts</span><a class="self-link" href="#concepts"></a></h2>
     A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-definition">animator definition</dfn> describes an author defined animation which can be referenced by
 an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-1">animator instance</a>. It consists of: 
    <ul>
@@ -1626,10 +1642,10 @@ write its explicitly exposed animatable attributes. It consists of:</p>
     <li data-md="">
      <p>A map of proxied output properties to their values.</p>
    </ul>
-   <h2 class="heading settled" data-level="5" id="registering-animator-definition"><span class="secno">5. </span><span class="content">Registering an Animator Definition</span><a class="self-link" href="#registering-animator-definition"></a></h2>
+   <h2 class="heading settled" data-level="6" id="registering-animator-definition"><span class="secno">6. </span><span class="content">Registering an Animator Definition</span><a class="self-link" href="#registering-animator-definition"></a></h2>
     The <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-2">AnimationWorkletGlobalScope</a></code> has a <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animator-name-to-animator-definition-map">animator name to animator definition map</dfn>.
 The map gets populated when <code class="idl"><a data-link-type="idl" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator-2">registerAnimator(name, animatorCtor)</a></code> is called. 
-   <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export="" data-lt="registerAnimator(name, animatorCtor)" id="dom-animationworkletglobalscope-registeranimator">registerAnimator(<var>name</var>, <var>animatorCtor</var>)</dfn> method is called, the user agent <em>must</em> run the following steps:</p>
+   <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export="" data-lt="registerAnimator(name, animatorCtor)" id="dom-animationworkletglobalscope-registeranimator"><code>registerAnimator(<var>name</var>, <var>animatorCtor</var>)</code></dfn> method is called, the user agent <em>must</em> run the following steps:</p>
    <ol>
     <li data-md="">
      <p>If the <var>name</var> is not a valid <a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident">&lt;ident></a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a> and abort all these
@@ -1740,7 +1756,7 @@ the user agent <em>must</em> run the following steps:</p>
        </div>
      </ol>
    </ol>
-   <h2 class="heading settled" data-level="6" id="creating-animator"><span class="secno">6. </span><span class="content">Creating an Animator</span><a class="self-link" href="#creating-animator"></a></h2>
+   <h2 class="heading settled" data-level="7" id="creating-animator"><span class="secno">7. </span><span class="content">Creating an Animator</span><a class="self-link" href="#creating-animator"></a></h2>
     Each <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-3">animator instance</a> lives in an <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-3">AnimationWorkletGlobalScope</a></code>. The <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-4">animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state. 
    <p>The <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope-4">AnimationWorkletGlobalScope</a></code> has an <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="-animator-name-root-element-to-instance-map">(animator name, root element) to instance map</dfn>.
@@ -1773,7 +1789,7 @@ the user agent <em>must</em> run the following steps:</p>
     <li data-md="">
      <p>Set the result of looking up <var>name</var> and <var>root element</var> in <var>animatorInstanceMap</var> to <var>animatorInstance</var>.</p>
    </ol>
-   <h2 class="heading settled" data-level="7" id="creating-element-proxy"><span class="secno">7. </span><span class="content">Creating an Element Proxy</span><a class="self-link" href="#creating-element-proxy"></a></h2>
+   <h2 class="heading settled" data-level="8" id="creating-element-proxy"><span class="secno">8. </span><span class="content">Creating an Element Proxy</span><a class="self-link" href="#creating-element-proxy"></a></h2>
     <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-2">Element Proxy</a> objects are created by the user agent for elements which have either <a class="property" data-link-type="propdesc" href="#propdef-animator" id="ref-for-propdef-animator-1">animator</a> or <a class="property" data-link-type="propdesc" href="#propdef-animator-root" id="ref-for-propdef-animator-root-1">animator-root</a> CSS properties. They cannot be constructed from user script. A single element may
 have multiple <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-3">Element Proxy</a> objects associated with it; one per <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-6">animator instance</a>. 
    <p>The <code class="idl"><a data-link-type="idl" href="#elementproxy" id="ref-for-elementproxy-1">ElementProxy</a></code> interface exposes two maps: a read only map of proxied input properties to their
@@ -1781,9 +1797,9 @@ values, and a map of proxied output properties to their values. The input and ou
 the maps are those specified in registerAnimator for the given <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-7">animator instance</a>.</p>
 <pre class="idl highlight def">[
     <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
-] <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="elementproxy">ElementProxy</dfn> {
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-inputstylemap">inputStyleMap<a class="self-link" href="#dom-elementproxy-inputstylemap"></a></dfn>;
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-outputstylemap">outputStyleMap</dfn>;
+] <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="elementproxy"><code>ElementProxy</code></dfn> {
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-inputstylemap"><code>inputStyleMap</code><a class="self-link" href="#dom-elementproxy-inputstylemap"></a></dfn>;
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="ElementProxy" data-dfn-type="attribute" data-export="" data-type="StylePropertyMapReadOnly" id="dom-elementproxy-outputstylemap"><code>outputStyleMap</code></dfn>;
 };
 </pre>
    <p class="issue" id="issue-65c145a8"><a class="self-link" href="#issue-65c145a8"></a> Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
@@ -1828,13 +1844,13 @@ cannot be constructed via javascript?</p>
    <p>When an element is removed, all proxies of that element are considered to be disconnected.
 A disconnected proxy continues to have the last value from the <a data-link-type="dfn" href="https://drafts.csswg.org/css-cascade-4/#computed-value">computed value</a> of the <a data-link-type="dfn" href="#proxied-element" id="ref-for-proxied-element-4">proxied element</a> properties, but setting values on its outputStyleMap will have no
 effect.</p>
-   <h2 class="heading settled" data-level="8" id="requesting-animation-frames"><span class="secno">8. </span><span class="content">Requesting Animation Frames</span><a class="self-link" href="#requesting-animation-frames"></a></h2>
+   <h2 class="heading settled" data-level="9" id="requesting-animation-frames"><span class="secno">9. </span><span class="content">Requesting Animation Frames</span><a class="self-link" href="#requesting-animation-frames"></a></h2>
     Each <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-9">animator instance</a> has an associated <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-requested-flag">animation requested flag</dfn>. It must be
 either <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-requested">frame-requested</dfn> or <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-current">frame-current</dfn>. It is initially set to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-2">frame-current</a>. Various events can cause the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-3">animation requested flag</a> to be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-1">frame-requested</a>. 
-   <p><a href="#running-animators">§9 Running Animators</a> resets the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-4">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
-   <h3 class="heading settled" data-level="8.1" id="requesting-animation-frames-element-proxy"><span class="secno">8.1. </span><span class="content">Element proxy creation/removal</span><a class="self-link" href="#requesting-animation-frames-element-proxy"></a></h3>
+   <p><a href="#running-animators">§10 Running Animators</a> resets the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-4">animation requested flag</a> on animators to <a data-link-type="dfn" href="#frame-current" id="ref-for-frame-current-3">frame-current</a>.</p>
+   <h3 class="heading settled" data-level="9.1" id="requesting-animation-frames-element-proxy"><span class="secno">9.1. </span><span class="content">Element proxy creation/removal</span><a class="self-link" href="#requesting-animation-frames-element-proxy"></a></h3>
    <p>When a new element proxy is assigned to or removed from an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-10">animator instance</a>, that <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-11">animator instance</a>’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-5">animation requested flag</a> should be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-2">frame-requested</a>.</p>
-   <h3 class="heading settled" data-level="8.2" id="requesting-animation-frames-computed-style"><span class="secno">8.2. </span><span class="content">Change in an element’s computed style</span><a class="self-link" href="#requesting-animation-frames-computed-style"></a></h3>
+   <h3 class="heading settled" data-level="9.2" id="requesting-animation-frames-computed-style"><span class="secno">9.2. </span><span class="content">Change in an element’s computed style</span><a class="self-link" href="#requesting-animation-frames-computed-style"></a></h3>
    <p>When the computed style for an element changes, the user agent <em>must</em> run the following steps:</p>
    <p>For each <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-4">element proxy</a> for that element, perform the following steps:</p>
    <ol>
@@ -1854,10 +1870,10 @@ either <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="frame-r
      <p>For each property in <var>inputProperties</var>, if the property’s computed value has changed,
 set the <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-6">animation requested flag</a> on the <var>animator</var> to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-3">frame-requested</a>.</p>
    </ol>
-   <h3 class="heading settled" data-level="8.3" id="requesting-animation-frames-document-timeline"><span class="secno">8.3. </span><span class="content">Animator specifies a DocumentTimeline</span><a class="self-link" href="#requesting-animation-frames-document-timeline"></a></h3>
+   <h3 class="heading settled" data-level="9.3" id="requesting-animation-frames-document-timeline"><span class="secno">9.3. </span><span class="content">Animator specifies a DocumentTimeline</span><a class="self-link" href="#requesting-animation-frames-document-timeline"></a></h3>
    <p>If a <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/web-animations/#dictdef-documenttimelineoptions">DocumentTimelineOptions</a></code> instance is present in an animator’s <a data-link-type="dfn" href="#animator-timeline-options-list" id="ref-for-animator-timeline-options-list-2">animator timeline options
 list</a> then that animator’s <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-7">animation requested flag</a> <em>must</em> be set to <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-4">frame-requested</a> at the start of each animation frame.</p>
-   <h3 class="heading settled" data-level="8.4" id="requesting-animation-frames-scroll-timeline"><span class="secno">8.4. </span><span class="content">Animator specifies a ScrollTimeline</span><a class="self-link" href="#requesting-animation-frames-scroll-timeline"></a></h3>
+   <h3 class="heading settled" data-level="9.4" id="requesting-animation-frames-scroll-timeline"><span class="secno">9.4. </span><span class="content">Animator specifies a ScrollTimeline</span><a class="self-link" href="#requesting-animation-frames-scroll-timeline"></a></h3>
    <p>If a <code class="idl"><a data-link-type="idl" href="https://wicg.github.io/scroll-animations/#dictdef-scrolltimelineoptions">ScrollTimelineOptions</a></code> <var>instance</var> is present in an animator’s <a data-link-type="dfn" href="#animator-timeline-options-list" id="ref-for-animator-timeline-options-list-3">animator timeline options
 list</a> then the user agent <em>must</em> run the following steps when the scroll position of the
 nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-1">root element</a> changes:</p>
@@ -1878,7 +1894,7 @@ nearest non-visible overflow ancestor to the animator’s <a data-link-type="dfn
        specifically here and when running animations.</p>
    <p class="issue" id="issue-a9c8649c"><a class="self-link" href="#issue-a9c8649c"></a> Need to add a definition for 'nearest non-visible overflow ancestor' to make sure all mentions
        stay in sync.</p>
-   <h2 class="heading settled" data-level="9" id="running-animators"><span class="secno">9. </span><span class="content">Running Animators</span><a class="self-link" href="#running-animators"></a></h2>
+   <h2 class="heading settled" data-level="10" id="running-animators"><span class="secno">10. </span><span class="content">Running Animators</span><a class="self-link" href="#running-animators"></a></h2>
    <p>When a user agent wants to produce a new animation frame, if for any <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-12">animator instance</a> the
 associated <a data-link-type="dfn" href="#animation-requested-flag" id="ref-for-animation-requested-flag-9">animation requested flag</a> is <a data-link-type="dfn" href="#frame-requested" id="ref-for-frame-requested-6">frame-requested</a> then the the user agent <em>must</em> <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-1">run animators</a> for the current frame.</p>
    <p class="note" role="note"><span>Note:</span> The user agent is not required to run animations on every frame. It is legal to defer
@@ -1922,9 +1938,9 @@ overflow ancestor of <var>rootElement</var> as the <code class="idl"><a data-lin
    </ol>
    <p class="note" role="note"><span>Note:</span> Although inefficient, it is legal for the user agent to <a data-link-type="dfn" href="#run-animators" id="ref-for-run-animators-2">run animators</a> multiple times
 in the same frame.</p>
-   <h2 class="heading settled" data-level="10" id="closing-animator"><span class="secno">10. </span><span class="content">Closing an Animator</span><a class="self-link" href="#closing-animator"></a></h2>
+   <h2 class="heading settled" data-level="11" id="closing-animator"><span class="secno">11. </span><span class="content">Closing an Animator</span><a class="self-link" href="#closing-animator"></a></h2>
    <p class="issue" id="issue-d4d8f39c"><a class="self-link" href="#issue-d4d8f39c"></a> Todo: Define when we may get rid of the animator.</p>
-   <h2 class="heading settled" data-level="11" id="css-animator-notation"><span class="secno">11. </span><span class="content">CSS Animator Notation</span><a class="self-link" href="#css-animator-notation"></a></h2>
+   <h2 class="heading settled" data-level="12" id="css-animator-notation"><span class="secno">12. </span><span class="content">CSS Animator Notation</span><a class="self-link" href="#css-animator-notation"></a></h2>
    <p>Two CSS properties <a class="property" data-link-type="propdesc" href="#propdef-animator-root" id="ref-for-propdef-animator-root-2">animator-root</a> and <a class="property" data-link-type="propdesc" href="#propdef-animator" id="ref-for-propdef-animator-2">animator</a> may be used to assign an HTML elements to an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-13">animator instance</a> either as a root element or a child element.</p>
    <table class="def propdef" data-link-for-hint="animator-root">
     <tbody>
@@ -1971,7 +1987,7 @@ in the same frame.</p>
 of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-8">animator name</a> as a value has no effect.</p>
       <li data-md="">
        <p>Otherwise, an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a> with this element as its <a data-link-type="dfn" href="#root-element" id="ref-for-root-element-4">root element</a> will exist and will have its <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-3">animate function</a> called (with respect to the rules
-laid out in <a href="#running-animators">§9 Running Animators</a>) with an <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-6">element proxy</a> for this element passed as
+laid out in <a href="#running-animators">§10 Running Animators</a>) with an <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-6">element proxy</a> for this element passed as
 one of the <a data-link-type="dfn" href="#element-proxy" id="ref-for-element-proxy-7">element proxies</a> for the given <a data-link-type="dfn" href="#animator-slot" id="ref-for-animator-slot-5">animator slot</a>.</p>
      </ul>
      <p>If the same <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-9">animator name</a> occurs multiple times in the list, only the first occurrence of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-10">animator name</a> is processed.</p>
@@ -2025,57 +2041,57 @@ such <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-inst
      </ul>
      <p>If the same <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-18">animator name</a> occurs multiple times in the list, only the first occurrence of that <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-19">animator name</a> is processed.</p>
    </dl>
-   <h2 class="heading settled" data-level="12" id="effect-stack"><span class="secno">12. </span><span class="content">Effect Stack</span><a class="self-link" href="#effect-stack"></a></h2>
+   <h2 class="heading settled" data-level="13" id="effect-stack"><span class="secno">13. </span><span class="content">Effect Stack</span><a class="self-link" href="#effect-stack"></a></h2>
    <p class="issue" id="issue-b3b90f2d"><a class="self-link" href="#issue-b3b90f2d"></a> Todo: the animators output style values have the highest order in animation stack effect and
 their composite operation is "replace" which is going to allow them to run independent on other
 animations and in a different thread. Supporting other composite operation is not in scope at this
 point.</p>
-   <h2 class="heading settled" data-level="13" id="security-considerations"><span class="secno">13. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
+   <h2 class="heading settled" data-level="14" id="security-considerations"><span class="secno">14. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
    <p class="issue" id="issue-de770110"><a class="self-link" href="#issue-de770110"></a> Need to decide what security considerations there are for this spec.</p>
-   <h2 class="heading settled" data-level="14" id="privacy-considerations"><span class="secno">14. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
+   <h2 class="heading settled" data-level="15" id="privacy-considerations"><span class="secno">15. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
    <p class="issue" id="issue-19f9ed9b"><a class="self-link" href="#issue-19f9ed9b"></a> Need to decide what privacy considerations there are for this spec.</p>
-   <h2 class="heading settled" data-level="15" id="examples"><span class="secno">15. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="15.1" id="example-1"><span class="secno">15.1. </span><span class="content">Example 1: A fade-in animation with spring timing.</span><a class="self-link" href="#example-1"></a></h3>
+   <h2 class="heading settled" data-level="16" id="examples"><span class="secno">16. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
+   <h3 class="heading settled" data-level="16.1" id="example-1"><span class="secno">16.1. </span><span class="content">Example 1: A fade-in animation with spring timing.</span><a class="self-link" href="#example-1"></a></h3>
 <pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
 <span class="p">.</span><span class="nc">myFadein</span> <span class="p">{</span>
   <span class="n">animator</span><span class="p">:</span> <span class="s1">'spring'</span> <span class="s1">'fadein'</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">></span>
 
 
-<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
-<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span> <span class="na">style</span><span class="o">=</span><span class="s">"--spring-k: 25;"</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span><span class="p">>&lt;/</span><span class="nt">section</span><span class="p">></span>
+<span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">'myFadein'</span> <span class="na">style</span><span class="o">=</span><span class="s">"--spring-k: 25;"</span><span class="p">>&lt;/</span><span class="nt">section</span><span class="p">></span>
 
 <span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
-document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'spring-timing.js'</span><span class="p">)</span><span class="p">;</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">></span>
+document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'spring-timing.js'</span><span class="p">);</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
 </pre>
-<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope
-</span>registerAnimator<span class="p">(</span><span class="s1">'spring'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope</span>
+<span class="c1"></span>registerAnimator<span class="p">(</span><span class="s1">'spring'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
 
     <span class="kr">static</span> elements <span class="o">=</span> <span class="p">[</span>
-        <span class="p">{</span>name<span class="o">:</span> <span class="s1">'fadein'</span><span class="p">,</span> inputProperties<span class="o">:</span>  <span class="p">[</span><span class="s1">'--spring-k'</span><span class="p">]</span><span class="p">,</span> outputProperties <span class="o">=</span>  <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]</span><span class="p">}</span><span class="p">]</span><span class="p">;</span>
-    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="s1">'document'</span><span class="p">]</span><span class="p">;</span>
+        <span class="p">{</span>name<span class="o">:</span> <span class="s1">'fadein'</span><span class="p">,</span> inputProperties<span class="o">:</span>  <span class="p">[</span><span class="s1">'--spring-k'</span><span class="p">],</span> outputProperties <span class="o">=</span>  <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]}];</span>
+    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="s1">'document'</span><span class="p">];</span>
 
     animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">=</span> <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">||</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
-        <span class="kr">const</span> deltaT <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime <span class="o">-</span> <span class="k">this</span><span class="p">.</span>startTime_<span class="p">;</span>
-        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'fadein'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
-          <span class="c1">// read a custom css property.
-</span>          <span class="kr">const</span> k <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--spring-k'</span><span class="p">)</span> <span class="o">||</span> <span class="mi">1</span><span class="p">;</span>
-          <span class="c1">// compute progress using a fancy spring timing function.
-</span>          <span class="kr">const</span> effectiveValue <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">)</span><span class="p">;</span>
-          <span class="c1">// update opacity accordingly.
-</span>          elem<span class="p">.</span>ouputStyleMap<span class="p">.</span>opacity <span class="o">=</span> effectiveValue<span class="p">;</span>
-        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">=</span> <span class="k">this</span><span class="p">.</span>startTime_ <span class="o">||</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">].</span>currentTime<span class="p">;</span>
+        <span class="kr">const</span> deltaT <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">].</span>currentTime <span class="o">-</span> <span class="k">this</span><span class="p">.</span>startTime_<span class="p">;</span>
+        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'fadein'</span><span class="p">).</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+          <span class="c1">// read a custom css property.</span>
+<span class="c1"></span>          <span class="kr">const</span> k <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--spring-k'</span><span class="p">)</span> <span class="o">||</span> <span class="mi">1</span><span class="p">;</span>
+          <span class="c1">// compute progress using a fancy spring timing function.</span>
+<span class="c1"></span>          <span class="kr">const</span> effectiveValue <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">);</span>
+          <span class="c1">// update opacity accordingly.</span>
+<span class="c1"></span>          elem<span class="p">.</span>ouputStyleMap<span class="p">.</span>opacity <span class="o">=</span> effectiveValue<span class="p">;</span>
+        <span class="p">});</span>
     <span class="p">}</span>
 
     springTiming<span class="p">(</span>deltaT<span class="p">,</span> k<span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// simulate the spring effect and return a progress value between [-1, 1];
-</span>    <span class="p">}</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+        <span class="c1">// simulate the spring effect and return a progress value between [-1, 1];</span>
+<span class="c1"></span>    <span class="p">}</span>
+<span class="p">});</span>
 </pre>
-   <h3 class="heading settled" data-level="15.2" id="example-2"><span class="secno">15.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
+   <h3 class="heading settled" data-level="16.2" id="example-2"><span class="secno">16.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
 <pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
 <span class="p">#</span><span class="nn">scroller</span> <span class="p">{</span>
   <span class="n">animator-root</span><span class="p">:</span> <span class="n">twitter-header</span><span class="p">;</span>
@@ -2086,55 +2102,55 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
 <span class="p">.</span><span class="nc">bar</span> <span class="p">{</span>
   <span class="n">animator</span><span class="p">:</span> <span class="n">twitter-header</span> <span class="n">bar</span><span class="p">;</span>
 <span class="p">}</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">></span>
 
 <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"scroller"</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">"bar"</span><span class="p">></span><span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">section</span> <span class="na">class</span><span class="o">=</span><span class="s">"bar"</span><span class="p">>&lt;/</span><span class="nt">section</span><span class="p">></span>
   <span class="p">&lt;</span><span class="nt">header</span><span class="p">></span>
     <span class="p">&lt;</span><span class="nt">picture</span> <span class="na">class</span><span class="o">=</span><span class="s">"avatar"</span><span class="p">></span>
       <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"avatar.jpg"</span><span class="p">></span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">picture</span><span class="p">></span>
+    <span class="p">&lt;/</span><span class="nt">picture</span><span class="p">></span>
     <span class="p">&lt;</span><span class="nt">section</span><span class="p">></span>
-      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Friends<span class="p">&lt;</span><span class="p">/</span><span class="nt">button</span><span class="p">></span>
-      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Edit Profile<span class="p">&lt;</span><span class="p">/</span><span class="nt">button</span><span class="p">></span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">section</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="p">/</span><span class="nt">header</span><span class="p">></span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Friends<span class="p">&lt;/</span><span class="nt">button</span><span class="p">></span>
+      <span class="p">&lt;</span><span class="nt">button</span><span class="p">></span>Edit Profile<span class="p">&lt;/</span><span class="nt">button</span><span class="p">></span>
+    <span class="p">&lt;/</span><span class="nt">section</span><span class="p">></span>
+  <span class="p">&lt;/</span><span class="nt">header</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
 
 <span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
-document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'tweeter-header.js'</span><span class="p">)</span><span class="p">;</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">></span>
+document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'tweeter-header.js'</span><span class="p">);</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
 </pre>
-<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope.
-</span>registerAnimator<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope.</span>
+<span class="c1"></span>registerAnimator<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
 
   <span class="kr">static</span> elements <span class="o">=</span>  <span class="p">[</span>
-    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'avatar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span><span class="p">,</span>
-    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]</span><span class="p">}</span>
-  <span class="p">]</span><span class="p">;</span>
+    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'avatar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[],</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]},</span>
+    <span class="p">{</span>name<span class="o">:</span> <span class="s1">'bar'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[],</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'opacity'</span><span class="p">]}</span>
+  <span class="p">];</span>
 
-  <span class="c1">// maps scroll offset [0, 140px] -> time values [0, 1]
-</span>  <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span>
+  <span class="c1">// maps scroll offset [0, 140px] -> time values [0, 1]</span>
+<span class="c1"></span>  <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span>
       orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">,</span>
       endScrollOffset<span class="o">:</span> <span class="s1">'140px'</span><span class="p">,</span>
       timeRange<span class="o">:</span> <span class="mi">1</span>
-    <span class="p">}</span><span class="p">}</span><span class="p">,</span>
-  <span class="p">]</span><span class="p">;</span>
+    <span class="p">}},</span>
+  <span class="p">];</span>
 
 
   animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> progress <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime<span class="p">;</span>
+    <span class="kd">var</span> progress <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">].</span>currentTime<span class="p">;</span>
 
-    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'avatar'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
-      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
-          <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span>
-                             <span class="k">new</span> CSSSimpleLength<span class="p">(</span>tween<span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">45</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
-          <span class="k">new</span> CSSScale<span class="p">(</span>tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">,</span> tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span><span class="p">(</span>progress<span class="p">)</span><span class="p">)</span>
-          <span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
-    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'bar'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
-      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'opacity'</span><span class="p">,</span> progress<span class="p">)</span><span class="p">;</span>
-    <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'avatar'</span><span class="p">).</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">([</span>
+          <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">),</span>
+                             <span class="k">new</span> CSSSimpleLength<span class="p">(</span>tween<span class="p">(</span><span class="mi">140</span><span class="p">,</span> <span class="mi">45</span><span class="p">)(</span>progress<span class="p">),</span> <span class="s1">'px'</span><span class="p">)),</span>
+          <span class="k">new</span> CSSScale<span class="p">(</span>tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)(</span>progress<span class="p">),</span> tween<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)(</span>progress<span class="p">))</span>
+          <span class="p">]));</span>
+    <span class="p">});</span>
+    elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'bar'</span><span class="p">).</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+      elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'opacity'</span><span class="p">,</span> progress<span class="p">);</span>
+    <span class="p">});</span>
   <span class="p">}</span>
 
   tween<span class="p">(</span>begin<span class="p">,</span> end<span class="p">)</span> <span class="p">{</span>
@@ -2142,9 +2158,9 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
         <span class="k">return</span> begin <span class="o">+</span> <span class="p">(</span>end <span class="o">-</span> begin<span class="p">)</span> <span class="o">*</span> progress<span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">});</span>
 </pre>
-   <h3 class="heading settled" data-level="15.3" id="example-3"><span class="secno">15.3. </span><span class="content">Example 3: Parallax backgrounds.</span><a class="self-link" href="#example-3"></a></h3>
+   <h3 class="heading settled" data-level="16.3" id="example-3"><span class="secno">16.3. </span><span class="content">Example 3: Parallax backgrounds.</span><a class="self-link" href="#example-3"></a></h3>
 <pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">style</span><span class="p">></span>
 <span class="p">#</span><span class="nn">scroller</span> <span class="p">{</span>
   <span class="n">animator-root</span><span class="p">:</span> <span class="s1">'parallax'</span><span class="p">;</span>
@@ -2153,44 +2169,44 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
   <span class="n">animator</span><span class="p">:</span> <span class="s1">'parallax'</span> <span class="s1">'background'</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">style</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">style</span><span class="p">></span>
 
 <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"scroller"</span><span class="p">></span>
     <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"background"</span> <span class="na">style</span><span class="o">=</span><span class="s">"--parallax-rate: 0.6"</span> <span class="p">></span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
     <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"background"</span> <span class="na">style</span><span class="o">=</span><span class="s">"--parallax-rate: 0.3"</span> <span class="p">></span>
-    <span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
 
     overflowing content!
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">div</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
 
 <span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
-document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'parallax.js'</span><span class="p">)</span><span class="p">;</span>
-<span class="p">&lt;</span><span class="p">/</span><span class="nt">script</span><span class="p">></span>
+document<span class="p">.</span>animationWorklet<span class="p">.</span><span class="kr">import</span><span class="p">(</span><span class="s1">'parallax.js'</span><span class="p">);</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
 </pre>
-<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope
-</span>registerAnimation<span class="p">(</span><span class="s1">'parallax'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
+<pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope</span>
+<span class="c1"></span>registerAnimation<span class="p">(</span><span class="s1">'parallax'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
 
     <span class="kr">static</span> elements <span class="o">=</span>  <span class="p">[</span>
-        <span class="p">{</span> name<span class="o">:</span> <span class="s1">'background'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--parallax-rate'</span><span class="p">]</span><span class="p">,</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]</span><span class="p">}</span>
-    <span class="p">]</span><span class="p">;</span>
+        <span class="p">{</span> name<span class="o">:</span> <span class="s1">'background'</span><span class="p">,</span> inputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'--parallax-rate'</span><span class="p">],</span> outputProperties<span class="o">:</span> <span class="p">[</span><span class="s1">'transform'</span><span class="p">]}</span>
+    <span class="p">];</span>
 
-    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[</span><span class="p">{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">}</span> <span class="p">}</span><span class="p">]</span><span class="p">;</span>
+    <span class="kr">static</span> timelines <span class="o">=</span> <span class="p">[{</span> type<span class="o">:</span> <span class="s1">'scroll'</span><span class="p">,</span> options<span class="o">:</span> <span class="p">{</span> orientation<span class="o">:</span> <span class="s1">'vertical'</span><span class="p">}</span> <span class="p">}];</span>
 
-    <span class="c1">// This can be passed in as an input but we should consider exposing this in ScrollTimeline
-</span>    <span class="kr">static</span> SCROLL_SIZE <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+    <span class="c1">// This can be passed in as an input but we should consider exposing this in ScrollTimeline</span>
+<span class="c1"></span>    <span class="kr">static</span> SCROLL_SIZE <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
 
     animate<span class="p">(</span>elementMap<span class="p">,</span> timelines<span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// read root scroller vertical scroll offset.
-</span>        <span class="kr">const</span> scrollTop <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">.</span>currentTime <span class="o">*</span> SCROLL_SIZE<span class="p">;</span>
-        <span class="c1">// update parallax transform
-</span>        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'background'</span><span class="p">)</span><span class="p">.</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
+        <span class="c1">// read root scroller vertical scroll offset.</span>
+<span class="c1"></span>        <span class="kr">const</span> scrollTop <span class="o">=</span> timelines<span class="p">[</span><span class="mi">0</span><span class="p">].</span>currentTime <span class="o">*</span> SCROLL_SIZE<span class="p">;</span>
+        <span class="c1">// update parallax transform</span>
+<span class="c1"></span>        elementMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'background'</span><span class="p">).</span>forEach<span class="p">(</span>elem <span class="p">=></span> <span class="p">{</span>
            <span class="kr">const</span> rate <span class="o">=</span> elem<span class="p">.</span>inputStyleMap<span class="p">.</span>get<span class="p">(</span><span class="s1">'--parallax-rate'</span><span class="p">)</span> <span class="o">||</span> <span class="mf">0.2</span><span class="p">;</span>
-           elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">(</span><span class="p">[</span>
-            <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">,</span> <span class="k">new</span> CSSSimpleLength<span class="p">(</span>rate <span class="o">*</span> scrollTop<span class="p">,</span> <span class="s1">'px'</span><span class="p">)</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
-        <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+           elem<span class="p">.</span>outputStyleMap<span class="p">.</span>set<span class="p">(</span><span class="s1">'transform'</span><span class="p">,</span> <span class="k">new</span> CSSTransformValue<span class="p">([</span>
+            <span class="k">new</span> CSSTranslation<span class="p">(</span><span class="k">new</span> CSSSimpleLength<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'px'</span><span class="p">),</span> <span class="k">new</span> CSSSimpleLength<span class="p">(</span>rate <span class="o">*</span> scrollTop<span class="p">,</span> <span class="s1">'px'</span><span class="p">))]));</span>
+        <span class="p">});</span>
     <span class="p">}</span>
-<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">});</span>
 </pre>
   </main>
   <div data-fill-with="conformance">
@@ -2205,7 +2221,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
             except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
    <p> Examples in this specification are introduced with the words “for example”
             or are set apart from the normative text with <code>class="example"</code>, like this: </p>
-   <div class="example" id="example-ae2b6bc0"><a class="self-link" href="#example-ae2b6bc0"></a> This is an example of an informative example. </div>
+   <div class="example" id="example-example"><a class="self-link" href="#example-example"></a> This is an example of an informative example. </div>
    <p> Informative notes begin with the word “Note”
             and are set apart from the normative text with <code>class="note"</code>, like this: </p>
    <p class="note" role="note"> Note, this is an informative note. </p>
@@ -2342,53 +2358,53 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
-   <li><a href="#animate-function">animate function</a><span>, in §4</span>
-   <li><a href="#animation-requested-flag">animation requested flag</a><span>, in §8</span>
-   <li><a href="#animation-worklet">Animation Worklet</a><span>, in §3</span>
-   <li><a href="#dom-window-animationworklet">animationWorklet</a><span>, in §3</span>
-   <li><a href="#animationworklet">AnimationWorklet</a><span>, in §3</span>
-   <li><a href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a><span>, in §3</span>
-   <li><a href="#propdef-animator">animator</a><span>, in §11</span>
-   <li><a href="#animator-definition">animator definition</a><span>, in §4</span>
-   <li><a href="#animator-input-property-list">animator input property list</a><span>, in §4</span>
-   <li><a href="#animator-instance">animator instance</a><span>, in §4</span>
-   <li><a href="#animator-name">animator name</a><span>, in §4</span>
-   <li><a href="#-animator-name-root-element-to-instance-map">(animator name, root element) to instance map</a><span>, in §6</span>
-   <li><a href="#animator-name-to-animator-definition-map">animator name to animator definition map</a><span>, in §5</span>
-   <li><a href="#animator-output-property-list">animator output property list</a><span>, in §4</span>
-   <li><a href="#propdef-animator-root">animator-root</a><span>, in §11</span>
-   <li><a href="#animator-slot">animator slot</a><span>, in §4</span>
-   <li><a href="#animator-slot-list">animator slot list</a><span>, in §4</span>
-   <li><a href="#animator-timeline-options-list">animator timeline options list</a><span>, in §4</span>
-   <li><a href="#class-constructor">class constructor</a><span>, in §4</span>
-   <li><a href="#create-an-element-proxy">create an element proxy</a><span>, in §7</span>
-   <li><a href="#create-a-new-animator-instance">create a new animator instance</a><span>, in §6</span>
-   <li><a href="#elementproxy">ElementProxy</a><span>, in §7</span>
-   <li><a href="#element-proxy">element proxy</a><span>, in §4</span>
-   <li><a href="#element-proxy-map">element proxy map</a><span>, in §4</span>
-   <li><a href="#frame-current">frame-current</a><span>, in §8</span>
-   <li><a href="#frame-requested">frame-requested</a><span>, in §8</span>
-   <li><a href="#dom-animationworklet-import">import(moduleURL)</a><span>, in §3</span>
-   <li><a href="#input-property-list">input property list</a><span>, in §4</span>
-   <li><a href="#dom-elementproxy-inputstylemap">inputStyleMap</a><span>, in §7</span>
+   <li><a href="#dom-animationworklet-addmodule">addModule(moduleURL)</a><span>, in §4</span>
+   <li><a href="#animate-function">animate function</a><span>, in §5</span>
+   <li><a href="#animation-requested-flag">animation requested flag</a><span>, in §9</span>
+   <li><a href="#animation-worklet">Animation Worklet</a><span>, in §4</span>
+   <li><a href="#dom-window-animationworklet">animationWorklet</a><span>, in §4</span>
+   <li><a href="#animationworklet">AnimationWorklet</a><span>, in §4</span>
+   <li><a href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a><span>, in §4</span>
+   <li><a href="#propdef-animator">animator</a><span>, in §12</span>
+   <li><a href="#animator-definition">animator definition</a><span>, in §5</span>
+   <li><a href="#animator-input-property-list">animator input property list</a><span>, in §5</span>
+   <li><a href="#animator-instance">animator instance</a><span>, in §5</span>
+   <li><a href="#animator-name">animator name</a><span>, in §5</span>
+   <li><a href="#-animator-name-root-element-to-instance-map">(animator name, root element) to instance map</a><span>, in §7</span>
+   <li><a href="#animator-name-to-animator-definition-map">animator name to animator definition map</a><span>, in §6</span>
+   <li><a href="#animator-output-property-list">animator output property list</a><span>, in §5</span>
+   <li><a href="#propdef-animator-root">animator-root</a><span>, in §12</span>
+   <li><a href="#animator-slot">animator slot</a><span>, in §5</span>
+   <li><a href="#animator-slot-list">animator slot list</a><span>, in §5</span>
+   <li><a href="#animator-timeline-options-list">animator timeline options list</a><span>, in §5</span>
+   <li><a href="#class-constructor">class constructor</a><span>, in §5</span>
+   <li><a href="#create-an-element-proxy">create an element proxy</a><span>, in §8</span>
+   <li><a href="#create-a-new-animator-instance">create a new animator instance</a><span>, in §7</span>
+   <li><a href="#elementproxy">ElementProxy</a><span>, in §8</span>
+   <li><a href="#element-proxy">element proxy</a><span>, in §5</span>
+   <li><a href="#element-proxy-map">element proxy map</a><span>, in §5</span>
+   <li><a href="#frame-current">frame-current</a><span>, in §9</span>
+   <li><a href="#frame-requested">frame-requested</a><span>, in §9</span>
+   <li><a href="#input-property-list">input property list</a><span>, in §5</span>
+   <li><a href="#dom-elementproxy-inputstylemap">inputStyleMap</a><span>, in §8</span>
    <li>
     none
     <ul>
-     <li><a href="#valdef-animator-root-none">value for animator-root</a><span>, in §11</span>
-     <li><a href="#valdef-animator-none">value for animator</a><span>, in §11</span>
+     <li><a href="#valdef-animator-root-none">value for animator-root</a><span>, in §12</span>
+     <li><a href="#valdef-animator-none">value for animator</a><span>, in §12</span>
     </ul>
-   <li><a href="#output-property-list">output property list</a><span>, in §4</span>
-   <li><a href="#dom-elementproxy-outputstylemap">outputStyleMap</a><span>, in §7</span>
-   <li><a href="#parsing-an-animator-property-list">parsing an animator property list</a><span>, in §5</span>
-   <li><a href="#parsing-an-animator-slot-list">parsing an animator slot list</a><span>, in §5</span>
-   <li><a href="#parsing-an-animator-timeline-options-list">parsing an animator timeline options list</a><span>, in §5</span>
-   <li><a href="#proxied-element">proxied element</a><span>, in §4</span>
-   <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §5</span>
-   <li><a href="#root-element">root element</a><span>, in §4</span>
-   <li><a href="#run-animators">run animators</a><span>, in §9</span>
-   <li><a href="#slot-name">slot name</a><span>, in §4</span>
-   <li><a href="#update-proxy-input-style-map">update proxy input style map</a><span>, in §7</span>
-   <li><a href="#callbackdef-voidfunction">VoidFunction</a><span>, in §3</span>
+   <li><a href="#output-property-list">output property list</a><span>, in §5</span>
+   <li><a href="#dom-elementproxy-outputstylemap">outputStyleMap</a><span>, in §8</span>
+   <li><a href="#parsing-an-animator-property-list">parsing an animator property list</a><span>, in §6</span>
+   <li><a href="#parsing-an-animator-slot-list">parsing an animator slot list</a><span>, in §6</span>
+   <li><a href="#parsing-an-animator-timeline-options-list">parsing an animator timeline options list</a><span>, in §6</span>
+   <li><a href="#proxied-element">proxied element</a><span>, in §5</span>
+   <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §6</span>
+   <li><a href="#root-element">root element</a><span>, in §5</span>
+   <li><a href="#run-animators">run animators</a><span>, in §10</span>
+   <li><a href="#slot-name">slot name</a><span>, in §5</span>
+   <li><a href="#update-proxy-input-style-map">update proxy input style map</a><span>, in §8</span>
+   <li><a href="#callbackdef-voidfunction">VoidFunction</a><span>, in §4</span>
   </ul>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
@@ -2419,11 +2435,12 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
-     <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a>
+     <li><a href="https://html.spec.whatwg.org/multipage/window-object.html#window">Window</a>
     </ul>
    <li>
     <a data-link-type="biblio">[web-animations-1]</a> defines the following terms:
     <ul>
+     <li><a href="https://w3c.github.io/web-animations/#animation">Animation</a>
      <li><a href="https://w3c.github.io/web-animations/#documenttimeline">DocumentTimeline</a>
      <li><a href="https://w3c.github.io/web-animations/#dictdef-documenttimelineoptions">DocumentTimelineOptions</a>
     </ul>
@@ -2462,7 +2479,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    <dt id="biblio-web-animations-1">[WEB-ANIMATIONS-1]
    <dd>Brian Birtles; et al. <a href="https://www.w3.org/TR/web-animations-1/">Web Animations</a>. URL: <a href="https://www.w3.org/TR/web-animations-1/">https://www.w3.org/TR/web-animations-1/</a>
    <dt id="biblio-webidl">[WebIDL]
-   <dd>Cameron McCormack; Boris Zbarsky; Tobie Langel. <a href="https://www.w3.org/TR/WebIDL-1/">Web IDL</a>. URL: <a href="https://www.w3.org/TR/WebIDL-1/">https://www.w3.org/TR/WebIDL-1/</a>
+   <dd>Cameron McCormack; Boris Zbarsky; Tobie Langel. <a href="https://heycam.github.io/webidl/">Web IDL</a>. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
    <dt id="biblio-worklets-1">[WORKLETS-1]
    <dd>Ian Kilpatrick. <a href="https://www.w3.org/TR/worklets-1/">Worklets Level 1</a>. URL: <a href="https://www.w3.org/TR/worklets-1/">https://www.w3.org/TR/worklets-1/</a>
   </dl>
@@ -2488,7 +2505,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
       <th scope="col">Com­puted value
     <tbody>
      <tr>
-      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator-root">animator-root</a>
+      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator">animator</a>
       <td>none | [animator name animator slot, ]* animator name animator slot
       <td>none
       <td>all elements
@@ -2499,7 +2516,7 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
       <td>per grammar
       <td>as specified
      <tr>
-      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator">animator</a>
+      <th scope="row"><a class="css" data-link-type="property" href="#propdef-animator-root">animator-root</a>
       <td>none | [animator name animator slot, ]* animator name animator slot
       <td>none
       <td>all elements
@@ -2512,26 +2529,26 @@ document<span class="p">.</span>animationWorklet<span class="p">.</span><span cl
    </table>
   </div>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl def"><span class="kt">interface</span> <a class="nv" href="#animationworklet">AnimationWorklet</a> {
-  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <a class="nv" href="#dom-animationworklet-import">import</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <a class="nv" href="#dom-animationworklet-import-moduleurl-moduleurl">moduleURL</a>);
+<pre class="idl highlight def"><span class="kt">interface</span> <a class="nv" href="#animationworklet"><code>AnimationWorklet</code></a> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#NewObject">NewObject</a>] <span class="kt">Promise</span>&lt;<span class="kt">void</span>> <a class="nv" href="#dom-animationworklet-addmodule"><code>addModule</code></a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-USVString"><span class="kt">USVString</span></a> <a class="nv" href="#dom-animationworklet-addmodule-moduleurl-moduleurl"><code>moduleURL</code></a>);
 };
 
-<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/browsers.html#window">Window</a> {
-    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet">AnimationWorklet</a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet">animationWorklet</a>;
+<span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/window-object.html#window">Window</a> {
+    [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject">SameObject</a>] <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#animationworklet">AnimationWorklet</a> <a class="nv" data-readonly="" data-type="AnimationWorklet" href="#dom-window-animationworklet"><code>animationWorklet</code></a>;
 };
 
-<span class="kt">callback</span> <a class="nv" href="#callbackdef-voidfunction">VoidFunction</a> = <span class="kt">void</span> ();
+<span class="kt">callback</span> <a class="nv" href="#callbackdef-voidfunction"><code>VoidFunction</code></a> = <span class="kt">void</span> ();
 
 [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=<span class="n">AnimationWorklet</span>]
-<span class="kt">interface</span> <a class="nv" href="#animationworkletglobalscope">AnimationWorkletGlobalScope</a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
-    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name">name</a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction">VoidFunction</a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">animatorCtor</a>);
+<span class="kt">interface</span> <a class="nv" href="#animationworkletglobalscope"><code>AnimationWorkletGlobalScope</code></a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a> {
+    <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator">registerAnimator</a>(<a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString"><span class="kt">DOMString</span></a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code>name</code></a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction">VoidFunction</a> <a class="nv" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code>animatorCtor</code></a>);
 };
 
 [
     <a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed">Exposed</a>=(<span class="n">AnimationWorklet</span>),
-] <span class="kt">interface</span> <a class="nv" href="#elementproxy">ElementProxy</a> {
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap">inputStyleMap</a>;
-    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap">outputStyleMap</a>;
+] <span class="kt">interface</span> <a class="nv" href="#elementproxy"><code>ElementProxy</code></a> {
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-inputstylemap"><code>inputStyleMap</code></a>;
+    <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/css-typed-om-1/#stylepropertymapreadonly">StylePropertyMapReadOnly</a> <a class="nv" data-type="StylePropertyMapReadOnly" href="#dom-elementproxy-outputstylemap"><code>outputStyleMap</code></a>;
 };
 
 </pre>
@@ -2557,265 +2574,266 @@ point.<a href="#issue-b3b90f2d"> ↵ </a></div>
    <b><a href="#animation-worklet">#animation-worklet</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-animation-worklet-1">2. Introduction</a> <a href="#ref-for-animation-worklet-2">(2)</a>
+    <li><a href="#ref-for-animation-worklet-3">3. Threading Model</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animationworklet">
    <b><a href="#animationworklet">#animationworklet</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animationworklet-1">3. Animation Worklet</a>
+    <li><a href="#ref-for-animationworklet-1">4. Animation Worklet</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-window-animationworklet">
    <b><a href="#dom-window-animationworklet">#dom-window-animationworklet</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-window-animationworklet-1">3. Animation Worklet</a> <a href="#ref-for-dom-window-animationworklet-2">(2)</a>
+    <li><a href="#ref-for-dom-window-animationworklet-1">4. Animation Worklet</a> <a href="#ref-for-dom-window-animationworklet-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="callbackdef-voidfunction">
    <b><a href="#callbackdef-voidfunction">#callbackdef-voidfunction</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-callbackdef-voidfunction-1">3. Animation Worklet</a>
+    <li><a href="#ref-for-callbackdef-voidfunction-1">4. Animation Worklet</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animationworkletglobalscope">
    <b><a href="#animationworkletglobalscope">#animationworkletglobalscope</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animationworkletglobalscope-1">3. Animation Worklet</a>
-    <li><a href="#ref-for-animationworkletglobalscope-2">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animationworkletglobalscope-3">6. Creating an Animator</a> <a href="#ref-for-animationworkletglobalscope-4">(2)</a>
+    <li><a href="#ref-for-animationworkletglobalscope-1">4. Animation Worklet</a>
+    <li><a href="#ref-for-animationworkletglobalscope-2">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animationworkletglobalscope-3">7. Creating an Animator</a> <a href="#ref-for-animationworkletglobalscope-4">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">
    <b><a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor">#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-1">5. Registering an Animator Definition</a> <a href="#ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-2">(2)</a>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-1">6. Registering an Animator Definition</a> <a href="#ref-for-dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-definition">
    <b><a href="#animator-definition">#animator-definition</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-definition-1">4. Concepts</a>
-    <li><a href="#ref-for-animator-definition-2">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animator-definition-3">11. CSS Animator Notation</a> <a href="#ref-for-animator-definition-4">(2)</a>
+    <li><a href="#ref-for-animator-definition-1">5. Concepts</a>
+    <li><a href="#ref-for-animator-definition-2">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-definition-3">12. CSS Animator Notation</a> <a href="#ref-for-animator-definition-4">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="class-constructor">
    <b><a href="#class-constructor">#class-constructor</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-class-constructor-1">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-class-constructor-2">6. Creating an Animator</a>
+    <li><a href="#ref-for-class-constructor-1">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-class-constructor-2">7. Creating an Animator</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animate-function">
    <b><a href="#animate-function">#animate-function</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animate-function-1">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animate-function-2">9. Running Animators</a>
-    <li><a href="#ref-for-animate-function-3">11. CSS Animator Notation</a> <a href="#ref-for-animate-function-4">(2)</a> <a href="#ref-for-animate-function-5">(3)</a>
+    <li><a href="#ref-for-animate-function-1">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animate-function-2">10. Running Animators</a>
+    <li><a href="#ref-for-animate-function-3">12. CSS Animator Notation</a> <a href="#ref-for-animate-function-4">(2)</a> <a href="#ref-for-animate-function-5">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-slot-list">
    <b><a href="#animator-slot-list">#animator-slot-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-slot-list-1">4. Concepts</a>
-    <li><a href="#ref-for-animator-slot-list-2">7. Creating an Element Proxy</a>
-    <li><a href="#ref-for-animator-slot-list-3">8.2. Change in an element’s computed style</a>
+    <li><a href="#ref-for-animator-slot-list-1">5. Concepts</a>
+    <li><a href="#ref-for-animator-slot-list-2">8. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-slot-list-3">9.2. Change in an element’s computed style</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-timeline-options-list">
    <b><a href="#animator-timeline-options-list">#animator-timeline-options-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-timeline-options-list-1">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animator-timeline-options-list-2">8.3. Animator specifies a DocumentTimeline</a>
-    <li><a href="#ref-for-animator-timeline-options-list-3">8.4. Animator specifies a ScrollTimeline</a> <a href="#ref-for-animator-timeline-options-list-4">(2)</a>
-    <li><a href="#ref-for-animator-timeline-options-list-5">9. Running Animators</a>
+    <li><a href="#ref-for-animator-timeline-options-list-1">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-timeline-options-list-2">9.3. Animator specifies a DocumentTimeline</a>
+    <li><a href="#ref-for-animator-timeline-options-list-3">9.4. Animator specifies a ScrollTimeline</a> <a href="#ref-for-animator-timeline-options-list-4">(2)</a>
+    <li><a href="#ref-for-animator-timeline-options-list-5">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-slot">
    <b><a href="#animator-slot">#animator-slot</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-slot-1">4. Concepts</a>
-    <li><a href="#ref-for-animator-slot-2">11. CSS Animator Notation</a> <a href="#ref-for-animator-slot-3">(2)</a> <a href="#ref-for-animator-slot-4">(3)</a> <a href="#ref-for-animator-slot-5">(4)</a> <a href="#ref-for-animator-slot-6">(5)</a> <a href="#ref-for-animator-slot-7">(6)</a> <a href="#ref-for-animator-slot-8">(7)</a> <a href="#ref-for-animator-slot-9">(8)</a>
+    <li><a href="#ref-for-animator-slot-1">5. Concepts</a>
+    <li><a href="#ref-for-animator-slot-2">12. CSS Animator Notation</a> <a href="#ref-for-animator-slot-3">(2)</a> <a href="#ref-for-animator-slot-4">(3)</a> <a href="#ref-for-animator-slot-5">(4)</a> <a href="#ref-for-animator-slot-6">(5)</a> <a href="#ref-for-animator-slot-7">(6)</a> <a href="#ref-for-animator-slot-8">(7)</a> <a href="#ref-for-animator-slot-9">(8)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-input-property-list">
    <b><a href="#animator-input-property-list">#animator-input-property-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-input-property-list-1">7. Creating an Element Proxy</a>
-    <li><a href="#ref-for-animator-input-property-list-2">8.2. Change in an element’s computed style</a>
+    <li><a href="#ref-for-animator-input-property-list-1">8. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-input-property-list-2">9.2. Change in an element’s computed style</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-output-property-list">
    <b><a href="#animator-output-property-list">#animator-output-property-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-output-property-list-1">7. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-output-property-list-1">8. Creating an Element Proxy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-instance">
    <b><a href="#animator-instance">#animator-instance</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-instance-1">4. Concepts</a> <a href="#ref-for-animator-instance-2">(2)</a>
-    <li><a href="#ref-for-animator-instance-3">6. Creating an Animator</a> <a href="#ref-for-animator-instance-4">(2)</a> <a href="#ref-for-animator-instance-5">(3)</a>
-    <li><a href="#ref-for-animator-instance-6">7. Creating an Element Proxy</a> <a href="#ref-for-animator-instance-7">(2)</a> <a href="#ref-for-animator-instance-8">(3)</a>
-    <li><a href="#ref-for-animator-instance-9">8. Requesting Animation Frames</a>
-    <li><a href="#ref-for-animator-instance-10">8.1. Element proxy creation/removal</a> <a href="#ref-for-animator-instance-11">(2)</a>
-    <li><a href="#ref-for-animator-instance-12">9. Running Animators</a>
-    <li><a href="#ref-for-animator-instance-13">11. CSS Animator Notation</a> <a href="#ref-for-animator-instance-14">(2)</a> <a href="#ref-for-animator-instance-15">(3)</a> <a href="#ref-for-animator-instance-16">(4)</a> <a href="#ref-for-animator-instance-17">(5)</a>
+    <li><a href="#ref-for-animator-instance-1">5. Concepts</a> <a href="#ref-for-animator-instance-2">(2)</a>
+    <li><a href="#ref-for-animator-instance-3">7. Creating an Animator</a> <a href="#ref-for-animator-instance-4">(2)</a> <a href="#ref-for-animator-instance-5">(3)</a>
+    <li><a href="#ref-for-animator-instance-6">8. Creating an Element Proxy</a> <a href="#ref-for-animator-instance-7">(2)</a> <a href="#ref-for-animator-instance-8">(3)</a>
+    <li><a href="#ref-for-animator-instance-9">9. Requesting Animation Frames</a>
+    <li><a href="#ref-for-animator-instance-10">9.1. Element proxy creation/removal</a> <a href="#ref-for-animator-instance-11">(2)</a>
+    <li><a href="#ref-for-animator-instance-12">10. Running Animators</a>
+    <li><a href="#ref-for-animator-instance-13">12. CSS Animator Notation</a> <a href="#ref-for-animator-instance-14">(2)</a> <a href="#ref-for-animator-instance-15">(3)</a> <a href="#ref-for-animator-instance-16">(4)</a> <a href="#ref-for-animator-instance-17">(5)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-name">
    <b><a href="#animator-name">#animator-name</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-name-1">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-animator-name-2">6. Creating an Animator</a>
-    <li><a href="#ref-for-animator-name-3">11. CSS Animator Notation</a> <a href="#ref-for-animator-name-4">(2)</a> <a href="#ref-for-animator-name-5">(3)</a> <a href="#ref-for-animator-name-6">(4)</a> <a href="#ref-for-animator-name-7">(5)</a> <a href="#ref-for-animator-name-8">(6)</a> <a href="#ref-for-animator-name-9">(7)</a> <a href="#ref-for-animator-name-10">(8)</a> <a href="#ref-for-animator-name-11">(9)</a> <a href="#ref-for-animator-name-12">(10)</a> <a href="#ref-for-animator-name-13">(11)</a> <a href="#ref-for-animator-name-14">(12)</a> <a href="#ref-for-animator-name-15">(13)</a> <a href="#ref-for-animator-name-16">(14)</a> <a href="#ref-for-animator-name-17">(15)</a> <a href="#ref-for-animator-name-18">(16)</a> <a href="#ref-for-animator-name-19">(17)</a>
+    <li><a href="#ref-for-animator-name-1">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-animator-name-2">7. Creating an Animator</a>
+    <li><a href="#ref-for-animator-name-3">12. CSS Animator Notation</a> <a href="#ref-for-animator-name-4">(2)</a> <a href="#ref-for-animator-name-5">(3)</a> <a href="#ref-for-animator-name-6">(4)</a> <a href="#ref-for-animator-name-7">(5)</a> <a href="#ref-for-animator-name-8">(6)</a> <a href="#ref-for-animator-name-9">(7)</a> <a href="#ref-for-animator-name-10">(8)</a> <a href="#ref-for-animator-name-11">(9)</a> <a href="#ref-for-animator-name-12">(10)</a> <a href="#ref-for-animator-name-13">(11)</a> <a href="#ref-for-animator-name-14">(12)</a> <a href="#ref-for-animator-name-15">(13)</a> <a href="#ref-for-animator-name-16">(14)</a> <a href="#ref-for-animator-name-17">(15)</a> <a href="#ref-for-animator-name-18">(16)</a> <a href="#ref-for-animator-name-19">(17)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="root-element">
    <b><a href="#root-element">#root-element</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-root-element-1">8.4. Animator specifies a ScrollTimeline</a> <a href="#ref-for-root-element-2">(2)</a>
-    <li><a href="#ref-for-root-element-3">11. CSS Animator Notation</a> <a href="#ref-for-root-element-4">(2)</a> <a href="#ref-for-root-element-5">(3)</a>
+    <li><a href="#ref-for-root-element-1">9.4. Animator specifies a ScrollTimeline</a> <a href="#ref-for-root-element-2">(2)</a>
+    <li><a href="#ref-for-root-element-3">12. CSS Animator Notation</a> <a href="#ref-for-root-element-4">(2)</a> <a href="#ref-for-root-element-5">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="element-proxy-map">
    <b><a href="#element-proxy-map">#element-proxy-map</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-element-proxy-map-1">5. Registering an Animator Definition</a>
-    <li><a href="#ref-for-element-proxy-map-2">9. Running Animators</a>
+    <li><a href="#ref-for-element-proxy-map-1">6. Registering an Animator Definition</a>
+    <li><a href="#ref-for-element-proxy-map-2">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="element-proxy">
    <b><a href="#element-proxy">#element-proxy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-element-proxy-1">4. Concepts</a>
-    <li><a href="#ref-for-element-proxy-2">7. Creating an Element Proxy</a> <a href="#ref-for-element-proxy-3">(2)</a>
-    <li><a href="#ref-for-element-proxy-4">8.2. Change in an element’s computed style</a> <a href="#ref-for-element-proxy-5">(2)</a>
-    <li><a href="#ref-for-element-proxy-6">11. CSS Animator Notation</a> <a href="#ref-for-element-proxy-7">(2)</a> <a href="#ref-for-element-proxy-8">(3)</a> <a href="#ref-for-element-proxy-9">(4)</a> <a href="#ref-for-element-proxy-10">(5)</a>
+    <li><a href="#ref-for-element-proxy-1">5. Concepts</a>
+    <li><a href="#ref-for-element-proxy-2">8. Creating an Element Proxy</a> <a href="#ref-for-element-proxy-3">(2)</a>
+    <li><a href="#ref-for-element-proxy-4">9.2. Change in an element’s computed style</a> <a href="#ref-for-element-proxy-5">(2)</a>
+    <li><a href="#ref-for-element-proxy-6">12. CSS Animator Notation</a> <a href="#ref-for-element-proxy-7">(2)</a> <a href="#ref-for-element-proxy-8">(3)</a> <a href="#ref-for-element-proxy-9">(4)</a> <a href="#ref-for-element-proxy-10">(5)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="proxied-element">
    <b><a href="#proxied-element">#proxied-element</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-proxied-element-1">7. Creating an Element Proxy</a> <a href="#ref-for-proxied-element-2">(2)</a> <a href="#ref-for-proxied-element-3">(3)</a> <a href="#ref-for-proxied-element-4">(4)</a>
+    <li><a href="#ref-for-proxied-element-1">8. Creating an Element Proxy</a> <a href="#ref-for-proxied-element-2">(2)</a> <a href="#ref-for-proxied-element-3">(3)</a> <a href="#ref-for-proxied-element-4">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-name-to-animator-definition-map">
    <b><a href="#animator-name-to-animator-definition-map">#animator-name-to-animator-definition-map</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animator-name-to-animator-definition-map-1">5. Registering an Animator Definition</a> <a href="#ref-for-animator-name-to-animator-definition-map-2">(2)</a>
-    <li><a href="#ref-for-animator-name-to-animator-definition-map-3">6. Creating an Animator</a>
-    <li><a href="#ref-for-animator-name-to-animator-definition-map-4">7. Creating an Element Proxy</a>
-    <li><a href="#ref-for-animator-name-to-animator-definition-map-5">8.2. Change in an element’s computed style</a>
-    <li><a href="#ref-for-animator-name-to-animator-definition-map-6">9. Running Animators</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-1">6. Registering an Animator Definition</a> <a href="#ref-for-animator-name-to-animator-definition-map-2">(2)</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-3">7. Creating an Animator</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-4">8. Creating an Element Proxy</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-5">9.2. Change in an element’s computed style</a>
+    <li><a href="#ref-for-animator-name-to-animator-definition-map-6">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator">
    <b><a href="#dom-animationworkletglobalscope-registeranimator">#dom-animationworkletglobalscope-registeranimator</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-1">3. Animation Worklet</a>
-    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-2">5. Registering an Animator Definition</a>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-1">4. Animation Worklet</a>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator-2">6. Registering an Animator Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="parsing-an-animator-slot-list">
    <b><a href="#parsing-an-animator-slot-list">#parsing-an-animator-slot-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-parsing-an-animator-slot-list-1">5. Registering an Animator Definition</a>
+    <li><a href="#ref-for-parsing-an-animator-slot-list-1">6. Registering an Animator Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="parsing-an-animator-property-list">
    <b><a href="#parsing-an-animator-property-list">#parsing-an-animator-property-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-parsing-an-animator-property-list-1">5. Registering an Animator Definition</a> <a href="#ref-for-parsing-an-animator-property-list-2">(2)</a>
+    <li><a href="#ref-for-parsing-an-animator-property-list-1">6. Registering an Animator Definition</a> <a href="#ref-for-parsing-an-animator-property-list-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="parsing-an-animator-timeline-options-list">
    <b><a href="#parsing-an-animator-timeline-options-list">#parsing-an-animator-timeline-options-list</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-parsing-an-animator-timeline-options-list-1">5. Registering an Animator Definition</a>
+    <li><a href="#ref-for-parsing-an-animator-timeline-options-list-1">6. Registering an Animator Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="-animator-name-root-element-to-instance-map">
    <b><a href="#-animator-name-root-element-to-instance-map">#-animator-name-root-element-to-instance-map</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for--animator-name-root-element-to-instance-map-1">6. Creating an Animator</a>
-    <li><a href="#ref-for--animator-name-root-element-to-instance-map-2">9. Running Animators</a>
+    <li><a href="#ref-for--animator-name-root-element-to-instance-map-1">7. Creating an Animator</a>
+    <li><a href="#ref-for--animator-name-root-element-to-instance-map-2">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="create-a-new-animator-instance">
    <b><a href="#create-a-new-animator-instance">#create-a-new-animator-instance</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-create-a-new-animator-instance-1">9. Running Animators</a>
+    <li><a href="#ref-for-create-a-new-animator-instance-1">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="elementproxy">
    <b><a href="#elementproxy">#elementproxy</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-elementproxy-1">7. Creating an Element Proxy</a> <a href="#ref-for-elementproxy-2">(2)</a>
+    <li><a href="#ref-for-elementproxy-1">8. Creating an Element Proxy</a> <a href="#ref-for-elementproxy-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-elementproxy-outputstylemap">
    <b><a href="#dom-elementproxy-outputstylemap">#dom-elementproxy-outputstylemap</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-elementproxy-outputstylemap-1">7. Creating an Element Proxy</a>
+    <li><a href="#ref-for-dom-elementproxy-outputstylemap-1">8. Creating an Element Proxy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="update-proxy-input-style-map">
    <b><a href="#update-proxy-input-style-map">#update-proxy-input-style-map</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-update-proxy-input-style-map-1">7. Creating an Element Proxy</a>
+    <li><a href="#ref-for-update-proxy-input-style-map-1">8. Creating an Element Proxy</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animation-requested-flag">
    <b><a href="#animation-requested-flag">#animation-requested-flag</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-animation-requested-flag-1">4. Concepts</a>
-    <li><a href="#ref-for-animation-requested-flag-2">6. Creating an Animator</a>
-    <li><a href="#ref-for-animation-requested-flag-3">8. Requesting Animation Frames</a> <a href="#ref-for-animation-requested-flag-4">(2)</a>
-    <li><a href="#ref-for-animation-requested-flag-5">8.1. Element proxy creation/removal</a>
-    <li><a href="#ref-for-animation-requested-flag-6">8.2. Change in an element’s computed style</a>
-    <li><a href="#ref-for-animation-requested-flag-7">8.3. Animator specifies a DocumentTimeline</a>
-    <li><a href="#ref-for-animation-requested-flag-8">8.4. Animator specifies a ScrollTimeline</a>
-    <li><a href="#ref-for-animation-requested-flag-9">9. Running Animators</a> <a href="#ref-for-animation-requested-flag-10">(2)</a>
+    <li><a href="#ref-for-animation-requested-flag-1">5. Concepts</a>
+    <li><a href="#ref-for-animation-requested-flag-2">7. Creating an Animator</a>
+    <li><a href="#ref-for-animation-requested-flag-3">9. Requesting Animation Frames</a> <a href="#ref-for-animation-requested-flag-4">(2)</a>
+    <li><a href="#ref-for-animation-requested-flag-5">9.1. Element proxy creation/removal</a>
+    <li><a href="#ref-for-animation-requested-flag-6">9.2. Change in an element’s computed style</a>
+    <li><a href="#ref-for-animation-requested-flag-7">9.3. Animator specifies a DocumentTimeline</a>
+    <li><a href="#ref-for-animation-requested-flag-8">9.4. Animator specifies a ScrollTimeline</a>
+    <li><a href="#ref-for-animation-requested-flag-9">10. Running Animators</a> <a href="#ref-for-animation-requested-flag-10">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="frame-requested">
    <b><a href="#frame-requested">#frame-requested</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-frame-requested-1">8. Requesting Animation Frames</a>
-    <li><a href="#ref-for-frame-requested-2">8.1. Element proxy creation/removal</a>
-    <li><a href="#ref-for-frame-requested-3">8.2. Change in an element’s computed style</a>
-    <li><a href="#ref-for-frame-requested-4">8.3. Animator specifies a DocumentTimeline</a>
-    <li><a href="#ref-for-frame-requested-5">8.4. Animator specifies a ScrollTimeline</a>
-    <li><a href="#ref-for-frame-requested-6">9. Running Animators</a>
+    <li><a href="#ref-for-frame-requested-1">9. Requesting Animation Frames</a>
+    <li><a href="#ref-for-frame-requested-2">9.1. Element proxy creation/removal</a>
+    <li><a href="#ref-for-frame-requested-3">9.2. Change in an element’s computed style</a>
+    <li><a href="#ref-for-frame-requested-4">9.3. Animator specifies a DocumentTimeline</a>
+    <li><a href="#ref-for-frame-requested-5">9.4. Animator specifies a ScrollTimeline</a>
+    <li><a href="#ref-for-frame-requested-6">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="frame-current">
    <b><a href="#frame-current">#frame-current</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-frame-current-1">6. Creating an Animator</a>
-    <li><a href="#ref-for-frame-current-2">8. Requesting Animation Frames</a> <a href="#ref-for-frame-current-3">(2)</a>
-    <li><a href="#ref-for-frame-current-4">9. Running Animators</a>
+    <li><a href="#ref-for-frame-current-1">7. Creating an Animator</a>
+    <li><a href="#ref-for-frame-current-2">9. Requesting Animation Frames</a> <a href="#ref-for-frame-current-3">(2)</a>
+    <li><a href="#ref-for-frame-current-4">10. Running Animators</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="run-animators">
    <b><a href="#run-animators">#run-animators</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-run-animators-1">9. Running Animators</a> <a href="#ref-for-run-animators-2">(2)</a>
+    <li><a href="#ref-for-run-animators-1">10. Running Animators</a> <a href="#ref-for-run-animators-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="propdef-animator-root">
    <b><a href="#propdef-animator-root">#propdef-animator-root</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-propdef-animator-root-1">7. Creating an Element Proxy</a>
-    <li><a href="#ref-for-propdef-animator-root-2">11. CSS Animator Notation</a>
+    <li><a href="#ref-for-propdef-animator-root-1">8. Creating an Element Proxy</a>
+    <li><a href="#ref-for-propdef-animator-root-2">12. CSS Animator Notation</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="propdef-animator">
    <b><a href="#propdef-animator">#propdef-animator</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-propdef-animator-1">7. Creating an Element Proxy</a>
-    <li><a href="#ref-for-propdef-animator-2">11. CSS Animator Notation</a>
+    <li><a href="#ref-for-propdef-animator-1">8. Creating an Element Proxy</a>
+    <li><a href="#ref-for-propdef-animator-2">12. CSS Animator Notation</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
