@@ -209,7 +209,7 @@ called, the user agent <em>must</em> run the following steps:
     3. If |paintDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
         "<a>InvalidModificationError</a>" <a>DOMException</a> and abort all these steps.
 
-    4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>
+    4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>.
 
     5. Let |inputPropertiesIterable| be the result of <a>Get</a>(|paintCtor|, "inputProperties").
 
