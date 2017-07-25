@@ -258,9 +258,6 @@ interface Fragment {
     readonly attribute double inlineSize;
     readonly attribute double blockSize;
 
-    readonly attribute double inlineOverflowSize;
-    readonly attribute double blockOverflowSize;
-
     attribute double inlineOffset;
     attribute double blockOffset;
 
@@ -278,10 +275,6 @@ the respective child's layout algorithm. They cannot be changed. If the <a>curre
 requires a different {{Fragment/inlineSize}} or {{Fragment/blockSize}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments in order to get different
 results.
-
-The {{Fragment}} has {{Fragment/inlineOverflowSize}} and {{Fragment/blockOverflowSize}} attributes.
-This is the size of the overflow area of the fragment. If the fragment didn't overflow these
-attributes will be the same as {{Fragment/inlineSize}} and {{Fragment/blockSize}} respectively.
 
 The author inside the current layout can position a resulting {{Fragment}} by setting its
 {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} attributes. If not set by the author they
@@ -335,16 +328,13 @@ registerLayout('block-like', class extends Layout {
             blockOffset += fragment.blockSize;
         }
 
-        const inlineOverflowSize = maxChildInlineSize + bordersAndPadding.inlineEnd;
-        const blockOverflowSize = blockOffset + bordersAndPadding.blockEnd;
+        const contentSize = blockOffset + bordersAndPadding.blockEnd;
         const blockSize = resolveBlockSize(
-            constraintSpace, styleMap, blockOverflowSize);
+            constraintSpace, styleMap, contentSize);
 
         return {
             inlineSize: inlineSize,
             blockSize: blockSize,
-            inlineOverflowSize: inlineOverflowSize,
-            blockOverflowSize: blockOverflowSize,
             childFragments: childFragments,
         };
     }
@@ -380,9 +370,6 @@ interface ConstraintSpace {
 
     readonly attribute double percentageInlineSize;
     readonly attribute double percentageBlockSize;
-
-    readonly attribute boolean inlineOverflow;
-    readonly attribute boolean blockOverflow;
 
     readonly attribute BlockFragmentationType blockFragmentationType;
 };
@@ -481,8 +468,6 @@ registerLayout('flex-distribution-like', class {
         return {
             inlineSize: inlineSize,
             blockSize: blockSize,
-            inlineOverflowSize: Math.max(inlineSize, totalSize),
-            blockOverflowSize: maxChildBlockSize,
             childFragments: childFragments,
         };
     }
@@ -573,7 +558,6 @@ registerLayout('basic-inline', class extends Layout {
                                    scrollbarSize.block;
 
         const childFragments = [];
-        let maxInlineSize = 0;
 
         let currentLine = [];
         let usedInlineSize = 0;
@@ -584,10 +568,6 @@ registerLayout('basic-inline', class extends Layout {
 
         // Just a small little function which will update the above variables.
         const nextLine = function() {
-            if (usedInlineSize > maxInlineSize) {
-                maxInlineSize = usedInlineSize;
-            }
-
             currentLine = [];
             usedInlineSize = 0;
             maxBaseline = 0;
@@ -668,19 +648,17 @@ registerLayout('basic-inline', class extends Layout {
 
         // Determine our block size.
         nextLine();
-        const blockOverflowSize = lineOffset +
+        const contentSize = lineOffset +
                                   bordersAndPadding.blockStart +
                                   bordersAndPadding.blockEnd;
         const blockSize = resolveBlockSize(constraintSpace,
                                            styleMap,
-                                           blockOverflowSize);
+                                           contentSize);
 
         // Return our fragment.
         const result = {
             inlineSize: inlineSize,
             blockSize: blockSize,
-            inlineOverflowSize: maxInlineSize,
-            blockOverflowSize: blockOverflowSize,
             childFragments: childFragments,
         }
 
@@ -866,6 +844,7 @@ map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is calle
 The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout class instances</dfn>. Initially
 this map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
+<div algorithm>
 When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
 is called, the user agent <em>must</em> run the following steps:
     1. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
@@ -991,6 +970,7 @@ is called, the user agent <em>must</em> run the following steps:
         }
     </pre>
 </div>
+</div>
 
 Layout Engine {#layout-engine}
 ------------------------------
@@ -1076,8 +1056,6 @@ Performing Layout {#performing-layout}
 dictionary FragmentResultOptions {
     double inlineSize = 0;
     double blockSize = 0;
-    double inlineOverflowSize = null;
-    double blockOverflowSize = null;
     sequence&lt;Fragment> childFragments = [];
     BreakTokenOptions breakToken = null;
     double alignmentBaseline = null;
@@ -1200,29 +1178,6 @@ context</a> for a given |box|, |constraintSpace|, |children| and an optional |br
       - The <a>inline size</a> is set to |fragmentResult|'s {{FragmentResultOptions/inlineSize}}.
 
       - The <a>block size</a> is set to |fragmentResult|'s {{FragmentResultOptions/blockSize}}.
-
-      - The <b>inline overflow size</b> is set to |fragmentResult|'s
-          {{FragmentResultOptions/inlineOverflowSize}} if not null, otherwise it is set to
-          {{FragmentResultOptions/inlineSize}}.
-
-          Issue: REMOVE THIS.
-
-      - The <b>block overflow size</b> is set to |fragmentResult|'s
-          {{FragmentResultOptions/blockOverflowSize}} if not null, otherwise it is set to
-          {{FragmentResultOptions/blockSize}}.
-
-          If the |constraintSpace|'s {{ConstraintSpace/inlineOverflow}} is <code>false</code> and
-          the <b>inline overflow size</b> is greater than the <a>inline size</a> and the <a>computed
-          value</a> for <a>inline</a> 'overflow' is ''overflow/auto'' then set |constraintSpace|'s
-          {{ConstraintSpace/inlineOverflow}} to <code>true</code>.
-
-          If the |constraintSpace|'s {{ConstraintSpace/blockOverflow}} is <code>false</code> and the
-          <b>block overflow size</b> is greater than the <a>block size</a> and the <a>computed
-          value</a> for <a>block</a> 'overflow' is ''overflow/auto'' then set |constraintSpace|'s
-          {{ConstraintSpace/blockOverflow}} to <code>true</code>.
-
-          If either {{ConstraintSpace/inlineOverflow}} or {{ConstraintSpace/blockOverflow}} were set
-          in the above steps, restart this algorithm with the updated |constraintSpace|.
 
           Note: In a future level of the specification there may be a way to more efficiently abort
               a layout given a "scroll trigger line" on the constraint space.
