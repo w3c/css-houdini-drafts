@@ -2060,9 +2060,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
 --------------------------------------------------
 
 {{CSSPositionValue}} objects represent <<position>> values,
-used by properties such as 'background-position'.
+used by properties such as 'object-position'.
 
-Issue(312): background-position is a shorthand
+Issue(312): object-position is a shorthand
 
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
@@ -2111,7 +2111,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
     <pre class='lang-css'>
     .example {
-        background-position: center bottom 10px;
+        object-position: center bottom 10px;
     }
     </pre>
 
@@ -2120,10 +2120,10 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     <pre class='lang-javascript'>
     let map = document.querySelector('.example').styleMap;
 
-    map.get('background-position').x;
+    map.get('object-position').x;
     // CSS.percent(50)
 
-    map.get('background-position').y;
+    map.get('object-position').y;
     // CSSMathSum(CSS.percent(100), CSS.px(-10))
     </pre>
 </div>
