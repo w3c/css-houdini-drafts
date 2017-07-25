@@ -307,6 +307,13 @@ the [=property model=]. This list of properties is sorted in the following manne
 *   custom properties are sorted by increasing code point order.
 *   custom properties are sorted after normal properties.
 
+The getProperties() method returns the following for custom properties:
+* For Inline StylePropertyMap it should return the custom properties that are set on the inline style of the current Node.
+* For Declared StylePropertyMap, should return the custom properties defined in the current style rule.
+* For Computed StylePropertyMap it should return all custom properties defined on the current Node and its ancestors. Please note that only custom properties that have an initial value show up in the Computed StylePropertyMap.
+
+The method should also warn authors about performance issues if they type untyped custom properties.
+
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
