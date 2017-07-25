@@ -256,7 +256,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
-    This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, por fails and throws a {{TypeError}}:
+    This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, or fails and throws a {{TypeError}}:
         : If |value| is a {{CSSStyleValue}},
         :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
             [=throw=] a {{TypeError}} and exit this algorithm.
@@ -312,9 +312,9 @@ the [=property model=]. This list of properties is sorted in the following manne
 *   custom properties are sorted by increasing code point order.
 *   custom properties are sorted after normal properties.
 
-Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
+[=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
 
-Issue(149): describe that these are not live objects
+Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
 Issue(268): stringification
 
@@ -2063,9 +2063,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 --------------------------------------------------
 
 {{CSSPositionValue}} objects represent <<position>> values,
-used by properties such as 'background-position'.
-
-Issue(312): background-position is a shorthand
+used by properties such as 'object-position'.
 
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
@@ -2114,7 +2112,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
     <pre class='lang-css'>
     .example {
-        background-position: center bottom 10px;
+        object-position: center bottom 10px;
     }
     </pre>
 
@@ -2123,10 +2121,10 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     <pre class='lang-javascript'>
     let map = document.querySelector('.example').styleMap;
 
-    map.get('background-position').x;
+    map.get('object-position').x;
     // CSS.percent(50)
 
-    map.get('background-position').y;
+    map.get('object-position').y;
     // CSSMathSum(CSS.percent(100), CSS.px(-10))
     </pre>
 </div>
