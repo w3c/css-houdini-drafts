@@ -250,18 +250,23 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     5. Let |values to append| be the empty list.
 
-    6. For each |value| in |values|:
+    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
+
+    7. Append |values to append| to the end of |entry|’s list. 
+</div>
+
+<div algorithm>
+    This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, or fails and throws a {{TypeError}}:
         : If |value| is a {{CSSStyleValue}},
         :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
             [=throw=] a {{TypeError}} and exit this algorithm.
-            Otherwise, append |value| to the end of |values to append|.
+            Otherwise, return the |value|.
         : If |value| is a {{DOMString}},
-        ::    [=Parse a CSSStyleValue=] with property |property| and value |value|.
+        ::    [=Parse a CSSStyleValue=] with property |property| and value |value| and return the resulting |value|.
             If the result is null,
             [=throw=] a {{TypeError}} and exit this algorithm.
-            Otherwise, append each [=list-valued property iteration=] in the result to the end of |values to append|.
-
-    7. Append |values to append| to the end of |entry|’s list.
+            Otherwise, append each [=list-valued property iteration=] in the result to a |values to append| object
+            and return |values to append|.
 </div>
 
 <div algorithm>
@@ -307,11 +312,9 @@ the [=property model=]. This list of properties is sorted in the following manne
 *   custom properties are sorted by increasing code point order.
 *   custom properties are sorted after normal properties.
 
-Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
+[=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
-
-Issue(149): describe that these are not live objects
 
 Issue(268): stringification
 
@@ -2060,9 +2063,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 --------------------------------------------------
 
 {{CSSPositionValue}} objects represent <<position>> values,
-used by properties such as 'background-position'.
-
-Issue(312): background-position is a shorthand
+used by properties such as 'object-position'.
 
 <pre class='idl'>
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
@@ -2111,7 +2112,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
     <pre class='lang-css'>
     .example {
-        background-position: center bottom 10px;
+        object-position: center bottom 10px;
     }
     </pre>
 
@@ -2120,10 +2121,10 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     <pre class='lang-javascript'>
     let map = document.querySelector('.example').styleMap;
 
-    map.get('background-position').x;
+    map.get('object-position').x;
     // CSS.percent(50)
 
-    map.get('background-position').y;
+    map.get('object-position').y;
     // CSSMathSum(CSS.percent(100), CSS.px(-10))
     </pre>
 </div>
