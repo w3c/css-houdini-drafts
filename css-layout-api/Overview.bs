@@ -63,6 +63,10 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
+urlPrefix: https://drafts.csswg.org/css-display-3/#; type: dfn
+    text: flow layout
+urlPrefix: https://drafts.csswg.org/css-sizing/#; type: dfn
+    text: intrinsic sizes
 </pre>
 
 Introduction {#intro}
@@ -733,6 +737,9 @@ name to child input properties map</dfn>. Initially these maps are empty and are
 Each <a>box</a> has an associated <dfn>layout valid flag</dfn>. It may be either
 <dfn>layout-valid</dfn> or <dfn>layout-invalid</dfn>. It is initially set to <a>layout-invalid</a>.
 
+TODO comments. <dfn>content size valid flag</dfn>. <dfn>content-size-valid</dfn>.
+<dfn>content-size-invalid</dfn>.
+
 Issue: The above flag is too restrictive on user agents, change.
 
 When the computed style for a |box| changes, the user agent must run the following steps:
@@ -846,7 +853,8 @@ The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout definitions</df
 map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
 The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout class instances</dfn>. Initially
-this map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+this map is empty; it is populated when the user agent calls either <a>determine the content
+size</a> or <a>generate a fragment</a> for a <a>box</a>.
 
 <div algorithm>
 When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
@@ -1089,6 +1097,11 @@ dictionary ContentSizeResultOptions {
     double maxContentSize;
     double minContentSize;
 };
+
+interface ContentSize {
+  readonly attribute double minContentSize;
+  readonly attribute double maxContentSize;
+};
 </pre>
 
 Issue: Specify how we do min/max content contributions.
@@ -1096,6 +1109,199 @@ Issue: Specify how we do min/max content contributions.
 Issue: Need to specify that the {{LayoutChild}} objects should remain the same between layouts so
     the author can store information? Not sure.
 
+<div algorithm="determine the content size">
+When the user agent wants to <dfn>determine the content size</dfn> of a <a>layout API formatting
+context</a> for a given |box|, |childBoxes| it <em>must</em> run the following steps:
+
+    1. Let |layoutFunction| be the <<layout()>> for the <a>computed value</a> of <<display-inside>>
+        for |box|.
+
+    2. If the <a>content size valid flag</a> for the |layoutFunction| is <a>content-size-valid</a>
+        the user agent <em>may</em> use the content size from the previous invocation. If so it
+        <em>may</em> abort all these steps and use the previous value for the content sizes.
+
+    3. Set the <a>content size valid flag</a> for the |layoutFunction| to <a>content-size-valid</a>.
+
+    4. Let |name| be the first argument of the |layoutFunction|.
+
+    5. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document layout
+        definitions</a> map.
+
+    6. If |documentLayoutDefinitionMap|[|name|] does not <a for=map>exist</a>, let the |box|
+        fallback to the <a>flow layout</a> and abort all these steps.
+
+    7. Let |documentDefinition| be the result of <a for=map>get</a>
+        |documentLayoutDefinitionMap|[|name|].
+
+    8. If |documentDefinition| is <code>"invalid"</code>, let the |box| fallback to the <a>flow
+        layout</a> and abort all these steps.
+
+    9. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
+        WorkletGlobalScopes</a> fomr the layout {{Worklet}}.
+
+        The user agent <em>must</em> have, and select from at least two
+        {{LayoutWorkletGlobalScope}}s in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>,
+        unless the user agent is under memory constraints.
+
+        Note: This is to ensure that authers do not rely on being able to store state on the global
+            object or non-regeneratable state on the class.
+
+        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        layout {{Worklet}}.
+
+    10. Run <a>invoke a content size callback</a> given |name|, |box|, |childBoxes|, and
+        |workletGlobalScope| optionally <a>in parallel</a>.
+
+        Note: If the user agent runs <a>invoke a content size callback</a> on a thread <a>in
+            parallel</a>, it should select a layout worklet global scope which can be used on that
+            thread.
+</div>
+
+<div algorithm="invoke a content size callback">
+When the user agent wants to <dfn>invoke a content size callback</dfn> given |name|, |box|,
+|childBoxes|, and |workletGlobalScope|, it <em>must</em> run the following steps:
+
+    1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
+        |workletGlobalScope|.
+
+        If |definition| is <code>"null"</code>, (i.e. <a>get a layout definition</a> failed), let
+        the |box| fallback to the <a>flow layout</a> and abort all these steps.
+
+    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |name|, |box|,
+        |definition|, |workletGlobalScope|.
+
+        If |layoutInstance| is <code>"null"</code>, (i.e. <a>get a layout class instance</a> failed),
+        let |box| fallback to the <a>flow layout</a> and abort all these steps.
+
+    3. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
+
+    4. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
+        properties</a>.
+
+    5. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+        <a>computed value</a>'s for properties listed in |inputProperties| for |box|.
+
+    6. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
+        represent |childBoxes|.
+
+        The {{LayoutChild/styleMap}} on each {{LayoutChild}} should be a new
+        {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed value</a>'s for
+        properties listed in |childInputProperties|.
+
+    7. Let |contentSizeGeneratorFunction| be |definition|'s <a>content size generator function</a>.
+
+    8. Let |contentSizeGenerator| be the result of <a>Invoke</a>(|contentSizeGeneratorFunction|,
+        |layoutInstance|, «|styleMap|, |children|»).
+
+        If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
+        all these steps.
+
+    9. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>,
+        |contentSizeGenerator|).
+
+        If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
+        all these steps.
+
+    10. Perform the following substeps until the result of <a>Get</a>(|nextResult|,
+        <code>"done"</code>) is <code>true</code>.
+
+        1. Let |childContentSizeRequests| be the result of <a>Get</a>(|nextResult|,
+            <code>"value"</code>).
+
+        2. Let |childContentSizes| be an <a for=list>empty</a> <a>list</a>.
+
+        3. <a for=list>For each</a> |childRequest| in |childContentSizeRequests| perform the
+            following substeps:
+
+            1. If |childRequest| is not a {{ContentSizeRequest}} then let |box| fallback to the
+                <a>flow layout</a> and abort all these steps.
+
+            2. Let |layoutChild| be result of looking up the internal slot
+                <code>\[[layoutChild]]</code> on |childRequest|.
+
+            3. Let |childContentSize| be a new {{ContentSize}} with:
+
+                - {{ContentSize/minContentSize}} being |layoutChild|'s <a>min-content size</a>.
+
+                - {{ContentSize/maxContentSize}} being |layoutChild|'s <a>max-content size</a>.
+
+            4. <a for=list>Append</a> |childContentSize| to |childContentSizes|.
+
+            The user agent may perform this loop out of order, and <a>in parallel</a>. The ordering
+            for |childContentSizes| and |childContentSizeRequests| <em>must</em> be consistent.
+
+        4. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>,
+            |contentSizeGenerator|, |childContentSizes|).
+
+            If an exception is <a>thrown</a> then let |box| fallback to the <a>flow layout</a> and
+            abort all these steps.
+
+    11. Let |contentSizeValue| be the result of calling <a>Get</a>(|nextResult|,
+        <code>"value"</code>).
+
+    12. Let |contentSize| be the result of <a>converting</a> |contentSizeValue| to a
+        {{ContentSizeResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
+        <a>flow layout</a> and abort all these steps.
+
+    13. Set the <a>intrinsic sizes</a> of |box|:
+
+        - Let |contentSize|'s {{ContentSizeResultOptions/minContentSize}} be the <a>min-content
+            size</a> of |box|.
+
+        - Let |contentSize|'s {{ContentSizeResultOptions/maxContentSize}} be the <a>max-content
+            size</a> of |box|.
+</div>
+
+<div algorithm="get a layout definition">
+When the user agent wants to <dfn>get a layout definition</dfn> given |name|, and
+|workletGlobalScope|, it <em>must</em> run the following steps:
+
+    1. Let |layoutDefinitionMap| be |workletGlobalScope|'s <a>layout definitions</a> map.
+
+    2. If |layoutDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following steps:
+
+        1. <a>Queue a task</a> to run the following steps:
+
+            1. Let |documentLayoutDefinitionMap| be the associated <a>document</a>'s <a>document
+                layout definition</a> map.
+
+            2. <a for=map>Set</a> |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
+
+            3. The user agent <em>should</em> log an error to the debugging console stating that a
+                class wasn't registered in all {{LayoutWorkletGlobalScope}}s.
+
+        2. Return <code>"null"</code>, and abort all these steps.
+
+    3. Return the result of <a>get</a> |layoutDefinitionMap|[|name|].
+</div>
+
+<div algorithm="get a layout class instance">
+When the user agent wants to <dfn>get a layout class instance</dfn> given |name|, |box|,
+|definition|, and |workletGlobalScope|, it <em>must</em> run the following steps:
+
+    1. Let |layoutClassInstanceMap| be |workletGlobalScope|'s <a>layout class instances</a> map.
+
+    2. Let |key| be a stable <a for=map>key</a> which is unique to |box| and |name|.
+
+    3. Let |layoutInstance| be the result of <a>get</a> |layoutClassInstanceMap|[|key|]. If
+        |layoutInstance| is null, run the following steps:
+
+        1. If the <a>constructor valid flag</a> on |definition| is false, let |box| fallback to the
+            <a>flow layout</a> and a abort all these steps.
+
+        2. Let |layoutCtor| be the <a>class constructor</a> on |definition|.
+
+        3. Let |layoutInstance| be the result of <a>Construct</a>(|layoutCtor|).
+
+            If <a>construct</a> throws an exception, set the |definition|'s <a>constructor valid
+            flag</a> to false, then return <code>"null"</code> and abort all these steps.
+
+        4. <a for=map>Set</a> |layoutClassInstanceMap|[|key|] to |layoutInstance|.
+
+    4. Return |layoutInstance|.
+</div>
+
+<div algorithm="generate a fragment">
 When the user agent wants to <dfn>generate a fragment</dfn> of a <a>layout API formatting
 context</a> for a given |box|, |constraintSpace|, |children| and an optional |breakToken| it
 <em>must</em> run the following steps:
@@ -1229,3 +1435,4 @@ context</a> for a given |box|, |constraintSpace|, |children| and an optional |br
               - The {{FragmentResultOptions/blockSize}} of the fragment.
 
     15. Return |fragment|.
+</div>

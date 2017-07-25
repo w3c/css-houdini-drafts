@@ -539,8 +539,8 @@ following steps:
         in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>, unless the user agent is under
         memory constraints.
 
-        Note: This is to ensure that authors do not rely on being able to store state on the class
-            or global object.
+        Note: This is to ensure that authors do not rely on being able to store state on the global
+            object or non-regeneratable state on the class.
 
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         paint {{Worklet}}.
@@ -591,7 +591,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
 
         3. Let |paintInstance| be the result of <a>Construct</a>(|paintCtor|).
 
-            If <a>Construct</a> throws an exception, set the |definition|'s <a>constructor valid
+            If <a>construct</a> throws an exception, set the |definition|'s <a>constructor valid
             flag</a> to false, let the image output be an <a>invalid image</a> and abort all these
             steps.
 
