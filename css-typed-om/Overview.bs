@@ -250,14 +250,13 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     5. Let |values to append| be the empty list.
 
-    6. For each |value| in |values| if the [=algorithm to check if any given value is of a certain type=] described below exits 
-        gracefully append the returned object to |values to append|
+    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
 
     7. Append |values to append| to the end of |entry|’s list. 
 </div>
 
 <div algorithm>
-    This section describes the <dfn>algorithm to check if any given |value| is of a certain type</dfn>:
+    This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, por fails and throws a {{TypeError}}:
         : If |value| is a {{CSSStyleValue}},
         :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
             [=throw=] a {{TypeError}} and exit this algorithm.
