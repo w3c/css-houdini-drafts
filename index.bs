@@ -89,13 +89,6 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 }
 </pre>
 
-Deprecated {#deprecated}
-========================
-<strong>The contents of this document are out of date and in need of large re-write to cover
-changes to the AnimationWorklet API</strong>.
-
-For now, please refer to our [[explainer]] for more up-to-date content.
-
 Introduction {#intro}
 =====================
 This document introduces a new primitive for creating scroll-linked and other high performance
@@ -474,11 +467,10 @@ Worklet Animation timing model {#timing-model}
 The section describes how <a>worklet animation</a> timing model differs from other <a>animations</a>.
 
 In addition to existing conditions on when the <a>animation</a> is considered <a>ready</a>, a
- <a>Worklet animation</a> readiness also depends on the following condition to be true:
+<a>Worklet animation</a> readiness also depends on the following condition to be true:
 
-   - the user agent has completed any setup required to create the <a>worklet animation</a>'s
-      corresponding <a>animator instance</a>.
-
+  - the user agent has completed any setup required to create the <a>worklet animation</a>'s
+     corresponding <a>animator instance</a>.
 
 As mentioned earlier, the <a>worklet animation</a>'s <a>current time</a> does not directly determine
 its effect's <a>local time</a> (via its <a>inherited time</a>) but instead the associated
@@ -490,14 +482,14 @@ means that the
 Here are a few implications of the above semantics:
 
  - Seeking current time of a <a>Worklet Animation</a> does not necessarily change its output. So
-   setting the animation <a>start time</a> or <a>current time</a> is not going to necessarily change
-   it but can change the animation <a>play state</a>.
+    setting the animation <a>start time</a> or <a>current time</a> is not going to necessarily change
+    it but can change the animation <a>play state</a>.
  - Similarly invoking {{Animation/finish()}} or updating <a>animation</a>'s <a>playback rate</a> will
     only change the animation <a>play state</a>.
  - Querying the animation effect's local time using {{AnimationEffectReadOnly/getComputedTiming()}}
-   returns the last known value set in the {{animationWorklet}} global scope and synced back to the
-   main thread. In cases where the <a>animator instance</a> is running is a parallel execution
-   context this value may be stale.
+    returns the last known value set in the {{animationWorklet}} global scope and synced back to the
+    main thread. In cases where the <a>animator instance</a> is running is a parallel execution
+    context this value may be stale.
 
 
 Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
