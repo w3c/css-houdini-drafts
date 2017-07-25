@@ -307,11 +307,11 @@ the [=property model=]. This list of properties is sorted in the following manne
 *   custom properties are sorted by increasing code point order.
 *   custom properties are sorted after normal properties.
 
+[=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
+
 Issue(145): should refactor out value type-checking, as it'll be needed by the rest of the setters too
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
-
-Issue(149): describe that these are not live objects
 
 Issue(268): stringification
 
