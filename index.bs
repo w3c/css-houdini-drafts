@@ -46,12 +46,15 @@ urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     text: playback rate
     text: set the target effect of an animation
     text: set the timeline of an animation
-urlPrefix: https://w3c.github.io/web-animations/level-2/#; type: interface;
-    text: GroupEffectReadOnly
-    text: AnimationEffectReadOnly
-    text: AnimationEffectMutable
-    text: GroupEffectMutable
-    text: Animation
+urlPrefix: https://w3c.github.io/web-animations/level-2/#;
+    type: interface;
+        text: GroupEffectReadOnly
+        text: AnimationEffectReadOnly
+        text: AnimationEffectMutable
+        text: GroupEffectMutable
+        text: Animation
+    type: dfn;
+        text: group effect
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -191,7 +194,7 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
 
 
 
-Concepts {#concepts}
+Animator Definition {#animator-definition-desc}
 ====================
 An <dfn>animator definition</dfn> is a <a>struct</a> which describes the author defined custom
 animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
@@ -203,26 +206,8 @@ animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
  - An <dfn>animate function</dfn> which is the animate <a>function</a> callback.
 
 
-
-An <dfn>animator instance</dfn> a <a>struct</a> which describes a fully realized custom animation
-instance in the {{AnimationWorkletGlobalScope}}. It has a reference to an <a>animator
-definition</a> and owns the instance specific state such as animation effects and timelines. It
-consists of:
-
- - An <a>animator name</a>.
-
- - An <a>animation requested flag</a>.
-
- - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
-
- - An <dfn>animator current time</dfn> which is the corresponding <a>worklet animation</a>'s current
-     time.
-
- - An <dfn>animator timelines list</dfn> which is <a>list</a> of its attached <a>timelines</a>.
-
-
 Registering an Animator Definition {#registering-animator-definition}
-============================================================
+-------------------------------------
 The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
 The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
 
@@ -267,6 +252,23 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 
 Animator Instance {#animator-instance-section}
 ======================================
+
+An <dfn>animator instance</dfn> is a <a>struct</a> which describes a fully realized custom animation
+instance in the {{AnimationWorkletGlobalScope}}. It has a reference to an <a>animator
+definition</a> and owns the instance specific state such as animation effect and timelines. It
+consists of:
+
+ - An <a>animator name</a>.
+
+ - An <a>animation requested flag</a>.
+
+ - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
+
+ - An <dfn>animator current time</dfn> which is the corresponding <a>worklet animation</a>'s current
+     time.
+
+ - An <dfn>animator timelines list</dfn> which is <a>list</a> of its attached <a>timelines</a>.
+
 
 Creating an Animator Instance {#creating-animator-instance}
 -----------------------------------------------------------
@@ -390,7 +392,7 @@ set to <a>frame-requested</a>. These include the following:
 <a>frame-current</a>.
 
 
-Integration With Web Animations {#integration-web-animation}
+Web Animations Integration {#web-animation-integration}
 ===============================
 
 
@@ -512,9 +514,13 @@ WorkletGroupEffect {#worklet-group-effect}
 ------------------
 <!-- Big Text: TODO -->
 
-A <a>worklet animation</a>'s effect can additionally be of {{WorkletGroupEffect}} type. Using this
-group effect allows the corresponding <a>animator instance</a> to directly control its children
-<a>local time</a>s.
+{{WorkletGroupEffect}} is a type of <a>group effect</a> which allows its children local time to be
+mutated individually.
+
+A <a>worklet animation</a>'s effect can additionally be of {{WorkletGroupEffect}} type. When a
+{{WorkletAnimation}} uses a {{WorkletGroupEffect}}, its corresponding <a>animator instance</a> can
+directly control the effect's children <a>local time</a>s. This effectively means that a single
+worklet animation can coordinate multiple effects which is necessary for some usecases.
 
 <pre class='idl'>
 
@@ -531,9 +537,23 @@ partial interface AnimationEffectReadOnly {
 };
 </pre>
 
+<div algorithm="set-local-time">
 
-TODO:
-  - define the children start time schedule for the group effect. [Issue](https://github.com/w3c/web-animations/issues/191)
+To set {{localTime}} property on an |effect| to value |t|, the user agent does the action that
+corresponds to the first matching condition from the following:
+
+ :  If the |effect| does not have a parent group,
+ :: Set the |effect| local time to |t|.
+ :  If the |effect| has a parent group and it is of {{WorkletGroupEffect}} type,
+ :: Set the effect start time to (parent's transformed time - t). Note this effectively set's the
+    |effect|'s local time to t.
+ :  Otherwise
+ :: Throw an exception indicating that the child effect time can only be controlled by
+    its parent group.
+
+</div>
+
+[Issue](https://github.com/w3c/web-animations/issues/191)
 
 
 Effect Stack {#effect-stack}
@@ -563,14 +583,15 @@ Example 1: Hidey Bar. {#example-1}
 An example of header effect where a header is moved with scroll and as soon as finger is lifted it
 animates fully to close or open position depending on its current position.
 
-<pre class='lang-markup'>
-&lt;div id='scrollingContainer'&gt;
-  &lt;div id='header'&gt;Some header&lt;/div&gt;
-  &lt;div&gt;content&lt;/div&gt;
-&lt;/div&gt;
+<xmp class='lang-markup'>
 
-&lt;script&gt;
-animationWorklet.addModule('hidey-bar-animator.js').then( _ =&gt; {
+<div id='scrollingContainer'>
+  <div id='header'>Some header</div>
+  <div>content</div>
+</div>
+
+<script>
+animationWorklet.addModule('hidey-bar-animator.js').then( _ => {
   const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
   const documentTimeline = document.timeline;
 
@@ -585,18 +606,19 @@ animationWorklet.addModule('hidey-bar-animator.js').then( _ =&gt; {
 });
 
 
-workletAnim.timeline == scrollTimeline; // true, timeline returns the primary timeline
+workletAnim.timeline == scrollTimeline; // true
+</script>
+</xmp>
 
-&lt;/script&gt;
-</pre>
+<xmp class='lang-javascript'>
 
-<pre class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope
 
 registerAnimator('hidey-bar', class {
+
   constructor(options) {
-     this.scrollTimeline_ = options.scrollTimeline;
-     this.documentTimeline_ = options.documentTimeline;
+    this.scrollTimeline_ = options.scrollTimeline;
+    this.documentTimeline_ = options.documentTimeline;
   }
 
   animate(currentTime, effects) {
@@ -623,7 +645,7 @@ registerAnimator('hidey-bar', class {
   }
 });
 
-</pre>
+</xmp>
 
 Issue: This example uses a hypothetical "phase" property on timeline as a way to detect when user
 is no longer actively scrolling. This is a reasonable thing to have on scroll timeline. A simple
@@ -637,15 +659,15 @@ An example of twitter profile header effect where two elements (avatar, and head
 sync with scroll offset.
 
 
-<pre class='lang-markup'>
+<xmp class='lang-markup'>
 // In document scope
-&lt;div id='scrollingContainer'&gt;
-  &lt;div id='header' style='height: 150px'&gt;&lt;/div&gt;
-  &lt;div id='avatar'&gt;&lt;img&gt;&lt;/div&gt;
-&lt;/div&gt;
+<div id='scrollingContainer'>
+  <div id='header' style='height: 150px'></div>
+  <div id='avatar'><img></div>
+</div>
 
-&lt;script&gt;
-animationWorklet.addModule('twitter-header-animator.js').then( _ =&gt; {
+<script>
+animationWorklet.addModule('twitter-header-animator.js').then( _ => {
   const workletAnim = new WorkletAnimation('twitter-header',
     [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
                         [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
@@ -660,11 +682,11 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ =&gt; {
   workletAnim == $avatarEl.getAnimations()[0] == $headerEl.getAnimations()[0];
 
 });
-&lt;/script&gt;
+</script>
 
-</pre>
+</xmp>
 
-<pre class='lang-javascript'>
+<xmp class='lang-javascript'>
 // Ins AnimationWorkletGlobalScope.
 registerAnimator('twitter-header', class {
   constructor(options) {
@@ -683,8 +705,7 @@ registerAnimator('twitter-header', class {
     effects.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
   }
 });
-
-</pre>
+</xmp>
 
 Example 3: Parallax backgrounds. {#example-3}
 -----------------------------------------
