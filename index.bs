@@ -13,7 +13,7 @@ Editor: Stephen McGruer, smcgruer@chromium.org
 </pre>
 
 <pre class="link-defaults">
-spec:css-break-3; type:dfn; text:fragment
+spec:infra; type:dfn; text:list
 </pre>
 
 <pre class="anchors">
@@ -31,9 +31,12 @@ urlPrefix: https://www.w3.org/TR/css3-transitions/#; type: dfn;
     text: animatable properties
 urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     url: the-documents-default-timeline; text: default document timeline
+    url: concept-animation; text: animation
     text: effect value
     text: effect stack
     text: target property
+    text: timeline
+    text: animation effect
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -88,7 +91,6 @@ The <a>Animation Worklet</a> provides a method to create scripted animations tha
 animations to run in their own dedicated thread to provide a degree of performance isolation
 from main thread.
 
-
 <strong>Relationship to Web Animation API</strong>: Animations that are running inside a
 <a>Animation Worklet</a> execution context expose the same {{Animation}} interface on the main
 javascript execution context. So they can be created, played, canceled, inspected, and generally
@@ -96,7 +98,6 @@ controlled from main thread using Web Animation APIs. However, worklet animation
 different timing model which enables them to be script-driven, statefull, and runnable in a
 parallel worklet execution context. As such Web Animation API that seek or alter the input
 time (reverse, finish, etc.) has a different semantic for worklet animations.
-
 
 Note: <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
 scrolling input) to these animations so that authors can create jank-free input driven animations
@@ -147,13 +148,12 @@ animations. The worklet can be accessed via {{animationWorklet}} attribute.
 
 The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
 
-<pre class='idl'>
-interface AnimationWorklet {
-  [NewObject] Promise&lt;void> addModule(USVString moduleURL);
-};
+The {{AnimationWorkletGlobalScope}} represents the <dfn>global execution context</dfn> of
+{{animationWorklet}}.
 
+<pre class='idl'>
 partial interface Window {
-    [SameObject] readonly attribute AnimationWorklet animationWorklet;
+    [SameObject] readonly attribute Worklet animationWorklet;
 };
 </pre>
 
@@ -171,20 +171,11 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     Note: This is how the class should look.
     <pre class='lang-javascript'>
         class FooAnimator {
-            static get elements() {
-                return [
-                    {name: 'foo', inputProperties: ['--foo'], outputProperties: []},
-                    {name: 'bar', inputProperties: [], outputProperties: ['transform']},
-                ];
-            };
-
-            static timelines = [
-                'document',
-                { type: 'scroll', { orientation: 'vertical' } },
-            ];
-
-            animate(elementMap, timelines) {
-                // Animation frame logic goes here
+            constructor(options) {
+                // Called when a new animator is instantiated.
+            }
+            animate(timelines, effect) {
+                // Animation frame logic goes here.
             }
         }
     </pre>
@@ -194,56 +185,51 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
 
 Concepts {#concepts}
 ====================
-A <dfn>animator definition</dfn> describes an author defined animation which can be referenced by
-an <a>animator instance</a>. It consists of:
-
- - A <dfn>class constructor</dfn>.
-
- - An <dfn>animate function</dfn>.
-
- - An <dfn>animator slot list</dfn> containing a dictionary providing each <dfn>slot name</dfn>,
-    its <dfn>input property list</dfn>, and its <dfn>output property list</dfn>.
-
- - An <dfn>animator timeline options list</dfn>.
-
-
-Each entry in the <a>animator slot list</a> consists of:
-
- - An <dfn>animator slot</dfn> <<ident>>#.
-
- - An <dfn>animator input property list</dfn>.
-
- - An <dfn>animator output property list</dfn>.
-
-
-An <dfn>animator instance</dfn> describes a fully realized custom animation instance in the worklet
-context and links an <a>animator definition</a> with the instance specific state such as its element
-proxies. It consists of:
+An <dfn>animator definition</dfn> is a <a>struct</a> which describes the author defined custom
+animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
 
  - An <dfn>animator name</dfn> <<ident>>#.
 
+ - A <dfn>class constructor</dfn> which is the class <a>constructor</a>.
+
+ - An <dfn>animate function</dfn> which is the animate <a>function</a> callback.
+
+
+
+An <dfn>animator instance</dfn> a <a>struct</a> which describes a fully realized custom animation
+instance in the {{AnimationWorkletGlobalScope}}. It has a reference to an <a>animator
+definition</a> and owns the instance specific state such as animation effects and timelines. It
+consists of:
+
+ - An <a>animator name</a>.
+
  - An <a>animation requested flag</a>.
 
- - A <dfn>root element</dfn>.
+ - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
 
- - An <dfn>element proxy map</dfn> mapping <a>animator slot</a> to a list of <a>element proxies</a>.
+ - An <dfn>animator timelines list</dfn> which is <a>list</a> of <a>timelines</a>.
 
 
-An <dfn>element proxy</dfn> defines a handle to an element which can be used to read or
-write its explicitly exposed animatable attributes. It consists of:
+An <dfn>worklet animation</dfn> is a <a>animation</a> in the <a>document</a> which may corresponds
+to an <a>animator instance</a> in the worklet global scope. It controls the lifetime of its
+corresponding <a>animator instance</a> and provides playback control. It consists of:
 
- - An <a>animator instance</a>.
+ - An <a>animator name</a>.
 
- - A <dfn>proxied element</dfn>.
+ - An <dfn>effect</dfn> which is an <a>animation effect</a>.
 
- - A read only map of proxied input properties to their values.
+ - A <dfn>timeline</dfn> which is a <a>timeline</a>.
 
- - A map of proxied output properties to their values.
+
 
 Registering an Animator Definition {#registering-animator-definition}
 ============================================================
 The {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
 The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
+
+
+
+<div algorithm="register-animator">
 
 When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 |animatorCtor|)</dfn> method is called, the user agent <em>must</em> run the following steps:
@@ -267,12 +253,6 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
     7. If the result of <a>IsCallable</a>(|animate|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    8. Let |elements| be the result of <a>parsing an animator slot list</a> for |animatorCtor|.
-        If an exception is thrown, rethrow the exception and abort all these steps.
-
-    9. Let |timelineOptions| be the result of <a>parsing an animator timeline options list</a> for
-        |animatorCtor|. If an exception is thrown, rethrow the exception and abort all these steps.
-
     10. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
@@ -281,93 +261,31 @@ When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|,
 
         - <a>animate function</a> being |animate|
 
-        - <a>element proxy map</a> being |elements|
-
-        - <a>animator timeline options list</a> being |timelineOptions|
-
-
     11. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
         definition map</a> of the associated <a>document</a>.
+</div>
 
 
-When <dfn>parsing an animator slot list</dfn> for {{animatorCtor}}, the user agent <em>must</em>
-run the following steps:
+Animator Instance {#animator-instance-section}
+======================================
 
-    1. Let |elements| be an empty <code>sequence&lt;Dictionary></code>.
+Creating an Animator Instance {#creating-animator-instance}
+-----------------------------------------------------------
 
-    1. Let |elementsIterable| be the result of <a>Get</a>(|animatorCtor|, |elements|).
-
-    2. If |elementsIterable| is not <em>undefined</em>, then for each |slot| in |elementsIterable| run the
-        following steps:
-
-        - Let |slotDictionary| be an empty dictionary.
-
-        - Let the |name| key of |slotDictionary| be the |name| value of |element|.
-
-        - Let the |inputProperties| key of |slotDictionary| be the result of
-            <a>parsing an animator property list</a> with name <em>inputProperties</em> for |slot|.
-
-        - Let the |outputProperties| key of |slotDictionary| be the result of
-            <a>parsing an animator property list</a> with name <em>outputProperties</em> for |slot|.
-
-        - Push |slotDictionary| onto |elements|.
-
-
-When <dfn>parsing an animator property list</dfn> with name <em>name</em> for <em>slot</em>,
-the user agent <em>must</em> run the following steps:
-
-    1. Let |properties| be an empty <code>sequence&lt;DOMString></code>.
-
-    2. Let |propertiesIterable| be the result of <a>Get</a>(|slot|, |name|).
-
-    3. If |propertiesIterable| is not <em>undefined</em>, then set |properties| to the result of
-        converting |propertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is thrown, rethrow the exception and abort all these steps.
-
-When <dfn>parsing an animator timeline options list</dfn> for {{animatorCtor}},
-the user agent <em>must</em> run the following steps:
-
-    1. Let |timelineOptions| be an empty <code>sequence&lt;Object></code>.
-
-    2. Let |timelinesIterable| be the result of <a>Get</a>(|animatorCtor|, |timelines|).
-
-    3. For each |timeline| in |timelinesIterable|, run the following steps:
-
-        1. If <a>Type</a>(|timeline|) is {{DOMString}} let |timelineObject| be <code>{ type:
-             |timeline|, options: {} }</code>, otherwise let |timelineObject| be |timeline|.
-
-        2. Let |type| be the result of <a>Get</a>(|timelineObject|, "type").
-
-        3. Let |options| be the result of <a>Get</a>(|timelineObject|, "options").
-
-        4. Process |type| and |options| according to the first matching condition in the following:
-
-             <div class="switch">
-
-             :  If |type| or |options| is <b>undefined</b>,
-             :: throw a <a>NotSupportedError</a> and abort all remaining steps.
-
-             :  If |type| is "document",
-             :: Push a {{DocumentTimelineOptions}} created from |options| onto |timelineOptions|.
-
-             :  If |type| is "scroll",
-             :: Push a {{ScrollTimelineOptions}} created from |options| onto |timelineOptions|.
-
-             :  Otherwise,
-             :: throw a <a>NotSupportedError</a> and abort all remaining steps.
-
-             </div>
-
-Creating an Animator {#creating-animator}
-====================================================
 Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}. The
 <a>animator instance</a> cannot be disposed arbitrarily (e.g., in the middle of running animation
 as it may contain the scripted animation state.
 
-The {{AnimationWorkletGlobalScope}} has an <dfn>(animator name, root element) to instance map</dfn>.
-The map is populated when the user agent constructs a new <a>animator instance</a> in that scope.
+Issue: This is no longer true as we provide destroy callback.
 
-To <dfn>create a new animator instance</dfn> given a |name|, |root element|, and |workletGlobalScope|,
+The {{AnimationWorkletGlobalScope}} has an <dfn>animation id to instance map</dfn>.
+The map is populated when the user agent constructs a new <a>animator instance</a> in that scope
+that corresponds to a worklet animation in the document scope.
+
+<div algorithm="create-animator">
+
+To <dfn>create a new animator instance</dfn> given a |name|, |animationId|,
+|timeline|, |effect|, and |workletGlobalScope|,
 the user agent <em>must</em> run the following steps:
 
     1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
@@ -375,314 +293,153 @@ the user agent <em>must</em> run the following steps:
 
           If |definition| does not exist abort the following steps.
 
-    2. Let |animatorInstanceMap| be |workletGlobalScope|'s <a>(animator name, root element) to
+    2. Let |animatorInstanceMap| be |workletGlobalScope|'s <a>animation id to
          instance map</a>.
 
-    3. If an entry exists for |name| and |root element| within |animatorInstanceMap| then abort the
+    3. If an entry exists for |animationId| within |animatorInstanceMap| then abort the
          following steps.
 
     4. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
 
-    5. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+    5. Let |timelineList| be a new <a>list</a> with |timeline| added to it.
 
-        If <a>Construct</a> throws an exception, set the result of looking up |name| and
-        |root element| in |animatorInstanceMap| to <b>null</b>, and abort the following steps.
+    6. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+
+        If <a>Construct</a> throws an exception, set the result of looking up |animationId| in
+        |animatorInstanceMap| in |animatorInstanceMap| to <b>null</b>, and abort the following
+        steps.
 
     6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
         - <a>animation requested flag</a> being <a>frame-current</a>
+        - <a>animator effect</a> being |effect|
+        - <a>animator timelines list</a> being |timelineList|
 
-    7. Set the result of looking up |name| and |root element| in |animatorInstanceMap| to
+    7. Set the result of looking up |animationId| in |animatorInstanceMap| to
          |animatorInstance|.
 
+</div>
 
-Creating an Element Proxy {#creating-element-proxy}
-====================================================
-<a>Element Proxy</a> objects are created by the user agent for elements which have either 'animator'
-or 'animator-root' CSS properties. They cannot be constructed from user script. A single element may
-have multiple <a>Element Proxy</a> objects associated with it; one per <a>animator instance</a>.
-
-The {{ElementProxy}} interface exposes two maps: a read only map of proxied input properties to their
-values, and a map of proxied output properties to their values. The input and output properties in
-the maps are those specified in registerAnimator for the given <a>animator instance</a>.
-
-<pre class='idl'>
-[
-    Exposed=(AnimationWorklet),
-] interface ElementProxy {
-    attribute StylePropertyMapReadOnly inputStyleMap;
-    attribute StylePropertyMapReadOnly outputStyleMap;
-};
-</pre>
-
-Issue: Todo: Should we have NoInterfaceObject/Exposed here? How do we properly represent that this
-cannot be constructed via javascript?
-
-When user agent wants to <dfn>create an element proxy</dfn> given |element| with a given |animatorSlot|, it
-<em>must</em> run the following steps:
-
-    1. Let |animatorInstance| be the <a>animator instance</a> associated with |element|
-
-    2. Let |workletGlobalScope| be the scope associated with |animatorInstance|.
-
-    3. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
-
-    4. Let |slot| be the result of finding the item with name |animatorSlot| in the
-        <a>animator slot list</a> of |definition|.
-
-    5. Let |inputProperties| be <a>animator input property list</a> of |slot|.
-
-    6. Let |outputProperties| be <a>animator output property list</a> of |slot|.
-
-    6. Let |proxy| be a new {{ElementProxy}} Object with:
-
-        - <a>proxied element</a> being |element|.
-
-        - {{outputStyleMap}} being a new {{StylePropertyMap}} for |outputProperties|.
-
-    7. <a>update proxy input style map</a> with |proxy| and |inputProperties|.
-
-    8. Associate |proxy| with  |animatorInstance|.
-
-    9. Return proxy.
-
-
-Note: Writing to the outputStyle map will update the effective value of the used style value of the
-<a>proxied element</a>. This <em>may</em> happen asynchronously.
-
-
-When the user agent wants to <dfn>update proxy input style map</dfn> given |proxy|, and
-|properties|, it <em>must</em> run the following steps:
-
-
-    1. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed value</a> of <a>proxied element</a> for properties listed in |properties|.
-
-    2. Set |proxy|'s inputStyleMap to |styleMap|.
-
-
-When an element is removed, all proxies of that element are considered to be disconnected.
-A disconnected proxy continues to have the last value from the <a>computed value</a>
-of the <a>proxied element</a> properties, but setting values on its outputStyleMap will have no
-effect.
-
-
-Requesting Animation Frames {#requesting-animation-frames}
-====================
-Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
-either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
-<a>frame-current</a>. Various events can cause the <a>animation requested flag</a> to be set to
-<a>frame-requested</a>.
-
-[[#running-animators]] resets the <a>animation requested flag</a> on animators to
-<a>frame-current</a>.
-
-Element proxy creation/removal {#requesting-animation-frames-element-proxy}
-------------------------------
-
-When a new element proxy is assigned to or removed from an <a>animator instance</a>, that
-<a>animator instance</a>'s <a>animation requested flag</a> should be set to <a>frame-requested</a>.
-
-Change in an element's computed style {#requesting-animation-frames-computed-style}
--------------------------------------
-
-When the computed style for an element changes, the user agent <em>must</em> run the following steps:
-
-For each <a>element proxy</a> for that element, perform the following steps:
-
-    1. Let |proxy| be the current <a>element proxy</a> of the element.
-
-    2. Let |animator| be the |proxy|'s assigned animator.
-
-    3. Let |name| be the |animator|'s name.
-
-    4. Let |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
-
-    5. Let |slot| be the result of finding the item with name |animatorSlot| in the
-        <a>animator slot list</a> of |definition|.
-
-    6. Let |inputProperties| be <a>animator input property list</a> of |slot|.
-
-    7. For each property in |inputProperties|, if the property’s computed value has changed,
-        set the <a>animation requested flag</a> on the |animator| to <a>frame-requested</a>.
-
-Animator specifies a DocumentTimeline {#requesting-animation-frames-document-timeline}
--------------------------------------
-
-If a {{DocumentTimelineOptions}} instance is present in an animator's <a>animator timeline options
-list</a> then that animator's <a>animation requested flag</a> <em>must</em> be set to
-<a>frame-requested</a> at the start of each animation frame.
-
-Animator specifies a ScrollTimeline {#requesting-animation-frames-scroll-timeline}
------------------------------------
-
-If a {{ScrollTimelineOptions}} |instance| is present in an animator's <a>animator timeline options
-list</a> then the user agent <em>must</em> run the following steps when the scroll position of the
-nearest non-visible overflow ancestor to the animator’s <a>root element</a> changes:
-
-  1. For each {{ScrollTimelineOptions}} instance |options| in the animator's <a>animator timeline
-       options list</a> do the following steps:
-
-    1. Let |timeline| be a {{ScrollTimeline}} created from |options|, adding the nearest non-visible
-         overflow ancestor of the <a>root element</a> as the {{scrollSource}}.
-
-    2. If the <a>current time of the ScrollTimeline</a> |timeline| would have changed due to the
-         change in scroll position, set the animator's <a>animation requested flag</a> to
-         <a>frame-requested</a>.
-
-Issue: Give each animator instance a re-used set of AnimationTimelines instead of creating them
-       specifically here and when running animations.
-
-Issue: Need to add a definition for 'nearest non-visible overflow ancestor' to make sure all mentions
-       stay in sync.
 
 Running Animators {#running-animators}
-======================================================
+--------------------------------------
 
 When a user agent wants to produce a new animation frame, if for any <a>animator instance</a> the
 associated <a>animation requested flag</a> is <a>frame-requested</a> then the the user agent
 <em>must</em> <a>run animators</a> for the current frame.
 
-Note: The user agent is not required to run animations on every frame. It is legal to defer
+Note: The user agent is not required to run animations on every visual frame. It is legal to defer
       generating an animation frame until a later frame. This allow the user agent to
       provide a different service level according to their policy.
 
 
-When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
-<em>must</em> iterate over all pairs of animator name and root element as (|animatorName|,
-|rootElement|). For each such pair:
+<div algorithm="run-animators">
 
-  1. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
+When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
+<em>must</em> iterate over all animation id as |animationId|. For each item:
+
+  1. Let |instance| be the result of looking up |animationId| in the
+        |workletGlobalScope|'s <a>animation id to instance map</a>.
+
+      If |instance| does not exist then abort the following steps.
+
+  2. Let |animatorName| be |instance|'s <a>animator name</a>
+
+  3. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
         <a>animator name to animator definition map</a>.
 
       If |definition| does not exist then abort the following steps.
 
-  2. Let |instance| be the result of looking up (|animatorName|, |rootElement|) in the
-        |workletGlobalScope|'s <a>(animator name, root element) to instance map</a>.
+  4. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the effect
+       belonging to the |instance| will not be visible within the visual viewport of the current
+       frame the user agent <em>may</em> abort all the following steps.
 
-      If |instance| does not exist then <a>create a new animator instance</a> for |animatorName|,
-      |rootElement|, and |workletGlobalScope|, and let |instance| be the result of that.
-
-  3. If |instance| still does not exist or |instance| is <b>null</b> then abort the following steps.
-
-  4. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the proxies
-        belonging to |instance| will not be visible within the visual viewport of the current frame
-        the user agent <em>may</em> abort all the following steps.
-
-        Issue: Consider giving user agents permission to skip running animator instances to throttle
-        slow animators.
+        Issue: Consider giving user agents permission to skip running animator instances to
+        throttle slow animators.
 
   5. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  6. Let |timelines| be an empty <code>sequence&lt;AnimationTimeline></code>.
+  6. Let |timelines| be </a>animator timelines list</a> of |instance|.
 
-  7. For each |timelineOptions| in the <a>animator timeline options list</a> of |definition|, do the
-       following:
+  8. Let |effect| be an <a>animator effect</a> of |instance|.
 
-    - If <a>Type</a>(|timelineOptions|) is {{DocumentTimelineOptions}}, push a new
-        {{DocumentTimeline}} created using |timelineOptions| to the |timelines| list.
-
-    - If <a>Type</a>(|timelineOptions|) is {{ScrollTimelineOptions}}, push a new {{ScrollTimeline}}
-        created using |timelineOptions| to the |timelines| list, adding the nearest non-visible
-        overflow ancestor of |rootElement| as the {{scrollSource}}.
-
-  8. Let |elementMap| be an <a>element proxy map</a> of |instance|.
-
-  9. <a>Invoke</a> |animateFunction| with arguments «|elementMap|, |timelines|»,
+  9. <a>Invoke</a> |animateFunction| with arguments «|timelines|, |effect|»,
         and with |instance| as the <a>callback this value</a>.
 
+</div>
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
 in the same frame.
 
-Closing an Animator {#closing-animator}
-====================================================
+Removing an Animator {#removing-animator}
+-----------------------------------------
 
-Issue: Todo: Define when we may get rid of the animator.
+Issue: Define when we may get rid of the animator.
+
+Requesting Animation Frames {#requesting-animation-frames}
+----------------------------------------------------------
+
+Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
+either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
+<a>frame-current</a>. Various events, for example changes in of the animator's <a>animator
+timelines list</a>  currentTime can cause the <a>animation requested flag</a> to be set to
+<a>frame-requested</a>.
+
+[[#running-animators]] resets the <a>animation requested flag</a> on animators to
+<a>frame-current</a>.
 
 
-CSS Animator Notation {#css-animator-notation}
-==============================================
+Integration With Web Animations {#integration-web-animation}
+===============================
 
-Two CSS properties 'animator-root' and 'animator' may be used to assign an HTML elements to an
-<a>animator instance</a> either as a root element or a child element.
+Creating an Worklet Animation {#creating-worklet-animation}
+-----------------------------------------------------------
+<!-- Big Text: TODO -->
 
-<pre class='propdef'>
-Name: animator-root
-Value:  none | [<a>animator name</a> <a>animator slot</a>, ]* <a>animator name</a> <a>animator slot</a>
-Initial: none
-Applies to: all elements
-Inherited: no
-Computed value: as specified
-Percentages: N/A
-Media: interactive
-Animatable: no
-</pre>
+TODO:
+  - add IDL for worklet animation
+  - describe how constructor handles single or sequence of effects
+  - define new semantics for reverse/finish/playbackRate.
+  - define what happens when timeline or effect is modified document scope
+  - define what it means when localTime is read on this instance (i.e., we get last value synced
+    from worklet scope)
 
-<dl dfn-type=value dfn-for=animator-root>
-    <dt><dfn>none</dfn>
-    <dd>
-      There will be no <a>animator instance</a> that has this element as its
-      <a>root element</a>.
-    <dt><a>animator name</a> <a>animator slot</a>
-    <dd>
-      For each <a>animator name</a> specified in the list, the following applies for each animation frame:
+Issue(62): describe how constructor handles single or sequence of effects.
 
-      * If there is no <a>animator definition</a> registered with the given <a>animator name</a>, the inclusion
-        of that <a>animator name</a> as a value has no effect.
+Issue(63): define worklet animation appropriate semantics for reverse/finish/playbackRate.
 
-      * Otherwise, an <a>animator instance</a> with this element as its <a>root element</a>
-        will exist and will have its <a>animate function</a> called (with respect to the rules
-        laid out in [[#running-animators]]) with an <a>element proxy</a> for this element passed as
-        one of the <a>element proxies</a> for the given <a>animator slot</a>.
+Timeline Attachment {#timeline-attachment}
+-------------------
+<!-- Big Text: TODO -->
 
-      If the same <a>animator name</a> occurs multiple times in the list, only the first occurrence of that
-      <a>animator name</a> is processed.
-</dl>
+TODO:
 
-<pre class='propdef'>
-Name: animator
-Value:  none | [<a>animator name</a> <a>animator slot</a>, ]* <a>animator name</a> <a>animator slot</a>
-Initial: none
-Applies to: all elements
-Inherited: no
-Computed value: as specified
-Percentages: N/A
-Media: interactive
-Animatable: no
-</pre>
+Issue(61): Define semantics of attachment and detachment
 
-<dl dfn-type=value dfn-for=animator>
-    <dt><dfn>none</dfn>
-    <dd>
-      This element will not be passed into any <a>animate function</a> as one of the
-      <a>element proxies</a>.
-    <dt><a>animator name</a> <a>animator slot</a>
-    <dd>
-      For each <a>animator name</a> specified in the list, the following applies for each animation frame:
+WorkletGroupEffect {#worklet-group-effect}
+------------------
+<!-- Big Text: TODO -->
 
-      * If there is no <a>animator definition</a> registered with the given <a>animator name</a>, the inclusion
-        of that <a>animator name</a> as a value has no effect.
+TODO:
+  - Add idl for worklet group effect
+  - define the children start time schedule for the group effect. [Issue](https://github.com/w3c/web-animations/issues/191)
 
-      * Otherwise, an <a>element proxy</a> for this element will be passed into the
-        <a>animate function</a> of the closest ancestor <a>animator instance</a> with the given
-        <a>animator name</a> as one of the <a>element proxies</a> for the given <a>animator slot</a>. If no
-        such <a>animator instance</a> exists, one is created with the document root element as its
-        <a>root element</a>.
+WorkletAnimation timing model {#timing-model}
+------------------------------------
+<!-- Big Text: TODO -->
 
-      If the same <a>animator name</a> occurs multiple times in the list, only the first occurrence of that
-      <a>animator name</a> is processed.
-</dl>
+TODO:
+ - Describe the relation of WorkletAnimation.currentTime with its timeline time
+ - Describe the relation of WorkletAnimation.effect.getComputedTiming().localTime with the local time
+    set in the worklet scope.
 
 
 Effect Stack {#effect-stack}
-============================
+----------------------------
 
-Issue: Todo: the animators output style values have the highest order in animation stack effect and
-their composite operation is "replace" which is going to allow them to run independent on other
-animations and in a different thread. Supporting other composite operation is not in scope at this
-point.
+Issue: Worklet animations will have a special animation class that  ranks them with the highest
+order in animation stack effect. also their composite operation is "replace" which is going to
+allow them to run in parallel to other web animations in the system. Supporting other
+composite operation is not in scope at this point.
 
 
 Security Considerations {#security-considerations}
@@ -698,127 +455,120 @@ Issue: Need to decide what privacy considerations there are for this spec.
 Examples {#examples}
 ====================
 
-Example 1: A fade-in animation with spring timing. {#example-1}
+Example 1: Hidey Bar. {#example-1}
 -----------------------------------------
+An example of header effect where a header is moved with scroll and as soon as finger is lifted it animates fully to close or open position depending on its current position.
 
 <pre class='lang-markup'>
-&lt;style&gt;
-.myFadein {
-  animator: 'spring' 'fadein';
-}
-&lt;/style&gt;
-
-
-&lt;section class='myFadein'&gt;&lt;/section&gt;
-&lt;section class='myFadein' style="--spring-k: 25;"&gt;&lt;/section&gt;
+&lt;div id='scrollingContainer'&gt;
+  &lt;div id='header'&gt;Some header&lt;/div&gt;
+  &lt;div&gt;content&lt;/div&gt;
+&lt;/div&gt;
 
 &lt;script&gt;
-document.animationWorklet.import('spring-timing.js');
-&lt;/script&gt;
+animationWorklet.addModule('hidey-bar-animator.js').then( _ =&gt; {
+  const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
 
+  var workletAnim = new WorkletAnimation('hidey-bar',
+    new KeyFrameEffect($header,
+                       [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
+                       {duration: 100, iterations: 1, fill: 'both' })
+    [scrollTimeline, document.timeline],
+  );
+});
+
+
+workletAnim.timeline == scrollTimeline; // true, timeline returns the primary timeline
+
+&lt;/script&gt;
 </pre>
 
 <pre class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope
-registerAnimator('spring', class {
 
-    static elements = [
-        {name: 'fadein', inputProperties:  ['--spring-k'], outputProperties =  ['opacity']}];
-    static timelines = ['document'];
+registerAnimator('hidey-bar', class {
+  animate(timelines, effects) {
+    const scroll = timeline[0].currentTime;  // [0, 100]
+    const time = timelines[1].currentTime;
 
-    animate(elementMap, timelines) {
-        this.startTime_ = this.startTime_ || timelines[0].currentTime;
-        const deltaT = timelines[0].currentTime - this.startTime_;
-        elementMap.get('fadein').forEach(elem => {
-          // read a custom css property.
-          const k = elem.inputStyleMap.get('--spring-k') || 1;
-          // compute progress using a fancy spring timing function.
-          const effectiveValue = 1 * springTiming(deltaT, k);
-          // update opacity accordingly.
-          elem.ouputStyleMap.opacity = effectiveValue;
-        });
+    activelyScrolling = timeline[0].phase == 'active';
+
+    let localTime;
+    if (activelyScrolling) {
+      this.startTime_ = undefined;
+      localTime = scroll;
+    } else {
+      this.startTime_ = this.startTime_ || time;
+      // Decide on close/open direction depending on how far we have scrolled the header
+      // This can even do more sophisticated animation curve by computing the scroll velocity and
+      // using it.
+      this.direction_ = scroll >= 50 ? +1 : -1;
+      localTime = this.direction_ * (time - this.startTime_);
     }
 
-    springTiming(deltaT, k) {
-        // simulate the spring effect and return a progress value between [-1, 1];
-    }
+    // Drive the output effects by setting its local time.
+    effect.localTime = localTime;
+  }
 });
+
 </pre>
+
+Issue: This example uses a hypothetical "phase" property on timeline as a way to detect when user
+is no longer actively scrolling. This is a reasonable thing to have on scroll timeline. A simple
+fallback can emulate this by detecting when timeline time (i.e. scroll offset) has not changed in
+the last few frames.
 
 
 Example 2: Twitter header. {#example-2}
 --------------------------
+An example of twitter profile header effect where two elements (avatar, and header) are updated in
+sync with scroll offset.
 
 
 <pre class='lang-markup'>
-&lt;style&gt;
-#scroller {
-  animator-root: twitter-header;
-}
-.avatar {
-  animator: twitter-header avatar;
-}
-.bar {
-  animator: twitter-header bar;
-}
-&lt;/style&gt;
-
-&lt;div id="scroller"&gt;
-  &lt;section class="bar"&gt;&lt;/section&gt;
-  &lt;header&gt;
-    &lt;picture class="avatar"&gt;
-      &lt;img src="avatar.jpg"&gt;
-    &lt;/picture&gt;
-    &lt;section&gt;
-      &lt;button&gt;Friends&lt;/button&gt;
-      &lt;button&gt;Edit Profile&lt;/button&gt;
-    &lt;/section&gt;
-  &lt;/header&gt;
+// In document scope
+&lt;div id='scrollingContainer'&gt;
+  &lt;div id='header' style='height: 150px'&gt;&lt;/div&gt;
+  &lt;div id='avatar'&gt;&lt;img&gt;&lt;/div&gt;
 &lt;/div&gt;
 
 &lt;script&gt;
-document.animationWorklet.import('tweeter-header.js');
+animationWorklet.addModule('twitter-header-animator.js').then( _ =&gt; {
+  const workletAnim = new WorkletAnimation('twitter-header',
+    [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
+                        [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
+                        {duration: 1, iterations: 1}),
+     new KeyFrameEffect($header, /* loses transparency as we scroll up */
+                        {opacity: 0, opacity: 0.8},
+                        {duration: 1, iterations: 1})] ,
+     [new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight})],
+  );
+
+  // Same animation instance is accessible via different animation targets
+  workletAnim == $avatarEl.getAnimations()[0] == $headerEl.getAnimations()[0];
+
+});
 &lt;/script&gt;
 
 </pre>
 
 <pre class='lang-javascript'>
-// Inside AnimationWorkletGlobalScope.
+// Ins AnimationWorkletGlobalScope.
 registerAnimator('twitter-header', class {
-
-  static elements =  [
-    {name: 'avatar', inputProperties: [], outputProperties: ['transform']},
-    {name: 'bar', inputProperties: [], outputProperties: ['opacity']}
-  ];
-
-  // maps scroll offset [0, 140px] -> time values [0, 1]
-  static timelines = [ { type: 'scroll', options: {
-      orientation: 'vertical',
-      endScrollOffset: '140px',
-      timeRange: 1
-    }},
-  ];
-
-
-  animate(elementMap, timelines) {
-    var progress = timelines[0].currentTime;
-
-    elementMap.get('avatar').forEach(elem => {
-      elem.outputStyleMap.set('transform', new CSSTransformValue([
-          new CSSTranslation(new CSSSimpleLength(0, 'px'),
-                             new CSSSimpleLength(tween(140, 45)(progress), 'px')),
-          new CSSScale(tween(1, 0.5)(progress), tween(1, 0.5)(progress))
-          ]));
-    });
-    elementMap.get('bar').forEach(elem => {
-      elem.outputStyleMap.set('opacity', progress);
-    });
+  constructor(options) {
+    this.timing_ = new CubicBezier('ease-out');
   }
 
-  tween(begin, end) {
-    return function lerp(progress) {
-        return begin + (end - begin) * progress;
-    }
+  clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  animate(timelines, effect) {
+    const scroll = timeline[0].currentTime;  // scroll is in [0, 1] range
+
+    // Drive the output group effect by setting its children local times individually.
+    effects.children[0].localTime = scroll;
+    effects.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
   }
 });
 
@@ -826,58 +576,6 @@ registerAnimator('twitter-header', class {
 
 Example 3: Parallax backgrounds. {#example-3}
 -----------------------------------------
+<!-- Big Text: TODO -->
 
-<pre class='lang-markup'>
-&lt;style&gt;
-#scroller {
-  animator-root: 'parallax';
-}
-.background {
-  animator: 'parallax' 'background';
-}
-
-&lt;/style&gt;
-
-&lt;div id="scroller"&gt;
-    &lt;div class="background" style="--parallax-rate: 0.6" &gt;
-    &lt;/div&gt;
-    &lt;div class="background" style="--parallax-rate: 0.3" &gt;
-    &lt;/div&gt;
-
-    overflowing content!
-&lt;/div&gt;
-
-&lt;script&gt;
-document.animationWorklet.import('parallax.js');
-&lt;/script&gt;
-
-
-</pre>
-
-<pre class='lang-javascript'>
-// Inside AnimationWorkletGlobalScope
-registerAnimation('parallax', class {
-
-    static elements =  [
-        { name: 'background', inputProperties: ['--parallax-rate'], outputProperties: ['transform']}
-    ];
-
-    static timelines = [{ type: 'scroll', options: { orientation: 'vertical'} }];
-
-    // This can be passed in as an input but we should consider exposing this in ScrollTimeline
-    static SCROLL_SIZE = 1000;
-
-    animate(elementMap, timelines) {
-        // read root scroller vertical scroll offset.
-        const scrollTop = timelines[0].currentTime * SCROLL_SIZE;
-        // update parallax transform
-        elementMap.get('background').forEach(elem => {
-           const rate = elem.inputStyleMap.get('--parallax-rate') || 0.2;
-           elem.outputStyleMap.set('transform', new CSSTransformValue([
-            new CSSTranslation(new CSSSimpleLength(0, 'px'), new CSSSimpleLength(rate * scrollTop, 'px'))]));
-        });
-    }
-});
-</pre>
-
-
+TODO
