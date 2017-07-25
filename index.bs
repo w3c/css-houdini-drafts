@@ -14,6 +14,7 @@ Editor: Stephen McGruer, smcgruer@chromium.org
 
 <pre class="link-defaults">
 spec:infra; type:dfn; text:list
+spec:dom; type:interface; text:Document
 </pre>
 
 <pre class="anchors">
@@ -37,6 +38,20 @@ urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     text: target property
     text: timeline
     text: animation effect
+    text: current time
+    text: local time
+    text: inherited time
+    text: ready
+    text: play state
+    text: playback rate
+    text: set the target effect of an animation
+    text: set the timeline of an animation
+urlPrefix: https://w3c.github.io/web-animations/level-2/#; type: interface;
+    text: GroupEffectReadOnly
+    text: AnimationEffectReadOnly
+    text: AnimationEffectMutable
+    text: GroupEffectMutable
+    text: Animation
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -160,7 +175,7 @@ partial interface Window {
 <pre class='idl'>
 callback VoidFunction = void ();
 
-[Exposed=AnimationWorklet]
+[Global=Worklet]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
 };
@@ -174,7 +189,7 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
             constructor(options) {
                 // Called when a new animator is instantiated.
             }
-            animate(timelines, effect) {
+            animate(currentTime, effect) {
                 // Animation frame logic goes here.
             }
         }
@@ -207,19 +222,10 @@ consists of:
 
  - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
 
- - An <dfn>animator timelines list</dfn> which is <a>list</a> of <a>timelines</a>.
+ - An <dfn>animator current time</dfn> which is the corresponding <a>worklet animation</a>'s current
+     time.
 
-
-An <dfn>worklet animation</dfn> is a <a>animation</a> in the <a>document</a> which may corresponds
-to an <a>animator instance</a> in the worklet global scope. It controls the lifetime of its
-corresponding <a>animator instance</a> and provides playback control. It consists of:
-
- - An <a>animator name</a>.
-
- - An <dfn>effect</dfn> which is an <a>animation effect</a>.
-
- - A <dfn>timeline</dfn> which is a <a>timeline</a>.
-
+ - An <dfn>animator timelines list</dfn> which is <a>list</a> of its attached <a>timelines</a>.
 
 
 Registering an Animator Definition {#registering-animator-definition}
@@ -312,6 +318,7 @@ the user agent <em>must</em> run the following steps:
     6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
         - <a>animation requested flag</a> being <a>frame-current</a>
+        - <a>animator current time</a> being unresolved
         - <a>animator effect</a> being |effect|
         - <a>animator timelines list</a> being |timelineList|
 
@@ -359,11 +366,12 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
 
   5. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  6. Let |timelines| be </a>animator timelines list</a> of |instance|.
 
-  8. Let |effect| be an <a>animator effect</a> of |instance|.
+  7. Let |currentTime| be <a>animator current time</a> of |instance|.
 
-  9. <a>Invoke</a> |animateFunction| with arguments «|timelines|, |effect|»,
+  8. Let |effect| be <a>animator effect</a> of |instance|.
+
+  9. <a>Invoke</a> |animateFunction| with arguments «|currentTime|, |effect|»,
         and with |instance| as the <a>callback this value</a>.
 
 </div>
@@ -380,9 +388,10 @@ Requesting Animation Frames {#requesting-animation-frames}
 
 Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
 either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
-<a>frame-current</a>. Various events, for example changes in of the animator's <a>animator
-timelines list</a>  currentTime can cause the <a>animation requested flag</a> to be set to
-<a>frame-requested</a>.
+<a>frame-current</a>. Different circumstances can cause the <a>animation requested flag</a> to be
+set to <a>frame-requested</a>. These include the following:
+  - Changes in the <a>current time</a> of any <a>timeline</a> in the animator's <a>animator timelines list</a>
+  - Changes in the <a>current time</a> of the animator's corresponding <a>Worklet Animation</a>
 
 [[#running-animators]] resets the <a>animation requested flag</a> on animators to
 <a>frame-current</a>.
@@ -391,21 +400,111 @@ timelines list</a>  currentTime can cause the <a>animation requested flag</a> to
 Integration With Web Animations {#integration-web-animation}
 ===============================
 
+
+Worklet Animation {#worklet-animation-desc}
+-------------------------------------------
+<dfn>Worklet animation</dfn> is a kind of <a>animation</a> that allows a <a>animator instance</a> to
+control the animation playback. It controls the lifetime of its corresponding <a>animator
+instance</a> while giving it the playback control effectively allowing an author-defined programming
+callback that runs in <a>global execution context</a> of {{animationWorklet}} to drive its output.
+
+Being an <a>animation</a>, <a>worklet animation</a> has an <a>animation effect</a> and a
+<a>timeline</a>. However unlike other animations, the <a>worklet animation</a>'s <a>current time</a>
+does not directly determine its effect's <a>local time</a> (via its <a>inherited time</a>) but
+instead the associated <a>animator instance</a> controls the effect's <a>local time</a> directly.
+Another implication of this is that the the <a>timeline</a>'s current time does not fully determine
+the animation's output.
+
+<a>Worklet animation</a> also has an <a>animator name</a> which identifies its <a>animator
+definition</a>.
+
+
+
 Creating an Worklet Animation {#creating-worklet-animation}
 -----------------------------------------------------------
 <!-- Big Text: TODO -->
 
+<pre class='idl'>
+
+[Constructor (DOMString animatorId,
+              optional (AnimationEffectReadOnly or array<AnimationEffectReadOnly>)? effects = null,
+              AnimationTimeline? timeline,
+              optional WorkletAnimationOptions)]
+interface WorkletAnimation : Animation {
+        readonly attribute DOMString animatorId;
+};
+
+</pre>
+
+<div algorithm="create-worklet-animation">
+<dfn constructor for=WorkletAnimation>WorkletAnimation(animatorId, effects, timeline)</dfn>
+Creates a new {{WorkletAnimation}} object using the following procedure.
+
+    1. Let |workletAnimation| be a new {{WorkletAnimation}} object.
+
+    2. Run the procedure to <a>set the timeline of an animation</a> on |workletAnimation| passing
+        |timeline| as the new timeline or, if a |timeline| argument is not provided,
+        passing the <a>default document timeline</a> of the {{Document}} associated with the
+        {{Window}} that is the <a>current global object</a>.
+
+    3. Let |effect| be the result corresponding to the first matching condition from below.
+         : If |effects| is a {{AnimationEffectReadOnly}} object,
+         :: Let effect be |effects|.
+         : If |effects| is an  <a>list</a> of {{AnimationEffectReadOnly}}</a>,
+         :: Let |effect| be a new {{WorkletGroupEffect}} with its children set to |effects|.
+         : Otherwise (effect is undefined),
+         :: Let |effect| be a undefined
+
+    4. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
+         passing |effect| as the new effect.
+
+    5. Run the procedure to <a>set the animator id of a worklet animation</a> on |workletAnimation|
+</div>
+
+
 TODO:
-  - add IDL for worklet animation
-  - describe how constructor handles single or sequence of effects
-  - define new semantics for reverse/finish/playbackRate.
   - define what happens when timeline or effect is modified document scope
-  - define what it means when localTime is read on this instance (i.e., we get last value synced
-    from worklet scope)
 
 Issue(62): describe how constructor handles single or sequence of effects.
 
-Issue(63): define worklet animation appropriate semantics for reverse/finish/playbackRate.
+Worklet Animation timing model {#timing-model}
+------------------------------------
+<!-- Big Text: TODO -->
+
+The section describes how <a>worklet animation</a> timing model differs from other <a>animations</a>.
+
+In addition to existing conditions on when the <a>animation</a> is considered <a>ready</a>, a
+ <a>Worklet animation</a> readiness also depends on the following condition to be true:
+
+   - the user agent has completed any setup required to create the <a>worklet animation</a>'s
+      corresponding <a>animator instance</a>.
+
+
+As mentioned earlier, the <a>worklet animation</a>'s <a>current time</a> does not directly determine
+its effect's <a>local time</a> (via its <a>inherited time</a>) but instead the associated
+<a>animator instance</a> controls the effect's <a>local time</a> directly. The effect's local time
+is set is {{animationWorklet}}'s <a>global execution context</a> which can be a parallel scope. This
+means that the
+
+
+Here are a few implications of the above semantics:
+
+ - Seeking current time of a <a>Worklet Animation</a> does not necessarily change its output. So
+   setting the animation <a>start time</a> or <a>current time</a> is not going to necessarily change
+   it but can change the animation <a>play state</a>.
+ - Similarly invoking {{Animation/finish()}} or updating <a>animation</a>'s <a>playback rate</a> will
+    only change the animation <a>play state</a>.
+ - Querying the animation effect's local time using {{AnimationEffectReadOnly/getComputedTiming()}}
+   returns the last known value set in the {{animationWorklet}} global scope and synced back to the
+   main thread. In cases where the <a>animator instance</a> is running is a parallel execution
+   context this value may be stale.
+
+
+Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
+   animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
+   it can react appropriately.
+
+
 
 Timeline Attachment {#timeline-attachment}
 -------------------
@@ -413,24 +512,36 @@ Timeline Attachment {#timeline-attachment}
 
 TODO:
 
-Issue(61): Define semantics of attachment and detachment
+Issue(61): Define semantics of attachment and detachment.
+
+
 
 WorkletGroupEffect {#worklet-group-effect}
 ------------------
 <!-- Big Text: TODO -->
 
+A <a>worklet animation</a>'s effect can additionally be of {{WorkletGroupEffect}} type. Using this
+group effect allows the corresponding <a>animator instance</a> to directly control its children
+<a>local time</a>s.
+
+<pre class='idl'>
+
+interface WorkletGroupEffectReadOnly :  GroupEffectReadOnly {};
+
+interface WorkletGroupEffect :  WorkletGroupEffectReadOnly {};
+WorkletGroupEffect implements AnimationEffectMutable;
+WorkletGroupEffect implements GroupEffectMutable;
+
+[Exposed=Worklet]
+partial interface AnimationEffectReadOnly {
+    // Intended for use inside Animation Worklet scope to drive the effect.
+    attribute double localTime;
+};
+</pre>
+
+
 TODO:
-  - Add idl for worklet group effect
   - define the children start time schedule for the group effect. [Issue](https://github.com/w3c/web-animations/issues/191)
-
-WorkletAnimation timing model {#timing-model}
-------------------------------------
-<!-- Big Text: TODO -->
-
-TODO:
- - Describe the relation of WorkletAnimation.currentTime with its timeline time
- - Describe the relation of WorkletAnimation.effect.getComputedTiming().localTime with the local time
-    set in the worklet scope.
 
 
 Effect Stack {#effect-stack}
@@ -457,7 +568,8 @@ Examples {#examples}
 
 Example 1: Hidey Bar. {#example-1}
 -----------------------------------------
-An example of header effect where a header is moved with scroll and as soon as finger is lifted it animates fully to close or open position depending on its current position.
+An example of header effect where a header is moved with scroll and as soon as finger is lifted it
+animates fully to close or open position depending on its current position.
 
 <pre class='lang-markup'>
 &lt;div id='scrollingContainer'&gt;
@@ -468,13 +580,16 @@ An example of header effect where a header is moved with scroll and as soon as f
 &lt;script&gt;
 animationWorklet.addModule('hidey-bar-animator.js').then( _ =&gt; {
   const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
+  const documentTimeline = document.timeline;
 
-  var workletAnim = new WorkletAnimation('hidey-bar',
-    new KeyFrameEffect($header,
-                       [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
-                       {duration: 100, iterations: 1, fill: 'both' })
-    [scrollTimeline, document.timeline],
-  );
+  // Note we pass in two timelines in the options bag which allows the animation to read their
+  // currenTime values directly.
+  const workletAnim = new WorkletAnimation('hidey-bar',
+        new KeyFrameEffect($header,
+                          [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
+                          {duration: 100, iterations: 1, fill: 'both' }]),
+        scrollTimeline,
+        {scrollTimeline, documentTimeline});
 });
 
 
@@ -487,11 +602,16 @@ workletAnim.timeline == scrollTimeline; // true, timeline returns the primary ti
 // Inside AnimationWorkletGlobalScope
 
 registerAnimator('hidey-bar', class {
-  animate(timelines, effects) {
-    const scroll = timeline[0].currentTime;  // [0, 100]
-    const time = timelines[1].currentTime;
+  constructor(options) {
+     this.scrollTimeline_ = options.scrollTimeline;
+     this.documentTimeline_ = options.documentTimeline;
+  }
 
-    activelyScrolling = timeline[0].phase == 'active';
+  animate(currentTime, effects) {
+    const scroll = this.scrollTimeline_.currentTime;  // [0, 100]
+    const time = this.documentTimeline_.currentTime;
+
+    const activelyScrolling = this.scrollTimeline_.phase == 'active';
 
     let localTime;
     if (activelyScrolling) {
@@ -540,8 +660,8 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ =&gt; {
                         {duration: 1, iterations: 1}),
      new KeyFrameEffect($header, /* loses transparency as we scroll up */
                         {opacity: 0, opacity: 0.8},
-                        {duration: 1, iterations: 1})] ,
-     [new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight})],
+                        {duration: 1, iterations: 1})],
+     new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
   );
 
   // Same animation instance is accessible via different animation targets
@@ -563,8 +683,8 @@ registerAnimator('twitter-header', class {
     return Math.min(Math.max(value, min), max);
   }
 
-  animate(timelines, effect) {
-    const scroll = timeline[0].currentTime;  // scroll is in [0, 1] range
+  animate(currentTime, effect) {
+    const scroll = currentTime;  // scroll is in [0, 1] range
 
     // Drive the output group effect by setting its children local times individually.
     effects.children[0].localTime = scroll;
