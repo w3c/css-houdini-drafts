@@ -52,6 +52,8 @@ urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     text: paused
     text: pending
     text: running
+    text: composite operation
+    text: animation class
 urlPrefix: https://w3c.github.io/web-animations/level-2/#;
     type: interface;
         text: GroupEffectReadOnly
@@ -365,10 +367,17 @@ instance set</a>. For each such |instance| the user agent <em>must</em> perform 
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
 in the same frame.
 
-Removing an Animator {#removing-animator}
+Removing an Animator Instance {#removing-animator}
 -----------------------------------------
 
-Issue: Define when we may get rid of the animator.
+<div algorithm="remove-animator">
+
+To <dfn>remove an animator instance</dfn> given |instance|, and |workletGlobalScope|, the user agent
+<em>must</em> run the following steps:
+
+1. Remove |animatorInstance| from |workletGlobalScope|'s <a>animator instance set</a>.
+
+</div>
 
 Requesting Animation Frames {#requesting-animation-frames}
 ----------------------------------------------------------
@@ -390,10 +399,10 @@ Web Animations Integration {#web-animation-integration}
 
 Worklet Animation {#worklet-animation-desc}
 -------------------------------------------
-<dfn>Worklet animation</dfn> is a kind of <a>animation</a> that allows a <a>animator instance</a> to
-control the animation playback. It controls the lifetime of its corresponding <a>animator
-instance</a> while giving it the playback control effectively allowing an author-defined programming
-callback that runs in <a>global execution context</a> of {{animationWorklet}} to drive its output.
+<dfn>Worklet animation</dfn> is a kind of <a>animation</a> that delegates the animation playback to
+an <a>animator instance</a>. It controls the lifetime of its corresponding <a>animator instance</a>
+while giving it the playback controls, effectively allowing an author-defined programming callback
+that runs in <a>global execution context</a> of {{animationWorklet}} to drive its output.
 
 Being an <a>animation</a>, <a>worklet animation</a> has an <a>animation effect</a> and a
 <a>timeline</a>. However unlike other animations, the <a>worklet animation</a>'s <a>current time</a>
@@ -423,7 +432,6 @@ definition</a>.
 
 Creating an Worklet Animation {#creating-worklet-animation}
 -----------------------------------------------------------
-<!-- Big Text: TODO -->
 
 <pre class='idl'>
 
@@ -463,14 +471,8 @@ Creates a new {{WorkletAnimation}} object using the following procedure.
 </div>
 
 
-TODO:
-  - define what happens when timeline or effect is modified document scope
-
-Issue(62): describe how constructor handles single or sequence of effects.
-
 Worklet Animation timing model {#timing-model}
 ------------------------------------
-<!-- Big Text: TODO -->
 
 The section describes how <a>worklet animation</a> timing model differs from other <a>animations</a>.
 
@@ -502,6 +504,9 @@ Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately.
 
+TODO:
+  - define what happens when timeline or effect is modified document scope
+
 Interaction with Animator Instances {#worklet-animation-animator-instances}
 -----------------------------------
 
@@ -517,7 +522,8 @@ When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <
   1. If |workletAnimation| has a corresponding <a>animator instance</a>, abort the following steps.
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
     |workletAnimation|.
-  3. Run the procedure to <a>create a new animator instance</a>, passing:
+  3. <a>Queue a task</a> on |workletGlobalScope| to run the procedure to <a>create a new animator
+       instance</a>, passing:
       * The |workletAnimation|'s {{animatorName}} as |name|.
       * The |workletAnimation|'s timeline as |timeline|.
       * The |workletAnimation|'s effect as |effect|.
@@ -537,27 +543,22 @@ user age <em>must</em> run the following steps:
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
     |workletAnimation|.
   3. Let |animatorInstance| be |workletAnimation|'s corresponding <a>animator instance</a>.
-  4. Remove |animatorInstance| from |workletGlobalScope|'s <a>animator instance set</a>.
+  4. <a>Queue a task</a> on the |workletGlobalScope| to run the procedure to <a>remove an animator
+     instance</a>, passing |animatorInstance| as instance and |workletGlobalScope| as
+     workletGlobalScope.
   5. Set |workletAnimation| as having no corresponding <a>animator instance</a>.
 
 </div>
 
-Note: An <a>animator instance</a> is not necessarily destroyed immediately when it no longer has a
-corresponding <a>worklet animation</a>. Instead, see [[#removing-animator]].
 
 Timeline Attachment {#timeline-attachment}
 -------------------
-<!-- Big Text: TODO -->
-
-TODO:
-
 Issue(61): Define semantics of attachment and detachment.
 
 
 
 WorkletGroupEffect {#worklet-group-effect}
 ------------------
-<!-- Big Text: TODO -->
 
 {{WorkletGroupEffect}} is a type of <a>group effect</a> which allows its children local time to be
 mutated individually.
@@ -601,13 +602,17 @@ corresponds to the first matching condition from the following:
 [Issue](https://github.com/w3c/web-animations/issues/191)
 
 
-Effect Stack {#effect-stack}
+Effect Stack and Composite Order {#effect-stack-composite-order}
 ----------------------------
+As with other animations, <a>Worklet animations</a> participates in the <a>effect stack</a>.
+WorkletAnimation <a>animation class</a> is "Worklet Animation" and has a higher composite order than
+animations whose class is either "CSS animation", "CSS Animation", or have no specific class.
 
-Issue: Worklet animations will have a special animation class that  ranks them with the highest
-order in animation stack effect. also their composite operation is "replace" which is going to
-allow them to run in parallel to other web animations in the system. Supporting other
-composite operation is not in scope at this point.
+Note:
+The higher composite order means <a>worklet animations</a> are sorted later in the effect stack.
+Being higher in the stack combined with with the <a>animation effect</a>'s
+<a>composite operation</a> being replace by default helps improve the chances of user agents being
+able to run such animations in parallel to directly update the visuals.
 
 
 Security Considerations {#security-considerations}
