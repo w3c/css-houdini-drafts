@@ -383,21 +383,22 @@ To <dfn>remove an animator instance</dfn> given |instance| and |workletGlobalSco
 
 </div>
 
+Issue: What about actually destructing animatorInstance?
+
 Migrating an Animator Instance {#migrating-animator}
 -----------------------------------------
-User agents are responsible for assigning an animator to a worklet global scopes of which many can
-exist across different threads or processes. In order to give the most flexibility to user agents in
-this respect, we allow migration of an animator while it is running.
 
-The section defines a migration process such that any author-defined effect that depends on internal
-state can maintain its state across such migrations. The basic mechanism for achieving this is to
-serialize the state and later restore it.
+User agents are responsible for assigning an <a>animator instance</a> to a {{WorkletGlobalScope}}.
+There can be many such {{WorkletGlobalScope}}s, which may exist across different threads or
+processes. To give the most flexibility to user agents in this respect, we allow migration of an
+<a>animator instance</a> while it is running. The basic mechanism is to serialize the internal state
+of any author-defined effect, and restore it after migration.
 
 <div algorithm="migrate-animator">
 
-When user agents wants to <dfn>migrate an animator instance</dfn> from one worklet global scope
-to another given |instance|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|,
-it <em>must</em> run the following steps :
+To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to another, given
+|instance|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|, the user agent
+<em>must</em> run the following steps :
 
   1. Let |serializedState| be undefined.
 
@@ -405,8 +406,8 @@ it <em>must</em> run the following steps :
 
      1. Let |animatorName| be |instance|'s <a>animator name</a>
 
-     2. Let the |definition| be the result of looking up |animatorName| on the
-        |sourceWorkletGlobalScope|'s <a>animator name to animator definition map</a>.
+     2. Let |definition| be the result of looking up |animatorName| on |sourceWorkletGlobalScope|'s
+        <a>animator name to animator definition map</a>.
 
         If |definition| does not exist then abort the following steps.
 
@@ -418,18 +419,19 @@ it <em>must</em> run the following steps :
         steps.
 
      7. <a>Invoke</a> |onDestroyFunction| with |instance| as the <a>callback this value</a> and let
-        |state| be the result of this invocation.
+        |state| be the result of the invocation.
 
      8. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
-        If any exception is throws, then abort the following steps.
+        If any exception is thrown, then abort the following steps.
 
-     9. <a>remove an animator instance</a> given |instance|, and |sourceWorkletGlobalScope|.
+     9. Run the procedure to <a>remove an animator instance</a> given |instance|, and
+        |sourceWorkletGlobalScope|.
 
-  2. Wait for the above step complete.
+  2. Wait for the above task to complete. If the task is aborted, abort the following steps.
 
   3. <a>Queue a task</a> on |destinationWorkletGlobalScope| to run the following steps:
 
-     1. <a>create a new animator instance</a> given:
+     1. Run the procedure to <a>create a new animator instance</a> given:
         - The |instance|'s <a>animator name</a> as name.
         - The |instance|'s <a>animator timeline</a> as timeline.
         - The |instance|'s <a>animator effect</a> as effect.
@@ -438,8 +440,6 @@ it <em>must</em> run the following steps :
         - The |destinationWorkletGlobalScope| as workletGlobalScope.
 
 </div>
-
-Issue: What about actually destructing animatorInstance?
 
 
 Requesting Animation Frames {#requesting-animation-frames}
