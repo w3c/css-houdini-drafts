@@ -2099,7 +2099,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
                         <span class="p">[{</span>transform<span class="o">:</span> <span class="s1">'scale(1)'</span><span class="p">},</span> <span class="p">{</span>transform<span class="o">:</span> <span class="s1">'scale(0.5)'</span><span class="p">}],</span>
                         <span class="p">{</span>duration<span class="o">:</span> <span class="mi">1</span><span class="p">,</span> iterations<span class="o">:</span> <span class="mi">1</span><span class="p">}),</span>
      <span class="k">new</span> KeyFrameEffect<span class="p">(</span>$header<span class="p">,</span> <span class="cm">/* loses transparency as we scroll up */</span>
-                        <span class="p">{</span>opacity<span class="o">:</span> <span class="mi">0</span><span class="p">,</span> opacity<span class="o">:</span> <span class="mf">0.8</span><span class="p">},</span>
+                        <span class="p">[{</span>opacity<span class="o">:</span> <span class="mi">0</span><span class="p">},</span> <span class="p">{</span>opacity<span class="o">:</span> <span class="mf">0.8</span><span class="p">}],</span>
                         <span class="p">{</span>duration<span class="o">:</span> <span class="mi">1</span><span class="p">,</span> iterations<span class="o">:</span> <span class="mi">1</span><span class="p">})],</span>
      <span class="k">new</span> ScrollTimeline<span class="p">(</span>$scrollingContainer<span class="p">,</span> <span class="p">{</span>timeRange<span class="o">:</span> <span class="mi">1</span><span class="p">,</span> startScrollOffset<span class="o">:</span> <span class="mi">0</span><span class="p">,</span> endScrollOffset<span class="o">:</span> $header<span class="p">.</span>clientHeight<span class="p">}),</span>
   <span class="p">);</span>
@@ -2124,8 +2124,8 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
     <span class="kr">const</span> scroll <span class="o">=</span> currentTime<span class="p">;</span>  <span class="c1">// scroll is in [0, 1] range</span>
 <span class="c1"></span>
     <span class="c1">// Drive the output group effect by setting its children local times individually.</span>
-<span class="c1"></span>    effects<span class="p">.</span>children<span class="p">[</span><span class="mi">0</span><span class="p">].</span>localTime <span class="o">=</span> scroll<span class="p">;</span>
-    effects<span class="p">.</span>children<span class="p">[</span><span class="mi">1</span><span class="p">].</span>localTime <span class="o">=</span> <span class="k">this</span><span class="p">.</span>timing_<span class="p">(</span>clamp<span class="p">(</span>scroll<span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span>
+<span class="c1"></span>    effect<span class="p">.</span>children<span class="p">[</span><span class="mi">0</span><span class="p">].</span>localTime <span class="o">=</span> scroll<span class="p">;</span>
+    effect<span class="p">.</span>children<span class="p">[</span><span class="mi">1</span><span class="p">].</span>localTime <span class="o">=</span> <span class="k">this</span><span class="p">.</span>timing_<span class="p">(</span>clamp<span class="p">(</span>scroll<span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">));</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </pre>

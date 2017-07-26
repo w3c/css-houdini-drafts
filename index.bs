@@ -807,7 +807,7 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ => {
                         [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
                         {duration: 1, iterations: 1}),
      new KeyFrameEffect($header, /* loses transparency as we scroll up */
-                        {opacity: 0, opacity: 0.8},
+                        [{opacity: 0}, {opacity: 0.8}],
                         {duration: 1, iterations: 1})],
      new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
   );
@@ -835,8 +835,8 @@ registerAnimator('twitter-header', class {
     const scroll = currentTime;  // scroll is in [0, 1] range
 
     // Drive the output group effect by setting its children local times individually.
-    effects.children[0].localTime = scroll;
-    effects.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
+    effect.children[0].localTime = scroll;
+    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
   }
 });
 </xmp>
