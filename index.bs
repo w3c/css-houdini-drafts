@@ -3,6 +3,7 @@ Title:  CSS Animation Worklet API
 Status: CG-DRAFT
 Group: WICG
 URL: https://wicg.github.io/animation-worklet/
+Repository: wicg/animation-worklet
 Shortname: css-animation-api
 Level: 1
 Abstract:
@@ -403,6 +404,22 @@ the animation's output.
 
 <a>Worklet animation</a> also has an <a>animator name</a> which identifies its <a>animator
 definition</a>.
+
+
+<figure>
+  <img src="img/WorkletAnimation-timing-model.svg" width="600"
+    alt="Overview of the WorkletAnimation timing model.">
+  <figcaption>
+    Overview of the WorkletAnimation timing model. <br>
+
+    The animation current time is input to the animator which produces local time value for
+    animation effect. If animator is running in a parallel global scope, the implementation may also
+    choose to use the local time value to produce the final effect value and update the visual in
+    parallel.
+
+  </figcaption>
+</figure>
+
 
 Creating an Worklet Animation {#creating-worklet-animation}
 -----------------------------------------------------------

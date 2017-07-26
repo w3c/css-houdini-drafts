@@ -1424,13 +1424,13 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-25">25 July 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-26">26 July 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
      <dd><a class="u-url" href="https://wicg.github.io/animation-worklet/">https://wicg.github.io/animation-worklet/</a>
      <dt>Issue Tracking:
-     <dd><a href="https://github.com/majido/animation-worklet/issues/">GitHub</a>
+     <dd><a href="https://github.com/wicg/animation-worklet/issues/">GitHub</a>
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editors:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-email email" href="mailto:majidvp@google.com">Majid Valipour</a>
@@ -1753,6 +1753,16 @@ Another implication of this is that the the <a data-link-type="dfn" href="https:
 the animation’s output.</p>
    <p><a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-5">Worklet animation</a> also has an <a data-link-type="dfn" href="#animator-name" id="ref-for-animator-name-5">animator name</a> which identifies its <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition-3">animator
 definition</a>.</p>
+   <figure>
+     <img alt="Overview of the WorkletAnimation timing model." src="img/WorkletAnimation-timing-model.svg" width="600"> 
+    <figcaption>
+      Overview of the WorkletAnimation timing model. <br> 
+     <p>The animation current time is input to the animator which produces local time value for
+    animation effect. If animator is running in a parallel global scope, the implementation may also
+    choose to use the local time value to produce the final effect value and update the visual in
+    parallel.</p>
+    </figcaption>
+   </figure>
    <h3 class="heading settled" data-level="6.2" id="creating-worklet-animation"><span class="secno">6.2. </span><span class="content">Creating an Worklet Animation</span><a class="self-link" href="#creating-worklet-animation"></a></h3>
 <pre class="idl highlight def">[Constructor (DOMString animatorName,
               optional (AnimationEffectReadOnly or array)? effects = null,
@@ -1795,7 +1805,7 @@ passing the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#
     <li data-md="">
      <p>define what happens when timeline or effect is modified document scope</p>
    </ul>
-   <p class="issue" id="issue-fb4f14aa"><a class="self-link" href="#issue-fb4f14aa"></a> describe how constructor handles single or sequence of effects. <a href="https://github.com/majido/animation-worklet/issues/62">&lt;https://github.com/majido/animation-worklet/issues/62></a></p>
+   <p class="issue" id="issue-fb4f14aa"><a class="self-link" href="#issue-fb4f14aa"></a> describe how constructor handles single or sequence of effects. <a href="https://github.com/wicg/animation-worklet/issues/62">&lt;https://github.com/wicg/animation-worklet/issues/62></a></p>
    <h3 class="heading settled" data-level="6.3" id="timing-model"><span class="secno">6.3. </span><span class="content">Worklet Animation timing model</span><a class="self-link" href="#timing-model"></a></h3>
    <p>The section describes how <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-6">worklet animation</a> timing model differs from other <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#concept-animation">animations</a>.</p>
    <p>In addition to existing conditions on when the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#concept-animation">animation</a> is considered <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#ready">ready</a>, a <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-7">Worklet animation</a> readiness also depends on the following condition to be true:</p>
@@ -1823,7 +1833,7 @@ context this value may be stale.</p>
    </ul>
    <p class="issue" id="issue-ecc3a1c5"><a class="self-link" href="#issue-ecc3a1c5"></a> Come with appropriate mechanism’s for <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-13">animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
-   it can react appropriately. <a href="https://github.com/majido/animation-worklet/issues/63">&lt;https://github.com/majido/animation-worklet/issues/63></a></p>
+   it can react appropriately. <a href="https://github.com/wicg/animation-worklet/issues/63">&lt;https://github.com/wicg/animation-worklet/issues/63></a></p>
    <h3 class="heading settled" data-level="6.4" id="worklet-animation-animator-instances"><span class="secno">6.4. </span><span class="content">Interaction with Animator Instances</span><a class="self-link" href="#worklet-animation-animator-instances"></a></h3>
    <p>A <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-11">worklet animation</a> corresponds to at most one <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-14">animator instance</a> at any time, and may
 have no current corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a>. The correspondance of an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-16">animator
@@ -1872,7 +1882,7 @@ following steps.</p>
 corresponding <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-13">worklet animation</a>. Instead, see <a href="#removing-animator">§5.3 Removing an Animator</a>.</p>
    <h3 class="heading settled" data-level="6.5" id="timeline-attachment"><span class="secno">6.5. </span><span class="content">Timeline Attachment</span><a class="self-link" href="#timeline-attachment"></a></h3>
    <p>TODO:</p>
-   <p class="issue" id="issue-1b7aae40"><a class="self-link" href="#issue-1b7aae40"></a> Define semantics of attachment and detachment. <a href="https://github.com/majido/animation-worklet/issues/61">&lt;https://github.com/majido/animation-worklet/issues/61></a></p>
+   <p class="issue" id="issue-1b7aae40"><a class="self-link" href="#issue-1b7aae40"></a> Define semantics of attachment and detachment. <a href="https://github.com/wicg/animation-worklet/issues/61">&lt;https://github.com/wicg/animation-worklet/issues/61></a></p>
    <h3 class="heading settled" data-level="6.6" id="worklet-group-effect"><span class="secno">6.6. </span><span class="content">WorkletGroupEffect</span><a class="self-link" href="#worklet-group-effect"></a></h3>
    <p><code class="idl"><a data-link-type="idl" href="#workletgroupeffect" id="ref-for-workletgroupeffect-2">WorkletGroupEffect</a></code> is a type of <a data-link-type="dfn" href="https://w3c.github.io/web-animations/level-2/#group-effect">group effect</a> which allows its children local time to be
 mutated individually.</p>
@@ -2329,11 +2339,11 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
    <div class="issue"> Consider giving user agents permission to skip running animator instances to
     throttle slow animators.<a href="#issue-07876098"> ↵ </a></div>
    <div class="issue"> Define when we may get rid of the animator.<a href="#issue-216cac5b"> ↵ </a></div>
-   <div class="issue"> describe how constructor handles single or sequence of effects. <a href="https://github.com/majido/animation-worklet/issues/62">&lt;https://github.com/majido/animation-worklet/issues/62></a><a href="#issue-fb4f14aa"> ↵ </a></div>
+   <div class="issue"> describe how constructor handles single or sequence of effects. <a href="https://github.com/wicg/animation-worklet/issues/62">&lt;https://github.com/wicg/animation-worklet/issues/62></a><a href="#issue-fb4f14aa"> ↵ </a></div>
    <div class="issue"> Come with appropriate mechanism’s for <a data-link-type="dfn" href="#animator-instance">animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
-   it can react appropriately. <a href="https://github.com/majido/animation-worklet/issues/63">&lt;https://github.com/majido/animation-worklet/issues/63></a><a href="#issue-ecc3a1c5"> ↵ </a></div>
-   <div class="issue"> Define semantics of attachment and detachment. <a href="https://github.com/majido/animation-worklet/issues/61">&lt;https://github.com/majido/animation-worklet/issues/61></a><a href="#issue-1b7aae40"> ↵ </a></div>
+   it can react appropriately. <a href="https://github.com/wicg/animation-worklet/issues/63">&lt;https://github.com/wicg/animation-worklet/issues/63></a><a href="#issue-ecc3a1c5"> ↵ </a></div>
+   <div class="issue"> Define semantics of attachment and detachment. <a href="https://github.com/wicg/animation-worklet/issues/61">&lt;https://github.com/wicg/animation-worklet/issues/61></a><a href="#issue-1b7aae40"> ↵ </a></div>
    <div class="issue"> Worklet animations will have a special animation class that  ranks them with the highest
 order in animation stack effect. also their composite operation is "replace" which is going to
 allow them to run in parallel to other web animations in the system. Supporting other
