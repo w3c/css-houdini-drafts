@@ -293,7 +293,7 @@ worklet animation in the document scope.
 
 <div algorithm="create-animator">
 
-To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect|, and
+To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect|, |options|, and
 |workletGlobalScope|, the user agent <em>must</em> run the following steps:
 
     1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
@@ -305,7 +305,7 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
 
     3. Let |timelineList| be a new <a>list</a> with |timeline| added to it.
 
-    4. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|).
+    4. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|, [|options|]).
 
         If <a>Construct</a> throws an exception, abort the following steps.
 
@@ -379,6 +379,7 @@ To <dfn>remove an animator instance</dfn> given |instance|, and |workletGlobalSc
 
 </div>
 
+
 Requesting Animation Frames {#requesting-animation-frames}
 ----------------------------------------------------------
 
@@ -411,8 +412,10 @@ instead the associated <a>animator instance</a> controls the effect's <a>local t
 Another implication of this is that the the <a>timeline</a>'s current time does not fully determine
 the animation's output.
 
-<a>Worklet animation</a> also has an <a>animator name</a> which identifies its <a>animator
-definition</a>.
+<a>Worklet animation</a> has the following additional properties:
+  - an <dfn>animation animator name</dfn> which identifies its <a>animator definition</a>.
+  - a <dfn>serialized options</dfn> which is <a>serializable</a> object that is used when
+    constructing a new animator instance.
 
 
 <figure>
@@ -445,8 +448,9 @@ interface WorkletAnimation : Animation {
 
 </pre>
 
+
 <div algorithm="create-worklet-animation">
-<dfn constructor for=WorkletAnimation>WorkletAnimation(animatorName, effects, timeline)</dfn>
+<dfn constructor for=WorkletAnimation>WorkletAnimation(animatorName, effects, timeline, options)</dfn>
 Creates a new {{WorkletAnimation}} object using the following procedure.
 
     1. Let |workletAnimation| be a new {{WorkletAnimation}} object.
@@ -464,10 +468,16 @@ Creates a new {{WorkletAnimation}} object using the following procedure.
          : Otherwise (effect is undefined),
          :: Let |effect| be a undefined
 
+
     4. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
          passing |effect| as the new effect.
 
-    5. Run the procedure to <a>set the animator name of a worklet animation</a> on |workletAnimation|
+    5. Let |serializedOptions| be the result of {{StructuredSerializeWithTransfer(options)}}.
+        Rethrow any exceptions.
+
+    6. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
+
+    7. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
 </div>
 
 
@@ -524,9 +534,10 @@ When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <
     |workletAnimation|.
   3. <a>Queue a task</a> on |workletGlobalScope| to run the procedure to <a>create a new animator
        instance</a>, passing:
-      * The |workletAnimation|'s {{animatorName}} as |name|.
+      * The |workletAnimation|'s animation animator name as |name|.
       * The |workletAnimation|'s timeline as |timeline|.
       * The |workletAnimation|'s effect as |effect|.
+      * The |workletAnimation|'s serialized options as |options|.
       * The |workletGlobalScope| as |workletGlobalScope|.
   4. If the procedure was successful, set the resulting <a>animator instance</a> as corresponding to
     |workletAnimation|.
