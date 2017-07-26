@@ -161,6 +161,18 @@ value currently being used to produce the visual frame that is visible to the us
 to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
 context.
 
+
+<figure>
+  <img src="img/AnimationWorklet-threading-model.svg" width="600"
+    alt="Overview of the animation worklet threading model.">
+  <figcaption>
+    Overview of the animation worklet threading model. <br>
+
+    A simplified visualization of how animators running in a parallel execution environment can sync
+    their update to main thread while remaining in sync with visual frame production.
+  </figcaption>
+</figure>
+
 Animation Worklet {#animation-worklet-desc}
 ==============================
 <dfn>Animation Worklet</dfn> is a {{Worklet}} responsible for all classes related to custom
