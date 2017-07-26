@@ -161,6 +161,17 @@ currently visible to the user). This is similar to the effect of asynchronous sc
 offsets on main thread.
 
 
+<figure>
+  <img src="img/AnimationWorklet-threading-model.svg" width="600"
+    alt="Overview of the animation worklet threading model.">
+  <figcaption>
+    Overview of the animation worklet threading model. <br>
+
+    A simplified visualization of how animators running in a parallel execution environment can sync
+    their update to main thread while remaining in sync with visual frame production.
+  </figcaption>
+</figure>
+
 
 Animation Worklet {#animation-worklet-desc}
 ==============================

@@ -1562,6 +1562,14 @@ context reading a worklet animated <a data-link-type="dfn" href="https://w3c.git
 value in effect at the parallel worklet context (i.e, the one used when producing the frame
 currently visible to the user). This is similar to the effect of asynchronous scrolling on scroll
 offsets on main thread.</p>
+   <figure>
+     <img alt="Overview of the animation worklet threading model." src="img/AnimationWorklet-threading-model.svg" width="600"> 
+    <figcaption>
+      Overview of the animation worklet threading model. <br> 
+     <p>A simplified visualization of how animators running in a parallel execution environment can sync
+    their update to main thread while remaining in sync with visual frame production.</p>
+    </figcaption>
+   </figure>
    <h2 class="heading settled" data-level="3" id="animation-worklet-desc"><span class="secno">3. </span><span class="content">Animation Worklet</span><a class="self-link" href="#animation-worklet-desc"></a></h2>
     <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="animation-worklet">Animation Worklet</dfn> is a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#worklet">Worklet</a></code> responsible for all classes related to custom
 animations. The worklet can be accessed via <code class="idl"><a data-link-type="idl" href="#dom-window-animationworklet" id="ref-for-dom-window-animationworklet-1">animationWorklet</a></code> attribute. 
