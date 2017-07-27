@@ -383,7 +383,6 @@ To <dfn>remove an animator instance</dfn> given |instance| and |workletGlobalSco
 
 </div>
 
-Issue: What about actually destructing animatorInstance?
 
 Migrating an Animator Instance {#migrating-animator}
 -----------------------------------------
@@ -573,7 +572,6 @@ Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately.
 
-Issue: Define what happens when timeline or effect is modified document scope
 
 Interaction with Animator Instances {#worklet-animation-animator-instances}
 -----------------------------------
@@ -584,8 +582,8 @@ instance</a> for a <a>worklet animation</a> depends on the animation <a>play sta
 
 <div algorithm="associate-animator-instance">
 
-When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
-<a>paused</a>, the user agent <em>must</em> run the following steps:
+To <dfn>associate animator instance of worklet animation</dfn> given |workletAnimation|,
+the user agent <em>must</em> run the following steps:
 
   1. If |workletAnimation| has a corresponding <a>animator instance</a>, abort the following steps.
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
@@ -604,8 +602,8 @@ When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <
 
 <div algorithm="disassociate-animator-instance">
 
-When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>, the
-user age <em>must</em> run the following steps:
+To <dfn>disassociate animator instance of worklet animation</dfn> given
+|workletAnimation|, the user age <em>must</em> run the following steps:
 
   1. If |workletAnimation| does not have a corresponding <a>animator instance</a>, abort the
     following steps.
@@ -618,6 +616,32 @@ user age <em>must</em> run the following steps:
   5. Set |workletAnimation| as having no corresponding <a>animator instance</a>.
 
 </div>
+
+
+<div algorithm="set-animator-instance">
+
+To <dfn>set animator instance of worklet animation</dfn> given
+|workletAnimation|, the user age <em>must</em> run the following steps:
+
+  1. <a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
+  2. <a>associate animator instance of worklet animation</a> given |workletAnimation|.
+
+</div>
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
+<a>paused</a>, run the procedure to
+<a>associate a worklet animation with its animator instance</a> given |workletAnimation|.
+
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>,
+run the procedure to
+<a>disassociate a worklet animation with its animator instance</a> given |workletAnimation|.
+
+When the procedure to <a>set the target effect of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
+
+When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
 
 
 Timeline Attachment {#timeline-attachment}
