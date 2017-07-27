@@ -1424,7 +1424,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-26">26 July 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-27">27 July 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1999,13 +1999,8 @@ its parent group.</p>
    <p>[Issue](https://github.com/w3c/web-animations/issues/191)</p>
    <h3 class="heading settled" data-level="6.7" id="effect-stack-composite-order"><span class="secno">6.7. </span><span class="content">Effect Stack and Composite Order</span><a class="self-link" href="#effect-stack-composite-order"></a></h3>
    <p>As with other animations, <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-13">worklet animations</a> participate in the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-stack">effect stack</a>.  A
-worklet animation’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> is "Worklet Animation" and it has a higher composite
-order than animations whose <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> is "CSS animation", "CSS Animation", or that have
-no specific class.</p>
-   <p class="note" role="note"><span>Note:</span> Having a higher composite order means that <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-14">worklet animations</a> are sorted later in the effect
-stack. Being higher in the stack combined with with the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-effect">animation effect</a>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#composite-operation">composite
-operation</a> being replace by default helps improve the chances of user agents being able to run
-such animations in parallel to directly update the visuals.</p>
+worklet animation does not have a specific <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> which means it has the same
+composite order as other Javascript created web animations.</p>
    <h2 class="heading settled" data-level="7" id="security-considerations"><span class="secno">7. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
    <p class="issue" id="issue-de770110"><a class="self-link" href="#issue-de770110"></a> Need to decide what security considerations there are for this spec.</p>
    <h2 class="heading settled" data-level="8" id="privacy-considerations"><span class="secno">8. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
@@ -2014,13 +2009,13 @@ such animations in parallel to directly update the visuals.</p>
    <h3 class="heading settled" data-level="9.1" id="example-1"><span class="secno">9.1. </span><span class="content">Example 1: Hidey Bar.</span><a class="self-link" href="#example-1"></a></h3>
     An example of header effect where a header is moved with scroll and as soon as finger is lifted it
 animates fully to close or open position depending on its current position. 
-<pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'scrollingContainer'</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'header'</span><span class="p">></span>Some header<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="nt">div</span><span class="p">></span>content<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
+<pre class="lang-markup highlight"><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'scrollingContainer'</span><span class="nt">></span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'header'</span><span class="nt">></span>Some header<span class="nt">&lt;/div></span>
+  <span class="nt">&lt;div></span>content<span class="nt">&lt;/div></span>
+<span class="nt">&lt;/div></span>
 
-<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
-animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'hidey-bar-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="p">=></span> <span class="p">{</span>
+<span class="nt">&lt;script></span>
+animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'hidey-bar-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="o">=></span> <span class="p">{</span>
   <span class="kr">const</span> scrollTimeline <span class="o">=</span> <span class="k">new</span> ScrollTimeline<span class="p">(</span>$scrollingContainer<span class="p">,</span> <span class="p">{</span>timeRange<span class="o">:</span> <span class="mi">100</span><span class="p">});</span>
   <span class="kr">const</span> documentTimeline <span class="o">=</span> document<span class="p">.</span>timeline<span class="p">;</span>
 
@@ -2036,7 +2031,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
 
 
 workletAnim<span class="p">.</span>timeline <span class="o">==</span> scrollTimeline<span class="p">;</span> <span class="c1">// true</span>
-<span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
+<span class="c1"></span><span class="nt">&lt;/script></span>
 </pre>
 <pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope</span>
 <span class="c1"></span>
@@ -2079,13 +2074,13 @@ the last few frames.</p>
     An example of twitter profile header effect where two elements (avatar, and header) are updated in
 sync with scroll offset. 
 <pre class="lang-markup highlight">// In document scope
-<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'scrollingContainer'</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'header'</span> <span class="na">style</span><span class="o">=</span><span class="s">'height: 150px'</span><span class="p">>&lt;/</span><span class="nt">div</span><span class="p">></span>
-  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'avatar'</span><span class="p">>&lt;</span><span class="nt">img</span><span class="p">>&lt;/</span><span class="nt">div</span><span class="p">></span>
-<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'scrollingContainer'</span><span class="nt">></span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'header'</span> <span class="na">style=</span><span class="s">'height: 150px'</span><span class="nt">>&lt;/div></span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'avatar'</span><span class="nt">>&lt;img>&lt;/div></span>
+<span class="nt">&lt;/div></span>
 
-<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
-animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'twitter-header-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="p">=></span> <span class="p">{</span>
+<span class="nt">&lt;script></span>
+animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'twitter-header-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="o">=></span> <span class="p">{</span>
   <span class="kr">const</span> workletAnim <span class="o">=</span> <span class="k">new</span> WorkletAnimation<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span>
     <span class="p">[</span><span class="k">new</span> KeyFrameEffect<span class="p">(</span>$avatar<span class="p">,</span>  <span class="cm">/* scales down as we scroll up */</span>
                         <span class="p">[{</span>transform<span class="o">:</span> <span class="s1">'scale(1)'</span><span class="p">},</span> <span class="p">{</span>transform<span class="o">:</span> <span class="s1">'scale(0.5)'</span><span class="p">}],</span>
@@ -2100,7 +2095,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
 <span class="c1"></span>  workletAnim <span class="o">==</span> $avatarEl<span class="p">.</span>getAnimations<span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> $headerEl<span class="p">.</span>getAnimations<span class="p">()[</span><span class="mi">0</span><span class="p">];</span>
 
 <span class="p">});</span>
-<span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
+<span class="nt">&lt;/script></span>
 </pre>
 <pre class="lang-javascript highlight"><span class="c1">// Ins AnimationWorkletGlobalScope.</span>
 <span class="c1"></span>registerAnimator<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
@@ -2629,7 +2624,7 @@ the last few frames.<a href="#issue-2eb87a7a"> ↵ </a></div>
     <li><a href="#ref-for-worklet-animation-3">6.1. Worklet Animation</a> <a href="#ref-for-worklet-animation-4">(2)</a>
     <li><a href="#ref-for-worklet-animation-5">6.3. Worklet Animation timing model</a> <a href="#ref-for-worklet-animation-6">(2)</a> <a href="#ref-for-worklet-animation-7">(3)</a> <a href="#ref-for-worklet-animation-8">(4)</a> <a href="#ref-for-worklet-animation-9">(5)</a> <a href="#ref-for-worklet-animation-10">(6)</a>
     <li><a href="#ref-for-worklet-animation-11">6.4. Interaction with Animator Instances</a> <a href="#ref-for-worklet-animation-12">(2)</a>
-    <li><a href="#ref-for-worklet-animation-13">6.7. Effect Stack and Composite Order</a> <a href="#ref-for-worklet-animation-14">(2)</a>
+    <li><a href="#ref-for-worklet-animation-13">6.7. Effect Stack and Composite Order</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animation-animator-name">

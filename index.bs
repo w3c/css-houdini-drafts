@@ -676,16 +676,8 @@ Effect Stack and Composite Order {#effect-stack-composite-order}
 --------------------------------
 
 As with other animations, <a>worklet animations</a> participate in the <a>effect stack</a>.  A
-worklet animation's <a>animation class</a> is "Worklet Animation" and it has a higher composite
-order than animations whose <a>animation class</a> is "CSS animation", "CSS Animation", or that have
-no specific class.
-
-Note:
-Having a higher composite order means that <a>worklet animations</a> are sorted later in the effect
-stack. Being higher in the stack combined with with the <a>animation effect</a>'s <a>composite
-operation</a> being replace by default helps improve the chances of user agents being able to run
-such animations in parallel to directly update the visuals.
-
+worklet animation does not have a specific <a>animation class</a> which means it has the same
+composite order as other Javascript created web animations.
 
 Security Considerations {#security-considerations}
 ==================================================
