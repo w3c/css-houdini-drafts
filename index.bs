@@ -132,23 +132,21 @@ which are not really possible today.
 Threading Model {#threading-model}
 ==================================
 
-<a>Animation Worklet</a> is thread-agnostic but rendering engines are recommended to create at least
-one parallel worklet execution context different from the main javascript execution context, e.g.,
-on its own dedicated thread. Rendering engines may assign any Animation Worklet animations to run in
-such a parallel execution context which ensures their performance is not impacted by the main thread
-jank.
+<a>Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
+parallel worklet execution contexts separate from the main javascript execution context, e.g., on
+their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
+animations to run in such contexts. Doing so allows Animation Worklet animations to avoid being
+impacted by main thread jank.
 
-Furthermore, rendering engines are recommended to make a best-effort attempt to execute animate
-callbacks synchronously with visual frame production. Note that it is still legal for rendering
-engines to produce visual frames without blocking to receive animation updates from a worklet (i.e.,
-letting the effects slip behind). This can happen for example when the <a>animate function</a>
-callback is unable to complete before the frame deadline.
+Rendering engines may wish to make a best-effort attempt to execute animate callbacks synchronously
+with visual frame production to ensure smooth animation. However it is legal for rendering engines
+to produce visual frames without blocking to receive animation updates from a worklet (i.e., letting
+the effects slip behind). For example, this could occur when the <a>animate function</a> callback is
+unable to complete before the frame deadline.
 
-These recommendations are intended to establish an environment where well behaving scripted
-animations can create effects that are consistently smooth and responsive. We believe scripted
-animations that run in a parallel execution environment and limit themselves to animating cheaper
-properties (e.g. no paint or layout inducing properties) will have a much better chance of meeting
-the strict frame budgets required for smooth playback.
+We believe that scripted animations which are run in a parallel execution environment and which
+limit themselves to animating properties which do not require the user agent to consult main thread
+will have a much better chance of meeting the strict frame budgets required for smooth playback.
 
 If a Worklet Animation animation is executing in a parallel worklet execution context, the last
 known state of it's animation effects must be periodically synced back to the main javascript
