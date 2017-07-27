@@ -1539,20 +1539,19 @@ animations.</p>
 scrolling input) to these animations so that authors can create jank-free input driven animations
 which are not really possible today.</p>
    <h2 class="heading settled" data-level="2" id="threading-model"><span class="secno">2. </span><span class="content">Threading Model</span><a class="self-link" href="#threading-model"></a></h2>
-   <p><a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-3">Animation Worklet</a> is thread-agnostic but rendering engines are recommended to create at least
-one parallel worklet execution context different from the main javascript execution context, e.g.,
-on its own dedicated thread. Rendering engines may assign any Animation Worklet animations to run in
-such a parallel execution context which ensures their performance is not impacted by the main thread
-jank.</p>
-   <p>Furthermore, rendering engines are recommended to make a best-effort attempt to execute animate
-callbacks synchronously with visual frame production. Note that it is still legal for rendering
-engines to produce visual frames without blocking to receive animation updates from a worklet (i.e.,
-letting the effects slip behind). This can happen for example when the <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-1">animate function</a> callback is unable to complete before the frame deadline.</p>
-   <p>These recommendations are intended to establish an environment where well behaving scripted
-animations can create effects that are consistently smooth and responsive. We believe scripted
-animations that run in a parallel execution environment and limit themselves to animating cheaper
-properties (e.g. no paint or layout inducing properties) will have a much better chance of meeting
-the strict frame budgets required for smooth playback.</p>
+   <p><a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet-3">Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
+parallel worklet execution contexts separate from the main javascript execution context, e.g., on
+their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
+animations to run in such contexts. Doing so allows Animation Worklet animations to avoid being
+impacted by main thread jank.</p>
+   <p>Rendering engines may wish to make a best-effort attempt to execute animate callbacks synchronously
+with visual frame production to ensure smooth animation. However it is legal for rendering engines
+to produce visual frames without blocking to receive animation updates from a worklet (i.e., letting
+the effects slip behind). For example, this could occur when the <a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function-1">animate function</a> callback is
+unable to complete before the frame deadline.</p>
+   <p>We believe that scripted animations which are run in a parallel execution environment and which
+limit themselves to animating properties which do not require the user agent to consult main thread
+will have a much better chance of meeting the strict frame budgets required for smooth playback.</p>
    <p>If a Worklet Animation animation is executing in a parallel worklet execution context, the last
 known state of it’s animation effects must be periodically synced back to the main javascript
 execution context. The synchronization of <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-value">effect values</a> from the parallel worklet execution
@@ -2029,13 +2028,13 @@ composite order as other Javascript created web animations.</p>
    <h3 class="heading settled" data-level="9.1" id="example-1"><span class="secno">9.1. </span><span class="content">Example 1: Hidey Bar.</span><a class="self-link" href="#example-1"></a></h3>
     An example of header effect where a header is moved with scroll and as soon as finger is lifted it
 animates fully to close or open position depending on its current position. 
-<pre class="lang-markup highlight"><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'scrollingContainer'</span><span class="nt">></span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'header'</span><span class="nt">></span>Some header<span class="nt">&lt;/div></span>
-  <span class="nt">&lt;div></span>content<span class="nt">&lt;/div></span>
-<span class="nt">&lt;/div></span>
+<pre class="lang-markup highlight"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'scrollingContainer'</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'header'</span><span class="p">></span>Some header<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">div</span><span class="p">></span>content<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
 
-<span class="nt">&lt;script></span>
-animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'hidey-bar-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="o">=></span> <span class="p">{</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
+animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'hidey-bar-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="p">=></span> <span class="p">{</span>
   <span class="kr">const</span> scrollTimeline <span class="o">=</span> <span class="k">new</span> ScrollTimeline<span class="p">(</span>$scrollingContainer<span class="p">,</span> <span class="p">{</span>timeRange<span class="o">:</span> <span class="mi">100</span><span class="p">});</span>
   <span class="kr">const</span> documentTimeline <span class="o">=</span> document<span class="p">.</span>timeline<span class="p">;</span>
 
@@ -2051,7 +2050,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
 
 
 workletAnim<span class="p">.</span>timeline <span class="o">==</span> scrollTimeline<span class="p">;</span> <span class="c1">// true</span>
-<span class="c1"></span><span class="nt">&lt;/script></span>
+<span class="c1"></span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
 </pre>
 <pre class="lang-javascript highlight"><span class="c1">// Inside AnimationWorkletGlobalScope</span>
 <span class="c1"></span>
@@ -2094,13 +2093,13 @@ the last few frames.</p>
     An example of twitter profile header effect where two elements (avatar, and header) are updated in
 sync with scroll offset. 
 <pre class="lang-markup highlight">// In document scope
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'scrollingContainer'</span><span class="nt">></span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'header'</span> <span class="na">style=</span><span class="s">'height: 150px'</span><span class="nt">>&lt;/div></span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">'avatar'</span><span class="nt">>&lt;img>&lt;/div></span>
-<span class="nt">&lt;/div></span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'scrollingContainer'</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'header'</span> <span class="na">style</span><span class="o">=</span><span class="s">'height: 150px'</span><span class="p">>&lt;/</span><span class="nt">div</span><span class="p">></span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">'avatar'</span><span class="p">>&lt;</span><span class="nt">img</span><span class="p">>&lt;/</span><span class="nt">div</span><span class="p">></span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">></span>
 
-<span class="nt">&lt;script></span>
-animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'twitter-header-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="o">=></span> <span class="p">{</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">></span>
+animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span class="s1">'twitter-header-animator.js'</span><span class="p">).</span>then<span class="p">(</span> _ <span class="p">=></span> <span class="p">{</span>
   <span class="kr">const</span> workletAnim <span class="o">=</span> <span class="k">new</span> WorkletAnimation<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span>
     <span class="p">[</span><span class="k">new</span> KeyFrameEffect<span class="p">(</span>$avatar<span class="p">,</span>  <span class="cm">/* scales down as we scroll up */</span>
                         <span class="p">[{</span>transform<span class="o">:</span> <span class="s1">'scale(1)'</span><span class="p">},</span> <span class="p">{</span>transform<span class="o">:</span> <span class="s1">'scale(0.5)'</span><span class="p">}],</span>
@@ -2115,7 +2114,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
 <span class="c1"></span>  workletAnim <span class="o">==</span> $avatarEl<span class="p">.</span>getAnimations<span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> $headerEl<span class="p">.</span>getAnimations<span class="p">()[</span><span class="mi">0</span><span class="p">];</span>
 
 <span class="p">});</span>
-<span class="nt">&lt;/script></span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">></span>
 </pre>
 <pre class="lang-javascript highlight"><span class="c1">// Ins AnimationWorkletGlobalScope.</span>
 <span class="c1"></span>registerAnimator<span class="p">(</span><span class="s1">'twitter-header'</span><span class="p">,</span> <span class="kr">class</span> <span class="p">{</span>
