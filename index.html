@@ -1424,7 +1424,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-26">26 July 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-27">27 July 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1753,7 +1753,6 @@ in the same frame.
       <p>Remove <var>instance</var> from <var>workletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-instance-set" id="ref-for-animator-instance-set-3">animator instance set</a>.</p>
     </ol>
    </div>
-   <p class="issue" id="issue-0eb0049e"><a class="self-link" href="#issue-0eb0049e"></a> What about actually destructing animatorInstance?</p>
    <h3 class="heading settled" data-level="5.4" id="migrating-animator"><span class="secno">5.4. </span><span class="content">Migrating an Animator Instance</span><a class="self-link" href="#migrating-animator"></a></h3>
    <p>User agents are responsible for assigning an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-6">animator instance</a> to a <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a></code>.
 There can be many such <code class="idl"><a data-link-type="idl" href="https://drafts.css-houdini.org/worklets/#workletglobalscope">WorkletGlobalScope</a></code>s, which may exist across different threads or
@@ -1918,13 +1917,13 @@ parallel execution context.</p>
    <p class="issue" id="issue-ecc3a1c5"><a class="self-link" href="#issue-ecc3a1c5"></a> Come with appropriate mechanism’s for <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-15">animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately. <a href="https://github.com/wicg/animation-worklet/issues/63">&lt;https://github.com/wicg/animation-worklet/issues/63></a></p>
-   <p class="issue" id="issue-de82681a"><a class="self-link" href="#issue-de82681a"></a> Define what happens when timeline or effect is modified document scope</p>
    <h3 class="heading settled" data-level="6.4" id="worklet-animation-animator-instances"><span class="secno">6.4. </span><span class="content">Interaction with Animator Instances</span><a class="self-link" href="#worklet-animation-animator-instances"></a></h3>
    <p>A <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-11">worklet animation</a> corresponds to at most one <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-16">animator instance</a> at any time, and may
 have no current corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-17">animator instance</a>. The correspondance of an <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-18">animator
 instance</a> for a <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-12">worklet animation</a> depends on the animation <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state">play state</a>.</p>
    <div class="algorithm" data-algorithm="associate-animator-instance">
-    <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#pending">pending</a>, <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#running">running</a>, or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#paused">paused</a>, the user agent <em>must</em> run the following steps:</p>
+    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="associate-animator-instance-of-worklet-animation">associate animator instance of worklet animation</dfn> given <var>workletAnimation</var>,
+the user agent <em>must</em> run the following steps:</p>
     <ol>
      <li data-md="">
       <p>If <var>workletAnimation</var> has a corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-19">animator instance</a>, abort the following steps.</p>
@@ -1950,8 +1949,7 @@ instance</a> for a <a data-link-type="dfn" href="#worklet-animation" id="ref-for
     </ol>
    </div>
    <div class="algorithm" data-algorithm="disassociate-animator-instance">
-    <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#idle">idle</a> or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#finished">finished</a>, the
-user age <em>must</em> run the following steps:</p>
+    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="disassociate-animator-instance-of-worklet-animation">disassociate animator instance of worklet animation</dfn> given <var>workletAnimation</var>, the user age <em>must</em> run the following steps:</p>
     <ol>
      <li data-md="">
       <p>If <var>workletAnimation</var> does not have a corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-21">animator instance</a>, abort the
@@ -1968,6 +1966,20 @@ following steps.</p>
       <p>Set <var>workletAnimation</var> as having no corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance-23">animator instance</a>.</p>
     </ol>
    </div>
+   <div class="algorithm" data-algorithm="set-animator-instance">
+    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="set-animator-instance-of-worklet-animation">set animator instance of worklet animation</dfn> given <var>workletAnimation</var>, the user age <em>must</em> run the following steps:</p>
+    <ol>
+     <li data-md="">
+      <p><a data-link-type="dfn" href="#disassociate-animator-instance-of-worklet-animation" id="ref-for-disassociate-animator-instance-of-worklet-animation-1">disassociate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
+     <li data-md="">
+      <p><a data-link-type="dfn" href="#associate-animator-instance-of-worklet-animation" id="ref-for-associate-animator-instance-of-worklet-animation-1">associate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
+    </ol>
+   </div>
+   <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#pending">pending</a>, <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#running">running</a>, or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#paused">paused</a>, run the procedure to <a data-link-type="dfn">associate a worklet animation with its animator instance</a> given <var>workletAnimation</var>.</p>
+   <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#idle">idle</a> or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#finished">finished</a>,
+run the procedure to <a data-link-type="dfn">disassociate a worklet animation with its animator instance</a> given <var>workletAnimation</var>.</p>
+   <p>When the procedure to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#set-the-target-effect-of-an-animation">set the target effect of an animation</a> for a given <var>workletAnimation</var> is called, then <a data-link-type="dfn" href="#set-animator-instance-of-worklet-animation" id="ref-for-set-animator-instance-of-worklet-animation-1">set animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
+   <p>When the procedure to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#set-the-timeline-of-an-animation">set the timeline of an animation</a> for a given <var>workletAnimation</var> is called, then <a data-link-type="dfn" href="#set-animator-instance-of-worklet-animation" id="ref-for-set-animator-instance-of-worklet-animation-2">set animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
    <h3 class="heading settled" data-level="6.5" id="timeline-attachment"><span class="secno">6.5. </span><span class="content">Timeline Attachment</span><a class="self-link" href="#timeline-attachment"></a></h3>
    <p class="issue" id="issue-1b7aae40"><a class="self-link" href="#issue-1b7aae40"></a> Define semantics of attachment and detachment. <a href="https://github.com/wicg/animation-worklet/issues/61">&lt;https://github.com/wicg/animation-worklet/issues/61></a></p>
    <h3 class="heading settled" data-level="6.6" id="worklet-group-effect"><span class="secno">6.6. </span><span class="content">WorkletGroupEffect</span><a class="self-link" href="#worklet-group-effect"></a></h3>
@@ -2007,13 +2019,8 @@ its parent group.</p>
    <p>[Issue](https://github.com/w3c/web-animations/issues/191)</p>
    <h3 class="heading settled" data-level="6.7" id="effect-stack-composite-order"><span class="secno">6.7. </span><span class="content">Effect Stack and Composite Order</span><a class="self-link" href="#effect-stack-composite-order"></a></h3>
    <p>As with other animations, <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-13">worklet animations</a> participate in the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-stack">effect stack</a>.  A
-worklet animation’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> is "Worklet Animation" and it has a higher composite
-order than animations whose <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> is "CSS animation", "CSS Animation", or that have
-no specific class.</p>
-   <p class="note" role="note"><span>Note:</span> Having a higher composite order means that <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-14">worklet animations</a> are sorted later in the effect
-stack. Being higher in the stack combined with with the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-effect">animation effect</a>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#composite-operation">composite
-operation</a> being replace by default helps improve the chances of user agents being able to run
-such animations in parallel to directly update the visuals.</p>
+worklet animation does not have a specific <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class">animation class</a> which means it has the same
+composite order as other Javascript created web animations.</p>
    <h2 class="heading settled" data-level="7" id="security-considerations"><span class="secno">7. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
    <p class="issue" id="issue-de770110"><a class="self-link" href="#issue-de770110"></a> Need to decide what security considerations there are for this spec.</p>
    <h2 class="heading settled" data-level="8" id="privacy-considerations"><span class="secno">8. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
@@ -2298,8 +2305,10 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
    <li><a href="#animator-name-to-animator-definition-map">animator name to animator definition map</a><span>, in §4.1</span>
    <li><a href="#animator-serialized-options">animator serialized options</a><span>, in §5</span>
    <li><a href="#animator-timeline">animator timeline</a><span>, in §5</span>
+   <li><a href="#associate-animator-instance-of-worklet-animation">associate animator instance of worklet animation</a><span>, in §6.4</span>
    <li><a href="#class-constructor">class constructor</a><span>, in §4</span>
    <li><a href="#create-a-new-animator-instance">create a new animator instance</a><span>, in §5.1</span>
+   <li><a href="#disassociate-animator-instance-of-worklet-animation">disassociate animator instance of worklet animation</a><span>, in §6.4</span>
    <li><a href="#frame-current">frame-current</a><span>, in §5.5</span>
    <li><a href="#frame-requested">frame-requested</a><span>, in §5.5</span>
    <li><a href="#global-execution-context">global execution context</a><span>, in §3</span>
@@ -2309,6 +2318,7 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
    <li><a href="#remove-an-animator-instance">remove an animator instance</a><span>, in §5.3</span>
    <li><a href="#run-animators">run animators</a><span>, in §5.2</span>
    <li><a href="#serialized-options">serialized options</a><span>, in §6.1</span>
+   <li><a href="#set-animator-instance-of-worklet-animation">set animator instance of worklet animation</a><span>, in §6.4</span>
    <li><a href="#callbackdef-voidfunction">VoidFunction</a><span>, in §3</span>
    <li><a href="#worklet-animation">Worklet animation</a><span>, in §6.1</span>
    <li><a href="#workletanimation">WorkletAnimation</a><span>, in §6.2</span>
@@ -2434,11 +2444,9 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
   <div style="counter-reset:issue">
    <div class="issue"> Consider giving user agents permission to skip running animator instances to
    throttle slow animators.<a href="#issue-c580570c"> ↵ </a></div>
-   <div class="issue"> What about actually destructing animatorInstance?<a href="#issue-0eb0049e"> ↵ </a></div>
    <div class="issue"> Come with appropriate mechanism’s for <a data-link-type="dfn" href="#animator-instance">animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately. <a href="https://github.com/wicg/animation-worklet/issues/63">&lt;https://github.com/wicg/animation-worklet/issues/63></a><a href="#issue-ecc3a1c5"> ↵ </a></div>
-   <div class="issue"> Define what happens when timeline or effect is modified document scope<a href="#issue-de82681a"> ↵ </a></div>
    <div class="issue"> Define semantics of attachment and detachment. <a href="https://github.com/wicg/animation-worklet/issues/61">&lt;https://github.com/wicg/animation-worklet/issues/61></a><a href="#issue-1b7aae40"> ↵ </a></div>
    <div class="issue"> The above algorithm should probably only apply to within the AnimationWorkletGlobalScope?<a href="#issue-0ac49f6c"> ↵ </a></div>
    <div class="issue"> Need to decide what security considerations there are for this spec.<a href="#issue-de770110"> ↵ </a></div>
@@ -2637,7 +2645,7 @@ the last few frames.<a href="#issue-2eb87a7a"> ↵ </a></div>
     <li><a href="#ref-for-worklet-animation-3">6.1. Worklet Animation</a> <a href="#ref-for-worklet-animation-4">(2)</a>
     <li><a href="#ref-for-worklet-animation-5">6.3. Worklet Animation timing model</a> <a href="#ref-for-worklet-animation-6">(2)</a> <a href="#ref-for-worklet-animation-7">(3)</a> <a href="#ref-for-worklet-animation-8">(4)</a> <a href="#ref-for-worklet-animation-9">(5)</a> <a href="#ref-for-worklet-animation-10">(6)</a>
     <li><a href="#ref-for-worklet-animation-11">6.4. Interaction with Animator Instances</a> <a href="#ref-for-worklet-animation-12">(2)</a>
-    <li><a href="#ref-for-worklet-animation-13">6.7. Effect Stack and Composite Order</a> <a href="#ref-for-worklet-animation-14">(2)</a>
+    <li><a href="#ref-for-worklet-animation-13">6.7. Effect Stack and Composite Order</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animation-animator-name">
@@ -2659,6 +2667,24 @@ the last few frames.<a href="#issue-2eb87a7a"> ↵ </a></div>
    <ul>
     <li><a href="#ref-for-workletanimation-1">6.2. Creating a Worklet Animation</a> <a href="#ref-for-workletanimation-2">(2)</a>
     <li><a href="#ref-for-workletanimation-3">6.6. WorkletGroupEffect</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="associate-animator-instance-of-worklet-animation">
+   <b><a href="#associate-animator-instance-of-worklet-animation">#associate-animator-instance-of-worklet-animation</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-associate-animator-instance-of-worklet-animation-1">6.4. Interaction with Animator Instances</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="disassociate-animator-instance-of-worklet-animation">
+   <b><a href="#disassociate-animator-instance-of-worklet-animation">#disassociate-animator-instance-of-worklet-animation</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-disassociate-animator-instance-of-worklet-animation-1">6.4. Interaction with Animator Instances</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="set-animator-instance-of-worklet-animation">
+   <b><a href="#set-animator-instance-of-worklet-animation">#set-animator-instance-of-worklet-animation</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-set-animator-instance-of-worklet-animation-1">6.4. Interaction with Animator Instances</a> <a href="#ref-for-set-animator-instance-of-worklet-animation-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="workletgroupeffectreadonly">
