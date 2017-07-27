@@ -129,23 +129,21 @@ animations.
 Threading Model {#threading-model}
 ==================================
 
-<a>Animation Worklet</a> is thread-agnostic but rendering engines are recommended to create at least
-one parallel worklet execution context different from the main javascript execution context, e.g.,
-on its own dedicated thread. Rendering engines may assign any Animation Worklet animations to run in
-such a parallel execution context which ensures their performance is not impacted by the main thread
-jank.
+<a>Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
+parallel worklet execution contexts separate from the main javascript execution context, e.g., on
+their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
+animations to run in such contexts. Doing so allows Animation Worklet animations to avoid being
+impacted by main thread jank.
 
-Furthermore, rendering engines are recommended to make a best-effort attempt to execute animate
-callbacks synchronously with visual frame production. Note that it is still legal for rendering
-engines to produce visual frames without blocking to receive animation updates from a worklet (i.e.,
-letting the effects slip behind). This can happen for example when the <a>animate function</a>
-callback is unable to complete before the frame deadline.
+Rendering engines may wish to make a best-effort attempt to execute animate callbacks synchronously
+with visual frame production to ensure smooth animation. However it is legal for rendering engines
+to produce visual frames without blocking to receive animation updates from a worklet (i.e., letting
+the effects slip behind). For example, this could occur when the <a>animate function</a> callback is
+unable to complete before the frame deadline.
 
-These recommendations are intended to establish an environment where well behaving scripted
-animations can create effects that are consistently smooth and responsive. We believe scripted
-animations that run in a parallel execution environment and limit themselves to animating cheaper
-properties (e.g. no paint or layout inducing properties) will have a much better chance of meeting
-the strict frame budgets required for smooth playback.
+We believe that scripted animations which are run in a parallel execution environment and which
+limit themselves to animating properties which do not require the user agent to consult main thread
+will have a much better chance of meeting the strict frame budgets required for smooth playback.
 
 If a Worklet Animation animation is executing in a parallel worklet execution context, the last
 known state of it's animation effects must be periodically synced back to the main javascript
@@ -157,6 +155,18 @@ when reading a <a>target property</a> that is being animated in a Worklet Animat
 value currently being used to produce the visual frame that is visible to the user. This is similar
 to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
 context.
+
+
+<figure>
+  <img src="img/AnimationWorklet-threading-model.svg" width="600"
+    alt="Overview of the animation worklet threading model.">
+  <figcaption>
+    Overview of the animation worklet threading model. <br>
+
+    A simplified visualization of how animators running in a parallel execution environment can sync
+    their update to main thread while remaining in sync with visual frame production.
+  </figcaption>
+</figure>
 
 Animation Worklet {#animation-worklet-desc}
 ==============================
@@ -380,7 +390,6 @@ To <dfn>remove an animator instance</dfn> given |instance| and |workletGlobalSco
 
 </div>
 
-Issue: What about actually destructing animatorInstance?
 
 Migrating an Animator Instance {#migrating-animator}
 -----------------------------------------
@@ -570,7 +579,6 @@ Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately.
 
-Issue: Define what happens when timeline or effect is modified document scope
 
 Interaction with Animator Instances {#worklet-animation-animator-instances}
 -----------------------------------
@@ -581,8 +589,8 @@ instance</a> for a <a>worklet animation</a> depends on the animation <a>play sta
 
 <div algorithm="associate-animator-instance">
 
-When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
-<a>paused</a>, the user agent <em>must</em> run the following steps:
+To <dfn>associate animator instance of worklet animation</dfn> given |workletAnimation|,
+the user agent <em>must</em> run the following steps:
 
   1. If |workletAnimation| has a corresponding <a>animator instance</a>, abort the following steps.
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
@@ -601,8 +609,8 @@ When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <
 
 <div algorithm="disassociate-animator-instance">
 
-When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>, the
-user age <em>must</em> run the following steps:
+To <dfn>disassociate animator instance of worklet animation</dfn> given
+|workletAnimation|, the user age <em>must</em> run the following steps:
 
   1. If |workletAnimation| does not have a corresponding <a>animator instance</a>, abort the
     following steps.
@@ -615,6 +623,32 @@ user age <em>must</em> run the following steps:
   5. Set |workletAnimation| as having no corresponding <a>animator instance</a>.
 
 </div>
+
+
+<div algorithm="set-animator-instance">
+
+To <dfn>set animator instance of worklet animation</dfn> given
+|workletAnimation|, the user age <em>must</em> run the following steps:
+
+  1. <a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
+  2. <a>associate animator instance of worklet animation</a> given |workletAnimation|.
+
+</div>
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
+<a>paused</a>, run the procedure to
+<a>associate a worklet animation with its animator instance</a> given |workletAnimation|.
+
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>,
+run the procedure to
+<a>disassociate a worklet animation with its animator instance</a> given |workletAnimation|.
+
+When the procedure to <a>set the target effect of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
+
+When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
 
 
 Timeline Attachment {#timeline-attachment}
@@ -685,16 +719,8 @@ Effect Stack and Composite Order {#effect-stack-composite-order}
 --------------------------------
 
 As with other animations, <a>worklet animations</a> participate in the <a>effect stack</a>.  A
-worklet animation's <a>animation class</a> is "Worklet Animation" and it has a higher composite
-order than animations whose <a>animation class</a> is "CSS animation", "CSS Animation", or that have
-no specific class.
-
-Note:
-Having a higher composite order means that <a>worklet animations</a> are sorted later in the effect
-stack. Being higher in the stack combined with with the <a>animation effect</a>'s <a>composite
-operation</a> being replace by default helps improve the chances of user agents being able to run
-such animations in parallel to directly update the visuals.
-
+worklet animation does not have a specific <a>animation class</a> which means it has the same
+composite order as other Javascript created web animations.
 
 Security Considerations {#security-considerations}
 ==================================================
@@ -804,7 +830,7 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ => {
                         [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
                         {duration: 1, iterations: 1}),
      new KeyFrameEffect($header, /* loses transparency as we scroll up */
-                        {opacity: 0, opacity: 0.8},
+                        [{opacity: 0}, {opacity: 0.8}],
                         {duration: 1, iterations: 1})],
      new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
   );
@@ -832,8 +858,8 @@ registerAnimator('twitter-header', class {
     const scroll = currentTime;  // scroll is in [0, 1] range
 
     // Drive the output group effect by setting its children local times individually.
-    effects.children[0].localTime = scroll;
-    effects.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
+    effect.children[0].localTime = scroll;
+    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
   }
 });
 </xmp>

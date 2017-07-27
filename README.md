@@ -59,7 +59,7 @@ flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
 # Key Concepts
 
-## Animation Worklet Scope
+## Animation Worklet Global Scope
 A [worklet global scope](https://drafts.css-houdini.org/worklets/#the-global-scope) that is created
 by Animation Worklet. Note that Animation Worklet creates multiple such scopes and uses them to
 execute user defined effects.
@@ -107,9 +107,9 @@ words we allow arbitrary start time for child effects. This is something that ne
 level 2 spec.
 
 ## Multiple Timelines
-Unlike typical animations, worklet animations can have multiple timelines. This is necessary to
-implement key usecases where the effect needs to smoothly animate across different timelines
-(e.g., scroll and wall clock).
+Unlike typical animations, worklet animations can be attached to multiple timelines. This is
+necessary to implement key usecases where the effect needs to smoothly animate across different
+timelines (e.g., scroll and wall clock).
 
 ### Primary Timeline
 The first timeline is considered the *primary timeline*. The only purpose of the primary timeline is
@@ -138,22 +138,24 @@ new WorklerAnimation('animation-with-local-state', [], [], {value: 1});
 
 ```js
 registerAnimator('animation-with-local-state', class {
-  constructor(options) {
+  constructor(options, state) {
     // |options| may be either:
     //  - The user provided options bag passed into the WorkletAnimation constructor on first initialization i.e, {value: 1}.
     //  - The object returned by |destroy| after each migration i.e. {value: 42}.
     this.options_ = options;
+    this.state_ = state || {value: Math.random()};
   }
 
   animate(timelines, effect) {
-    this.options_.value = 42;
+    this.state_.value += 0.1;
+    effect.localTime = this.state_.value;
   }
 
   destroy() {
     // Invoked before each migration attempts.
     // The returned object must be structure clonable and will be passed to constructor to help
     // animator restore its state after migration to the new scope.
-    return this.options_;
+    return this.state_;
   }
 });
 ```
@@ -176,17 +178,20 @@ it animates fully to close or open position depending on its current position.
 <script>
 animationWorklet.addModule('hidey-bar-animator.js').then( _ => {
   const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
+  const documentTimeline = document.timeline;
+
 
   var workletAnim = new WorkletAnimation('hidey-bar',
     new KeyFrameEffect($header,
                        [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
                        {duration: 100, iterations: 1, fill: 'both' })
-    [scrollTimeline, document.timeline],
+    scrollTimeline, 
+    {scrollTimeline, documentTimeline},
   );
 });
 
 
-workletAnim.timeline == scrollTimeline; // true, timeline returns the primary timeline
+workletAnim.timeline == scrollTimeline; // true
 
 </script>
 ```
@@ -194,14 +199,23 @@ workletAnim.timeline == scrollTimeline; // true, timeline returns the primary ti
 hidey-bar-animator.js:
 ```js
 registerAnimator('hidey-bar', class {
-  animate(timelines, effects) {
+
+  constructor(options) {
+    this.scrollTimeline_ = options.scrollTimeline;
+    this.documentTimeline_ = options.documentTimeline;
+  }
+
+  animate(currentTime, effect) {
     const scroll = timeline[0].currentTime;  // [0, 100]
     const time = timelines[1].currentTime;
+
+    const scroll = this.scrollTimeline_.currentTime;  // [0, 100]
+    const time = this.documentTimeline_.currentTime;
 
     // **TODO**: use a hypothetical 'phase' property on timeline as a way to detect when user is no
     // longer actively scrolling. This is a reasonable thing to have on scroll timeline but we can
     // fallback to using a timeout based approach as well.
-    activelyScrolling = timeline[0].phase == 'active';
+    const activelyScrolling = this.scrollTimeline_.phase == 'active';
 
     let localTime;
     if (activelyScrolling) {
@@ -218,7 +232,6 @@ registerAnimator('hidey-bar', class {
 
     // Drive the output effects by setting its local time.
     effect.localTime = localTime;
-  }
 });
 
 ```
@@ -242,9 +255,9 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ => {
                         [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
                         {duration: 1, iterations: 1}),
      new KeyFrameEffect($header, /* loses transparency as we scroll up */
-                        {opacity: 0, opacity: 0.8},
+                        [{opacity: 0}, {opacity: 0.8}],
                         {duration: 1, iterations: 1})] ,
-     [new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight})],
+     new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
   );
 
   // Same animation instance is accessible via different animation targets
@@ -257,7 +270,7 @@ animationWorklet.addModule('twitter-header-animator.js').then( _ => {
 twitter-header-animator.js:
 ```js
 registerAnimator('twitter-header', class {
-  constructor() {
+  constructor(options) {
     this.timing_ = new CubicBezier('ease-out');
   }
 
@@ -265,8 +278,8 @@ registerAnimator('twitter-header', class {
     return Math.min(Math.max(value, min), max);
   }
 
-  animate(timelines, effect) {
-    const scroll = timeline[0].currentTime;  // [0, 1]
+  animate(currentTime, effect) {
+    const scroll = currentTime;  // [0, 1]
 
     // Drive the output group effect by setting its children local times.
     effects.children[0].localTime = scroll;
@@ -290,12 +303,12 @@ the animation worklet scope.
 
 ```webidl
 
-[Constructor (DOMString animatorId,
-              optional array<AnimationEffectReadOnly>? effects = null,
-              optional array<AnimationTimeline>? timelines,
+[Constructor (DOMString animatorName,
+              optional (AnimationEffectReadOnly or array<AnimationEffectReadOnly>)? effects = null,
+              AnimationTimeline? timeline,
               optional WorkletAnimationOptions)]
 interface WorkletAnimation : Animation {
-        attribute array<AnimationTimeline> timelines;
+        readonly attribute DOMString animatorName;
 }
 ```
 
@@ -303,14 +316,14 @@ interface WorkletAnimation : Animation {
 `WorkletAnimation` where it should be possible to directly control individual child effect local
 times. We need to bring this up with web-animation spec.
 
-`KeyframeEffect` gets a writable `localTime` attribute which may be used to drive the effect from
-the worklet.
+`AnimationEffectReadOnly` gets a writable `localTime` attribute which may be used to drive the
+effect from the worklet global scope.
 
 ```webidl
-partial interface KeyframeEffect {
-    [Exposed=AnimationWorklet]
+partial interface AnimationEffectReadOnly {
+    [Exposed=Worklet]
     // Intended for use inside Animation Worklet scope to drive the effect.
-    attribute localTime;
+    attribute double localTime;
 };
 
 ```
@@ -319,11 +332,8 @@ partial interface KeyframeEffect {
 
 
 # Specification
-The [draft specification](https://wicg.github.io/animation-worklet) is *out dated* we are actively
-working on updating the draft following agreements on Houdini Tokyo F2F meeting on the new direction
-of WIP design.
-
-
+The [draft specification](https://wicg.github.io/animation-worklet) is updated to reflect the 
+the agreed design direction from Houdini Tokyo F2F meeting and recent changes in the same direction.
 
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
