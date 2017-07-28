@@ -125,9 +125,6 @@ stateful, and runnable in a parallel worklet execution context. As such Web Anim
 or alter the input time (reverse, finish, etc.) have different semantics for Animation Worklet
 animations.
 
-Note: <strong>Access to input</strong>: We are interested on exposing additional user input (e.g.,
-scrolling input) to these animations so that authors can create jank-free input driven animations
-which are not really possible today.
 
 Threading Model {#threading-model}
 ==================================
@@ -658,6 +655,18 @@ Timeline Attachment {#timeline-attachment}
 -------------------
 
 Issue(61): Define semantics of attachment and detachment.
+
+ScrollTimeline {#scroll-timeline}
+---------------------------------
+{{ScrollTimeline}} is a new concept being proposed for addition to web animation API. It defines
+an animation timeline whose time value depends on the scroll position of a scroll container.
+<a>Worklet animations</a> can have a scroll timeline and thus drive their scripted effects based
+on a scroll offset.
+
+Note: <strong>Access to input</strong>: We are interested on exposing additional user input beside
+scrolling (e.g., touch/pointer input) to these animations so that authors can create jank-free
+input driven animations which are not really possible today. We are still trying to figure out the
+right abstractions and mechanisms to do this.
 
 WorkletGroupEffect {#worklet-group-effect}
 ------------------
