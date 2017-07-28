@@ -1424,7 +1424,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-27">27 July 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-07-28">28 July 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1981,8 +1981,8 @@ run the procedure to <a data-link-type="dfn">disassociate a worklet animation wi
    <p class="issue" id="issue-1b7aae40"><a class="self-link" href="#issue-1b7aae40"></a> Define semantics of attachment and detachment. <a href="https://github.com/wicg/animation-worklet/issues/61">&lt;https://github.com/wicg/animation-worklet/issues/61></a></p>
    <h3 class="heading settled" data-level="6.6" id="scroll-timeline"><span class="secno">6.6. </span><span class="content">ScrollTimeline</span><a class="self-link" href="#scroll-timeline"></a></h3>
     <code class="idl"><a data-link-type="idl" href="https://wicg.github.io/scroll-animations/#scrolltimeline">ScrollTimeline</a></code> is a new concept being proposed for addition to web animation API. It defines
-an animation timeline whose time value depends on scroll position of a scroll container. <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-13">Worklet animations</a> can have a scroll timeline as thus drive its scripted effect based on
-a scroll offset. 
+an animation timeline whose time value depends on the scroll position of a scroll container. <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation-13">Worklet animations</a> can have a scroll timeline and thus drive their scripted effects based
+on a scroll offset. 
    <p class="note" role="note"><span>Note:</span> <strong>Access to input</strong>: We are interested on exposing additional user input beside
 scrolling (e.g., touch/pointer input) to these animations so that authors can create jank-free
 input driven animations which are not really possible today. We are still trying to figure out the

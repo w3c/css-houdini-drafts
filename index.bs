@@ -659,9 +659,9 @@ Issue(61): Define semantics of attachment and detachment.
 ScrollTimeline {#scroll-timeline}
 ---------------------------------
 {{ScrollTimeline}} is a new concept being proposed for addition to web animation API. It defines
-an animation timeline whose time value depends on scroll position of a scroll container.
-<a>Worklet animations</a> can have a scroll timeline as thus drive its scripted effect based on
-a scroll offset.
+an animation timeline whose time value depends on the scroll position of a scroll container.
+<a>Worklet animations</a> can have a scroll timeline and thus drive their scripted effects based
+on a scroll offset.
 
 Note: <strong>Access to input</strong>: We are interested on exposing additional user input beside
 scrolling (e.g., touch/pointer input) to these animations so that authors can create jank-free
