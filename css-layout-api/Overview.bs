@@ -38,6 +38,10 @@ spec:css-display-3; type:value; for:display; text:none
 spec:css-display-3; type:value; for:<display-inside>; text:grid
 spec:dom; type:dfn; for:/; text:element
 spec:infra; type:dfn; text:list
+spec:css-pseudo-4; type:selector; text:::after
+spec:css-pseudo-4; type:selector; text:::before
+spec:css-pseudo-4; type:selector; text:::first-letter
+spec:css-pseudo-4; type:selector; text:::first-line
 </pre>
 
 <pre class="anchors">
@@ -114,19 +118,11 @@ containers do</a>. [[!CSS21]]
 Note: In a future level of the specification there may be a way to override the containing block
     behaviour.
 
-The 'overflow' property applies to <a>layout API containers</a>. This is discussed (TODO: writing
-about scrollbars).
+The 'overflow' property applies to <a>layout API containers</a>. This is discussed in
+[[#interaction-overflow]].
 
 As the layout is entirely up to the author, properties which are used in other layout modes (e.g.
-flex, block) may not apply. For example an author may not call respect the 'width' or 'height'
-properties.
-
-A <a>layout API container</a> has a <dfn>layout instance</dfn>, initially this is set to null. This
-is an instance of the author defined layout class (see [[#registering-layout]]). If the <a>box</a>'s
-<a>computed value</a> of 'display' changes, this must be reset to null.
-
-Issue: Having the layout instance on the box is wrong, should really be a map on the layout worklet
-    global scope.
+flex, block) may not apply. For example an author may not repect the 'margin' property on children.
 
 Layout API Container Painting {#painting}
 -----------------------------------------
