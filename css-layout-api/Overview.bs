@@ -246,9 +246,9 @@ interface Fragment {
     attribute double inlineOffset;
     attribute double blockOffset;
 
-    readonly attribute ChildBreakToken? breakToken;
+    readonly attribute any data;
 
-    readonly attribute double alignmentBaseline;
+    readonly attribute ChildBreakToken? breakToken;
 };
 </pre>
 
@@ -326,9 +326,6 @@ be changed.
 If the <a>current layout</a> requires a different {{Fragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
-The {{Fragment}}'s {{Fragment/alignmentBaseline}} attribute specify where the alignment baseline is
-positioned relative to the block start of the fragment. It cannot be changed.
-
 Note: In a future level of the specification there may be a way to query for additional baseline
       information, for example where the alphabetic or center baseline is positioned.
 
@@ -348,6 +345,8 @@ interface ConstraintSpace {
     readonly attribute double percentageBlockSize;
 
     readonly attribute BlockFragmentationType blockFragmentationType;
+
+    readonly attribute any data;
 };
 
 dictionary ConstraintSpaceOptions {
@@ -362,7 +361,7 @@ dictionary ConstraintSpaceOptions {
 
     BlockFragmentationType blockFragmentationType = "none";
 
-    boolean alignmentBaseline = false;
+    any data = null;
 };
 
 enum BlockFragmentationType { "none", "page", "column", "region" };
@@ -495,8 +494,7 @@ This tells the <a>child layout</a> to produce a {{Fragment}} starting at the poi
 Issue: Explain resuming the author defined layout.
 
 <div class="example">
-This example shows a simple inline layout which places child fragments in the inline direction. It
-places each of its on a line, aligning their baselines.
+This example shows a simple inline layout which places child fragments in the inline direction.
 
 This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
 produce the next fragment for the {{LayoutChild}}.
@@ -523,7 +521,6 @@ registerLayout('basic-inline', class extends Layout {
 
         let currentLine = [];
         let usedInlineSize = 0;
-        let maxBaseline = 0;
 
         let lineOffset = 0;
         let maxLineBlockSize = 0;
@@ -532,7 +529,6 @@ registerLayout('basic-inline', class extends Layout {
         const nextLine = function() {
             currentLine = [];
             usedInlineSize = 0;
-            maxBaseline = 0;
 
             lineOffset += maxLineBlockSize;
             maxLineBlockSize = 0;
@@ -581,15 +577,10 @@ registerLayout('basic-inline', class extends Layout {
             currentLine.push(fragment);
             fragment.inlineOffset = usedInlineSize;
 
-            if (fragment.alignmentBaseline > maxBaseline) {
-                maxBaseline = fragment.alignmentBaseline;
-            }
-
             // Go through each of the fragments on the line and update their
             // block offsets.
             for (let fragmentOnLine of currentLine) {
-                fragmentOnLine.blockOffset = lineOffset +
-                    maxBaseline - fragmentOnLine.alignmentBaseline;
+                fragmentOnLine.blockOffset = lineOffset;
 
                 const lineBlockSize =
                     fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
@@ -1116,7 +1107,6 @@ dictionary FragmentResultOptions {
     double blockSize = 0;
     sequence&lt;Fragment> childFragments = [];
     BreakTokenOptions breakToken = null;
-    double alignmentBaseline = null;
 };
 
 dictionary IntrinsicSizesResultOptions {
@@ -1382,8 +1372,6 @@ following steps:
             {{FragmentResultOptions/breakToken}}.
 
             TODO: storage of the break token.
-
-        - TODO: baselines.
 </div>
 
 ### Utility Algorithms ### {#utility-algorithms}
@@ -1513,11 +1501,6 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
 
                     - {{Fragment/breakToken}} being a new {{ChildBreakToken}} representing
                         |layoutChild|'s internal break token.
-
-                    - {{Fragment/alignmentBaseline}} being |internalFragment|'s <a>alignment
-                        baseline</a> if |childConstraintSpace| had
-                        {{ConstraintSpaceOptions/alignmentBaseline}} set to <b>true</b>, otherwise
-                        just null.
 
             4. If |result| is null (that is neither of the above branches was taken), return
                 failure, and abort all these steps.
