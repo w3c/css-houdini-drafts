@@ -69,6 +69,8 @@ urlPrefix: https://drafts.csswg.org/css-sizing/#; type: dfn
     text: intrinsic sizes
 urlPrefix: https://drafts.csswg.org/css-break/#; type: dfn
     text: fragmentation break
+urlPrefix: https://www.w3.org/TR/CSS21/box.html#; type: dfn
+    url: box-dimensions; text: box model edges
 </pre>
 
 Introduction {#intro}
@@ -297,20 +299,11 @@ registerLayout('block-like', class extends Layout {
     static blockifyChildren = true;
     static inputProperties = super.inputProperties;
 
-    *layout(space, children, styleMap) {
+    *layout(space, children, styleMap, edges) {
         const inlineSize = resolveInlineSize(space, styleMap);
 
-        const bordersAndPadding = resolveBordersAndPadding(constraintSpace, styleMap);
-        const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-        const availableInlineSize = inlineSize -
-                                    bordersAndPadding.inlineStart -
-                                    bordersAndPadding.inlineEnd -
-                                    scrollbarSize.inline;
-
-        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
-                                   bordersAndPadding.blockStart -
-                                   bordersAndPadding.blockEnd -
-                                   scrollbarSize.block;
+        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
 
         const childFragments = [];
         const childConstraintSpace = new ConstraintSpace({
@@ -319,7 +312,7 @@ registerLayout('block-like', class extends Layout {
         });
 
         let maxChildInlineSize = 0;
-        let blockOffset = bordersAndPadding.blockStart;
+        let blockOffset = edges.all.blockStart;
 
         for (let child of children) {
             const fragment = yield child.layoutNextFragment(childConstraintSpace);
@@ -328,7 +321,7 @@ registerLayout('block-like', class extends Layout {
             // inline direction.
             fragment.blockOffset = blockOffset;
             fragment.inlineOffset = Math.max(
-                bordersAndPadding.inlineStart,
+                edges.all.inlineStart,
                 (availableInlineSize - fragment.inlineSize) / 2);
 
             maxChildInlineSize =
@@ -336,7 +329,7 @@ registerLayout('block-like', class extends Layout {
             blockOffset += fragment.blockSize;
         }
 
-        const contentSize = blockOffset + bordersAndPadding.blockEnd;
+        const contentSize = blockOffset + edges.all.blockEnd;
         const blockSize = resolveBlockSize(
             constraintSpace, styleMap, contentSize);
 
@@ -422,20 +415,12 @@ creates child constraint spaces which specify that a child should be a fixed inl
 
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
-    *layout(space, children, styleMap, breakToken) {
+    *layout(space, children, styleMap, edges, breakToken) {
         const inlineSize = resolveInlineSize(space, styleMap);
 
-        const bordersAndPadding = resolveBordersAndPadding(constraintSpace, styleMap);
-        const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-        const availableInlineSize = inlineSize -
-                                    bordersAndPadding.inlineStart -
-                                    bordersAndPadding.inlineEnd -
-                                    scrollbarSize.inline;
-
-        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
-                                   bordersAndPadding.blockStart -
-                                   bordersAndPadding.blockEnd -
-                                   scrollbarSize.block;
+        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableBlockSize =
+            resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
 
         const unconstrainedSizes = [];
         const childConstraintSpace = new ConstraintSpace({
@@ -549,23 +534,14 @@ resume the layout.
 registerLayout('basic-inline', class extends Layout {
     static inputProperties = super.inputProperties;
 
-    *layout(constraintSpace, children, styleMap, breakToken) {
+    *layout(constraintSpace, children, styleMap, edges, breakToken) {
         // Resolve our inline size.
         const inlineSize = resolveInlineSize(constraintSpace, styleMap);
 
         // Determine our (inner) available size.
-        const bordersAndPadding =
-            resolveBordersAndPadding(constraintSpace, styleMap);
-        const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-        const availableInlineSize = inlineSize -
-                                    bordersAndPadding.inlineStart -
-                                    bordersAndPadding.inlineEnd -
-                                    scrollbarSize.inline;
-
-        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
-                                   bordersAndPadding.blockStart -
-                                   bordersAndPadding.blockEnd -
-                                   scrollbarSize.block;
+        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableBlockSize =
+            resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
 
         const childFragments = [];
 
@@ -658,9 +634,7 @@ registerLayout('basic-inline', class extends Layout {
 
         // Determine our block size.
         nextLine();
-        const contentSize = lineOffset +
-                                  bordersAndPadding.blockStart +
-                                  bordersAndPadding.blockEnd;
+        const contentSize = lineOffset + edges.all.block;
         const blockSize = resolveBlockSize(constraintSpace,
                                            styleMap,
                                            contentSize);
@@ -684,25 +658,91 @@ registerLayout('basic-inline', class extends Layout {
 </pre>
 </div>
 
-Utility Functions {#utility-functions}
---------------------------------------
+Edges {#edges}
+--------------
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
-interface LayoutStrut {
+interface LayoutEdgeSizes {
   readonly attribute double inlineStart;
   readonly attribute double inlineEnd;
 
   readonly attribute double blockStart;
   readonly attribute double blockEnd;
-};
 
-[Exposed=LayoutWorklet]
-interface LayoutSize {
+  // Convenience attributes for the sum in one direction.
   readonly attribute double inline;
   readonly attribute double block;
 };
 
+[Exposed=LayoutWorklet]
+interface LayoutEdges {
+  readonly attribute LayoutEdgeSizes border;
+  readonly attribute LayoutEdgeSizes scrollbar;
+  readonly attribute LayoutEdgeSizes padding;
+
+  readonly attribute LayoutEdgeSizes all;
+};
+</pre>
+
+A {{LayoutEdges}} object is passed into the layout method. This represents size of the <a>box
+model edges</a> for the current box which is being laid out.
+
+The {{LayoutEdges}} has {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, and
+{{LayoutEdges/padding}} attributes. Each of these represent the width of their respective edge.
+
+The {{LayoutEdges}} has the {{LayoutEdges/all}} attribute. This is a convenience attribute which
+represents the sum of the {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, {{LayoutEdges/padding}}
+edges.
+
+The {{LayoutEdgeSizes}} object represents the width in CSS pixels of an edge in each of the
+<a>abstract dimensions</a> ({{LayoutEdgeSizes/inlineStart}}, {{LayoutEdgeSizes/inlineEnd}},
+{{LayoutEdgeSizes/blockStart}}, {{LayoutEdgeSizes/blockEnd}}).
+
+The {{LayoutEdgeSizes/inline}}, and {{LayoutEdgeSizes/block}} on the {{LayoutEdgeSizes}} object are
+convenience attributes which represent the sum in that direction.
+
+<div class="example">
+This example shows an node styled by CSS, and what its respective {{LayoutEdges}} could contain.
+
+<pre class="lang-html">
+&lt;style>
+.container {
+  width: 50px;
+  height: 50px;
+}
+
+.box {
+  display: layout(box-edges);
+
+  padding: 10%;
+  border: solid 2px;
+  overflow-y: scroll;
+}
+&lt;/style>
+
+&lt;div class="container">
+  &lt;div class="box">&lt;/div>
+&lt;/div>
+</pre>
+
+<pre class="lang-javascript">
+registerLayout('box-edges', class extends Layout {
+    *layout(constraintSpace, children, styleMap, edges, breakToken) {
+        edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
+        edges.border.blockEnd; // 2
+        edges.scrollbar.inlineEnd; // UA-dependent, may be 0 or >0 (e.g. 16).
+        edges.all.block; // 14 (2 + 5 + 5 + 2).
+    }
+}
+</pre>
+</div>
+
+Utility Functions {#utility-functions}
+--------------------------------------
+
+<pre class='idl'>
+[Exposed=LayoutWorklet]
 partial interface LayoutWorkletGlobalScope {
     double resolveInlineSize(ConstraintSpace constraintSpace,
                              StylePropertyMapReadOnly styleMap);
@@ -710,18 +750,6 @@ partial interface LayoutWorkletGlobalScope {
     double resolveBlockSize(ConstraintSpace constraintSpace,
                             StylePropertyMapReadOnly styleMap,
                             optional double contentSize);
-
-    LayoutStrut resolveBordersAndPadding(ConstraintSpace constraintSpace,
-                                         StylePropertyMapReadOnly styleMap);
-
-    LayoutSize resolveScrollbarSize(ConstraintSpace constraintSpace,
-                                    StylePropertyMapReadOnly styleMap);
-};
-
-[Exposed=LayoutWorklet]
-interface Layout {
-    readonly attribute sequence&lt;DOMString> inputProperties;
-    readonly attribute sequence&lt;DOMString> childInputProperties;
 };
 </pre>
 
@@ -730,12 +758,22 @@ Issue: Specify the behaviour of these functions.
 Interactions with other Modules {#interactions-with-other-modules}
 ==================================================================
 
-This section describes how other css modules interact with the CSS Layout API.
+This section describes how other CSS modules interact with the CSS Layout API.
 
-Sizing {#sizing}
-----------------
+Sizing {#interaction-sizing}
+----------------------------
 
-TODO
+Positioning {#interaction-positioning}
+--------------------------------------
+
+Overflow {#interaction-overflow}
+--------------------------------
+
+Fragmentation {#interaction-fragmentation}
+------------------------------------------
+
+Alignment {#interaction-alignment}
+----------------------------------
 
 Layout {#layout}
 ================
@@ -1006,7 +1044,7 @@ is called, the user agent <em>must</em> run the following steps:
                 // Intrinsic sizes code goes here.
             }
 
-            *layout(constraintSpace, children, styleMap, breakToken) {
+            *layout(constraintSpace, children, styleMap, edges, breakToken) {
                 // Layout code goes here.
             }
         }
@@ -1326,34 +1364,37 @@ following steps:
     7. Let |constraintSpace| be a new {{ConstraintSpace}} populated with the appropriate information
         from |internalConstraintSpace|.
 
-    8. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
+    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
+        <a>box model edges</a> for |box|.
+
+    9. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
         |internalBreakToken|.
 
         If |internalBreakToken| is null, let |breakToken| be null.
 
-    9. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
+    10. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
         |children|, |styleMap|, |constraintSpace|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
-    10. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
+    11. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
 
-    11. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
-        |layoutInstance|, «|styleMap|, |children|, |constraintSpace|, |breakToken|»).
+    12. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
+        |layoutInstance|, «|styleMap|, |children|, |constraintSpace|, |edges|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
 
-    12. Let |fragmentValue| be the result of <a>run a generator</a> given |layoutGenerator|, and
+    13. Let |fragmentValue| be the result of <a>run a generator</a> given |layoutGenerator|, and
         <code>"layout"</code>.
 
         If <a>run a generator</a> returned failure, then let |box| fallback to the <a>flow
         layout</a> and abort all these steps.
 
-    13. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
+    14. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
         {{FragmentResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    14. Create a <a>fragment</a> for |box| with:
+    15. Create a <a>fragment</a> for |box| with:
 
         - The <a>inline size</a> set to |fragment|'s {{FragmentResultOptions/inlineSize}}.
 
