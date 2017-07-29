@@ -270,9 +270,22 @@ The layout algorithm performs a block-like layout (positioning fragments sequent
 direction), while centering its children in the inline direction.
 
 <pre class="lang-javascript">
-registerLayout('block-like', class extends Layout {
-    static blockifyChildren = true;
-    static inputProperties = super.inputProperties;
+registerLayout('block-like', class {
+    *intrinsicSizes(styleMap, children) {
+      const childrenSizes = yield children.map((child) => {
+          return child.intrinsicSizes();
+      });
+
+      const maxContentSize = childrenSizes.reduce((max, childSizes) => {
+          return Math.max(max, childSizes.maxContentContribution);
+      }, 0);
+
+      const minContentSize = childrenSizes.reduce((max, childSizes) => {
+          return Math.max(max, childSizes.minContentContribution);
+      }, 0);
+
+      return {maxContentSize, minContentSize};
+    }
 
     *layout(space, children, styleMap, edges) {
         const inlineSize = resolveInlineSize(space, styleMap);
@@ -286,12 +299,13 @@ registerLayout('block-like', class extends Layout {
             blockSize: availableBlockSize,
         });
 
-        let maxChildInlineSize = 0;
         let blockOffset = edges.all.blockStart;
 
-        for (let child of children) {
-            const fragment = yield child.layoutNextFragment(childConstraintSpace);
+        const childFragments = yeild children.map((child) => {
+            return child.layoutNextFragment(childConstraintSpace);
+        });
 
+        for (let fragment of childFragments) {
             // Position the fragment in a block like manner, centering it in the
             // inline direction.
             fragment.blockOffset = blockOffset;
@@ -299,8 +313,6 @@ registerLayout('block-like', class extends Layout {
                 edges.all.inlineStart,
                 (availableInlineSize - fragment.inlineSize) / 2);
 
-            maxChildInlineSize =
-                Math.max(maxChildInlineSize, childFragments.inlineSize);
             blockOffset += fragment.blockSize;
         }
 
@@ -389,6 +401,22 @@ creates child constraint spaces which specify that a child should be a fixed inl
 
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
+    *intrinsicSizes(styleMap, children) {
+      const childrenSizes = yield children.map((child) => {
+          return child.intrinsicSizes();
+      });
+
+      const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
+          return sum + childSizes.maxContentContribution;
+      }, 0);
+
+      const minContentSize = childrenSizes.reduce((max, childSizes) => {
+          return sum + childSizes.minContentContribution;
+      }, 0);
+
+      return {maxContentSize, minContentSize};
+    }
+
     *layout(space, children, styleMap, edges, breakToken) {
         const inlineSize = resolveInlineSize(space, styleMap);
 
@@ -396,39 +424,42 @@ registerLayout('flex-distribution-like', class {
         const availableBlockSize =
             resolveBlockSize(space, styleMap) - edges.all.block;
 
-        const unconstrainedSizes = [];
         const childConstraintSpace = new ConstraintSpace({
             inlineSize: availableInlineSize,
             blockSize: availableBlockSize,
         });
-        let totalSize = 0;
 
-        // Calculate the unconstrained size for each child.
-        for (let child of children) {
-            const fragment = yield child.layoutNextFragment(childConstraintSpace);
-            unconstrainedSizes.push(fragment.inlineSize);
-            totalSize += fragment.inlineSize;
-        }
+        const unconstrainedChildFragments = yield children.map((child) => {
+            return child.layoutNextFragment(childConstraintSpace);
+        });
+
+        const unconstrainedSizes = [];
+        const totalSize = unconstrainedChildFragments.reduce((sum, fragment, i) => {
+            unconstrainedSizes[i] = fragment.inlineSize;
+            return sum + fragment.inlineSize;
+        }, 0);
 
         // Distribute spare space between children.
         const remainingSpace = Math.max(0, inlineSize - totalSize);
         const extraSpace = remainingSpace / children.length;
-        const childFragments = [];
-        let inlineOffset = 0;
-        let maxChildBlockSize = 0;
-        for (let i = 0; i < children.length; i++) {
-            let fragment = yield child.layoutNextFragment(new ConstraintSpace({
+
+        const childFragments = yield children.map((child, i) => {
+            return child.layoutNextFragment(new ConstraintSpace({
                 inlineSize: unconstrainedSizes[i] + extraSpace,
                 inlineSizeFixed: true,
                 blockSize: availableBlockSize
             }));
+        });
 
+        // Position the fragments.
+        let inlineOffset = 0;
+        let maxChildBlockSize = 0;
+        for (let fragment of childFragments) {
             fragment.inlineOffset = inlineOffset;
+            fragment.blockOffset = edges.all.blockStart;
+
             inlineOffset += fragment.inlineSize;
-
             maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
-
-            childFragments.push(fragment);
         }
 
         // Resolve our block size.
@@ -505,8 +536,8 @@ It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken
 resume the layout.
 
 <pre class="lang-javascript">
-registerLayout('basic-inline', class extends Layout {
-    static inputProperties = super.inputProperties;
+registerLayout('basic-inline', class {
+    static displayType = 'normal';
 
     *layout(space, children, styleMap, edges, breakToken) {
         // Resolve our inline size.
@@ -694,7 +725,7 @@ This example shows an node styled by CSS, and what its respective {{LayoutEdges}
 </pre>
 
 <pre class="lang-javascript">
-registerLayout('box-edges', class extends Layout {
+registerLayout('box-edges', class {
     *layout(space, children, styleMap, edges, breakToken) {
         edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
         edges.border.blockEnd; // 2
@@ -933,13 +964,13 @@ is called, the user agent <em>must</em> run the following steps:
     18. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
         <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    19. Let |intrinsizeSizes| be the result of <a>Get</a>(|prototype|,
+    19. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
         <code>"intrinsicSizes"</code>).
 
-    20. If the result of <a>IsCallable</a>(|intrinsizeSizes|) is false, <a>throw</a> a
+    20. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    21. If |intrinsizeSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
+    21. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
         <code>"generator"</code>, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
     22. Let |definition| be a new <a>layout definition</a> with:
@@ -948,7 +979,7 @@ is called, the user agent <em>must</em> run the following steps:
 
         - <a>layout generator function</a> being |layout|.
 
-        - <a>intrinsic sizes generator function</a> being |intrinsizeSizes|.
+        - <a>intrinsic sizes generator function</a> being |intrinsicSizes|.
 
         - <a>constructor valid flag</a> being <b>true</b>.
 
