@@ -319,7 +319,9 @@ results.
 
 The author inside the current layout can position a resulting {{Fragment}} by setting its
 {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} attributes. If not set by the author they
-default to zero.
+default to zero. The {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} attributes represent the
+position of the {{Fragment}} relative to its parent's border box, before transform or positioning
+(e.g. if a fragment is <a>relatively positioned</a>) has been applied.
 
 <div class="example">
 The layout algorithm performs a block-like layout (positioning fragments sequentially in the block
@@ -850,6 +852,12 @@ As a result:
 
 Overflow {#interaction-overflow}
 --------------------------------
+
+The <a>scrollable overflow</a> for a <a>layout API container</a> is handled by the user agent in
+this level of the specification.
+
+A <a>layout API container</a> should calculate its scrollable overflow exactly like block
+containers do.
 
 Fragmentation {#interaction-fragmentation}
 ------------------------------------------
