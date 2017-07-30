@@ -520,8 +520,8 @@ enum BreakType { "none", "line", "column", "page", "region" };
 
 A {{LayoutChild}} can produce multiple {{Fragment}}s. A {{LayoutChild}} may fragment in the block
 direction if a {{ConstraintSpace/blockFragmentationType}} is not none.  Additionally {{LayoutChild}}
-which represents <a>inline-level</a> content, may fragment line by line if the <a for="layout
-definition">child display</a> (set by <code>childDisplay</code>) is <code>"normal"</code>.
+which represents <a>inline-level</a> content, may fragment line by line if the <a for="document
+layout definition">child display</a> (set by <code>childDisplay</code>) is <code>"normal"</code>.
 
 A subsequent {{Fragment}} is produced by using the previous {{Fragment}}'s {{Fragment/breakToken}}.
 This tells the <a>child layout</a> to produce a {{Fragment}} starting at the point encoded in the
@@ -530,7 +530,8 @@ This tells the <a>child layout</a> to produce a {{Fragment}} starting at the poi
 Issue: Explain resuming the author defined layout.
 
 <div class="example">
-This example shows a simple inline layout which places child fragments in the inline direction.
+This example shows a simple layout which places indents child fragments for a certain number of
+lines.
 
 This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
 produce the next fragment for the {{LayoutChild}}.
@@ -541,8 +542,9 @@ It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken
 resume the layout.
 
 <pre class="lang-javascript">
-registerLayout('basic-inline', class {
+registerLayout('indent-lines', class {
     static childDisplay = 'normal';
+    static inputProperties = ['--indent', '--indent-lines'];
 
     *layout(space, children, styleMap, edges, breakToken) {
         // Resolve our inline size.
@@ -553,22 +555,11 @@ registerLayout('basic-inline', class {
         const availableBlockSize =
             resolveBlockSize(space, styleMap) - edges.all.block;
 
+        // Detrermine the number of lines to indent, and the indent amount.
+        const indent = resolveLength(space, styleMap.get('--indent'));
+        let lines = styleMap.get('--indent-lines').value;
+
         const childFragments = [];
-
-        let currentLine = [];
-        let usedInlineSize = 0;
-
-        let lineOffset = 0;
-        let maxLineBlockSize = 0;
-
-        // Just a small little function which will update the above variables.
-        const nextLine = function() {
-            currentLine = [];
-            usedInlineSize = 0;
-
-            lineOffset += maxLineBlockSize;
-            maxLineBlockSize = 0;
-        }
 
         let childBreakToken = null;
         if (breakToken) {
@@ -578,51 +569,36 @@ registerLayout('basic-inline', class {
             children.splice(0, children.indexOf(childBreakToken.child));
         }
 
+        let blockOffset = edges.all.blockStart;
         let child = children.shift();
         while (child) {
-            // Make sure we actually have space on the current line.
-            if (usedInlineSize > availableInlineSize) {
-                nextLine();
-            }
+            const shouldIndent = lines-- > 0;
 
-            // The constraint space here will have the inline size of the
-            // remaining space on the line.
-            const remainingInlineSize = availableInlineSize - usedInlineSize;
-            const constraintSpace = new ConstraintSpace({
-                inlineSize: availableInlineSize - usedInlineSize,
+            // Adjust the inline size for the indent.
+            const childAvailableInlineSize = shouldIndent ?
+                availableInlineSize - indent : availableInlineSize;
+
+            const childSpace = new ConstraintSpace({
+                inlineSize: childAvailableInlineSize,
                 blockSize: availableBlockSize,
                 percentageInlineSize: availableInlineSize,
+                blockFragmentationType: space.blockFragmentationType,
             });
 
-            const fragment = yield child.layoutNextFragment(constraintSpace,
+            const fragment = yield child.layoutNextFragment(childSpace,
                                                             childBreakToken);
             childFragments.push(fragment);
 
-            // Check if there is still space on the current line.
-            if (fragment.inlineSize > remainingInlineSize) {
-                nextLine();
+            // Position the fragment.
+            fragment.inlineOffset = shouldIndent ?
+                edges.all.inlineStart + indent : edges.all.inlineStart;
+            fragment.blockOffset = blockOffset;
+            blockOffset += fragment.blockSize;
 
-                // Check if we have gone over the block fragmentation limit.
-                if (constraintSpace.blockFragmentationType != 'none' &&
-                    lineOffset > constraintSpace.blockSize) {
-                    break;
-                }
-            }
-
-            // Insert fragment on the current line.
-            currentLine.push(fragment);
-            fragment.inlineOffset = usedInlineSize;
-
-            // Go through each of the fragments on the line and update their
-            // block offsets.
-            for (let fragmentOnLine of currentLine) {
-                fragmentOnLine.blockOffset = lineOffset;
-
-                const lineBlockSize =
-                    fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
-                if (maxLineBlockSize < lineBlockSize) {
-                    maxLineBlockSize = lineBlockSize;
-                }
+            // Check if we have gone over the block fragmentation limit.
+            if (constraintSpace.blockFragmentationType != 'none' &&
+                blockOffset > constraintSpace.blockSize) {
+                break;
             }
 
             if (fragment.breakToken) {
@@ -635,9 +611,7 @@ registerLayout('basic-inline', class {
             }
         }
 
-        // Determine our block size.
-        nextLine();
-        const contentSize = lineOffset + edges.all.block;
+        const contentSize = blockOffset + edges.all.blockEnd;
         const blockSize = resolveBlockSize(space,
                                            styleMap,
                                            contentSize);
@@ -753,6 +727,8 @@ partial interface LayoutWorkletGlobalScope {
     double resolveBlockSize(ConstraintSpace constraintSpace,
                             StylePropertyMapReadOnly styleMap,
                             optional double contentSize);
+
+    double resolveLength(ConstraintSpace constraintSpace, CSSStyleValue value);
 };
 </pre>
 
