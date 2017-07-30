@@ -36,6 +36,7 @@ spec:css-break-3; type:dfn; text:fragment
 spec:css-display-3; type:dfn; text:box
 spec:css-display-3; type:value; for:display; text:none
 spec:css-display-3; type:value; for:<display-inside>; text:grid
+spec:css-display-3; type:value; for:<display-outside>; text:inline
 spec:css-pseudo-4; type:selector; text:::after
 spec:css-pseudo-4; type:selector; text:::before
 spec:css-pseudo-4; type:selector; text:::first-letter
@@ -90,7 +91,7 @@ The layout stage of CSS is responsible for generating and positioning <a>fragmen
 <a>box tree</a>.
 
 This specification describes an API which allows developers to layout a <a>box</a> in response to
-computed style and <a>box</a> tree changes.
+computed style and <a>box tree</a> changes.
 
 Layout API Containers {#layout-api-containers}
 ==============================================
@@ -115,6 +116,9 @@ provided by the author is used instead of the block layout.
 For example, floats do not intrude into the layout API container, and the layout API container's
 margins do not collapse with the margins of its contents.
 
+All inflow children of a <a>layout API container</a> are called <dfn>layout API children</dfn> and
+are laid out using the auther defined layout.
+
 <a>Layout API containers</a> form a containing block for their contents
 <a href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
 containers do</a>. [[!CSS21]]
@@ -135,6 +139,51 @@ Layout API Container Painting {#painting}
 the order in which they are returned from the layout method (via
 {{FragmentResultOptions/childFragments}}) is used in place of raw document order, and 'z-index'
 values other than ''z-index/auto'' create a stacking context even if 'position' is ''static''.
+
+Box Tree Transformations {#layout-api-box-tree}
+-----------------------------------------------
+
+The children of a <a>layout API container</a> can act in different ways depending on the value of <a
+for="document layout definition">child display</a> (set by <code>childDisplay</code> on the class).
+
+If the value of <a for="document layout definition">child display</a> is <code>"block"</code> the
+'display' value of that child is <a>blockified</a>. This is similar to children of <a>flex
+containers</a> or <a>grid containers</a>. See [[!css3-display]].
+
+If the value of <a for="document layout definition">child display</a> is <code>"normal"</code>, no
+<a>blockification</a> occurs. Instead children with a <<display-outside>> <a>computed value</a> of
+''inline'' (a <a>root inline box</a>) will produce a single {{Fragment}} representing each line when
+{{LayoutChild/layoutNextFragment()}} is called.
+
+Note: This allows authors to adjust the available inline size of each line, and position each line
+    separately.
+
+Children of a {{LayoutChild}} which represents <a>root inline box</a> also have some additional
+transformations.
+
+ - A <a>block-level</a> box inside a <a>inline-level</a> box is <a>inlinified</a> I.e. its
+     <<display-outside>> is set to ''inline''.
+
+ - A <a>float</a> inside a <a>inline-level</a> box is not taken out of flow. Instead it must be
+     treated as inflow, and be <a>inlinified</a>.
+
+In both of the above cases the children become <a>atomic inlines</a>.
+
+Note: User agents would not perform any "inline splitting" or fragmenting when they encounter a
+    <a>block-level</a> box.
+
+<div class="note">
+    Note: In the example below "inline-span" would be represented as a single {{LayoutChild}} with
+    both "block" and "float" being <a>atomic inlines</a>.
+    <pre class="lang-html">
+        &lt;span id="inline-span">
+          Text
+          &lt;div id="block">&lt;/div>
+          &lt;div id="float">&lt;/div>
+          Text
+        &lt;/span>
+    </pre>
+</div>
 
 Layout API Model and Terminology {#layout-api-model-and-terminology}
 ====================================================================
