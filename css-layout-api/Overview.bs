@@ -75,8 +75,11 @@ urlPrefix: https://drafts.csswg.org/css-sizing/#; type: dfn
     text: intrinsic sizes
 urlPrefix: https://drafts.csswg.org/css-break/#; type: dfn
     text: fragmentation break
-urlPrefix: https://www.w3.org/TR/CSS21/box.html#; type: dfn
-    url: box-dimensions; text: box model edges
+urlPrefix: https://www.w3.org/TR/CSS21/; type:dfn
+    urlPrefix: box.html#;
+        url: box-dimensions; text: box model edges
+    urlPrefix: visudet.html#;
+        text: static position
 urlPrefix: https://html.spec.whatwg.org/#; type: dfn
     text: structuredserializeforstorage
     text: structureddeserialize
@@ -791,8 +794,59 @@ This section describes how other CSS modules interact with the CSS Layout API.
 Sizing {#interaction-sizing}
 ----------------------------
 
+
+
 Positioning {#interaction-positioning}
 --------------------------------------
+
+All positioning in this level of the specification is handled by the user agent.
+
+As a result:
+  - Out-of-flow children do not appear as {{LayoutChild}}ren.
+
+  - <a>Layout API containers</a> establish <a>containing blocks</a> <a
+      href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
+      containers do</a>. [[!CSS21]]
+
+  - The {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} represent the position of the
+      fragment before any positioning and transforms have occured.
+
+  - The <a>static position</a> of an absolutely-positioned child of a <a>layout API container</a> is
+      set to the <a>inline-start</a>, <a>block-start</a> padding edge of the <a>layout API
+      container</a>. Auto margins are treated as zero for the child.
+
+<div class="note">
+    Note: In the example below:
+      - "child-relative" would be the only child passed to the author's layout. If it was positioned
+          at ({{Fragment/inlineOffset}} <code>= 20</code>, {{Fragment/blockOffset}} <code> =
+          30</code>), its final position would be (<code>25</code>, <code>40</code>) as the relative
+          positioning was handled by the user agent.
+
+      - "child-absolute" would not appear as a {{LayoutChild}}, and instead would be laid out and
+          positioned by the user agent.
+
+      - The examples above also apply in a similar way to sticky and fixed positioned children.
+
+    <pre class="lang-html">
+        &lt;style>
+          #container {
+            display: layout(foo);
+            position: relative; /* container is a containing block */
+            width: 100px;
+            height: 100px;
+          }
+          #child-relative {
+            position: relative;
+            left: 5px;
+            top: 10px;
+          }
+        &lt;/style>
+        &lt;div id="container">
+          &lt;div id="child-relative">&lt;/div>
+          &lt;div id="child-absolute">&lt;/div>
+        &lt;/div>
+    </pre>
+</div>
 
 Overflow {#interaction-overflow}
 --------------------------------
