@@ -206,9 +206,6 @@ registerAnimator('hidey-bar', class {
   }
 
   animate(currentTime, effect) {
-    const scroll = timeline[0].currentTime;  // [0, 100]
-    const time = timelines[1].currentTime;
-
     const scroll = this.scrollTimeline_.currentTime;  // [0, 100]
     const time = this.documentTimeline_.currentTime;
 
