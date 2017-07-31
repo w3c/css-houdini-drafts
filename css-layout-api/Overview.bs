@@ -146,8 +146,8 @@ values other than ''z-index/auto'' create a stacking context even if 'position' 
 Box Tree Transformations {#layout-api-box-tree}
 -----------------------------------------------
 
-The children of a <a>layout API container</a> can act in different ways depending on the value of <a
-for="document layout definition">child display</a> (set by <code>childDisplay</code> on the class).
+The <a>layout API children</a> can act in different ways depending on the value of <a for="document
+layout definition">child display</a> (set by <code>childDisplay</code> on the class).
 
 If the value of <a for="document layout definition">child display</a> is <code>"block"</code> the
 'display' value of that child is <a>blockified</a>. This is similar to children of <a>flex
@@ -349,7 +349,8 @@ registerLayout('block-like', class {
         const inlineSize = resolveInlineSize(space, styleMap);
 
         const availableInlineSize = inlineSize - edges.all.inline;
-        const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
+        const availableBlockSize =
+            resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
 
         const childFragments = [];
         const childConstraintSpace = new ConstraintSpace({
@@ -373,9 +374,9 @@ registerLayout('block-like', class {
             blockOffset += fragment.blockSize;
         }
 
-        const contentSize = blockOffset + edges.all.blockEnd;
+        const autoBlockSize = blockOffset + edges.all.blockEnd;
         const blockSize = resolveBlockSize(
-            constraintSpace, styleMap, contentSize);
+            constraintSpace, styleMap, autoBlockSize);
 
         return {
             inlineSize: inlineSize,
@@ -417,6 +418,7 @@ interface ConstraintSpace {
     readonly attribute double percentageInlineSize;
     readonly attribute double percentageBlockSize;
 
+    readonly attribute double? blockFragmentationOffset;
     readonly attribute BlockFragmentationType blockFragmentationType;
 
     readonly attribute any data;
@@ -432,6 +434,7 @@ dictionary ConstraintSpaceOptions {
     double? percentageInlineSize = null;
     double? percentageBlockSize = null;
 
+    double? blockFragmentationOffset = null;
     BlockFragmentationType blockFragmentationType = "none";
 
     any data = null;
@@ -665,10 +668,10 @@ registerLayout('indent-lines', class {
             }
         }
 
-        const contentSize = blockOffset + edges.all.blockEnd;
+        const autoBlockSize = blockOffset + edges.all.blockEnd;
         const blockSize = resolveBlockSize(space,
                                            styleMap,
-                                           contentSize);
+                                           autoBlockSize);
 
         // Return our fragment.
         const result = {
@@ -780,13 +783,27 @@ partial interface LayoutWorkletGlobalScope {
 
     double resolveBlockSize(ConstraintSpace constraintSpace,
                             StylePropertyMapReadOnly styleMap,
-                            optional double contentSize);
+                            optional double autoBlockSize);
 
     double resolveLength(ConstraintSpace constraintSpace, CSSStyleValue value);
 };
 </pre>
 
-Issue: Specify the behaviour of these functions.
+<div algorithm>
+When the <dfn method for=LayoutWorkletGlobalScope>resolveBlockSize(|constraintSpace|, |styleMap|,
+|autoBlockSize|)</dfn> method is called, the user agent <em>must</em> run the following steps:
+
+    Issue: Define that this algorithm should do exactly what CSS does for block sizes.
+        |constraintSpace|, |styleMap|, |autoBlockSize|.
+</div>
+
+<div algorithm>
+When the <dfn method for=LayoutWorkletGlobalScope>resolveLength(|constraintSpace|, |value|)</dfn>
+method is called, the user agent <em>must</em> run the following steps:
+
+    Issue: Define that this algorithm should do exactly what CSS does for generic lengths. 
+        |constraintSpace|, |value|.
+</div>
 
 Interactions with other Modules {#interactions-with-other-modules}
 ==================================================================
@@ -796,7 +813,79 @@ This section describes how other CSS modules interact with the CSS Layout API.
 Sizing {#interaction-sizing}
 ----------------------------
 
+User agents must use the {{ConstraintSpace}} to communicate to the <a>current layout</a> the size
+they would like the fragment to be.
 
+If the user agent wishes to force a size on the box, it can use the
+{{ConstraintSpace/inlineSizeFixed}} and {{ConstraintSpace/blockSizeFixed}} attributes to do so.
+
+Issue: Do we want the inlineSize to always be fixed? This would remove the resolveInlineSize call,
+    and just rely on the pre-defined behaviour by the user agent.
+
+    The downside to this is that we won't be able to things like MathML in the initial version of
+    the specifcation, which is able to "bubble" up inline sizes to its parent.
+
+    We can't do a similar thing for the blockSize due to fragmentation. E.g. the size of the
+    fragment which is undergoing fragmentation, isn't able to be automatically resolved.
+
+If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and has
+an ''width/auto'' inline size, the user agent <em>must</em> set the {{ConstraintSpace/inlineSize}}
+to the <a>stretch-fit inline size</a>.
+
+<div class="note">
+    Note: In the example below the <a>layout API container</a> has its inline size set to 50.
+
+    <pre class="lang-html">
+        &lt;style>
+          #container {
+            width: 100px;
+            height: 100px;
+            box-sizing: border-box;
+            padding: 5px;
+          }
+          #layout-api {
+            display: layout(foo);
+            margin: 0 20px;
+          }
+        &lt;/style>
+        &lt;div id="container">
+          &lt;div id="layout-api">&lt;/div>
+        &lt;/div>
+    </pre>
+</div>
+
+### Positioned layout sizing ### {#interaction-sizing-positiong-layout}
+
+If a <a>layout API container</a> is out-of-flow positioned the user agent <em>must</em> solve the
+positioned size equations ([[css-position-3#abs-non-replaced-width]],
+[[css-position-3#abs-non-replaced-height]]), and set the appropriate fixed
+{{ConstraintSpace/inlineSize}} and {{ConstraintSpace/blockSize}}.
+
+<div class="note">
+    Note: In the example below the <a>layout API container</a> has its inline and block size fixed
+        to 80.
+
+    <pre class="lang-html">
+        &lt;style>
+          #container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+          }
+          #layout-api {
+            display: layout(foo);
+            top: 10px;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            position: absolute;
+          }
+        &lt;/style>
+        &lt;div id="container">
+          &lt;div id="layout-api">&lt;/div>
+        &lt;/div>
+    </pre>
+</div>
 
 Positioning {#interaction-positioning}
 --------------------------------------
