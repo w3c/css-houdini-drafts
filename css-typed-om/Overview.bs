@@ -767,15 +767,15 @@ The following are the arithmetic operations you can perform on dimensions:
 
     2. Let |thisAndValues| be |this| prepended to |values|.
 
-    3. [=list/If all=] |item|s of |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be {{CSSUnitValue}}.
+    3. If all |item|s of |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be {{CSSUnitValue}}.
 
-    4. [=list/If all=] |item|s in |thisAndValues| are {{CSSUnitValue}s and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
+    4. If all |item|s in |thisAndValues| are {{CSSUnitValue}s and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
 
-    5. [=list/If all=] |item|s in |thisAndValues| are {{CSSMathValue}}s :
+    5. If all |item|s in |thisAndValues| are {{CSSMathValue}}s :
         1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
-        	1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
-    	2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
-    		1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
+            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
+        2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
+            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
 </div>
 
 
