@@ -281,7 +281,7 @@ registerAnimator('twitter-header', class {
     // Drive the output group effect by setting its children local times.
     effect.children[0].localTime = scroll;
     // Can control the child effects individually
-    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 1));
+    effect.children[1].localTime = this.timing_(this.clamp(scroll, 0, 1));
   }
 });
 
