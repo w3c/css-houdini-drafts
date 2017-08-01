@@ -125,14 +125,14 @@ Speculative Evaluation {#speculative-evaluation}
 Some specifications which use worklets ([[css-paint-api-1]]) may
 invoke methods on a class based on the state of the user agent. To
 increase the concurrency between threads, a user agent may invoke a
-method speculatively, before a consistent snapshot of the state is
-known.
+method speculatively, based on potential future states.
 
 In these specifications user agents might invoke methods on a class at
 any time, and with any arguments, not just ones corresponding to
-consistent states of the user agent. The results of such speculative
-evaluations will be discarded, but may be cached for later use, thus
-increasing the concurrency between the user agent and worklet threads.
+the current state of the user agent. The results of such speculative
+evaluations are not displayed immediately, but may be cached for use
+if the user agent state matches the speculated state.
+This may increase the concurrency between the user agent and worklet threads.
 
 As a result of this, to prevent this compatibility risk between user
 agents, authors who register classes on the global scope using these

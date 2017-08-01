@@ -453,9 +453,12 @@ the <a>concrete object size</a> given by the user agent.
 
 The <a>draw a paint image</a> function may be speculatively invoked by
 the user agent at any point, with any |concreteObjectSize|. The
-resulting image is discarded.
+resulting image is not displayed.
 
-Note: Although the image is discarded, it may still be cached, so subsequent invocations
+Note: User agents may use any heuristic to speculate a possible future value
+    for |concretObjectSize|, for example speculating that the size remains unchanged.
+
+Note: Although the image is not displayed, it may still be cached, and subsequent invocations
     of <<paint()>> may use the cached image.
 
 <pre class='idl'>
