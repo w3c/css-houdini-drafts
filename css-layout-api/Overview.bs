@@ -386,7 +386,7 @@ registerLayout('block-like', class {
             blockSize: availableBlockSize,
         });
 
-        const childFragments = yeild children.map((child) => {
+        const childFragments = yield children.map((child) => {
             return child.layoutNextFragment(childConstraintSpace);
         });
 
