@@ -1427,8 +1427,10 @@ interface IntrinsicSizes {
 };
 </pre>
 
-Issue: Need to specify that the {{LayoutChild}} objects should remain the same between layouts so
-    the author can store information? Not sure.
+Issue: Should {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}} be content
+    contributions instead? E.g.  minContentContribution, maxContentContribution. Should
+    {{IntrinsicSizesResultOptions/minContentSize}} and
+    {{IntrinsicSizesResultOptions/maxContentSize}} be content contributions as well?
 
 ### Determining Intrinsic Sizes ### {#determining-intrinsic-sizes}
 
