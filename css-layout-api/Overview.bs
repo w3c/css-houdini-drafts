@@ -443,6 +443,34 @@ dictionary ConstraintSpaceOptions {
 enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
 
+<div class="issue">
+Issue: Should {{ConstraintSpaceOptions}} be instead:
+
+<pre class="lang-javascript">
+const options = {
+  availableInlineSize: 100,
+  availableBlockSize: Infinity,
+
+  fixedInlineSize: 150, // This makes the engine ignore availableInlineSize.
+  fixedBlockSize: 150, // This makes the engine ignore availableBlockSize.
+
+  percentageInlineSize: 100, // This defaults to fixedInlineSize,
+                             // then availableInlineSize if not set.
+  percentageBlockSize: 100,  // This defaults to fixedBlockSize,
+                             // then availableBlockSize if not set.
+
+  blockFragmentationOffset: 200,
+  blockFragmentationType: 'column',
+
+  data: {floatPositions: [{x: 20, y: 30}]}, // Author data.
+};
+</pre>
+
+The constraint space would mirror this, additionally with the blockSize, and inlineSize attributes
+which represent the resolved inline and block sizes for the fragment.
+
+</div>
+
 A {{ConstraintSpace}} is passed into the layout method which represents the available space for the
 <a>current layout</a> to perform layout inside. It is also used to pass information about the
 available space into a <a>child layout</a>.
@@ -948,11 +976,40 @@ this level of the specification.
 A <a>layout API container</a> should calculate its scrollable overflow exactly like block
 containers do.
 
+Even if the author's <a>layout API container</a> positions a fragment into the <a>scrollable
+overflow</a> region, relative positioning or transforms may cause the fragment to shift such that
+its <a>scrollable overflow</a> region, causing no overflow to occur.
+
 Fragmentation {#interaction-fragmentation}
 ------------------------------------------
 
+A <a>parent layout</a> can ask the <a>current layout</a> to <a>fragment</a> by setting the
+{{ConstraintSpace/blockFragmentationType}} and {{ConstraintSpace/blockFragmentationOffset}}.
+
+E.g. [[css-multicol-1]] layout would set a {{ConstraintSpace/blockFragmentationType}} to
+<code>"column"</code> and set the {{ConstraintSpace/blockFragmentationOffset}} to where it needs the
+child to fragment.
+
 Alignment {#interaction-alignment}
 ----------------------------------
+
+<div class="issue">
+Issue: We need to add the ability to request baselines on the constraint space, and have a fragment
+    returned what was asked. E.g.
+
+<pre class="lang-javascript">
+const spaceOptions = {
+    inlineSize: availableInlineSize,
+    baselines: ['alphabetic', 'middle'],
+};
+
+const fragment = yield child.layoutNextFragment(spaceOptions);
+fragment.baselines.get('alphabetic') == /* something */;
+</pre>
+
+Do we want this in level 1? E.g. is it better to wait for implementations of [[css-align-3]] before
+doing this?
+</div>
 
 Layout {#layout}
 ================
