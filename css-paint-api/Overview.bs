@@ -437,7 +437,8 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 </div>
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>.
+negotiation</a> algorithm which is responsible for rendering an <<image>>,
+with |concreteObjectSize| set to the <a>concrete object size</a> of the <a>box</a>.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
@@ -450,6 +451,13 @@ Note: In a future version of the spec, the author could have the ability to spec
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
 the <a>concrete object size</a> given by the user agent.
 
+The <a>draw a paint image</a> function may be speculatively invoked by
+the user agent at any point, with any |concreteObjectSize|. The
+resulting image is discarded.
+
+Note: Although the image is discarded, it may still be cached, so subsequent invocations
+    of <<paint()>> may use the cached image.
+
 <pre class='idl'>
 [Exposed=PaintWorklet]
 interface PaintSize {
@@ -461,12 +469,12 @@ interface PaintSize {
 <div algorithm>
 When the user agent wants to <dfn>draw a paint image</dfn> of a <<paint()>> function for a |box|
 into its appropriate stacking level (as defined by the property the CSS property its associated
-with), given its |concreteObjectSize| (<a>concrete object size</a>) it <em>must</em> run the
-following steps:
+with), given |concreteObjectSize| it <em>must</em> run the following steps:
     1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
-    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a> the user agent
+    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>,
+        and the previous invocation had the same |concreteObjectSize|, the user agent
         <em>may</em> use the drawn image from the previous invocation. If so it <em>may</em> abort
         all these steps and use the previously drawn image.
 
