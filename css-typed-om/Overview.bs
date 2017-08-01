@@ -3,7 +3,7 @@ Title:  CSS Typed OM Level 1
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
-TR: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
+TR: https://www.w3.org/TR/css-typed-om-1/
 Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
 Shortname: css-typed-om
 Level: 1
@@ -76,6 +76,9 @@ spec:css-transforms-1;
         text:transform-style;
 spec:css-syntax-3;
     type:dfn; text:identifier
+spec:css-values-4;
+    type:type; text:<position>
+    type:value; text:in
 spec:infra;
     type: dfn;
         text: list
@@ -252,7 +255,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
 
-    7. Append |values to append| to the end of |entry|’s list. 
+    7. Append |values to append| to the end of |entry|’s list.
 </div>
 
 <div algorithm>
