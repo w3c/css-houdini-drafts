@@ -44,6 +44,11 @@ spec:css-pseudo-4; type:selector; text:::first-line
 spec:dom; type:dfn; for:/; text:element
 spec:infra; type:dfn; text:list
 spec:html; type:dfn; for:global object; text:realm
+spec:css22; type:property;
+    text:max-height
+    text:max-width
+    text:min-height
+    text:min-width
 </pre>
 
 <pre class="anchors">
@@ -1026,10 +1031,9 @@ name to child input properties map</dfn>. Initially these maps are empty and are
 Each <a>box</a> has an associated <dfn>layout valid flag</dfn>. It may be either
 <dfn>layout-valid</dfn> or <dfn>layout-invalid</dfn>. It is initially set to <a>layout-invalid</a>.
 
-TODO comments. <dfn>intrinsic sizes valid flag</dfn>. <dfn>intrinsic-sizes-valid</dfn>.
-<dfn>intrinsic-sizes-invalid</dfn>.
-
-Issue: The above flag is too restrictive on user agents, change.
+Each <a>box</a> has an associated <dfn>intrinsic sizes valid flag</dfn>. If may be either
+<dfn>intrinsic-sizes-valid</dfn> or <dfn>intrinsic-sizes-invalid</dfn>. It is initially set to
+<a>intrinsic-sizes-invalid</a>.
 
 When the computed style for a |box| changes, the user agent must run the following steps:
     1. Let |layoutFunction| be the ''layout()'' function of the 'display' property on the computed
@@ -1045,18 +1049,28 @@ When the computed style for a |box| changes, the user agent must run the followi
         input properties map</a>.
 
     5. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
-        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>.
+        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>, and
+        set the <a>intrinsic sizes valid flag</a> to <a>intrinsic-sizes-invalid</a>.
 
     6. For each |property| in |childInputProperties|, if the |property|'s <a>computed value</a> has
-        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>.
+        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>, and
+        set the <a>intrinsic sizes valid flag</a> to <a>intrinsic-sizes-invalid</a>.
 
 When a child <a>box</a> represented by a {{LayoutChild}} is added or removed from the <a>box
 tree</a> or has its layout invalidated (from a computed style change, or a descentdant change). Set
-the <a>layout valid flag</a> on the current <a>box</a> to <a>layout-invalid</a>.
+the <a>layout valid flag</a> on the current <a>box</a> to <a>layout-invalid</a> and set the
+<a>intrinsic sizes valid flag</a> on the current <a>box</a> to <a>intrinsic-sizes-invalid</a>.
 
 Note: This only describes layout invalidation as it relates to the CSS Layout API. All
     <a>boxes</a> conceptually have a <a>layout valid flag</a> and these changes are propagated
     through the <a>box tree</a>.
+
+Issue: We also want to implcitly invalidate on size and edge properties, i.e.
+    - 'width', 'min-width', 'max-width'
+    - 'height', 'min-height', 'max-height'
+    - 'padding-top', 'padding-bottom', 'padding-left', 'padding-right'
+    - 'border-top-width', 'border-bottom-width', 'border-left-width', 'border-right-width'
+    - 'overflow', 'overflow-x', 'overflow-y'
 
 Concepts {#concepts}
 --------------------
