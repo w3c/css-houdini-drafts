@@ -146,7 +146,7 @@ limit themselves to animating properties which do not require the user agent to 
 will have a much better chance of meeting the strict frame budgets required for smooth playback.
 
 If a Worklet Animation animation is executing in a parallel worklet execution context, the last
-known state of it's animation effects must be periodically synced back to the main javascript
+known state of its animation effects must be periodically synced back to the main javascript
 execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
 context to the main javascript execution context <em>must</em> occur before <a>running the animation
 frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
@@ -469,7 +469,7 @@ Web Animations Integration {#web-animation-integration}
 Worklet Animation {#worklet-animation-desc}
 -------------------------------------------
 <dfn>Worklet animation</dfn> is a kind of <a>animation</a> that delegates the animation playback to
-an <a>animator instance</a>. It controls the lifetime and playback state of it's corresponding
+an <a>animator instance</a>. It controls the lifetime and playback state of its corresponding
 <a>animator instance</a>.
 
 Being an <a>animation</a>, <a>worklet animation</a> has an <a>animation effect</a> and a
@@ -480,7 +480,7 @@ directly. Note that this means that the <a>timeline's</a> current time does not 
 animation's output.
 
 <a>Worklet animation</a> has the following properties in addition to the {{Animation}} interface:
-  - an <dfn>animation animator name</dfn> which identifies it's <a>animator definition</a>.
+  - an <dfn>animation animator name</dfn> which identifies its <a>animator definition</a>.
   - a <dfn>serialized options</dfn> which is serializable object that is used when
     constructing a new animator instance.
 
@@ -531,7 +531,7 @@ Creates a new {{WorkletAnimation}} object using the following procedure.
          : If |effects| is a {{AnimationEffectReadOnly}} object,
          :: Let effect be |effects|.
          : If |effects| is a <a>list</a> of {{AnimationEffectReadOnly}}</a> objects,
-         :: Let |effect| be a new {{WorkletGroupEffect}} with it's children set to |effects|.
+         :: Let |effect| be a new {{WorkletGroupEffect}} with its children set to |effects|.
          : Otherwise,
          :: Let |effect| be undefined.
 
@@ -560,7 +560,7 @@ In addition to the existing conditions on when the <a>animation</a> is considere
      corresponding <a>animator instance</a>.
 
 As described in [[#worklet-animation-desc]], the <a>worklet animation's</a> <a>current time</a> does
-not determine it's <a>animation effect's</a> <a>local time</a>. Instead the associated <a>animator
+not determine its <a>animation effect's</a> <a>local time</a>. Instead the associated <a>animator
 instance</a> controls the animation effect's <a>local time</a> directly. This means that the
 animation effect's local time is controlled from a {{WorkletGlobalScope}} which may be in a parallel
 execution context.
@@ -568,7 +568,7 @@ execution context.
 Here are a few implications of the above semantics:
 
  - Setting the <a>current time</a> or <a>start time</a> of a <a>worklet animation</a> does not
-    necessarily change it's output, but may change the animation <a>play state</a>.
+    necessarily change its output, but may change the animation <a>play state</a>.
  - Similarly, invoking {{Animation/finish()}} or updating a <a>worklet animation's</a> <a>playback
     rate</a> will only change the animation <a>play state</a> and may not change the output.
  - Querying the animation effect's local time using {{AnimationEffectReadOnly/getComputedTiming()}}
@@ -671,7 +671,7 @@ right abstractions and mechanisms to do this.
 WorkletGroupEffect {#worklet-group-effect}
 ------------------
 
-{{WorkletGroupEffect}} is a type of <a>group effect</a> that allows it's <a>child effect's</a>
+{{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
 <a>local times</a> to be mutated individually.
 
 When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a {{WorkletAnimation}}, the
