@@ -281,13 +281,10 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If |property| is not a [=list-valued property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    4. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
         return that entry.
     
-    5. Else, return `null`.
+    4. Else, return `null`.
 </div>
 
 <div algorithm>
