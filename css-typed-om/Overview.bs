@@ -2220,6 +2220,19 @@ Issue: Does the loading lifecycle need to be described here?
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
 objects, the {{CSSURLImageValue/url}} attribute contains the URL that references the image.
 
+<div algorithm>
+    The <dfn constructor for=CSSURLImageValue>CSSURLImageValue(|url|)</dfn> constructor must,
+    when called,
+    perform the following steps:
+
+    1. If the |url| passed into the constructor doesn't correctly 
+        parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
+    2. Else, return a new {{CSSURLImageValue}}
+        with its {{CSSURLImageValue/url}} internal slot
+        set to |url|.
+</div>
+
+
 <!--
 ████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
 ██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██
