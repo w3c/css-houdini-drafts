@@ -356,6 +356,7 @@ The 2D rendering context {#2d-rendering-context}
 <pre class='idl'>
 [Exposed=PaintWorklet]
 interface PaintRenderingContext2D {
+    readonly attribute unrestricted double devicePixelRatio;
 };
 PaintRenderingContext2D implements CanvasState;
 PaintRenderingContext2D implements CanvasTransform;
@@ -382,6 +383,11 @@ The size of the <a>output bitmap</a> does not necessarily represent the size of 
 that the user agent will use internally or during rendering. For example, if the visual viewport is
 zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
 the coordinate space, so that the resulting rendering is of high quality.
+
+A {{PaintRenderingContext2D}} object has a devicePixelRatio property, which represents the ratio
+of the resolution in physical pixels to the resolution of CSS pixels for the current display
+device. When measured from the same display device, this value must be identical to the
+Window.devicePixelRatio.
 
 Additionally the user agent may record the sequence of drawing operations which have been applied to
 the <a>output bitmap</a> such that the user agent can subsequently draw onto a device bitmap at the
