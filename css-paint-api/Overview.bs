@@ -131,10 +131,10 @@ partial interface CSS {
 
 The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
 
-The {{PaintWorkletGlobalScope}} has a devicePixelRatio property, which represents the ratio
-of the resolution in physical pixels to the resolution of CSS pixels for the current display
-device. When measured from the same display device, this value must be identical to the
-Window.devicePixelRatio.
+The {{PaintWorkletGlobalScope}} has a {{PaintWorkletGlobalScope/devicePixelRatio}} property,
+which represents the ratio of the resolution in physical pixels to the resolution of CSS
+pixels for the current display device. When measured from the same display device, this
+value must be identical to the Window.devicePixelRatio.
 
 <pre class='idl'>
 [Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
