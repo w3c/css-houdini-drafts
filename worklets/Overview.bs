@@ -122,26 +122,22 @@ The following techniques are used in order to encourage authors to write code in
 Speculative Evaluation {#speculative-evaluation}
 ------------------------------------------------
 
-Some specifications which use worklets ([[css-paint-api-1]]) may
-invoke methods on a class based on the state of the user agent. To
-increase the concurrency between threads, a user agent may invoke a
+Some specifications which use worklets ([[css-paint-api-1]]) may invoke methods on a class based on
+the state of the user agent. To increase the concurrency between threads, a user agent may invoke a
 method speculatively, based on potential future states.
 
-In these specifications user agents might invoke methods on a class at
-any time, and with any arguments, not just ones corresponding to
-the current state of the user agent. The results of such speculative
-evaluations are not displayed immediately, but may be cached for use
-if the user agent state matches the speculated state.
-This may increase the concurrency between the user agent and worklet threads.
+In these specifications user agents might invoke methods on a class at any time, and with any
+arguments, not just ones corresponding to the current state of the user agent. The results of such
+speculative evaluations are not displayed immediately, but may be cached for use if the user agent
+state matches the speculated state.  This may increase the concurrency between the user agent and
+worklet threads.
 
-As a result of this, to prevent this compatibility risk between user
-agents, authors who register classes on the global scope using these
-APIs, should make their code stateless. That is, the only effect of
-invoking a method should be its result, not any side-effects such as
-updating mutable state.
+As a result of this, to prevent this compatibility risk between user agents, authors who register
+classes on the global scope using these APIs, should make their code stateless. That is, the only
+effect of invoking a method should be its result, not any side-effects such as updating mutable
+state.
 
-The same techniques which encourage code idempotence also encourage
-authors to write stateless code.
+The same techniques which encourage code idempotence also encourage authors to write stateless code.
 
 Infrastructure {#infrastructure}
 ================================

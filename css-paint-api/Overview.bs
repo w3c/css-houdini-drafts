@@ -451,9 +451,8 @@ Note: In a future version of the spec, the author could have the ability to spec
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
 the <a>concrete object size</a> given by the user agent.
 
-The <a>draw a paint image</a> function may be speculatively invoked by
-the user agent at any point, with any |concreteObjectSize|. The
-resulting image is not displayed.
+The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
+with any |concreteObjectSize|. The resulting image is not displayed.
 
 Note: User agents may use any heuristic to speculate a possible future value
     for |concretObjectSize|, for example speculating that the size remains unchanged.
