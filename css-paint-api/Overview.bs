@@ -844,8 +844,8 @@ registerPaint('arc', class {
     ctx.strokeStyle = args[0].cssText;
 
     // Determine the center point.
-		const x = geom.width / 2;
-		const y = geom.height / 2;
+    const x = geom.width / 2;
+    const y = geom.height / 2;
 
     // Convert the start and end angles to radians.
     const startAngle = this.convertAngle(args[1]) - Math.PI / 2;
@@ -923,6 +923,51 @@ registerPaint('heading-color', class {
         // Draw just a solid image.
         ctx.fillStyle = color;
         ctx.fillRect(0, 0, width, height);
+    }
+});
+</pre>
+
+Example 5: Drawing outside an element's area {#example-5}
+---------------------------------------------------------
+
+It is possible to draw outside an element's area by using the 'border-image' property.
+
+<pre class='lang-markup'>
+&lt;style>
+#overdraw {
+    --border-width: 10;
+
+    border-style: solid;
+    border-width: calc(var(--border-width) * 1px);
+
+    border-image-source: paint(overdraw);
+    border-image-slice: 0 fill;
+    border-image-outset: calc(var(--border-width) * 1px);
+
+    width: 200px;
+    height: 200px;
+}
+&lt;/style>
+&lt;div id="overdraw">&lt;/div>
+&lt;script>
+    CSS.paintWorklet.addModule('overdraw.js');
+&lt;/script>
+</pre>
+
+<pre class='lang-javascript'>
+// overdraw.js
+registerPaint('overdraw', class {
+    static get inputProperties() { return ['--border-width']; }
+    paint(ctx, geom, properties) {
+        const borderWidth = parseInt(properties.get('--border-width'));
+        ctx.shadowColor = 'rgba(0,0,0,0.25)';
+        ctx.shadowBlur = borderWidth;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.fillRect(borderWidth,
+                     borderWidth,
+                     geom.width - 2 * borderWidth,
+                     geom.height - 2 * borderWidth);
     }
 });
 </pre>
