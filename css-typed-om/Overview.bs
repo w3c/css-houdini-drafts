@@ -2809,6 +2809,18 @@ rather than directly constructed by the author,
 are serialized according to the following rules,
 depending on the property they came from:
 
+: 'background-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'border-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
 : 'border-image'
 ::
     1. Let |values| initially be the empty [=list=].
@@ -2828,6 +2840,12 @@ depending on the property they came from:
         append "none" to |values|.
     8. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
+
+: 'color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
 
 
 
