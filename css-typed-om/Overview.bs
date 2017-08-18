@@ -2825,7 +2825,7 @@ depending on the property they came from:
     6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
         serialize 'border-image-repeat' and append it to |values|.
     7. If |values| is [=list/empty=],
-        serialize the keyword <css>none</css> and append it to |values|.
+        append "none" to |values|.
     8. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
 
