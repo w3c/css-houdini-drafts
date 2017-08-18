@@ -2831,9 +2831,15 @@ depending on the property they came from:
     4. If 'border-image-width' does not specify ''1'' for all sides,
         append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
         to the result of serializing 'border-image-width' and append it to |values|.
-    5. If 'border-image-outset' does not specify ''0'' for all sides,
-        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
-        to the result of serializing 'border-image-outset' and append it to |values|.
+    5. If 'border-image-outset' does not specify ''0'' for all sides:
+        1. If the previous 'border-image-width' step did not append anything to |values|,
+            let |prefix| be <nobr>"// "</nobr>
+            (two U+002F FORWARD SLASH characters followed by U+0020 SPACE);
+            otherwise let |prefix| be <nobr>"/ "</nobr>
+            (U+002F FORWARD SLASH followed by U+0020 SPACE)
+        2. Append |prefix|
+            to the result of serializing 'border-image-outset' 
+            and append it to |values|.
     6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
         serialize 'border-image-repeat' and append it to |values|.
     7. If |values| is [=list/empty=],
