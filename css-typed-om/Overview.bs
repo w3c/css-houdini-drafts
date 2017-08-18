@@ -253,7 +253,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     5. Let |values to append| be the empty list.
 
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
+    6. For each |value| in |values| if the <a>algorithm that coerces |value| into an appropriate type for a given property</a> does not throw an error, append the returned object to |values to append|.
 
     7. Append |values to append| to the end of |entry|’s list.
 </div>
@@ -773,9 +773,9 @@ The following are the arithmetic operations you can perform on dimensions:
 
     5. If all |item|s in |thisAndValues| are {{CSSMathValue}}s :
         1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
-            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
-        2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
-            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
+            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValues| are equal.
+        2. If |thisAndValues| are all either {{CSSMathNegate}} or {{CSSMathInvert}}:
+            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValues| are equal.
 </div>
 
 
