@@ -253,7 +253,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     5. Let |values to append| be the empty list.
 
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
+    6. For each |value| in |values| if the <a>algorithm that coerces |value| into an appropriate type for a given property</a> does not throw an error, append the returned object to |values to append|.
 
     7. Append |values to append| to the end of |entry|’s list.
 </div>
@@ -781,9 +781,9 @@ The following are the arithmetic operations you can perform on dimensions:
 
     5. If all |item|s in |thisAndValues| are {{CSSMathValue}}s :
         1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
-            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
-        2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
-            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
+            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValues| are equal.
+        2. If |thisAndValues| are all either {{CSSMathNegate}} or {{CSSMathInvert}}:
+            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValues| are equal.
 </div>
 
 
@@ -2228,6 +2228,19 @@ Issue: Does the loading lifecycle need to be described here?
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
 objects, the {{CSSURLImageValue/url}} attribute contains the URL that references the image.
 
+<div algorithm>
+    The <dfn constructor for=CSSURLImageValue>CSSURLImageValue(|url|)</dfn> constructor must,
+    when called,
+    perform the following steps:
+
+    1. If the |url| passed into the constructor doesn't correctly 
+        parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
+    2. Else, return a new {{CSSURLImageValue}}
+        with its {{CSSURLImageValue/url}} internal slot
+        set to |url|.
+</div>
+
+
 <!--
 ████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
 ██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██
@@ -2683,7 +2696,7 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 :   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
-::  the serialization matches the CSSOM serialization of the corresponding value.
+::  the serialization is specified in [[#cssom-serialization]] below.
 
 <div class='example'>
 
@@ -2795,6 +2808,60 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 
 {{CSSFontFaceValue}} objects are serialized to the value of their contained
 {{CSSFontFaceValue/fontFamilyName}}.
+
+Serialization from CSSOM Values {#cssom-serialization}
+------------------------------------------------------
+
+{{CSSStyleValue}} objects produced by the user agent from values in the CSSOM,
+rather than directly constructed by the author,
+are serialized according to the following rules,
+depending on the property they came from:
+
+: 'background-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'border-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'border-image'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If 'border-image-source' is not ''border-image-source/none'',
+        serialize 'border-image-source' and append it to |values|.
+    3. If 'border-image-slice' does not specify ''100%'' for all sides and omits the ''border-image-slice/fill'' keyword,
+        serialize 'border-image-slice' and append it to |values|.
+    4. If 'border-image-width' does not specify ''1'' for all sides,
+        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
+        to the result of serializing 'border-image-width' and append it to |values|.
+    5. If 'border-image-outset' does not specify ''0'' for all sides:
+        1. If the previous 'border-image-width' step did not append anything to |values|,
+            let |prefix| be <nobr>"// "</nobr>
+            (two U+002F FORWARD SLASH characters followed by U+0020 SPACE);
+            otherwise let |prefix| be <nobr>"/ "</nobr>
+            (U+002F FORWARD SLASH followed by U+0020 SPACE)
+        2. Append |prefix|
+            to the result of serializing 'border-image-outset' 
+            and append it to |values|.
+    6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
+        serialize 'border-image-repeat' and append it to |values|.
+    7. If |values| is [=list/empty=],
+        append "none" to |values|.
+    8. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+: 'color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+
 
 Security Considerations {#security-considerations}
 ==================================================
