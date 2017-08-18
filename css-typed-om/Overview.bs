@@ -282,7 +282,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
-        return that entry.
+        return the first value found in that entry.
     
     4. Else, return `null`.
 </div>
