@@ -2688,7 +2688,7 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 :   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
-::  the serialization matches the CSSOM serialization of the corresponding value.
+::  the serialization is specified in [[#cssom-serialization]] below.
 
 <div class='example'>
 
@@ -2800,6 +2800,36 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 
 {{CSSFontFaceValue}} objects are serialized to the value of their contained
 {{CSSFontFaceValue/fontFamilyName}}.
+
+Serialization from CSSOM Values {#cssom-serialization}
+------------------------------------------------------
+
+{{CSSStyleValue}} objects produced by the user agent from values in the CSSOM,
+rather than directly constructed by the author,
+are serialized according to the following rules,
+depending on the property they came from:
+
+: 'border-image'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If 'border-image-source' is not ''border-image-source/none'',
+        serialize 'border-image-source' and append it to |values|.
+    3. If 'border-image-slice' does not specify ''100%'' for all sides and omits the ''border-image-slice/fill'' keyword,
+        serialize 'border-image-slice' and append it to |values|.
+    4. If 'border-image-width' does not specify ''1'' for all sides,
+        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
+        to the result of serializing 'border-image-width' and append it to |values|.
+    5. If 'border-image-outset' does not specify ''0'' for all sides,
+        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
+        to the result of serializing 'border-image-outset' and append it to |values|.
+    6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
+        serialize 'border-image-repeat' and append it to |values|.
+    7. If |values| is [=list/empty=],
+        serialize the keyword <css>none</css> and append it to |values|.
+    8. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+
 
 Security Considerations {#security-considerations}
 ==================================================
