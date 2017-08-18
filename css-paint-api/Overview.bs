@@ -614,7 +614,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
-            - "alpha" - The alpha in the <a for="paint definition">ContextAttributes object</a> given by |definition|.
+            - "context_attributes" - The <a for="paint definition">ContextAttributes object</a> given by |definition|.
 
         Note: The |renderingContext| is not be re-used between invocations of paint. Implicitly this
             means that there is no stored data, or state on the |renderingContext| between
