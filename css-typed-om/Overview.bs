@@ -260,6 +260,20 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
+    To <dfn>delete a StylePropertyMap</dfn> given a <var>property</var> and a list of
+    <var>values</var>, run these steps:
+
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+        remove that entry from the [=property model=].
+</div>
+
+<div algorithm>
     This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, or fails and throws a {{TypeError}}:
         : If |value| is a {{CSSStyleValue}},
         :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
