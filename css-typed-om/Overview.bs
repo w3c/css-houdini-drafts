@@ -303,6 +303,17 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
+    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
+
+    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
+        1. If the algoritm returns a {{CSSStyleValue}} return true.
+
+        2. If the algorithm returns `null` return false.
+
+</div>
+
+
+<div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
@@ -2892,6 +2903,52 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'margin'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If 'margin-bottom' does not specify ''0'' for it's initial value, 
+        serialize 'margin-bottom' and append it to |values|.
+    3. If 'margin-left' does not specify ''0'' for it's initial value, 
+        serialize 'margin-left' and append it to |values|.
+    4. If 'margin-right' does not specify ''0'' for it's initial value, 
+        serialize 'margin-right' and append it to |values|.
+    5. If 'margin-top' does not specify ''0'' for it's initial value, 
+        serialize 'margin-top' and append it to |values|.
+    6. If 'margin' is set to the ''inherit'' keyword, append "inherit" to |values|.
+    7. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+: 'margin-bottom'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-left'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-right'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-top'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
 
 
 Security Considerations {#security-considerations}
