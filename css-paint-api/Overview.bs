@@ -153,7 +153,7 @@ dictionary ContextAttributes {
         class MyPaint {
             static get inputProperties() { return ['--foo']; }
             static get inputArguments() { return ['&lt;color>']; }
-            static get ContextAttributes() { return {alpha: true}; }
+            static get contextAttributes() { return {alpha: true}; }
 
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
@@ -253,11 +253,11 @@ called, the user agent <em>must</em> run the following steps:
 
         2. <a for=list>Append</a> |parsedSyntax| to |inputArgumentSyntaxes|.
 
-    12. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "ContextAttributes.alpha").
+    12. Let |contextAttributesValue| be the result of <a>Get</a>(|paintCtor|, "ContextAttributes").
 
-    13. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the
-        result of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is
-        <a>thrown</a>, rethrow the exception and abort all these steps.
+    13. Let |contextAttributes| be the result of <a>converting</a> |contextAttributesValue| to a
+        {{PaintContextAttributes}}. If an exception is <a>thrown</a>, rethrow the exception and
+        abort all these steps.
 
         Note: Setting <code>ContextAttributes.alpha</code> is <code>false</code> allows user agents
             to anti-alias text in addition to performing "visibility" optimizations, e.g. not
@@ -286,7 +286,7 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a for="paint definition">input properties</a> being |inputProperties|.
 
-        - <a for="paint definition">ContextAttributes object</a> being {alpha: |alpha|}.
+        - <a for="paint definition">ContextAttributes object</a> being |contextAttributes|.
 
     20. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
 
@@ -302,7 +302,7 @@ called, the user agent <em>must</em> run the following steps:
             - <a for="document paint definition">input argument syntaxes</a> being
                 |inputArgumentSyntaxes|.
 
-            - <a for="document paint definition">ContextAttributes object</a> being {alpha: |alpha|}.
+            - <a for="document paint definition">ContextAttributes object</a> being |contextAttributes|.
 
         3. If |documentPaintDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
 
@@ -320,7 +320,7 @@ called, the user agent <em>must</em> run the following steps:
 
                 Log an error to the debugging console stating that the same class was registered
                 with different <code>inputProperties</code>, <code>inputArguments</code>, or
-                <code>ContextAttributes</code>.
+                <code>contextAttributes</code>.
 
         4. Otherwise, <a for=map>set</a> |documentPaintDefinitionMap|[|name|] to
             |documentDefinition|.
@@ -614,7 +614,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
-            - "context_attributes" - The <a for="paint definition">ContextAttributes object</a> given by |definition|.
+            - "contextAttributes" - The <a for="paint definition">ContextAttributes object</a> given by |definition|.
 
         Note: The |renderingContext| is not be re-used between invocations of paint. Implicitly this
             means that there is no stored data, or state on the |renderingContext| between
