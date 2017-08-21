@@ -303,6 +303,17 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
+    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
+
+    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
+        1. If the algoritm returns a {{CSSStyleValue}} return true.
+
+        2. If the algorithm returns `null` return false.
+
+</div>
+
+
+<div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
