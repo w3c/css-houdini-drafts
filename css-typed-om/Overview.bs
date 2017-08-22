@@ -2895,12 +2895,43 @@ depending on the property they came from:
     8. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
 
+: 'bottom'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
 : 'color'
 ::
     1. If the value is the ''currentcolor'' keyword,
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'left'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'right'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'top'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
 
 
 Security Considerations {#security-considerations}
