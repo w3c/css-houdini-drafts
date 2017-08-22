@@ -2903,6 +2903,27 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'height'
+::
+    1. If the value is of type <<length>> return the result of serializing the <<length>> value.
+    2. Else, if the value if of type <<percentage>> return the result of serializing the <<percentage>> value.
+    3. Else, if the value is one of the following keywords return the string representation of the keyword:
+        * available,
+        * min-content,
+        * max-content,
+        * fit-content,
+        * auto.
+
+: 'width'
+::
+    1. If the value is of type <<length>> return the result of serializing the <<length>> value.
+    2. Else, if the value if of type <<percentage>> return the result of serializing the <<percentage>> value.
+    3. Else, if the value is one of the following keywords return the string representation of the keyword:
+        * available,
+        * min-content,
+        * max-content,
+        * fit-content,
+        * auto.
 
 
 Security Considerations {#security-considerations}
