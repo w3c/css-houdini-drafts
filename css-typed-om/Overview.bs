@@ -381,16 +381,14 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface Window {
+partial interface CSS {
     StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
 };
 </pre>
 
-Issue(350): getComputedStyleMap needs to move to CSS
-
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
-{{Window/getComputedStyleMap()}} method.
+{{CSS/getComputedStyleMap()}} method.
 
 When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
@@ -584,7 +582,7 @@ Instead, clamping and/or rounding will occur during computation of style.
         console.log(myElement.styleMap.get("opacity").value); // 3
         console.log(myElement.styleMap.get("z-index").value); // 15.4
 
-        var computedStyle = getComputedStyleMap(myElement);
+        var computedStyle = CSS.getComputedStyleMap(myElement);
         var opacity = computedStyle.get("opacity");
         var zIndex = computedStyle.get("z-index");
     </pre>
