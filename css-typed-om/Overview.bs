@@ -393,7 +393,7 @@ partial interface Element {
 When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
-Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
+Note: The StylePropertyMap returned by computedStyleMap represents computed style,
             not resolved style. In this regard it provides different values than those
             in objects returned by getComputedStyle.
 
@@ -402,12 +402,12 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-    [SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
 <dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
 When constructed, the [=property model=] for [=declared StylePropertyMap=]
@@ -582,7 +582,7 @@ Instead, clamping and/or rounding will occur during computation of style.
         console.log(myElement.attributeStyleMap.get("opacity").value); // 3
         console.log(myElement.attributeStyleMap.get("z-index").value); // 15.4
 
-        var computedStyle = myElement.computedStyleMap(myElement);
+        var computedStyle = myElement.computedStyleMap();
         var opacity = computedStyle.get("opacity");
         var zIndex = computedStyle.get("z-index");
     </pre>
