@@ -2845,32 +2845,49 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 {{CSSURLImageValue}} objects are serialized to the string given by
 "url(" + {{CSSURLImageValue/url}} + ")".
 
-Units and Values Serialization {#unitsandvalues-serialization}
+{{CSSFontFaceValue}} Serialization {#fontfacevalue-serialization}
 -----------------------------------------------------------------
+ 
+{{CSSFontFaceValue}} objects are serialized to the value of their contained
+{{CSSFontFaceValue/fontFamilyName}}.
+
+Units and Values Serialization {#unitsandvalues-serialization}
+--------------------------------------------------------------
 
 This section covers how to serialize the various unit types in CSSOM
 
-: 'length'
-::
+<div algorithm="serialize a 'length' value">
+
+To <dfn>serialize a 'length' value</dfn>, run these steps:
     1. Let |values| initially be the empty [=list=].
-    2. If the <length> unit has a '-' sign character append it to |values|.
-    3. Append the result of serializing a 'number' to |values|. 
-    4. If the number is '0' skip this step. Else, append a unit identifier 
-        (a two-letter abbreviation) to |values|.
+    2. If the <length> value has a '-' sign character append it to |values|.
+    3. Append the result of [=serialize a <length> value=] to |values|. 
+    4. If the number is '0' skip this step. Else, append the <length> 
+        value's unit identifier (a two-letter abbreviation) to |values|.
     5. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
+</div>
 
-: 'number'
-::
+<div algorithm="serialize a 'number' value">
+
+To <dfn>serialize a 'number' value</dfn>, run these steps:
     1. Return the number respresented as a string.
+</div>
 
-: 'percentage'
-::
-    // TODO
 
-: 'color'
-::
+<div algorithm="serialize a 'percentage' value">
+
+To <dfn>serialize a 'percentage' value</dfn>, run these steps:
     // TODO
+</div>
+
+
+<div algorithm="serialize a 'color' value">
+
+To <dfn>serialize a 'color' value</dfn>, run these steps:
+    // TODO
+</div>
+
 
 
 Serialization from CSSOM Values {#cssom-serialization}
