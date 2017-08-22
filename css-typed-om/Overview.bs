@@ -2905,7 +2905,7 @@ depending on the property they came from:
 
 : 'opacity'
 ::
-    1. If the value of type <<number>>,
+    1. If the value is of type <<number>>,
         return the result of serializing the <<number>> value.
     2. Otherwise, return the result of serializing the <<percentage>> value.
 
