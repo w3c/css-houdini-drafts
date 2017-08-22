@@ -303,17 +303,6 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
-    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
-
-    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
-        1. If the algoritm returns a {{CSSStyleValue}} return true.
-
-        2. If the algorithm returns `null` return false.
-
-</div>
-
-
-<div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
@@ -2906,16 +2895,24 @@ depending on the property they came from:
 : 'margin'
 ::
     1. Let |values| initially be the empty [=list=].
-    2. If 'margin-bottom' does not specify ''0'' for it's initial value, 
-        serialize 'margin-bottom' and append it to |values|.
-    3. If 'margin-left' does not specify ''0'' for it's initial value, 
-        serialize 'margin-left' and append it to |values|.
-    4. If 'margin-right' does not specify ''0'' for it's initial value, 
-        serialize 'margin-right' and append it to |values|.
-    5. If 'margin-top' does not specify ''0'' for it's initial value, 
-        serialize 'margin-top' and append it to |values|.
-    6. If 'margin' is set to the ''inherit'' keyword, append "inherit" to |values|.
-    7. Return the result of concatenating all the items in |values|,
+    2. If 'margin-top' does not specify ''0'' for its value, 
+        consider 'margin-top' to be |topValue| and append it to |values|.
+    3. If 'margin-right' does not specify ''0'' for its value, 
+        consider 'margin-right' to be |rightValue|.
+    4. If 'margin-bottom' does not specify ''0'' for its value, 
+        consider 'margin-bottom' to be |bottomValue|.
+    5. If 'margin-left' does not specify ''0'' for its value, 
+        consider 'margin-left' to be |leftValue|.
+    6. Append |rightValue| to |values| if one of the following conditions is true:
+        1. |rightValue| and |topValue| are not equivalent,
+        2. |topValue| and |bottomValue| are not equivalent
+        3. Or |rightValue| and |leftValue| are not equivalent.
+    7. Append |bottomValue| to |values| if one of the following conditions is true:
+        1. |topValue| and |bottomValue| are not equivalent
+        2. Or |rightValue| and |leftValue| are not equivalent.
+    8. If |rightValue| and |leftValue| are not equivalent append |leftValue| to |values|.
+    9. If 'margin' is set to the ''inherit'' keyword, append "inherit" to |values|.
+    10. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
 
 : 'margin-bottom'
