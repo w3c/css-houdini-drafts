@@ -2845,11 +2845,33 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 {{CSSURLImageValue}} objects are serialized to the string given by
 "url(" + {{CSSURLImageValue/url}} + ")".
 
-{{CSSFontFaceValue}} Serialization {#fontfacevalue-serialization}
+Units and Values Serialization {#unitsandvalues-serialization}
 -----------------------------------------------------------------
 
-{{CSSFontFaceValue}} objects are serialized to the value of their contained
-{{CSSFontFaceValue/fontFamilyName}}.
+This section covers how to serialize the various unit types in CSSOM
+
+: 'length'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If the <length> unit has a '-' sign character append it to |values|.
+    3. Append the result of serializing a 'number' to |values|. 
+    4. If the number is '0' skip this step. Else, append a unit identifier 
+        (a two-letter abbreviation) to |values|.
+    5. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+: 'number'
+::
+    1. Return the number respresented as a string.
+
+: 'percentage'
+::
+    // TODO
+
+: 'color'
+::
+    // TODO
+
 
 Serialization from CSSOM Values {#cssom-serialization}
 ------------------------------------------------------
