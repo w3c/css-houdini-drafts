@@ -381,14 +381,14 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface CSS {
-    StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+partial interface Element {
+    StylePropertyMapReadOnly computedStyleMap();
 };
 </pre>
 
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
-{{CSS/getComputedStyleMap()}} method.
+{{Element/computedStyleMap()}} method.
 
 When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
@@ -422,12 +422,12 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface Element {
-    [SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
 <dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
-directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
+directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
 attribute of {{Element}} objects.
 
 When constructed, the [=property model=] for [=inline StylePropertyMap=] objects
@@ -576,13 +576,13 @@ Instead, clamping and/or rounding will occur during computation of style.
     The following code is valid
 
     <pre class=lang-js>
-        myElement.styleMap.set("opacity", CSS.number(3));
-        myElement.styleMap.set("z-index", CSS.number(15.4));
+        myElement.attributeStyleMap.set("opacity", CSS.number(3));
+        myElement.attributeStyleMap.set("z-index", CSS.number(15.4));
 
-        console.log(myElement.styleMap.get("opacity").value); // 3
-        console.log(myElement.styleMap.get("z-index").value); // 15.4
+        console.log(myElement.attributeStyleMap.get("opacity").value); // 3
+        console.log(myElement.attributeStyleMap.get("z-index").value); // 15.4
 
-        var computedStyle = CSS.getComputedStyleMap(myElement);
+        var computedStyle = myElement.computedStyleMap(myElement);
         var opacity = computedStyle.get("opacity");
         var zIndex = computedStyle.get("z-index");
     </pre>
@@ -2170,7 +2170,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     Will produce the following behavior:
 
     <pre class='lang-javascript'>
-    let map = document.querySelector('.example').styleMap;
+    let map = document.querySelector('.example').attributeStyleMap;
 
     map.get('object-position').x;
     // CSS.percent(50)
@@ -2750,7 +2750,7 @@ var length2 = CSSNumericValue.from(42.0, "px");
 length2.toString(); // "42px";
 
 element.style.width = "42.0px";
-var length3 = element.styleMap.get('width');
+var length3 = element.attributeStyleMap.get('width');
 length3.toString(); // "42px";
 </pre>
 
