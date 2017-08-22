@@ -2903,6 +2903,11 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'opacity'
+::
+    1. If the value of type <<number>>,
+        return the result of serializing the <<number>> value.
+    2. Otherwise, return the result of serializing the <<percentage>> value.
 
 
 Security Considerations {#security-considerations}
