@@ -218,7 +218,7 @@ is initialized differently depending on where the {{CSSStyleValue}} is used
 [[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
-All properties stored on the [=property model=] in {{StylePropertyMapReadOnly}} are case-insensitive within the ASCII range (i.e., [a-z] and [A-Z] are equivalent).
+All properties stored on the [=property model=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=] within the ASCII range (i.e., [a-z] and [A-Z] are equivalent).
 
 <div class='note'>
 The sequence of {{CSSStyleValue}}s associated with a property do
