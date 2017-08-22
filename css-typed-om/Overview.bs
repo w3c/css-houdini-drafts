@@ -2901,6 +2901,60 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'margin'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If 'margin-top' does not specify ''0'' for its value, 
+        consider 'margin-top' to be |topValue| and append it to |values|.
+    3. If 'margin-right' does not specify ''0'' for its value, 
+        consider 'margin-right' to be |rightValue|.
+    4. If 'margin-bottom' does not specify ''0'' for its value, 
+        consider 'margin-bottom' to be |bottomValue|.
+    5. If 'margin-left' does not specify ''0'' for its value, 
+        consider 'margin-left' to be |leftValue|.
+    6. Append |rightValue| to |values| if one of the following conditions is true:
+        1. |rightValue| and |topValue| are not equivalent,
+        2. |topValue| and |bottomValue| are not equivalent
+        3. Or |rightValue| and |leftValue| are not equivalent.
+    7. Append |bottomValue| to |values| if one of the following conditions is true:
+        1. |topValue| and |bottomValue| are not equivalent
+        2. Or |rightValue| and |leftValue| are not equivalent.
+    8. If |rightValue| and |leftValue| are not equivalent append |leftValue| to |values|.
+    9. If 'margin' is set to the ''inherit'' keyword, append "inherit" to |values|.
+    10. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+: 'margin-bottom'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-left'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-right'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
+
+: 'margin-top'
+::
+    1. If the value specifies ''0'', exit the algorithm.
+    2. If the value is the ''inherit'' keyword,
+        return "inherit".
+    3. If the value is of type <<margin-width>> return the 
+        result of serializing the <<margin-width>> value.
 
 
 Security Considerations {#security-considerations}
