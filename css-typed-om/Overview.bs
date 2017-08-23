@@ -2909,10 +2909,6 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
-: 'position'
-::
-    1. Return value of 'position'.
-
 : 'left'
 ::
     1. If the value is the ''auto'' keyword,
@@ -2920,6 +2916,10 @@ depending on the property they came from:
     2. If the value is of type <<length>>,
         return the result of serializing the <<length>> value.
     3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'position'
+::
+    1. Return the serialization of 'position'.
 
 : 'right'
 ::
