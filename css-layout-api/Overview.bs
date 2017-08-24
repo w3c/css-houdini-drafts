@@ -313,10 +313,12 @@ interface Fragment {
 };
 
 /* NOTE EVERYTHING BELOW HERE IS SPECULATIVE */
+[Exposed=LayoutWorklet]
 interface LineFragment : Fragment {
     readonly attribute sequence&lt;LineFragmentSegment> segments;
 };
 
+[Exposed=LayoutWorklet]
 interface LineFragmentSegment {
     readonly attribute LineFragmentSegmentType type;
     readonly attribute LineFragmentSegmentBreakType breakType;
@@ -832,7 +834,6 @@ Utility Functions {#utility-functions}
 --------------------------------------
 
 <pre class='idl'>
-[Exposed=LayoutWorklet]
 partial interface LayoutWorkletGlobalScope {
     double resolveInlineSize(ConstraintSpace constraintSpace,
                              StylePropertyMapReadOnly styleMap);
@@ -1421,6 +1422,7 @@ dictionary IntrinsicSizesResultOptions {
     double minContentSize;
 };
 
+[Exposed=LayoutWorklet]
 interface IntrinsicSizes {
   readonly attribute double minContentSize;
   readonly attribute double maxContentSize;

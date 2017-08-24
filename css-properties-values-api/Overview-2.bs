@@ -18,7 +18,7 @@ The apply hook {#the-apply-hook}
 ================================
 
 <pre class='idl'>
-
+[Exposed=???]
 interface ElementProxy {
   readonly attribute StylePropertyMapReadOnly inputStyle;
   readonly attribute StylePropertyMap outputStyle;
@@ -32,6 +32,7 @@ dictionary ApplyDescriptor {
 
 callback VoidFunction = void ();
 
+[Exposed=???]
 interface StyleWorklet : WorkletGlobalContext {
   void registerApplyHook(DOMString name, VoidFunction applyCtor, ApplyDescriptor config);
   void unregisterApplyHook(DOMString name);

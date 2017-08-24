@@ -72,6 +72,7 @@ Boxes are not explicitly exposed by this API.
 <h2 id='api'>API</h2>
 
 <pre class='idl'>
+[Exposed=Window]
 interface DeadFragmentInformation {
 	readonly attribute Node node;
 	readonly attribute double width;
