@@ -968,7 +968,7 @@ The following are the arithmetic operations you can perform on dimensions:
         * ''calc(1px * 2em)'' becomes `«(2, «["em" → 1, "px" → 1]»)»`
         * ''calc(1px + 1deg)'' can't be represented as a [=sum value=]
             because it's an invalid computation
-        * ''calc(1px * 1deg)'' becomes `«(2, «["deg" → 1, "px" → 1]»)»`
+        * ''calc(1px * 2deg)'' becomes `«(2, «["deg" → 1, "px" → 1]»)»`
     </div>
 
     To <dfn lt="create a sum value|creating a sum value">create a sum value</dfn> from a {{CSSNumericValue}} |this|,
