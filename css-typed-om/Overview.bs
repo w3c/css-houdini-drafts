@@ -2273,7 +2273,7 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
     when called,
     perform the following steps:
 
-    1. If the |url| passed into the constructor doesn't correctly 
+    1. If the |url| passed into the constructor doesn't correctly
         parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
     2. Else, return a new {{CSSURLImageValue}}
         with its {{CSSURLImageValue/url}} internal slot
@@ -2877,7 +2877,7 @@ depending on the property they came from:
     3. If 'border-image-slice' does not specify ''100%'' for all sides and omits the ''border-image-slice/fill'' keyword,
         serialize 'border-image-slice' and append it to |values|.
     4. If 'border-image-width' does not specify ''1'' for all sides,
-        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE) 
+        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE)
         to the result of serializing 'border-image-width' and append it to |values|.
     5. If 'border-image-outset' does not specify ''0'' for all sides:
         1. If the previous 'border-image-width' step did not append anything to |values|,
@@ -2886,7 +2886,7 @@ depending on the property they came from:
             otherwise let |prefix| be <nobr>"/ "</nobr>
             (U+002F FORWARD SLASH followed by U+0020 SPACE)
         2. Append |prefix|
-            to the result of serializing 'border-image-outset' 
+            to the result of serializing 'border-image-outset'
             and append it to |values|.
     6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
         serialize 'border-image-repeat' and append it to |values|.
