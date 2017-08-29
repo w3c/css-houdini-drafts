@@ -643,7 +643,7 @@ This tells the <a>child layout</a> to produce a {{Fragment}} starting at the poi
 Issue: Explain resuming the author defined layout.
 
 <div class="example">
-This example shows a simple layout which places indents child fragments for a certain number of
+This example shows a simple layout which indents child fragments for a certain number of
 lines.
 
 This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
@@ -775,7 +775,7 @@ interface LayoutEdges {
 };
 </pre>
 
-A {{LayoutEdges}} object is passed into the layout method. This represents size of the <a>box
+A {{LayoutEdges}} object is passed into the layout method. This represents the size of the <a>box
 model edges</a> for the current box which is being laid out.
 
 The {{LayoutEdges}} has {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, and
