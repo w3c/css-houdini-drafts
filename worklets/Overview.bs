@@ -142,7 +142,7 @@ Each {{WorkletGlobalScope}} has an assocated <dfn for=WorkletGlobalScope>owner d
 initially null and set inside the <a>create a WorkletGlobalScope</a> algorithm.
 
 Whenever a {{Document}} object is <a>discarded</a>, each {{WorkletGlobalScope}} whose <a>owner
-document</a> is that {{Document}} object should clear its <a>owner document</a>.
+document</a> is that {{Document}} object, should clear its <a>owner document</a>.
 
 Each {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
 
