@@ -138,8 +138,9 @@ interface WorkletGlobalScope {
 };
 </pre>
 
-Each {{WorkletGlobalScope}} has an assocated <dfn for=WorkletGlobalScope>owner document</dfn>. It is
-initially null and set inside the <a>create a WorkletGlobalScope</a> algorithm.
+Each {{WorkletGlobalScope}} has an assocated <dfn export for=WorkletGlobalScope>owner
+document</dfn>.
+It is initially null and set inside the <a>create a WorkletGlobalScope</a> algorithm.
 
 Whenever a {{Document}} object is <a>discarded</a>, each {{WorkletGlobalScope}} whose <a>owner
 document</a> is that {{Document}} object, should clear its <a>owner document</a>.
