@@ -131,10 +131,14 @@ partial interface CSS {
 
 The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
 
+The {{PaintWorkletGlobalScope}} has a {{PaintWorkletGlobalScope/devicePixelRatio}}
+property which is identical to the Window.{{Window/devicePixelRatio}} property.
+
 <pre class='idl'>
 [Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
 interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
+    readonly attribute unrestricted double devicePixelRatio;
 };
 </pre>
 
