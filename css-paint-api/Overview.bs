@@ -154,7 +154,7 @@ dictionary PaintRenderingContext2DSettings {
         class MyPaint {
             static get inputProperties() { return ['--foo']; }
             static get inputArguments() { return ['&lt;color>']; }
-            static get paintRenderingContext2DSettings() { return {alpha: true}; }
+            static get contextOptions() { return {alpha: true}; }
 
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
@@ -254,14 +254,13 @@ called, the user agent <em>must</em> run the following steps:
 
         2. <a for=list>Append</a> |parsedSyntax| to |inputArgumentSyntaxes|.
 
-    12. Let |paintRenderingContext2DSettingsValue| be the result of
-        <a>Get</a>(|paintCtor|, "PaintRenderingContext2DSettings").
+    12. Let |contextOptionsValue| be the result of <a>Get</a>(|paintCtor|, "contextOptions").
 
     13. Let |paintRenderingContext2DSettings| be the result of <a>converting</a>
-        |paintRenderingContext2DSettingsValue| to a {{PaintRenderingContext2DSettings}}.
+        |contextOptionsValue| to a {{PaintRenderingContext2DSettings}}.
         If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
-        Note: Setting <code>PaintRenderingContext2DSettings.alpha</code> is <code>false</code> allows user agents
+        Note: Setting <code>paintRenderingContext2DSettings.alpha</code> is <code>false</code> allows user agents
             to anti-alias text in addition to performing "visibility" optimizations, e.g. not
             painting an image behind the paint image as the paint image is opaque.
 
