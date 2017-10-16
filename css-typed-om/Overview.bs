@@ -665,7 +665,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
     };
 </xmp>
 
-Issue: Figure out how we want to represent the type of an expression in JS,
+Issue(482): Figure out how we want to represent the type of an expression in JS,
 and define the type() method accordingly.
 
 The methods on the {{CSSNumericValue}} superclass
