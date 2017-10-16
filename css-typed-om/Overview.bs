@@ -305,6 +305,29 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 </div>
 
 <div algorithm>
+    To <dfn>get all values from a StylePropertyMap</dfn>, run these steps:
+
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+  
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|:
+        
+        1. If |property| is a [=list-valued property=],
+        return the list of |values| assigned to that property.
+        
+        2. If |property| is not a [=list-valued property=],
+        let |values| initially be the empty [=list=] and append 
+        the |value| assigned to the |property| to this list 
+        and return |values|.
+    
+    4. Else, return an empty [=list=].   
+
+</div>
+
+<div algorithm>
     To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
 
     1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
