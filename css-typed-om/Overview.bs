@@ -391,7 +391,8 @@ partial interface Element {
 {{Element/computedStyleMap()}} method.
 
 When constructed, the [=property model=] for [=computed StylePropertyMap=]
-objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
+objects is initialized to contain an entry for every valid CSS property supported by the User Agent,
+as well as any custom properties with initial values and are defined on the node and its ancestors.
 
 Note: The StylePropertyMap returned by computedStyleMap represents computed style,
             not resolved style. In this regard it provides different values than those
@@ -412,10 +413,9 @@ attribute of {{CSSStyleRule}} objects.
 
 When constructed, the [=property model=] for [=declared StylePropertyMap=]
 objects is initialized to contain
-an entry for each property that is paired with at least one valid value inside the
+an entry for each property (including custom properties) that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
 the last valid value provided by the {{CSSStyleRule}} object.
-
 
 Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 ----------------------------------------------------------------------
@@ -432,7 +432,7 @@ attribute of {{Element}} objects.
 
 When constructed, the [=property model=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
-entry for each property that is paired with at least one valid value in the string
+entry for each property (including custom properties) that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
 The value for a given property is the last valid value provided in the string.
 
