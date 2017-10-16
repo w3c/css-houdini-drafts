@@ -375,8 +375,6 @@ Issue(268): stringification
 
 Issue(276): interaction with custom properties
 
-Issue(310): consider using properties in addition to get/set
-
 Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
 
