@@ -1564,7 +1564,7 @@ enum CSSMathOperator {
 };
 </xmp>
 
-Issue: {{CSSNumericArray}} will be an Array-like
+Issue(486): {{CSSNumericArray}} will be an Array-like
 restricted to containing CSSNumericValue objects.
 This is dependent on [WebIDL#345](https://github.com/heycam/webidl/issues/345) getting resolved properly.
 
@@ -1803,7 +1803,7 @@ interface CSSTransformValue : CSSStyleValue {
 };
 </xmp>
 
-Issue: Assuming the resolution of <a href="https://github.com/heycam/webidl/issues/345">WebIDL#345</a>
+Issue(487): Assuming the resolution of <a href="https://github.com/heycam/webidl/issues/345">WebIDL#345</a>
 produces an "arraylike" declaration.
 
 A {{CSSTransformValue}}’s [=values to iterate over=]
@@ -2283,7 +2283,7 @@ and the resource has an intrinsic width, height, or aspect ratio,
 then {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}}, and {{CSSImageValue/intrinsicRatio}} must reflect the resource's corresponding value.
 In all other cases, the attributes must be <code>null</code>.
 
-Issue: Does the loading lifecycle need to be described here?
+Issue(186): Does the loading lifecycle need to be described here?
 
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
 objects, the {{CSSURLImageValue/url}} attribute contains the URL that references the image.
@@ -2354,9 +2354,9 @@ it produces a raw {{CSSStyleValue}},
 with a <a for=CSSStyleValue>stringification behavior</a>
 that produces the CSSOM serialization of the property.
 
-Issue: Better to define a full table of properties and what types they normalize to.
+Issue(488): Better to define a full table of properties and what types they normalize to.
 
-Issue: Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
+Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
 We instead need to strictly define the serialization of every property.
 This should be done according to CSSOM principlies, tho
 (generally, shortest possible value).
@@ -2818,7 +2818,7 @@ followed by their {{CSSUnitValue/unit}}.
 
 {{CSSMathValue}} objects are serialized into a ''calc()'' expression
 
-Issue: TODO
+Issue(489): TODO
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
@@ -3039,7 +3039,7 @@ Computed {{CSSMathValue}} objects {#computed-calc-objects}
 
 During computation, {{CSSMathValue}} objects are reduced accordingly:
 
-Issue: TODO
+Issue(490): TODO
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
