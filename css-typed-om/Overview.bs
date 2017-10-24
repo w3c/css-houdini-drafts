@@ -191,6 +191,7 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <pre class='idl'>
+[Exposed=PaintWorklet]
 interface StylePropertyMapReadOnly {
     CSSStyleValue? get(DOMString property);
     sequence&lt;CSSStyleValue> getAll(DOMString property);
@@ -473,7 +474,7 @@ The value for a given property is the last valid value provided in the string.
 ----------------------------------------------
 
 <pre class='idl'>
-[Constructor((DOMString or CSSVariableReferenceValue)... members)]
+[Constructor((DOMString or CSSVariableReferenceValue)... members), Exposed=PaintWorklet]
 interface CSSUnparsedValue : CSSStyleValue {
     iterable<(DOMString or CSSVariableReferenceValue)>;
     readonly attribute unsigned long length;
@@ -515,7 +516,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 {{CSSKeywordValue}} objects represent CSS keywords and other [=identifiers=].
 
 <pre class='idl'>
-[Constructor(DOMString value)]
+[Constructor(DOMString value), Exposed=PaintWorklet]
 interface CSSKeywordValue : CSSStyleValue {
     attribute DOMString value;
     stringifier;
@@ -645,17 +646,17 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
     interface CSSNumericValue : CSSStyleValue {
-        CSSNumericValue add(CSSNumberish... values);
-        CSSNumericValue sub(CSSNumberish... values);
-        CSSNumericValue mul(CSSNumberish... values);
-        CSSNumericValue div(CSSNumberish... values);
-        CSSNumericValue min(CSSNumberish... values);
-        CSSNumericValue max(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue add(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue sub(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue mul(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue div(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue min(CSSNumberish... values);
+        [Exposed=PaintWorklet] CSSNumericValue max(CSSNumberish... values);
 
-        boolean equals(CSSNumberish... value);
+        [Exposed=PaintWorklet] boolean equals(CSSNumberish... value);
 
-        CSSNumericValue to(DOMString unit);
-        CSSMathSum toSum(DOMString... units);
+        [Exposed=PaintWorklet] CSSNumericValue to(DOMString unit);
+        [Exposed=PaintWorklet] CSSMathSum toSum(DOMString... units);
         // ??? type();
 
         static CSSNumericValue parse(DOMString cssText);
@@ -1795,7 +1796,7 @@ They "contain" one or more {{CSSTransformComponent}}s,
 which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
-[Constructor(optional sequence<CSSTransformComponent> transforms)]
+[Constructor(optional sequence<CSSTransformComponent> transforms), Exposed=PaintWorklet]
 interface CSSTransformValue : CSSStyleValue {
     /*arraylike<CSSTransformComponent>;*/
     readonly attribute boolean is2D;
@@ -1857,12 +1858,13 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 
 <xmp class=idl>
+    [Exposed=PaintWorklet]
     interface CSSTransformComponent {
         stringifier;
         attribute boolean is2D;
     };
 
-    [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
+    [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z), Exposed=PaintWorklet]
     interface CSSTranslation : CSSTransformComponent {
         attribute CSSNumericValue x;
         attribute CSSNumericValue y;
@@ -1870,7 +1872,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 
     [Constructor(CSSNumericValue angle),
-     Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
+     Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle), Exposed=PaintWorklet]
     interface CSSRotation : CSSTransformComponent {
         attribute CSSNumberish x;
         attribute CSSNumberish y;
@@ -1878,25 +1880,25 @@ is a [=list=] of {{CSSTransformComponent}}s.
         attribute CSSNumericValue angle;
     };
 
-    [Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)]
+    [Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z), Exposed=PaintWorklet]
     interface CSSScale : CSSTransformComponent {
         attribute CSSNumberish x;
         attribute CSSNumberish y;
         attribute CSSNumberish z;
     };
 
-    [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
+    [Constructor(CSSNumericValue ax, CSSNumericValue ay), Exposed=PaintWorklet]
     interface CSSSkew : CSSTransformComponent {
         attribute CSSNumericValue ax;
         attribute CSSNumericValue ay;
     };
 
-    [Constructor(CSSNumericValue length)]
+    [Constructor(CSSNumericValue length), Exposed=PaintWorklet]
     interface CSSPerspective : CSSTransformComponent {
         attribute CSSNumericValue length;
     };
 
-    [Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
+    [Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options), Exposed=PaintWorklet]
     interface CSSMatrixComponent : CSSTransformComponent {
         attribute DOMMatrix matrix;
     };
@@ -2137,7 +2139,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 used by properties such as 'object-position'.
 
 <pre class='idl'>
-[Constructor(CSSNumericValue x, CSSNumericValue y)]
+[Constructor(CSSNumericValue x, CSSNumericValue y), Exposed=PaintWorklet]
 interface CSSPositionValue : CSSStyleValue {
     attribute CSSNumericValue x;
     attribute CSSNumericValue y;
@@ -2216,6 +2218,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 <pre class='idl'>
 enum CSSResourceState {"unloaded", "loading", "loaded", "error"};
 
+[Exposed=PaintWorklet]
 interface CSSResourceValue : CSSStyleValue {
     readonly attribute CSSResourceState state;
 };
