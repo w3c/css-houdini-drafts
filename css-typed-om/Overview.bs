@@ -2943,6 +2943,18 @@ depending on the property they came from:
         return the result of serializing the <<length>> value.
     3. Otherwise, return the result of serializing the <<percentage>> value.
 
+: 'stroke-align'
+::
+    1. Return the result of serializing the keyword value.
+
+: 'stroke-break'
+::
+    1. Return the result of serializing the keyword value.
+
+: 'stroke-linecap'
+::
+    1. Return the result of serializing the keyword value.
+
 : 'top'
 ::
     1. If the value is the ''auto'' keyword,
