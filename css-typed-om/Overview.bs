@@ -2763,10 +2763,10 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 For example:
 
 <pre class='lang-javascript'>
-var length1 = CSSNumericValue.from("42.0px");
+var length1 = CSSNumericValue.parse("42.0px");
 length1.toString(); // "42.0px"
 
-var length2 = CSSNumericValue.from(42.0, "px");
+var length2 = CSS.px(42);
 length2.toString(); // "42px";
 
 element.style.width = "42.0px";
