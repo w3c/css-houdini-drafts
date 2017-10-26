@@ -1412,7 +1412,6 @@ are represented as {{CSSUnitValue}}s.
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
         attribute DOMString unit;
-        readonly attribute DOMString type;
     };
 </xmp>
 
@@ -1519,7 +1518,6 @@ are represented in this way.
 <xmp class=idl>
 interface CSSMathValue : CSSNumericValue {
     readonly attribute CSSMathOperator operator;
-    readonly attribute DOMString type;
 };
 
 [Constructor(CSSNumberish... args)]
