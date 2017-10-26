@@ -408,7 +408,7 @@ When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for
 |height|, and |alpha|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
     2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to the rounded values of |width| and |height|.
-    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |alpha|.
+    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |paintRenderingContext2DSettings.alpha|.
     4. Return the new {{PaintRenderingContext2D}}.
 
 Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
