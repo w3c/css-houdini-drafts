@@ -2766,7 +2766,7 @@ For example:
 var length1 = CSSNumericValue.parse("42.0px");
 length1.toString(); // "42.0px"
 
-var length2 = CSS.px(42);
+var length2 = CSS.px(42.0);
 length2.toString(); // "42px";
 
 element.style.width = "42.0px";
