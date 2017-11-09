@@ -8,7 +8,7 @@ Previous Version: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Shortname: worklets
 Level: 1
 Abstract:  This specification defines an API for running scripts in stages of the rendering pipeline independent of the main javascript execution environment.
-Editor: Ian Kilpatrick, ikilpatrick@chromium.org
+Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 </pre>
 
 <style>

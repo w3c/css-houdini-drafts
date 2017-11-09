@@ -5,7 +5,7 @@ Level: 1
 Status: UD
 Group: HOUDINI
 URL: https://drafts.css-houdini.org/css-parser-api/
-Editor: Tab Atkins-Bittner
+Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Abstract: An API exposing the CSS parser more directly,
 Abstract: for parsing arbitrary CSS-like languages into a mildly typed representation.
 </pre>
