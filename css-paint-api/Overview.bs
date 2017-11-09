@@ -451,8 +451,8 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 </div>
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>,
-with |concreteObjectSize| set to the <a>concrete object size</a> of the <a>box</a>.
+negotiation</a> algorithm which is responsible for rendering an <<image>>, with |concreteObjectSize|
+set to the <a>concrete object size</a> of the <a>box</a>.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
@@ -492,10 +492,10 @@ with), given |concreteObjectSize| it <em>must</em> run the following steps:
     1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
-    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>,
-        and the previous invocation had the same |concreteObjectSize|, the user agent
-        <em>may</em> use the drawn image from the previous invocation. If so it <em>may</em> abort
-        all these steps and use the previously drawn image.
+    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>, and the
+        previous invocation had the same |concreteObjectSize|, the user agent <em>may</em> use the
+        drawn image from the previous invocation. If so it <em>may</em> abort all these steps and
+        use the previously drawn image.
 
         Note: The user agent for implementation reasons may also continue with all these steps in
             this case. It can do this every frame, or multiple times per frame.
