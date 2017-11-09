@@ -129,10 +129,10 @@ partial interface CSS {
 };
 </pre>
 
-The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
+A {{PaintWorkletGlobalScope}} is a global execution context of the {{paintWorklet}}.
 
-The {{PaintWorkletGlobalScope}} has a {{PaintWorkletGlobalScope/devicePixelRatio}}
-property which is identical to the Window.{{Window/devicePixelRatio}} property.
+A {{PaintWorkletGlobalScope}} has a {{PaintWorkletGlobalScope/devicePixelRatio}} property which is
+identical to the Window.{{Window/devicePixelRatio}} property.
 
 <pre class='idl'>
 [Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
@@ -143,9 +143,9 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
 </pre>
 
 The {{PaintRenderingContext2DSettings}} contains the settings for the rendering context associated
-with the paint canvas. The {{PaintRenderingContext2DSettings}} provides a supported subset
-of canvas rendering context 2D settings. In the future, it may be extended to support color
-management in paint canvas.
+with the paint canvas. The {{PaintRenderingContext2DSettings}} provides a supported subset of canvas
+rendering context 2D settings. In the future, it may be extended to support color management in
+paint canvas.
 <pre class='idl'>
 dictionary PaintRenderingContext2DSettings {
     boolean alpha = true;
@@ -203,10 +203,10 @@ Registering Custom Paint {#registering-custom-paint}
 The <a>document</a> has a <a>map</a> of <dfn>document paint definitions</dfn>. Initially
 this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially
-this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially this map
+is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
+A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
 map is empty; it is populated when <a>draw a paint image</a> is invoked by the user agent.
 
 Instances of paint classes in the <a>paint class instances</a> map may be disposed and removed from
