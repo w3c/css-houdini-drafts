@@ -10,6 +10,7 @@ Level: 1
 Abstract: Converting CSSOM value strings into meaningfully typed JavaScript representations and back can incur a significant performance overhead. This specification exposes CSS values as typed JavaScript objects to facilitate their performant manipulation.
 Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
+Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts
 Inline Github Issues: title
 Ignored Vars: type, unit
@@ -217,6 +218,8 @@ is initialized differently depending on where the {{CSSStyleValue}} is used
 [[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
+All properties stored on the [=property model=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
+
 <div class='note'>
 The sequence of {{CSSStyleValue}}s associated with a property do
 not represent multiple successive definitions of that property's value.
@@ -253,9 +256,22 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     5. Let |values to append| be the empty list.
 
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to append|.
+    6. For each |value| in |values| if the <a>algorithm that coerces |value| into an appropriate type for a given property</a> does not throw an error, append the returned object to |values to append|.
 
     7. Append |values to append| to the end of |entry|’s list.
+</div>
+
+<div algorithm>
+    To <dfn>delete a StylePropertyMap</dfn> given a <var>property</var>, run these steps:
+
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+        remove that entry from the [=property model=].
 </div>
 
 <div algorithm>
@@ -275,14 +291,72 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 <div algorithm>
     To <dfn>get a value from a StylePropertyMap</dfn>, run these steps:
 
-    Issue(148): Write this
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+        return the first value found in that entry.
+
+    4. Else, return `null`.
+</div>
+
+<div algorithm>
+    To <dfn>get all values from a StylePropertyMap</dfn>, run these steps:
+
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+  
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|:
+        
+        1. If |property| is a [=list-valued property=],
+        return the list of |values| assigned to that property.
+        
+        2. If |property| is not a [=list-valued property=],
+        let |values| initially be the empty [=list=] and append 
+        the |value| assigned to the |property| to this list 
+        and return |values|.
+    
+    4. Else, return an empty [=list=].   
 
 </div>
 
 <div algorithm>
+    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
+
+    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
+        1. If the algoritm returns a {{CSSStyleValue}} return true.
+
+        2. If the algorithm returns `null` return false.
+
+</div>
+
+
+<div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
 
-    Issue(148): Write this
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+        let |entry| be that entry.
+        Otherwise, exit the algorithm.
+
+    4. Empty the list of |values| currently stored on the |entry|.
+
+    5. Let |values to set| be an empty list.
+
+    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to set|.
+
+    7. Set |values to set| to be |entry|’s list.
 </div>
 
 The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
@@ -323,29 +397,23 @@ Issue(268): stringification
 
 Issue(276): interaction with custom properties
 
-Issue(309): should StylePropertyMaps be case sensitive?
-
-Issue(310): consider using properties in addition to get/set
-
 Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonly-objects}
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface Window {
-    StylePropertyMapReadOnly getComputedStyleMap(Element element, optional DOMString? pseudoElt);
+partial interface Element {
+    StylePropertyMapReadOnly computedStyleMap();
 };
 </pre>
 
-Issue(350): getComputedStyleMap needs to move to CSS
-
 <dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
 {{Element}} or pseudo element, and are accessed by calling the
-{{Window/getComputedStyleMap()}} method.
+{{Element/computedStyleMap()}} method.
 
 When constructed, the [=property model=] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
-Note: The StylePropertyMap returned by getComputedStyleMap represents computed style,
+Note: The StylePropertyMap returned by computedStyleMap represents computed style,
             not resolved style. In this regard it provides different values than those
             in objects returned by getComputedStyle.
 
@@ -354,12 +422,12 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-    [SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
 <dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
 When constructed, the [=property model=] for [=declared StylePropertyMap=]
@@ -374,12 +442,12 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface Element {
-    [SameObject] readonly attribute StylePropertyMap styleMap;
+    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
 <dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
-directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
+directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
 attribute of {{Element}} objects.
 
 When constructed, the [=property model=] for [=inline StylePropertyMap=] objects
@@ -528,13 +596,13 @@ Instead, clamping and/or rounding will occur during computation of style.
     The following code is valid
 
     <pre class=lang-js>
-        myElement.styleMap.set("opacity", CSS.number(3));
-        myElement.styleMap.set("z-index", CSS.number(15.4));
+        myElement.attributeStyleMap.set("opacity", CSS.number(3));
+        myElement.attributeStyleMap.set("z-index", CSS.number(15.4));
 
-        console.log(myElement.styleMap.get("opacity").value); // 3
-        console.log(myElement.styleMap.get("z-index").value); // 15.4
+        console.log(myElement.attributeStyleMap.get("opacity").value); // 3
+        console.log(myElement.attributeStyleMap.get("z-index").value); // 15.4
 
-        var computedStyle = getComputedStyleMap(myElement);
+        var computedStyle = myElement.computedStyleMap();
         var opacity = computedStyle.get("opacity");
         var zIndex = computedStyle.get("z-index");
     </pre>
@@ -594,7 +662,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
     };
 </xmp>
 
-Issue: Figure out how we want to represent the type of an expression in JS,
+Issue(482): Figure out how we want to represent the type of an expression in JS,
 and define the type() method accordingly.
 
 The methods on the {{CSSNumericValue}} superclass
@@ -767,15 +835,15 @@ The following are the arithmetic operations you can perform on dimensions:
 
     2. Let |thisAndValues| be |this| prepended to |values|.
 
-    3. If all |item|s of |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be {{CSSUnitValue}}.
+    3. If all |item|s in |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be of type {{CSSUnitValue}}.
 
-    4. If all |item|s in |thisAndValues| are {{CSSUnitValue}s and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
+    4. If all |item|s in |thisAndValues| are of type {{CSSUnitValue}} and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
 
-    5. If all |item|s in |thisAndValues| are {{CSSMathValue}}s :
+    5. If all |item|s in |thisAndValues| are of type {{CSSMathValue}}:
         1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
-            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValue| are equal.
-        2. If |this| and |value| are both either {{CSSMathNegate}} or {{CSSMathInvert}}:
-            1. Go back to step 1 to check that the {{CSSUnitValue}} on all items in |thisAndValue| are equal.
+            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValues| are equal.
+        2. If |thisAndValues| are all either {{CSSMathNegate}} or {{CSSMathInvert}}:
+            1. Go back to step 1 to check that the {{CSSNumericValue}} on all items in |thisAndValues| are equal.
 </div>
 
 
@@ -920,7 +988,7 @@ The following are the arithmetic operations you can perform on dimensions:
         * ''calc(1px * 2em)'' becomes `«(2, «["em" → 1, "px" → 1]»)»`
         * ''calc(1px + 1deg)'' can't be represented as a [=sum value=]
             because it's an invalid computation
-        * ''calc(1px * 1deg)'' becomes `«(2, «["deg" → 1, "px" → 1]»)»`
+        * ''calc(1px * 2deg)'' becomes `«(2, «["deg" → 1, "px" → 1]»)»`
     </div>
 
     To <dfn lt="create a sum value|creating a sum value">create a sum value</dfn> from a {{CSSNumericValue}} |this|,
@@ -1344,7 +1412,6 @@ are represented as {{CSSUnitValue}}s.
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
         attribute DOMString unit;
-        readonly attribute DOMString type;
     };
 </xmp>
 
@@ -1451,7 +1518,6 @@ are represented in this way.
 <xmp class=idl>
 interface CSSMathValue : CSSNumericValue {
     readonly attribute CSSMathOperator operator;
-    readonly attribute DOMString type;
 };
 
 [Constructor(CSSNumberish... args)]
@@ -1496,7 +1562,7 @@ enum CSSMathOperator {
 };
 </xmp>
 
-Issue: {{CSSNumericArray}} will be an Array-like
+Issue(486): {{CSSNumericArray}} will be an Array-like
 restricted to containing CSSNumericValue objects.
 This is dependent on [WebIDL#345](https://github.com/heycam/webidl/issues/345) getting resolved properly.
 
@@ -1735,7 +1801,7 @@ interface CSSTransformValue : CSSStyleValue {
 };
 </xmp>
 
-Issue: Assuming the resolution of <a href="https://github.com/heycam/webidl/issues/345">WebIDL#345</a>
+Issue(487): Assuming the resolution of <a href="https://github.com/heycam/webidl/issues/345">WebIDL#345</a>
 produces an "arraylike" declaration.
 
 A {{CSSTransformValue}}’s [=values to iterate over=]
@@ -2122,7 +2188,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     Will produce the following behavior:
 
     <pre class='lang-javascript'>
-    let map = document.querySelector('.example').styleMap;
+    let map = document.querySelector('.example').attributeStyleMap;
 
     map.get('object-position').x;
     // CSS.percent(50)
@@ -2215,10 +2281,23 @@ and the resource has an intrinsic width, height, or aspect ratio,
 then {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}}, and {{CSSImageValue/intrinsicRatio}} must reflect the resource's corresponding value.
 In all other cases, the attributes must be <code>null</code>.
 
-Issue: Does the loading lifecycle need to be described here?
+Issue(186): Does the loading lifecycle need to be described here?
 
 {{CSSURLImageValue}} objects represent {{CSSImageValue}}s that match the <<url>> production. For these
 objects, the {{CSSURLImageValue/url}} attribute contains the URL that references the image.
+
+<div algorithm>
+    The <dfn constructor for=CSSURLImageValue>CSSURLImageValue(|url|)</dfn> constructor must,
+    when called,
+    perform the following steps:
+
+    1. If the |url| passed into the constructor doesn't correctly
+        parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
+    2. Else, return a new {{CSSURLImageValue}}
+        with its {{CSSURLImageValue/url}} internal slot
+        set to |url|.
+</div>
+
 
 <!--
 ████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
@@ -2273,9 +2352,9 @@ it produces a raw {{CSSStyleValue}},
 with a <a for=CSSStyleValue>stringification behavior</a>
 that produces the CSSOM serialization of the property.
 
-Issue: Better to define a full table of properties and what types they normalize to.
+Issue(488): Better to define a full table of properties and what types they normalize to.
 
-Issue: Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
+Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
 We instead need to strictly define the serialization of every property.
 This should be done according to CSSOM principlies, tho
 (generally, shortest possible value).
@@ -2675,21 +2754,21 @@ The way that a {{CSSStyleValue}} serializes is dependent on how the value was co
 :   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
-::  the serialization matches the CSSOM serialization of the corresponding value.
+::  the serialization is specified in [[#cssom-serialization]] below.
 
 <div class='example'>
 
 For example:
 
 <pre class='lang-javascript'>
-var length1 = CSSNumericValue.from("42.0px");
+var length1 = CSSNumericValue.parse("42.0px");
 length1.toString(); // "42.0px"
 
-var length2 = CSSNumericValue.from(42.0, "px");
+var length2 = CSS.px(42.0);
 length2.toString(); // "42px";
 
 element.style.width = "42.0px";
-var length3 = element.styleMap.get('width');
+var length3 = element.attributeStyleMap.get('width');
 length3.toString(); // "42px";
 </pre>
 
@@ -2737,7 +2816,7 @@ followed by their {{CSSUnitValue/unit}}.
 
 {{CSSMathValue}} objects are serialized into a ''calc()'' expression
 
-Issue: TODO
+Issue(489): TODO
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
@@ -2787,6 +2866,91 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 
 {{CSSFontFaceValue}} objects are serialized to the value of their contained
 {{CSSFontFaceValue/fontFamilyName}}.
+
+Serialization from CSSOM Values {#cssom-serialization}
+------------------------------------------------------
+
+{{CSSStyleValue}} objects produced by the user agent from values in the CSSOM,
+rather than directly constructed by the author,
+are serialized according to the following rules,
+depending on the property they came from:
+
+: 'background-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'border-color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'border-image'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If 'border-image-source' is not ''border-image-source/none'',
+        serialize 'border-image-source' and append it to |values|.
+    3. If 'border-image-slice' does not specify ''100%'' for all sides and omits the ''border-image-slice/fill'' keyword,
+        serialize 'border-image-slice' and append it to |values|.
+    4. If 'border-image-width' does not specify ''1'' for all sides,
+        append "/ " (U+002F FORWARD SLASH followed by U+0020 SPACE)
+        to the result of serializing 'border-image-width' and append it to |values|.
+    5. If 'border-image-outset' does not specify ''0'' for all sides:
+        1. If the previous 'border-image-width' step did not append anything to |values|,
+            let |prefix| be <nobr>"// "</nobr>
+            (two U+002F FORWARD SLASH characters followed by U+0020 SPACE);
+            otherwise let |prefix| be <nobr>"/ "</nobr>
+            (U+002F FORWARD SLASH followed by U+0020 SPACE)
+        2. Append |prefix|
+            to the result of serializing 'border-image-outset'
+            and append it to |values|.
+    6. If 'border-image-repeat' is not ''border-image-repeat/stretch'' in both axises,
+        serialize 'border-image-repeat' and append it to |values|.
+    7. If |values| is [=list/empty=],
+        append "none" to |values|.
+    8. Return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
+: 'bottom'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'color'
+::
+    1. If the value is the ''currentcolor'' keyword,
+        return "currentcolor".
+    2. Otherwise, return the result of serializing the <<color>> value.
+
+: 'left'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'right'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
+: 'top'
+::
+    1. If the value is the ''auto'' keyword,
+        return "auto".
+    2. If the value is of type <<length>>,
+        return the result of serializing the <<length>> value.
+    3. Otherwise, return the result of serializing the <<percentage>> value.
+
 
 Security Considerations {#security-considerations}
 ==================================================
@@ -2873,7 +3037,7 @@ Computed {{CSSMathValue}} objects {#computed-calc-objects}
 
 During computation, {{CSSMathValue}} objects are reduced accordingly:
 
-Issue: TODO
+Issue(490): TODO
 
 Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------

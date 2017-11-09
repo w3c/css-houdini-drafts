@@ -38,9 +38,7 @@ Repository: w3c/css-houdini-drafts
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:cssom-1; type:interface; text:CSS
 spec:css-color-4; type:property; text:color
-spec:dom;
-	type:dfn; text:ascii case-insensitive
-	type:interface; text:Document
+spec:dom; type:interface; text:Document
 </pre>
 
 Introduction {#intro}

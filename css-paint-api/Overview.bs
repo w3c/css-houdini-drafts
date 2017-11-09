@@ -129,12 +129,26 @@ partial interface CSS {
 };
 </pre>
 
-The {{PaintWorkletGlobalScope}} is the global execution context of the {{paintWorklet}}.
+A {{PaintWorkletGlobalScope}} is a global execution context of the {{paintWorklet}}.
+
+A {{PaintWorkletGlobalScope}} has a {{PaintWorkletGlobalScope/devicePixelRatio}} property which is
+identical to the Window.{{Window/devicePixelRatio}} property.
 
 <pre class='idl'>
 [Global=(Worklet,PaintWorklet),Exposed=PaintWorklet]
 interface PaintWorkletGlobalScope : WorkletGlobalScope {
     void registerPaint(DOMString name, VoidFunction paintCtor);
+    readonly attribute unrestricted double devicePixelRatio;
+};
+</pre>
+
+The {{PaintRenderingContext2DSettings}} contains the settings for the rendering context associated
+with the paint canvas. The {{PaintRenderingContext2DSettings}} provides a supported subset of canvas
+rendering context 2D settings. In the future, it may be extended to support color management in
+paint canvas.
+<pre class='idl'>
+dictionary PaintRenderingContext2DSettings {
+    boolean alpha = true;
 };
 </pre>
 
@@ -144,7 +158,7 @@ interface PaintWorkletGlobalScope : WorkletGlobalScope {
         class MyPaint {
             static get inputProperties() { return ['--foo']; }
             static get inputArguments() { return ['&lt;color>']; }
-            static get alpha() { return true; }
+            static get contextOptions() { return {alpha: true}; }
 
             paint(ctx, size, styleMap) {
                 // Paint code goes here.
@@ -169,7 +183,7 @@ A <dfn>paint definition</dfn> is a <a>struct</a> which describes the information
  - <dfn for="paint definition">input properties</dfn> which is a <a>list</a> of
     <code>DOMStrings</code>.
 
- - A <dfn for="paint definition">context alpha flag</dfn>.
+ - A <dfn for="paint definition">PaintRenderingContext2DSettings object</dfn>.
 
 A <dfn>document paint definition</dfn> is a <a>struct</a> which describes the information
 needed by the <a>document</a> about the author defined <<image>> function (which can be referenced
@@ -181,7 +195,7 @@ by the paint function). It consists of:
  - A <dfn for="document paint definition">input argument syntaxes</dfn> which is a <a>list</a> of
     parsed [[css-properties-values-api-1#supported-syntax-strings]].
 
- - A <dfn for="document paint definition">context alpha flag</dfn>.
+ - A <dfn for="document paint definition">PaintRenderingContext2DSettings object</dfn>.
 
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
@@ -189,10 +203,10 @@ Registering Custom Paint {#registering-custom-paint}
 The <a>document</a> has a <a>map</a> of <dfn>document paint definitions</dfn>. Initially
 this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially
-this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
+A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially this map
+is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-The {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
+A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
 map is empty; it is populated when <a>draw a paint image</a> is invoked by the user agent.
 
 Instances of paint classes in the <a>paint class instances</a> map may be disposed and removed from
@@ -244,15 +258,15 @@ called, the user agent <em>must</em> run the following steps:
 
         2. <a for=list>Append</a> |parsedSyntax| to |inputArgumentSyntaxes|.
 
-    12. Let |alphaValue| be the result of <a>Get</a>(|paintCtor|, "alpha").
+    12. Let |contextOptionsValue| be the result of <a>Get</a>(|paintCtor|, "contextOptions").
 
-    13. Let |alpha| be <code>true</code> if |alphaValue| is undefined, otherwise let it be the
-        result of <a>converting</a> |alphaValue| to a <a>boolean</a>. If an exception is
-        <a>thrown</a>, rethrow the exception and abort all these steps.
+    13. Let |paintRenderingContext2DSettings| be the result of <a>converting</a>
+        |contextOptionsValue| to a {{PaintRenderingContext2DSettings}}.
+        If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
-        Note: Setting <code>alpha</code> is <code>false</code> allows user agents to anti-alias text
-            an addition to performing "visibility" optimizations, e.g. not painting an image behind
-            the paint image as the paint image is opaque.
+        Note: Setting <code>paintRenderingContext2DSettings.alpha</code> is <code>false</code> allows user agents
+            to anti-alias text in addition to performing "visibility" optimizations, e.g. not
+            painting an image behind the paint image as the paint image is opaque.
 
     14. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
@@ -277,7 +291,7 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a for="paint definition">input properties</a> being |inputProperties|.
 
-        - <a for="paint definition">context alpha flag</a> being |alpha|.
+        - <a for="paint definition">PaintRenderingContext2DSettings object</a> being |paintRenderingContext2DSettings|.
 
     20. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
 
@@ -293,7 +307,7 @@ called, the user agent <em>must</em> run the following steps:
             - <a for="document paint definition">input argument syntaxes</a> being
                 |inputArgumentSyntaxes|.
 
-            - <a for="document paint definition">context alpha flag</a> being |alpha|.
+            - <a for="document paint definition">PaintRenderingContext2DSettings object</a> being |paintRenderingContext2DSettings|.
 
         3. If |documentPaintDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
 
@@ -305,13 +319,13 @@ called, the user agent <em>must</em> run the following steps:
             3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
                 <a for="document paint definition">input properties</a>, <a for="document paint
                 definition">input argument syntaxes</a>, and <a for="document paint
-                definition">context alpha flag</a> are different), then:
+                definition">PaintRenderingContext2DSettings object</a> are different), then:
 
                 <a for=map>Set</a> |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
 
                 Log an error to the debugging console stating that the same class was registered
                 with different <code>inputProperties</code>, <code>inputArguments</code>, or
-                <code>alpha</code>.
+                <code>paintRenderingContext2DSettings</code>.
 
         4. Otherwise, <a for=map>set</a> |documentPaintDefinitionMap|[|name|] to
             |documentDefinition|.
@@ -405,10 +419,10 @@ is treated as opaque black.
 
 <div algorithm>
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
-|height|, and |alpha|, it <em>must</em> run the following steps:
+|height|, and |paintRenderingContext2DSettings|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
-    2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to |width| and |height|.
-    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |alpha|.
+    2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to the rounded values of |width| and |height|.
+    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |paintRenderingContext2DSettings.alpha|.
     4. Return the new {{PaintRenderingContext2D}}.
 
 Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
@@ -451,14 +465,17 @@ Note: In a future version of the spec, the author could have the ability to spec
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
 the <a>concrete object size</a> given by the user agent.
 
+Note: See [[css-images-3#object-sizing-examples]] for examples on how the <a>concrete object
+    size</a> is calculated.
+
 The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
 with any |concreteObjectSize|. The resulting image is not displayed.
 
-Note: User agents may use any heuristic to speculate a possible future value
-    for |concretObjectSize|, for example speculating that the size remains unchanged.
+Note: User agents may use any heuristic to speculate a possible future value for |concretObjectSize|,
+    for example speculating that the size remains unchanged.
 
-Note: Although the image is not displayed, it may still be cached, and subsequent invocations
-    of <<paint()>> may use the cached image.
+Note: Although the image is not displayed, it may still be cached, and subsequent invocations of
+    <<paint()>> may use the cached image.
 
 <pre class='idl'>
 [Exposed=PaintWorklet]
@@ -615,7 +632,8 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
-            - "alpha" - The <a for="paint definition">context alpha flag</a> given by |definition|.
+            - "paintRenderingContext2DSettings" - The 
+                <a for="paint definition">PaintRenderingContext2DSettings object</a> given by |definition|.
 
         Note: The |renderingContext| is not be re-used between invocations of paint. Implicitly this
             means that there is no stored data, or state on the |renderingContext| between
@@ -854,8 +872,8 @@ registerPaint('arc', class {
     ctx.strokeStyle = args[0].cssText;
 
     // Determine the center point.
-		const x = geom.width / 2;
-		const y = geom.height / 2;
+    const x = geom.width / 2;
+    const y = geom.height / 2;
 
     // Convert the start and end angles to radians.
     const startAngle = this.convertAngle(args[1]) - Math.PI / 2;
@@ -933,6 +951,51 @@ registerPaint('heading-color', class {
         // Draw just a solid image.
         ctx.fillStyle = color;
         ctx.fillRect(0, 0, width, height);
+    }
+});
+</pre>
+
+Example 5: Drawing outside an element's area {#example-5}
+---------------------------------------------------------
+
+It is possible to draw outside an element's area by using the 'border-image' property.
+
+<pre class='lang-markup'>
+&lt;style>
+#overdraw {
+    --border-width: 10;
+
+    border-style: solid;
+    border-width: calc(var(--border-width) * 1px);
+
+    border-image-source: paint(overdraw);
+    border-image-slice: 0 fill;
+    border-image-outset: calc(var(--border-width) * 1px);
+
+    width: 200px;
+    height: 200px;
+}
+&lt;/style>
+&lt;div id="overdraw">&lt;/div>
+&lt;script>
+    CSS.paintWorklet.addModule('overdraw.js');
+&lt;/script>
+</pre>
+
+<pre class='lang-javascript'>
+// overdraw.js
+registerPaint('overdraw', class {
+    static get inputProperties() { return ['--border-width']; }
+    paint(ctx, geom, properties) {
+        const borderWidth = parseInt(properties.get('--border-width'));
+        ctx.shadowColor = 'rgba(0,0,0,0.25)';
+        ctx.shadowBlur = borderWidth;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.fillRect(borderWidth,
+                     borderWidth,
+                     geom.width - 2 * borderWidth,
+                     geom.height - 2 * borderWidth);
     }
 });
 </pre>

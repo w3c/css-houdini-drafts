@@ -29,6 +29,7 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org
 <pre class=link-defaults>
 spec:fetch; type:dfn; for:/; text:fetch
 spec:html; type:dfn; for:/; text:browsing context
+spec:html; type:interface; for:/; text:Document
 spec:html; type:dfn; for:environment settings object;
     text: global object
     text: https state
@@ -49,6 +50,9 @@ urlPrefix: https://html.spec.whatwg.org/multipage/webappapis.html; type: dfn;
     text: event loop processing model
     text: microtask queue
     text: task queues
+    text: discarded; url: a-browsing-context-is-discarded
+urlPrefix: https://w3c.github.io/webappsec-csp/#; type: dfn;
+    text: initialize a global object's CSP list; url: initialize-global-object-csp
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: Construct
     text: InitializeHostDefinedRealm
@@ -154,6 +158,13 @@ interface WorkletGlobalScope {
 };
 </pre>
 
+Each {{WorkletGlobalScope}} has an assocated <dfn export for=WorkletGlobalScope>owner
+document</dfn>.
+It is initially null and set inside the <a>create a WorkletGlobalScope</a> algorithm.
+
+Whenever a {{Document}} object is <a>discarded</a>, each {{WorkletGlobalScope}} whose <a>owner
+document</a> is that {{Document}} object, should clear its <a>owner document</a>.
+
 Each {{WorkletGlobalScope}} has an associated <a>environment settings object</a>.
 
 Each {{WorkletGlobalScope}} has an associated <dfn for=WorkletGlobalScope>module map</dfn>. It is a
@@ -214,7 +225,12 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
 
     4. Associate the |insideSettings| with |workletGlobalScope|.
 
-    5. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
+    5. Set |workletGlobalScope|'s <a>owner document</a> to |outsideSettings|'s <a>responsible
+        document</a>.
+
+    6. Invoke the <a>initialize a global object's CSP list</a> algorithm given |workletGlobalScope|.
+
+    7. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
         substeps:
 
         1. Let |moduleURLRecord| be |entry|'s key.
