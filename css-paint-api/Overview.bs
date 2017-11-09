@@ -451,7 +451,8 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 </div>
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>.
+negotiation</a> algorithm which is responsible for rendering an <<image>>,
+with |concreteObjectSize| set to the <a>concrete object size</a> of the <a>box</a>.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
@@ -467,6 +468,15 @@ the <a>concrete object size</a> given by the user agent.
 Note: See [[css-images-3#object-sizing-examples]] for examples on how the <a>concrete object
     size</a> is calculated.
 
+The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
+with any |concreteObjectSize|. The resulting image is not displayed.
+
+Note: User agents may use any heuristic to speculate a possible future value for |concretObjectSize|,
+    for example speculating that the size remains unchanged.
+
+Note: Although the image is not displayed, it may still be cached, and subsequent invocations of
+    <<paint()>> may use the cached image.
+
 <pre class='idl'>
 [Exposed=PaintWorklet]
 interface PaintSize {
@@ -478,12 +488,12 @@ interface PaintSize {
 <div algorithm>
 When the user agent wants to <dfn>draw a paint image</dfn> of a <<paint()>> function for a |box|
 into its appropriate stacking level (as defined by the property the CSS property its associated
-with), given its |concreteObjectSize| (<a>concrete object size</a>) it <em>must</em> run the
-following steps:
+with), given |concreteObjectSize| it <em>must</em> run the following steps:
     1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
-    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a> the user agent
+    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>,
+        and the previous invocation had the same |concreteObjectSize|, the user agent
         <em>may</em> use the drawn image from the previous invocation. If so it <em>may</em> abort
         all these steps and use the previously drawn image.
 
