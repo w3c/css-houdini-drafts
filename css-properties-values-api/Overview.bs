@@ -3,6 +3,8 @@ Title:  CSS Properties and Values API Level 1
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
+TR: https://www.w3.org/TR/css-properties-values-api-1/
+Previous Version: https://www.w3.org/TR/2017/WD-css-properties-values-api-1-20171109/
 Previous Version: http://www.w3.org/TR/2016/WD-css-properties-values-api-1-20160607/
 Shortname: css-properties-values-api
 Level: 1
