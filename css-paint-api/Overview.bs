@@ -452,11 +452,11 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
 negotiation</a> algorithm which is responsible for rendering an <<image>>, with |snappedConcreteObjectSize|
-defined as follows. Let |concreateObjectSize| be the <a>concrete object size</a> of the <a>box</a>, and
-|deviceObjectSize| be the |concreateObjectSize| multiplied by the {{PaintWorkletGlobalScope/devicePixelRatio}}.
-If the |deviceObjectSize| is non-integral, then adjust it to align with pixel boundary. Finally, set
-|snappedConcreateObjectSize| to the adjusted |deviceObjectSize| divided by the
-{{PaintWorkletGlobalScope/devicePixelRatio}}.
+defined as follows. Let |concreateObjectSize| be the <a>concrete object size</a> of the <a>box</a>.
+The |snappedConcreateObjectSize| is usually the same as the |concreateObjectSize|. However, the
+user agent may adjust the size such that it paints to pixel boundaries. If it does, the user agent
+should adjust the |snappedConcreateObjectSize| by the proportional change from its original size
+such that the <<paint()>> function can adjust the drawing accordingly.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
