@@ -452,8 +452,8 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
 negotiation</a> algorithm which is responsible for rendering an <<image>>, with |snappedConcreteObjectSize|
-defined as follows. Let |concreateObjectSize| be the <a>concrete object size</a> of the <a>box</a>.
-The |snappedConcreateObjectSize| is usually the same as the |concreateObjectSize|. However, the
+defined as follows. Let |concreteObjectSize| be the <a>concrete object size</a> of the <a>box</a>.
+The |snappedConcreateObjectSize| is usually the same as the |concreteObjectSize|. However, the
 user agent may adjust the size such that it paints to pixel boundaries. If it does, the user agent
 should adjust the |snappedConcreateObjectSize| by the proportional change from its original size
 such that the <<paint()>> function can adjust the drawing accordingly.
