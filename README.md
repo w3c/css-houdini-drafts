@@ -29,13 +29,13 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
 # Motivating Use Cases
 
 * Scroll-linked effects:
-  -   Parallax ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
-  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
-  -  Springy sticky elements ([demo](http://googlechrome.github.io/houdini-samples/animation-worklet/spring-sticky/))
+  -   Parallax ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
+  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
+  -  Springy sticky elements ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/))
 
 * Animations with custom timing functions (particularly those that are not calculable a priori)
 
-  -   Spring timing function ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/spring-timing/))
+  -   Spring timing function ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-timing/))
 
 * Location tracking and positioning:
 
@@ -43,13 +43,13 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
 
 * Procedural animation of multiple elements in sync:
 
-  -   Efficient Expando ([demo](http://googlechrome.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
+  -   Efficient Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
   -   Compositing growing / shrinking box with border (using 9 patch)
 
 * Animating scroll offsets:
 
   -   Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
-      scroll either ([demo](https://googlechrome.github.io/houdini-samples/animation-worklet/sync-scroller/))
+      scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
   -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
