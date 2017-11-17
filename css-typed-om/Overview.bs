@@ -2913,6 +2913,10 @@ depending on the property they came from:
     8. Return the result of concatenating all the items in |values|,
         separated by " " (U+0020 SPACE).
 
+: 'box-sizing'
+::
+    1. Return the result of serializing the keyword value.
+
 : 'bottom'
 ::
     1. If the value is the ''auto'' keyword,
