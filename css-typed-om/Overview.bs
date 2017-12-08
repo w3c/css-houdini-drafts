@@ -2927,6 +2927,45 @@ depending on the property they came from:
         return "currentcolor".
     2. Otherwise, return the result of serializing the <<color>> value.
 
+: 'display'
+::
+    1. Let |values| initially be the empty [=list=].
+    2. If <<display-outside>> or <<display-inside>> is specified:
+        1. Serialize value of <<display-outside>> and append it to |values|.
+        2. Serialize value of <<display-inside>> and append to |values|.
+        3. Goto step 7.
+    3. If <<display-listitem>> is specified:
+        1. Append "list-item" to |values|.
+        2. If <<display-outside>> is specified, serialize its value and append it to |values|.
+        3. If "flow" or "flow-root" is specified, append it to |values|.
+        4. Goto step 7.
+    4. If <<display-internal>> is specified:
+        1. Serialize its value and append it to |values|.
+        2. Goto step 7.
+    5. If <<display-box>> is specified:
+        1. Serialize its value and append it to |values|.
+        2. Goto step 7.
+    6. If <<display-legacy>> is specified:
+        1. Serialize its value and append it to |values|.
+        2. Goto step 7.
+    7. If |values| is:
+        1. «"block", "flow"», return "block".
+        2. «"block", "flow-root"», return "flow-root".
+        3. «"inline", "flow"», return "inline".
+        4. «"inline", "flow-root"», return "inline-block".
+        5. «"run-in", "flow"», return "run-in".
+        6. «"list-item", "block", "flow"», return "list-item".
+        7. «"list-item", "inline", "flow"», return the result of concatenating «"inline", "list-item"», separated by " " (U+0020 SPACE).
+        8. «"block", "flex"», return "flex".
+        9. «"inline", "flex"», return "inline-flex".
+        10. «"block", "grid"», return "grid".
+        11. «"inline", "grid"», return "inline-grid".
+        12. «"inline", "ruby"», return "ruby".
+        13. «"block", "table"», return "table".
+        14. «"inline", "table"», return "inline-table".
+        15. otherwise, return the result of concatenating all the items in |values|,
+        separated by " " (U+0020 SPACE).
+
 : 'left'
 ::
     1. If the value is the ''auto'' keyword,
