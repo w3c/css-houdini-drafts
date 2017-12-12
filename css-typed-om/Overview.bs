@@ -499,6 +499,18 @@ The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how man
 
 The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
 
+<div algorithm="CSSVariableReferenceValue.variable">
+    The <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
+    of a {{CSSVariableReferenceValue}} |this| must, on setting a
+    variable |variable|, perform the following steps:
+
+    1. If |variable| does not start with two dashes (U+002D HYPHEN), [=throw=] a
+        {{TypeError}}, and exit this algorithm.
+
+    2. Otherwise, set |this|’s {{CSSVariableReferenceValue/variable}} internal slot,
+        to |variable|.
+ </div>
+
 <!--
 ██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████
 ██   ██  ██        ██  ██  ██  ██  ██ ██     ██ ██     ██ ██     ██
