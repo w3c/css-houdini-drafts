@@ -527,7 +527,9 @@ interface CSSKeywordValue : CSSStyleValue {
     when called,
     perform the following steps:
 
-    1. Return a new {{CSSKeywordValue}}
+    1. If |value| is an empty string [=throw=] a {{TypeError}}
+        and exit this algorithm.
+    2. Otherwise, return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |value|.
 </div>
@@ -560,6 +562,18 @@ typedef (DOMString or CSSKeywordValue) CSSKeywordish;
         return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |val|.
+</div>
+
+<div algorithm="CSSKeywordValue.value">
+    The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
+    on setting a value |value|,
+    perform the following steps:
+
+    1. If |value| is an empty string, [=throw=] a {{TypeError}},
+        and exit this algorithm.
+
+    2. Otherwise, set |this|’s {{CSSKeywordValue/value}} internal slot,
+        to |value|.
 </div>
 
 
