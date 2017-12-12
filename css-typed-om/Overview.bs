@@ -89,9 +89,10 @@ spec:infra;
 Introduction {#intro}
 =====================
 
-Converting CSSOM value strings into meaningfully typed JavaScript representations and
-back can incur a significant performance overhead. This specification exposes CSS values
-as typed JavaScript objects to facilitate their performant manipulation.
+Converting Cascading Style Sheets Object Model (CSSOM) value strings into 
+meaningfully typed JavaScript representations and back can incur a significant 
+performance overhead. This specification exposes CSS values as typed JavaScript 
+objects to facilitate their performant manipulation.
 
 The API exposed by this specification is designed for performance rather than ergonomics.
 Some particular considerations:
