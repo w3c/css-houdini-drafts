@@ -1712,7 +1712,7 @@ partial namespace CSS {
     CSSUnitValue vmax(double value);
     CSSUnitValue cm(double value);
     CSSUnitValue mm(double value);
-    CSSUnitValue q(double value);
+    CSSUnitValue Q(double value);
     CSSUnitValue in(double value);
     CSSUnitValue pt(double value);
     CSSUnitValue pc(double value);
