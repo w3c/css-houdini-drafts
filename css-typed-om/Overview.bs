@@ -1943,27 +1943,29 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. If |x|, |y|, or |z| (if passed)
-        don't match <<length-percentage>>,
+    1. If |x|, |y|, don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. Let |this| be a new {{CSSTranslation}} object,
+    2. If |z| (if passed) doesn't match <<length>>,
+        [=throw=] a {{TypeError}}.
+
+    3. Let |this| be a new {{CSSTranslation}} object,
         with its {{CSSTranslation/x}} and {{CSSTranslation/y}} internal slots
         set to |x| and |y|.
 
-    3. If |z| was passed,
+    4. If |z| was passed,
         set |this|’s {{CSSTranslation/z}} internal slot
         to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `false`.
 
-    4. If |z| was not passed,
+    5. If |z| was not passed,
         set |this|’s {{CSSTranslation/z}} internal slot
         to [=create a CSSUnitValue from a string|new unit value=] of ''0px'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
-    5. Return |this|.
+    6. Return |this|.
 </div>
 
 <div algorithm="CSSRotation(angle)">
