@@ -211,7 +211,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 </pre>
 
 A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn>,
-which is a list of property - sequence&lt;{{CSSStyleValue}}> pairs. This list
+which is an [=ordered set=] of property - sequence&lt;{{CSSStyleValue}}> pairs. This set
 is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
 [[#computed-stylepropertymapreadonly-objects]],
