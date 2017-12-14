@@ -88,7 +88,7 @@ various methods roughly translate:
      animator instance.
 
 ## ScrollTimeline
-[ScrollTimline](https://wicg.github.io/scroll-animations/#scrolltimeline) is a concept introduced in
+[ScrollTimeline](https://wicg.github.io/scroll-animations/#scrolltimeline) is a concept introduced in
 scroll-linked animation proposal. It defines an animation timeline whose time value depends on
 scroll position of a scroll container. `ScrollTimeline` can be used an an input timeline for
 worklet animations and it is the intended mechanisms to give read access to scroll position.
