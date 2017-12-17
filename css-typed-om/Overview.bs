@@ -636,6 +636,27 @@ All numeric CSS values
 are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
+    enum CSSNumericBaseType {
+        "length",
+        "angle",
+        "time",
+        "frequency",
+        "resolution",
+        "flex",
+        "percent",
+    };
+
+    dictionary CSSNumericType {
+        int length;
+        int angle;
+        int time;
+        int frequency;
+        int resolution;
+        int flex;
+        int percent;
+        CSSNumericBaseType percentHint;
+    };
+
     interface CSSNumericValue : CSSStyleValue {
         CSSNumericValue add(CSSNumberish... values);
         CSSNumericValue sub(CSSNumberish... values);
@@ -648,7 +669,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
         CSSNumericValue to(DOMString unit);
         CSSMathSum toSum(DOMString... units);
-        // ??? type();
+        CSSNumericType type();
 
         static CSSNumericValue parse(DOMString cssText);
     };
