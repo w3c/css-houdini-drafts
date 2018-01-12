@@ -2651,7 +2651,7 @@ any sub-process referenced by this process fails, then normalization as a whole 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
         the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
-        by the provided value and a horizontal <var>bias</var>.
+        by the provided value and an auto <var>bias</var>.
 1.  Otherwise, if the provided value consists of a combination of two keywords, then:
 
         1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
