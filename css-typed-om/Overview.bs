@@ -520,7 +520,6 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 [Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
     attribute DOMString value;
-    stringifier;
 };
 </pre>
 
@@ -532,15 +531,6 @@ interface CSSKeywordValue : CSSStyleValue {
     1. Return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |value|.
-</div>
-
-<div algorithm="CSSKeywordValue stringification behavior">
-    The <dfn for=CSSKeywordValue>stringification behavior</dfn> of a {{CSSKeywordValue}} |this| is:
-
-    1. Let |token| be an <<ident-token>>
-        with its value set to |this|’s {{CSSKeywordValue/value}} internal slot.
-
-    2. Return the serialization of |token|.
 </div>
 
 Any place that accepts a {{CSSKeywordValue}}
