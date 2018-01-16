@@ -717,7 +717,7 @@ The following are the arithmetic operations you can perform on dimensions:
         with the same {{CSSUnitValue/unit}} internal slot as |this|,
         and a {{CSSUnitValue/value}} internal slot set to the negation of |this|’s.
 
-    2. Otherwise,
+    3. Otherwise,
         return a new {{CSSMathNegate}} object
         whose {{CSSMathNegate/value}} internal slot
         is set to |this|.
@@ -737,11 +737,28 @@ The following are the arithmetic operations you can perform on dimensions:
         Otherwise,
         prepend |this| to |values|.
 
-    3. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
+    3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+        with {{CSSUnitValue/unit}} internal slot set to "number",
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to "number",
+        and {{CSSUnitValue/value}} internal slot is set to the product of
+        the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
+
+    4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+        with {{CSSUnitValue/unit}} internal slot set to "number"
+        except one which is set to |unit|,
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |unit|,
+        and {{CSSUnitValue/value}} internal slot is set to the product of
+        the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
+
+    5. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
         [=throw=] a {{TypeError}}.
 
-    5. Return a new {{CSSMathProduct}} object
+    6. Return a new {{CSSMathProduct}} object
         whose {{CSSMathProduct/values}} internal slot
         is set to |values|.
 </div>
@@ -765,7 +782,12 @@ The following are the arithmetic operations you can perform on dimensions:
     1. If |this| is a {{CSSMathInvert}} object,
         return |this|’s {{CSSMathInvert/value}} internal slot.
 
-    2. Otherwise,
+    2. If |this| is a {{CSSUnitValue}} object with {{CSSUnitValue/unit}} internal slot set to "number",
+        return a new {{CSSUnitValue}}
+        with the {{CSSUnitValue/unit}} internal slot set to "number",
+        and a {{CSSUnitValue/value}} internal slot set to the inverse of |this|’s.
+
+    3. Otherwise,
         return a new {{CSSMathInvert}} object
         whose {{CSSMathInvert/value}} internal slot
         is set to |this|.
@@ -785,11 +807,19 @@ The following are the arithmetic operations you can perform on dimensions:
         Otherwise,
         prepend |this| to |values|.
 
-    3. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
+    3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+        and have the same {{CSSUnitValue/unit}},
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to the minimum of
+        the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
+
+    4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
         [=throw=] a {{TypeError}}.
 
-    4. Return a new {{CSSMathMin}} object
+    5. Return a new {{CSSMathMin}} object
         whose {{CSSMathMin/values}} internal slot
         is set to |values|.
 </div>
@@ -808,11 +838,19 @@ The following are the arithmetic operations you can perform on dimensions:
         Otherwise,
         prepend |this| to |values|.
 
-    3. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
+    3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
+        and have the same {{CSSUnitValue/unit}},
+        return a new {{CSSUnitValue}}
+        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        and {{CSSUnitValue/value}} internal slot is set to the maximum of
+        the {{CSSUnitValue/value}} internal slots
+        of the [=list/items=] in |values|.
+
+    4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
         [=throw=] a {{TypeError}}.
 
-    4. Return a new {{CSSMathMax}} object
+    5. Return a new {{CSSMathMax}} object
         whose {{CSSMathMax/values}} internal slot
         is set to |values|.
 </div>
