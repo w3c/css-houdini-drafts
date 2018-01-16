@@ -148,7 +148,7 @@ and parseMultiple set to true.
 
     1. Attempt to parse |property| as an <<ident>>.
         If this fails,
-        [=throw=] a {{SyntaxError}} and exit this algorithm.
+        [=throw=] a {{TypeError}} and exit this algorithm.
         Otherwise, let |property| be the parsed result.
         If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
@@ -158,7 +158,7 @@ and parseMultiple set to true.
 
     3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
         If this fails,
-        [=throw=] a {{SyntaxError}} and exit this algorithm.
+        [=throw=] a {{TypeError}} and exit this algorithm.
         Otherwise,
         let |value| be the parsed result.
 
