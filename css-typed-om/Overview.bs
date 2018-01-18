@@ -2965,6 +2965,10 @@ depending on the property they came from:
         return the result of serializing the <<length>> value.
     3. Otherwise, return the result of serializing the <<percentage>> value.
 
+: 'position'
+::
+    1. Return the serialization of 'position'.
+
 : 'right'
 ::
     1. If the value is the ''auto'' keyword,
