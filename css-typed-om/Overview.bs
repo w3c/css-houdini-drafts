@@ -647,13 +647,13 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
     };
 
     dictionary CSSNumericType {
-        required long length;
-        required long angle;
-        required long time;
-        required long frequency;
-        required long resolution;
-        required long flex;
-        required long percent;
+        long length;
+        long angle;
+        long time;
+        long frequency;
+        long resolution;
+        long flex;
+        long percent;
         CSSNumericBaseType percentHint;
     };
 
