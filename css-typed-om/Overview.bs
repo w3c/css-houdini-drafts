@@ -2890,7 +2890,7 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 -----------------------------------------------------------
 
 {{CSSURLImageValue}} objects are serialized to the string given by
-"url(" + {{CSSURLImageValue/url}} + ")".
+'url("' + {{CSSURLImageValue/url}} + '")'.
 
 {{CSSFontFaceValue}} Serialization {#fontfacevalue-serialization}
 -----------------------------------------------------------------
