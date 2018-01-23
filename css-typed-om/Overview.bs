@@ -647,7 +647,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
         boolean equals(CSSNumberish... value);
 
-        CSSNumericValue to(DOMString unit);
+        CSSUnitValue to(DOMString unit);
         CSSMathSum toSum(DOMString... units);
         // ??? type();
 
