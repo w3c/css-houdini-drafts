@@ -1452,7 +1452,7 @@ are represented as {{CSSUnitValue}}s.
     perform the following steps:
 
     1. If [=creating a type=] from |unit| returns failure,
-        [=throw=] a {{SyntaxError}}
+        [=throw=] a {{TypeError}}
         and abort this algorithm.
 
     2. Return a new {{CSSUnitValue}}
