@@ -1699,7 +1699,7 @@ of all the "math" operations.
             of each of the [=list/items=] in its {{CSSMathProduct/values}} internal slot.
 
         : {{CSSMathNegate}}
-        :: The [=type=] is the same as the [=type=] of its {{CSSMathNegate/values}} internal slot.
+        :: The [=type=] is the same as the [=type=] of its {{CSSMathNegate/value}} internal slot.
 
         : {{CSSMathInvert}}
         :: The [=type=] is the same as the [=type=] of its {{CSSMathInvert/value}} internal slot,
