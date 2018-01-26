@@ -333,7 +333,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
 
     1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
-        1. If the algoritm returns a {{CSSStyleValue}} return true.
+        1. If the algorithm returns a {{CSSStyleValue}} return true.
 
         2. If the algorithm returns `null` return false.
 
@@ -2389,7 +2389,7 @@ Issue(488): Better to define a full table of properties and what types they norm
 
 Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
 We instead need to strictly define the serialization of every property.
-This should be done according to CSSOM principlies, tho
+This should be done according to CSSOM principles, tho
 (generally, shortest possible value).
 
 Raw CSS tokens: properties with ''var()'' references {#normalize-tokens}
