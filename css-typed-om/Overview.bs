@@ -351,15 +351,13 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
     3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
         let |entry| be that entry.
-        Otherwise, exit the algorithm.
+        1. Empty the list of |values| currently stored on the |entry|.
 
-    4. Empty the list of |values| currently stored on the |entry|.
+    4. Let |values to set| be an empty list.
 
-    5. Let |values to set| be an empty list.
+    5. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to set|.
 
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to set|.
-
-    7. Set |values to set| to be |entry|’s list.
+    6. Set |values to set| to be |entry|’s list.
 </div>
 
 The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
