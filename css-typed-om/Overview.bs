@@ -213,15 +213,15 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 };
 </pre>
 
-A {{StylePropertyMapReadOnly}} object has an associated <dfn>property model</dfn>,
-which is a list of property - sequence&lt;{{CSSStyleValue}}> pairs. This list
-is initialized differently depending on where the {{CSSStyleValue}} is used
+A {{StylePropertyMapReadOnly}} object has an associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">contained properties map</dfn>,
+which is a [=map=] of property name ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects) pairs.
+This list is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
 [[#computed-stylepropertymapreadonly-objects]],
 [[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
-All properties stored on the [=property model=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
+All properties stored on the [=contained properties map=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
 
 <div class='note'>
 The sequence of {{CSSStyleValue}}s associated with a property do
@@ -251,10 +251,10 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    4. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+    4. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
         let |entry| be that entry.
         Otherwise, create a new entry for |property| with an empty list,
-        add it to the [=property model=],
+        add it to the [=contained properties map=],
         and let |entry| be the newly-created entry.
 
     5. Let |values to append| be the empty list.
@@ -273,8 +273,8 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
-        remove that entry from the [=property model=].
+    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
+        remove that entry from the [=contained properties map=].
 </div>
 
 <div algorithm>
@@ -300,7 +300,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
         return the first value found in that entry.
 
     4. Else, return `null`.
@@ -315,7 +315,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
   
-    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|:
+    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|:
         
         1. If |property| is a [=list-valued property=],
             return the list of |values| assigned to that property.
@@ -341,7 +341,10 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 
 
 <div algorithm>
-    To <dfn>set a value on a StylePropertyMap</dfn>, run these steps:
+    To <dfn>set a value on a StylePropertyMap</dfn>,
+    given a [=string=] |property|
+    and a [=list=] of {{CSSPropertyValue}} objects |value|,
+    run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
@@ -349,7 +352,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=property model=] contains an entry for |property|,
+    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
         let |entry| be that entry.
         Otherwise, exit the algorithm.
 
@@ -385,8 +388,8 @@ map set to the object this method was invoked on .
 
 </div>
 
-The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the properties listed in
-the [=property model=]. This list of properties is sorted in the following manner:
+The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the contained properties maped in
+the [=contained properties map=]. This list of properties is sorted in the following manner:
 
 *   normal properties are sorted alphabetically.
 *   custom properties are sorted by increasing code point order.
@@ -413,7 +416,7 @@ partial interface Element {
 {{Element}} or pseudo element, and are accessed by calling the
 {{Element/computedStyleMap()}} method.
 
-When constructed, the [=property model=] for [=computed StylePropertyMap=]
+When constructed, the [==] for [=computed StylePropertyMap=]
 objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
 
 Note: The StylePropertyMap returned by computedStyleMap represents computed style,
@@ -433,7 +436,7 @@ partial interface CSSStyleRule {
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-When constructed, the [=property model=] for [=declared StylePropertyMap=]
+When constructed, the [=contained properties map=] for [=declared StylePropertyMap=]
 objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
@@ -453,7 +456,7 @@ partial interface Element {
 directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
 attribute of {{Element}} objects.
 
-When constructed, the [=property model=] for [=inline StylePropertyMap=] objects
+When constructed, the [=contained properties map=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
