@@ -284,7 +284,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
             [=throw=] a {{TypeError}} and exit this algorithm.
             Otherwise, return the |value|.
         : If |value| is a {{DOMString}},
-        ::    [=Parse a CSSStyleValue=] with property |property| and value |value| and return the resulting |value|.
+        ::    [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple true, and return the resulting |value|.
             If the result is null,
             [=throw=] a {{TypeError}} and exit this algorithm.
             Otherwise, append each [=list-valued property iteration=] in the result to a |values to append| object
