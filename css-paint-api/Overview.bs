@@ -750,7 +750,7 @@ Animations API.
       name: '--circle-color',
       syntax: '&lt;color>',
       initialValue: 'black',
-      inherit: false
+      inherits: false
     });
     CSS.paintWorklet.addModule('circle.js');
 &lt;/script>
