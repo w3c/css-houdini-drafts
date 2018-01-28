@@ -863,20 +863,35 @@ The following are the arithmetic operations you can perform on dimensions:
 
     1. Replace each [=list/item=] of |values|
         with the result of [=rectifying a numberish value=] for the [=list/item=].
-
-    2. Let |thisAndValues| be |this| prepended to |values|.
-
-    3. If all |item|s in |thisAndValues| do not belong to the same class return false. Example: all items in |thisAndValues| must be of type {{CSSUnitValue}}.
-
-    4. If all |item|s in |thisAndValues| are of type {{CSSUnitValue}} and have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}} return true.
-
-    5. If all |item|s in |thisAndValues| are of type {{CSSMathValue}}:
-        1. If |thisAndValues| are all either {{CSSMathSum}}, {{CSSMathProduct}}, {{CSSMathMin}} or {{CSSMathMax}}, iterate over the {{CSSNumericArray}}s on |thisAndValues|,
-            1. For each {{CSSNumericValue}} in each of the {{CSSNumericArray}}s go back to step 1 to check that the {{CSSUnitValue}}s on all items in |thisAndValues| are equal.
-        2. If |thisAndValues| are all either {{CSSMathNegate}} or {{CSSMathInvert}}:
-            1. Go back to step 1 to check that the {{CSSNumericValue}} on all items in |thisAndValues| are equal.
+    2. For each [=list/item=] in |values|,
+        if the [=list/item=] is not [=equal=] to |this|,
+        return `false`.
+    3. Return `true`.
 </div>
 
+<div algorithm>
+    To determine whether two {{CSSNumericValue}}s |value1| and |value2|
+    are <dfn lt="equal">equal</dfn>,
+    the steps are:
+
+    1. If |value1| and |value2| do not belong to the same class, return `false`.
+    2. If |value1| and |value2| are both {{CSSUnitValue}}s,
+        return whether they have the same {{CSSUnitValue/unit}} and {{CSSUnitValue/value}}.
+    3. If |value1| and |value2| are both
+        {{CSSMathSum}}s, {{CSSMathProduct}}s, {{CSSMathMin}}s or {{CSSMathMax}}s,
+        1. If |value1|'s {{CSSMathSum/values}} and |value2|'s {{CSSMathSum/values}}
+            have different lengths,
+            return `false`.
+        2. If any item in |value1|'s {{CSSMathSum/values}}
+            is not [=equal=] to the corresponding item in |value2|'s {{CSSMathSum/values}},
+            return `false`
+        3. Return `true` otherwise.
+    4. Otherwise, assert: |value1| and |value2| are
+        both {{CSSMathNegate}}s or {{CSSMathInvert}}s.
+    5. Return whether |value1|'s {{CSSMathNegate/value}}
+        and |value2|'s {{CSSMathNegate/value}}
+        are [=equal=].
+</div>
 
 <div algorithm="CSSNumericValue.to()">
     The <dfn method for=CSSNumericValue>to(|unit|)</dfn> method converts an existing {{CSSNumericValue}} |this|
