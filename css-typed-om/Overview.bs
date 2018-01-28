@@ -492,8 +492,8 @@ Issue(239): Is this the best representation for this object?
 They represent a list of string fragments and variable references.
 
 They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
-which is a [=list=] of either {{DOMString}}, {{CSSVariableReferenceValue}} 
-ojects or both. This list is the object's [=values to iterate over=].
+which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects. 
+This list is the object's [=values to iterate over=].
 
 The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
 
