@@ -224,14 +224,13 @@ This list is initialized differently depending on where the {{CSSStyleValue}} is
 All properties stored on the [=contained properties map=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
 
 <div class='note'>
-The sequence of {{CSSStyleValue}}s associated with a property do
-not represent multiple successive definitions of that property's value.
-Instead, sequences represent values associated with list-valued properties.
+    The sequence of {{CSSStyleValue}}s associated with a property 
+    do not represent multiple successive definitions of that property's value.
+    Instead, sequences represent values associated with [=list-valued properties=].
 
-This approach allows single-valued properties to become list-valued in the
-future without breaking code that relies on calling
-{{StylePropertyMapReadOnly/get()}} and/or
-{{StylePropertyMap/set()}} for those properties.
+    This approach allows single-valued properties to become list-valued in the future 
+    without breaking code that relies on calling {{StylePropertyMapReadOnly/get()}} 
+    and/or {{StylePropertyMap/set()}} for those properties.
 </div>
 
 The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
@@ -343,7 +342,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 <div algorithm>
     To <dfn>set a value on a StylePropertyMap</dfn>,
     given a [=string=] |property|
-    and a [=list=] of {{CSSPropertyValue}} objects |value|,
+    and a [=list=] of {{CSSStyleValue}} objects |value|,
     run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
