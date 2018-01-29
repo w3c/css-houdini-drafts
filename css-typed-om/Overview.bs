@@ -470,9 +470,10 @@ partial interface ElementCSSInlineStyle {
 };
 </pre>
 
-<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
-directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>styleMap</dfn>
-attribute of {{Element}} {{ElementCSSInlineStyle}} interface.
+<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations 
+attached directly to {{Element}}s. 
+They are accessed via the <dfn attribute for=ElementCSSInlineStyle>attributeStyleMap</dfn> attribute of {{Element}} objects
+(via the {{ElementCSSInlineStyle}} mixin interface).
 
 When constructed, the [=contained properties map=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
