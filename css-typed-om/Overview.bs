@@ -264,8 +264,6 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     2. Custom properties, sorted in increasing code-point order.
 </div>
 
-All properties stored on the [=StylePropertyMap/map entries=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
-
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
 their value is a list of parallel grammar terms,
