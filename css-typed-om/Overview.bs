@@ -194,13 +194,15 @@ Issue(305): appropriate failure indicators for this algorithm
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
-<pre class='idl'>
+<xmp class='idl'>
 interface StylePropertyMapReadOnly {
-    CSSStyleValue? get(DOMString property);
-    sequence&lt;CSSStyleValue> getAll(DOMString property);
+    any get(DOMString property);
+    /* 'any' means (undefined or CSSStyleValue) here,
+       see https://github.com/heycam/webidl/issues/60 */
+    sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
-    iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue>)>;
-    sequence&lt;DOMString> getProperties();
+    iterable<DOMString, (CSSStyleValue or sequence<CSSStyleValue>)>;
+    sequence<DOMString> getProperties();
     stringifier;
 };
 
@@ -212,7 +214,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     void set(DOMString property, (CSSStyleValue or DOMString)... values);
     void update(DOMString property, UpdateFunction updateFunction);
 };
-</pre>
+</xmp>
 
 A {{StylePropertyMapReadOnly}} object has an associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">contained properties map</dfn>,
 which is a [=map=] of property name ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects) pairs.
@@ -284,16 +286,18 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    To <dfn>delete a StylePropertyMap</dfn> given a <var>property</var>, run these steps:
+    The <dfn method for=StylePropertyMap>delete(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
+    1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        remove that entry from the [=contained properties map=].
+    3. If |this|’s [=contained properties map=] [=contains=] |property|,
+        [=map/remove=] it.
 </div>
 
 <div algorithm>
@@ -307,14 +311,16 @@ probably in an appendix.
         Otherwise, return the |value|.
 
     : If |value| is a {{DOMString}},
-    ::  [=Parse a CSSStyleValue=] with property |property|, value |value|, and |parseMultiple| set to `false`,
+    ::  [=Parse a CSSStyleValue=] with property |property|, value |value|, and parseMultiple set to `false`,
         and return the result.
 
         Note: This can throw a {{TypeError}} instead.
 </div>
 
 <div algorithm>
-    To <dfn>get a value from a StylePropertyMap</dfn>, run these steps:
+    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">get(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
@@ -322,51 +328,18 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        return the first value found in that entry.
+    3. Let |props| be |this|’s [=contained properties map=].
 
-    4. Else, return `null`.
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|][0].
+
+        Otherwise, return `undefined`.
 </div>
 
 <div algorithm>
-    To <dfn>get all values from a StylePropertyMap</dfn>, run these steps:
-
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=supported property name=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-  
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|:
-        
-        1. If |property| is a [=list-valued property=],
-            return the list of |values| assigned to that property.
-        
-        2. If |property| is not a [=list-valued property=],
-            let |values| initially be the empty [=list=] and append 
-            the |value| assigned to the |property| to this list 
-            and return |values|.
-    
-    4. Else, return an empty [=list=].   
-
-</div>
-
-<div algorithm>
-    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
-
-    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
-        1. If the algorithm returns a {{CSSStyleValue}} return true.
-
-        2. If the algorithm returns `null` return false.
-
-</div>
-
-
-<div algorithm>
-    To <dfn>set a value on a StylePropertyMap</dfn>,
-    given a [=string=] |property|
-    and a [=list=] of {{CSSStyleValue}} objects |value|,
-    run these steps:
+    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">getAll(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
@@ -374,41 +347,57 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        let |entry| be that entry.
-        Otherwise, exit the algorithm.
+    3. Let |props| be |this|’s [=contained properties map=].
 
-    4. Empty the list of |values| currently stored on the |entry|.
-
-    5. Let |values to set| be an empty list.
-
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to set|.
-
-    7. Set |values to set| to be |entry|’s list.
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|].
+        Otherwise, return an empty [=list=].
 </div>
-
-The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
-UpdateFunction <var>updateFunction</var>)</dfn> method, when invoked, must
-[=update a value in a StylePropertyMap=] with property name
-<var>property</var>, update function <var>updateFunction</var>, and property
-map set to the object this method was invoked on .
 
 <div algorithm>
-    To <dfn>update a value in a StylePropertyMap</dfn> given a <var>property
-    name</var>, <var>update function</var>, and <var>property map</var>, run these
-    steps:
+    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-    1.  Let <var>old value</var> be the result of running the algorithm to
-        [=get a value from a StylePropertyMap=] with property name <var>property
-        name</var> and property map <var>property map</var>.
+    1. If |property| does not start with two dashes (U+002D HYPHEN),
+        let |property| be |property| [=ASCII lowercased=].
 
-    2.  Let <var>new value</var> be the return value given by [=invoking=] the callback
-        <var>update function</var> with a single input of <var>old value</var>.
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3.  Run the algorithm to [=set a value on a StylePropertyMap=] with property name <var>property name</var>,
-        value <var>new value</var>, and property map <var>property map</var>.
+    3. Let |props| be |this|’s [=contained properties map=].
 
+    4. If |props|[|property|] [=map/exists=],
+        [=map/remove=] it.
+
+    5. Let |values to set| be an empty [=list=].
+
+    6. For each |value| in |values|:
+        1. [=Normalize a style value=] for |property| and |value|,
+            and append the result to |values to set|.
+
+    7. Set |props|[|property|] to |values to set|.
+
+    Note: The property is deleted then added back
+    so that it gets put at the end of the [=ordered map=],
+    which gives the expected behavior in the face of [=shorthand properties=].
 </div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Let |old value| be the result of calling |this|.get(|property|)
+        (using the original value of {{StylePropertyMap/get()}}).
+
+    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
+
+    3. Call |this|.set(|property|, |new value|)
+        (using the original value of {{StylePropertyMap/set()}}).
+</div>
+
+Issue: Do we need an updateAll() method that gets and sets a list?
 
 The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the contained properties maped in
 the [=contained properties map=]. This list of properties is sorted in the following manner:
