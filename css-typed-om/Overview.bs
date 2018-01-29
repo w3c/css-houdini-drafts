@@ -337,15 +337,8 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
   
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|:
-        
-        1. If |property| is a [=list-valued property=],
-            return the list of |values| assigned to that property.
-        
-        2. If |property| is not a [=list-valued property=],
-            let |values| initially be the empty [=list=] and append 
-            the |value| assigned to the |property| to this list 
-            and return |values|.
+    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property| 
+        return the list of |values| assigned to that property.
     
     4. Else, return an empty [=list=].   
 
