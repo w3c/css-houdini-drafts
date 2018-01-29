@@ -164,18 +164,18 @@ and parseMultiple set to true.
         Otherwise,
         let |value| be the parsed result.
 
-    4. If |property| is a [=list-valued property=], and |parseMultiple| is true,
+    4. If |parseMultiple| is true,
         subdivide |value| into a list of {{CSSStyleValue}} objects,
         each representing one [=list-valued property iteration=],
         and let |value| be the result. Return |value| as a sequence of
         {{CSSStyleValue}} objects.
 
-    5. If |property| is a [=list-valued property=], and |parseMultiple| is false
+    5. If |parseMultiple| is false
         subdivide |value| into a list of {{CSSStyleValue}} objects,
         each representing one [=list-valued property iteration=],
         and let |value| be the first entry in this list.
 
-    6. return a {{CSSStyleValue}} representing |value|.
+    6. Return a {{CSSStyleValue}} representing |value|.
 
 </div>
 
