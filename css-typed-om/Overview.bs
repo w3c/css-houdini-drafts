@@ -14,7 +14,7 @@ Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts
 Inline Github Issues: title
 Ignored Vars: type, unit
-Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS
+Ignored Terms: Drawable, paint image definition, list-valued property, parse a CSSStyleValue, values to iterate over, CSS
 Markup Shorthands: markdown yes
 </pre>
 
@@ -166,13 +166,13 @@ and parseMultiple set to true.
 
     4. If |property| is a [=list-valued property=], and |parseMultiple| is true,
         subdivide |value| into a list of {{CSSStyleValue}} objects,
-        each representing one [=list-valued property iteration=],
+        each representing one comma separated iteration of a [=list-valued property=],
         and let |value| be the result. Return |value| as a sequence of
         {{CSSStyleValue}} objects.
 
     5. If |property| is a [=list-valued property=], and |parseMultiple| is false
         subdivide |value| into a list of {{CSSStyleValue}} objects,
-        each representing one [=list-valued property iteration=],
+        each representing one comma separated iteration of a [=list-valued property=],
         and let |value| be the first entry in this list.
 
     6. return a {{CSSStyleValue}} representing |value|.
@@ -302,7 +302,7 @@ probably in an appendix.
     and a [=string=] or {{CSSStyleValue}} |value|:
 
     : If |value| is a {{CSSStyleValue}},
-    :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
+    :: If |value| does not match the grammar of a comma separated iteration of a [=list-valued property=] of |property|,
         [=throw=] a {{TypeError}} and exit this algorithm.
         Otherwise, return the |value|.
 
