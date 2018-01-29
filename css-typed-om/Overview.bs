@@ -155,7 +155,7 @@ and parseMultiple set to true.
         If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
@@ -275,7 +275,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If |property| is not a [=list-valued property=],
@@ -305,7 +305,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If |this|’s [=StylePropertyMap/map entries=] [=contains=] |property|,
@@ -337,7 +337,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
@@ -356,7 +356,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
@@ -374,7 +374,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If |property| is a [=single-valued property=] and |values| has more than one [=list/entry=],
@@ -422,6 +422,10 @@ if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
 but applies to [=strings=],
 rather than [=identifiers=];
 it can be used without invoking the CSS parser.)
+
+A [=string=] is a <dfn>valid CSS property</dfn>
+if it is a [=custom property name string=],
+or is a CSS property name recognized by the user agent.
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
