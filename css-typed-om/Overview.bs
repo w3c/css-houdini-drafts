@@ -1989,7 +1989,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 
     [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
-    interface CSSTranslation : CSSTransformComponent {
+    interface CSSTranslate : CSSTransformComponent {
         attribute CSSNumericValue x;
         attribute CSSNumericValue y;
         attribute CSSNumericValue z;
@@ -1997,7 +1997,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     [Constructor(CSSNumericValue angle),
      Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
-    interface CSSRotation : CSSTransformComponent {
+    interface CSSRotate : CSSTransformComponent {
         attribute CSSNumberish x;
         attribute CSSNumberish y;
         attribute CSSNumberish z;
@@ -2037,7 +2037,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     indicates whether the transform is 2D or 3D.
     When it's `true`,
     the attributes of the transform that are relevant to 3D transforms
-    (such as the {{CSSTranslation/z|CSSTranslation.z}} attribute)
+    (such as the {{CSSTranslate/z|CSSTranslate.z}} attribute)
     simply have no effect on the transform they represent.
 
     Note: This affects the serialization of the object,
@@ -2066,8 +2066,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
     but also prevents "accidentally" flipping a 2D transform into becoming 3D.
 </details>
 
-<div algorithm="CSSTranslation()">
-    The <dfn constructor for=CSSTranslation>CSSTranslation(|x|, |y|, |z|)</dfn> constructor must,
+<div algorithm="CSSTranslate()">
+    The <dfn constructor for=CSSTranslate>CSSTranslate(|x|, |y|, |z|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
@@ -2075,18 +2075,18 @@ is a [=list=] of {{CSSTransformComponent}}s.
         don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. Let |this| be a new {{CSSTranslation}} object,
-        with its {{CSSTranslation/x}} and {{CSSTranslation/y}} internal slots
+    2. Let |this| be a new {{CSSTranslate}} object,
+        with its {{CSSTranslate/x}} and {{CSSTranslate/y}} internal slots
         set to |x| and |y|.
 
     3. If |z| was passed,
-        set |this|’s {{CSSTranslation/z}} internal slot
+        set |this|’s {{CSSTranslate/z}} internal slot
         to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `false`.
 
     4. If |z| was not passed,
-        set |this|’s {{CSSTranslation/z}} internal slot
+        set |this|’s {{CSSTranslate/z}} internal slot
         to [=create a CSSUnitValue from a string|new unit value=] of ''0px'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
@@ -2094,26 +2094,26 @@ is a [=list=] of {{CSSTransformComponent}}s.
     5. Return |this|.
 </div>
 
-<div algorithm="CSSRotation(angle)">
-    The <dfn constructor for=CSSRotation>CSSRotation(|angle|)</dfn> constructor must,
+<div algorithm="CSSRotate(angle)">
+    The <dfn constructor for=CSSRotate>CSSRotate(|angle|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
     1. If |angle| doesn't match <<angle>>,
         [=throw=] a {{TypeError}}.
 
-    2. Return a new {{CSSRotation}}
-        with its {{CSSRotation/angle}} internal slot
+    2. Return a new {{CSSRotate}}
+        with its {{CSSRotate/angle}} internal slot
         set to |angle|,
-        its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots
+        its {{CSSRotate/x}} and {{CSSRotate/y}} internal slots
         set to [=create a CSSUnitValue from a string|new unit values=] of ''0'',
-        its {{CSSRotation/z}} internal slot
+        its {{CSSRotate/z}} internal slot
         set to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
-<div algorithm="CSSRotation(x, y, z, angle)">
-    The <dfn constructor for=CSSRotation>CSSRotation(|x|, |y|, |z|, |angle|)</dfn> constructor must,
+<div algorithm="CSSRotate(x, y, z, angle)">
+    The <dfn constructor for=CSSRotate>CSSRotate(|x|, |y|, |z|, |angle|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
@@ -2127,10 +2127,10 @@ is a [=list=] of {{CSSTransformComponent}}s.
         don't match <<number>>,
         [=throw=] a {{TypeError}}.
 
-    4. Return a new {{CSSRotation}}
-        with its {{CSSRotation/angle}} internal slot
+    4. Return a new {{CSSRotate}}
+        with its {{CSSRotate/angle}} internal slot
         set to |angle|,
-        its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
+        its {{CSSRotate/x}}, {{CSSRotate/y}}, {{CSSRotate/z}} internal slots set to |x|, |y|, and |z|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
@@ -2230,7 +2230,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 <div class=note>
     Each {{CSSTransformComponent}} can correspond to
     one of a number of underlying transform functions.
-    For example, a {{CSSTranslation}}
+    For example, a {{CSSTranslate}}
     with an x value of ''10px''
     and y &amp; z values of ''0px'' could represent any of the following:
 
@@ -2737,8 +2737,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         : ''translate3d()''
         : ''translateZ()''
         ::
-            1. Return a new {{CSSTranslation}} object,
-                whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
+            1. Return a new {{CSSTranslate}} object,
+                whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
                 are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
                 or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
@@ -2765,10 +2765,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         : ''rotateY()''
         : ''rotateZ()''
         ::
-            1. Return a new {{CSSRotation}} object,
-                whose {{CSSRotation/angle}} internal slot
+            1. Return a new {{CSSRotate}} object,
+                whose {{CSSRotate/angle}} internal slot
                 is set to the [=normalize a numeric value|normalization=] of the specified angle,
-                and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
+                and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
                 are set to the specified rotation axis coordinates,
                 or the implicit axis coordinates if not specified in |func|
                 and whose {{CSSTransformComponent/is2D}} internal slot
@@ -3198,7 +3198,7 @@ Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
 
 During computation, any {{CSSNumericValue}} objects referenced by a {{CSSTransformComponent}}
-(e.g. the {{CSSTranslation/x}} attribute of a {{CSSTranslation}}) are
+(e.g. the {{CSSTranslate/x}} attribute of a {{CSSTranslate}}) are
 computed according to [[#computed-numericvalue-objects]], but the
 {{CSSTransformValue}} object is otherwise as specified.
 
