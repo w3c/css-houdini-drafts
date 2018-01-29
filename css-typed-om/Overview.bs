@@ -213,7 +213,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
     void delete(DOMString property);
-    [Exposed=PaintWorklet] void set(DOMString property, (CSSStyleValue or DOMString)... values);
+    void set(DOMString property, (CSSStyleValue or DOMString)... values);
     void update(DOMString property, UpdateFunction updateFunction);
 };
 </xmp>
