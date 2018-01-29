@@ -385,13 +385,17 @@ probably in an appendix.
     5. If |props|[|property|] [=map/exists=],
         [=map/remove=] it.
 
-    6. Let |values to set| be an empty [=list=].
+    6. If |property| is a single-valued property and |values| has more than 
+    one |value| [=throw=] a {{TypeError}} and exit this algorithm.
 
-    7. For each |value| in |values|,
+    7. Let |values to set| be an empty [=list=].
+
+    8. For each |value| in |values|,
         [=normalize a style value=] for |property| and |value|,
         and append the result to |values to set|.
 
-    8. Set |props|[|property|] to |values to set|.
+
+    9. Set |props|[|property|] to |values to set|.
 
     Note: The property is deleted then added back
     so that it gets put at the end of the [=ordered map=],
@@ -2075,17 +2079,15 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. If |x| or |y| don't match <<length-percentage>>,
+    1. If |x|, |y|, or |z| (if passed)
+        don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. If |z| was passed, but doesn't match <<length>>,
-        [=throw=] a {{TypeError}}.
-
-    3. Let |this| be a new {{CSSTranslate}} object,
+    2. Let |this| be a new {{CSSTranslate}} object,
         with its {{CSSTranslate/x}} and {{CSSTranslate/y}} internal slots
         set to |x| and |y|.
 
-    4. If |z| was passed,
+    3. If |z| was passed,
         set |this|’s {{CSSTranslate/z}} internal slot
         to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
@@ -2097,7 +2099,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
-    6. Return |this|.
+    5. Return |this|.
 </div>
 
 <div algorithm="CSSRotate(angle)">
