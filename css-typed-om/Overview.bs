@@ -1691,12 +1691,12 @@ interface CSSMathProduct : CSSMathValue {
 
 [Constructor(CSSNumberish arg)]
 interface CSSMathNegate : CSSMathValue {
-    attribute CSSNumericValue value;
+    attribute CSSNumberish value;
 };
 
 [Constructor(CSSNumberish arg)]
 interface CSSMathInvert : CSSMathValue {
-    attribute CSSNumericValue value;
+    attribute CSSNumberish value;
 };
 
 [Constructor(CSSNumberish... args)]
