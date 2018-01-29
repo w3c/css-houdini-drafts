@@ -154,7 +154,7 @@ and parseMultiple set to true.
         If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
@@ -252,6 +252,9 @@ probably in an appendix.
     like each "layer" in a 'background-image' property.
 </div>
 
+A <dfn>valid CSS property</dfn> is defined as a property that either is a valid CSS property name, 
+or is a custom property that starts with two dashes (U+002D HYPHEN).
+
 The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
 (CSSStyleValue or DOMString)... <var>values</var>)</dfn> method, when invoked, must
 [=append to a StylePropertyMap=] with property <var>property</var> and values <var>values</var>.
@@ -263,7 +266,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If |property| is not a [=list-valued property=],
@@ -288,7 +291,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
@@ -315,7 +318,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
@@ -330,7 +333,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
   
     3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|:
@@ -367,7 +370,7 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [=supported property name=],
+    2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
