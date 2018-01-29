@@ -196,12 +196,12 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 
 <xmp class='idl'>
 interface StylePropertyMapReadOnly {
+    readonly maplike<DOMString, sequence<CSSStyleValue>>;
     any get(DOMString property);
     /* 'any' means (undefined or CSSStyleValue) here,
        see https://github.com/heycam/webidl/issues/60 */
     sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
-    iterable<DOMString, (CSSStyleValue or sequence<CSSStyleValue>)>;
     sequence<DOMString> getProperties();
     stringifier;
 };
@@ -209,6 +209,7 @@ interface StylePropertyMapReadOnly {
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
 interface StylePropertyMap : StylePropertyMapReadOnly {
+    maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
     void delete(DOMString property);
     void set(DOMString property, (CSSStyleValue or DOMString)... values);
@@ -216,15 +217,15 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 };
 </xmp>
 
-A {{StylePropertyMapReadOnly}} object has an associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">contained properties map</dfn>,
-which is a [=map=] of property name ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects) pairs.
+A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
+which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
 This list is initialized differently depending on where the {{CSSStyleValue}} is used
 (see
 [[#computed-stylepropertymapreadonly-objects]],
 [[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
-All properties stored on the [=contained properties map=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
+All properties stored on the [=StylePropertyMap/map entries=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
 
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
@@ -269,7 +270,7 @@ probably in an appendix.
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    4. Let |props| be |this|’s [=contained properties map=].
+    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
     5. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
@@ -296,7 +297,7 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If |this|’s [=contained properties map=] [=contains=] |property|,
+    3. If |this|’s [=StylePropertyMap/map entries=] [=contains=] |property|,
         [=map/remove=] it.
 </div>
 
@@ -328,7 +329,7 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. Let |props| be |this|’s [=contained properties map=].
+    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
     4. If |props|[|property|] [=map/exists=],
         return |props|[|property|][0].
@@ -347,7 +348,7 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. Let |props| be |this|’s [=contained properties map=].
+    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
     4. If |props|[|property|] [=map/exists=],
         return |props|[|property|].
@@ -365,7 +366,7 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. Let |props| be |this|’s [=contained properties map=].
+    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
     4. If |props|[|property|] [=map/exists=],
         [=map/remove=] it.
@@ -400,7 +401,7 @@ probably in an appendix.
 Issue: Do we need an updateAll() method that gets and sets a list?
 
 The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the contained properties maped in
-the [=contained properties map=]. This list of properties is sorted in the following manner:
+the [=StylePropertyMap/map entries=]. This list of properties is sorted in the following manner:
 
 *   normal properties are sorted alphabetically.
 *   custom properties are sorted by increasing code point order.
@@ -454,7 +455,7 @@ partial interface CSSStyleRule {
 in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-When constructed, the [=contained properties map=] for [=declared StylePropertyMap=]
+When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=]
 objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
@@ -474,7 +475,7 @@ partial interface Element {
 directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
 attribute of {{Element}} objects.
 
-When constructed, the [=contained properties map=] for [=inline StylePropertyMap=] objects
+When constructed, the [=StylePropertyMap/map entries=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
