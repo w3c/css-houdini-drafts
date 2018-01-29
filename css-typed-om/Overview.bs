@@ -447,12 +447,12 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
+    [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
 <dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
 When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=]
@@ -466,14 +466,15 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 ----------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface Element {
+partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
-<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
-directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
-attribute of {{Element}} objects.
+<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations 
+attached directly to {{Element}}s. 
+They are accessed via the <dfn attribute for=ElementCSSInlineStyle>attributeStyleMap</dfn> attribute of {{Element}} objects
+(via the {{ElementCSSInlineStyle}} mixin interface).
 
 When constructed, the [=StylePropertyMap/map entries=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
