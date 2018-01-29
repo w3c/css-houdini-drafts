@@ -1956,14 +1956,14 @@ which represent individual <<transform-function>> values.
 <xmp class='idl'>
 [Constructor(optional sequence<CSSTransformComponent> transforms)]
 interface CSSTransformValue : CSSStyleValue {
-    /*arraylike<CSSTransformComponent>;*/
+    iterable<CSSTransformComponent>;
+    readonly attribute unsigned long length;
+    getter CSSTransformComponent (unsigned long index);
+
     readonly attribute boolean is2D;
     DOMMatrix toMatrix();
 };
 </xmp>
-
-Issue(487): Assuming the resolution of <a href="https://github.com/heycam/webidl/issues/345">WebIDL#345</a>
-produces an "arraylike" declaration.
 
 A {{CSSTransformValue}}’s [=values to iterate over=]
 is a [=list=] of {{CSSTransformComponent}}s.
@@ -2014,6 +2014,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
         and with its internal [=matrix/is 2D=] flag set to |is2D|.
 </div>
 
+The <dfn attribute for=CSSTransformValue>length</dfn> attribute indicates how many transform components are contained within the {{CSSTransformValue}}.
+
+The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform component at the provided index.
 
 <xmp class=idl>
     interface CSSTransformComponent {
