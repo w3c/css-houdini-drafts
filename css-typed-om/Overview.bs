@@ -221,8 +221,6 @@ This list is initialized differently depending on where the {{CSSStyleValue}} is
 [[#declared-stylepropertymap-objects]], and
 [[#inline-stylepropertymap-objects]]).
 
-All properties stored on the [=contained properties map=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
-
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
 their value is a list of parallel grammar terms,
