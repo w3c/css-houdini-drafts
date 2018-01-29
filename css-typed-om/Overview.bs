@@ -117,13 +117,13 @@ Some particular considerations:
 {{CSSStyleValue}} objects {#stylevalue-objects}
 ============================================
 
-<pre class='idl'>
+<xmp class='idl'>
 interface CSSStyleValue {
     stringifier;
     static CSSStyleValue? parse(DOMString property, DOMString cssText);
-    static sequence&lt;CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
+    static sequence<CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
 };
-</pre>
+</xmp>
 
 {{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
 
