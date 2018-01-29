@@ -377,18 +377,21 @@ probably in an appendix.
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
+    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/entry=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-    4. If |props|[|property|] [=map/exists=],
+    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
+
+    5. If |props|[|property|] [=map/exists=],
         [=map/remove=] it.
 
-    5. Let |values to set| be an empty [=list=].
+    6. Let |values to set| be an empty [=list=].
 
-    6. For each |value| in |values|,
+    7. For each |value| in |values|,
         [=normalize a style value=] for |property| and |value|,
         and append the result to |values to set|.
 
-    7. Set |props|[|property|] to |values to set|.
+    8. Set |props|[|property|] to |values to set|.
 
     Note: The property is deleted then added back
     so that it gets put at the end of the [=ordered map=],
