@@ -2461,38 +2461,6 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
         set to |url|.
 </div>
 
-
-<!--
-████████  ███████  ██    ██ ████████ ████████    ███     ██████  ████████
-██       ██     ██ ███   ██    ██    ██         ██ ██   ██    ██ ██
-██       ██     ██ ████  ██    ██    ██        ██   ██  ██       ██
-██████   ██     ██ ██ ██ ██    ██    ██████   ██     ██ ██       ██████
-██       ██     ██ ██  ████    ██    ██       █████████ ██       ██
-██       ██     ██ ██   ███    ██    ██       ██     ██ ██    ██ ██
-██        ███████  ██    ██    ██    ██       ██     ██  ██████  ████████
--->
-
-{{CSSFontFaceValue}} objects {#fontfacevalue-objects}
------------------------------------------------------
-
-<pre class='idl'>
-
-[Constructor(DOMString fontFamilyName)]
-interface CSSFontFaceValue : CSSResourceValue {
-    readonly attribute DOMString fontFamilyName;
-};
-
-</pre>
-
-Issue(293): Add a src?
-
-{{CSSFontFaceValue}} objects are opaque representations of the contents of
-@font-face rules. They are used to pass font information into [=paint image definition=]s,
-via [=custom properties=].
-
-As font data may need to be fetched from a remote source, {{CSSFontFaceValue}} is a subclass
-of {{CSSResourceValue}}.
-
 Issue(159): Spec up ColorValue
 
 <!--
@@ -3052,12 +3020,6 @@ of serializations of the contained {{CSSTransformComponent}} objects.
 {{CSSURLImageValue}} objects are serialized to the string given by
 'url("' + {{CSSURLImageValue/url}} + '")'.
 
-{{CSSFontFaceValue}} Serialization {#fontfacevalue-serialization}
------------------------------------------------------------------
-
-{{CSSFontFaceValue}} objects are serialized to the value of their contained
-{{CSSFontFaceValue/fontFamilyName}}.
-
 Serialization from CSSOM Values {#cssom-serialization}
 ------------------------------------------------------
 
@@ -3249,8 +3211,3 @@ Computed {{CSSImageValue}} objects {#computed-imagevalue-objects}
 -----------------------------------------------------------------
 
 Computed {{CSSImageValue}} objects are as specified.
-
-Computed {{CSSFontFaceValue}} objects {#computed-fontfacevalue-objects}
----------------------------------------------------------------
-
-Computed {{CSSFontFaceValue}} objects are as specified.
