@@ -267,9 +267,6 @@ probably in an appendix.
     like each "layer" in a 'background-image' property.
 </div>
 
-A <dfn>valid CSS property</dfn> is defined as a property that either is a valid CSS property name, 
-or is a custom property that starts with two dashes (U+002D HYPHEN).
-
 <div algorithm>
     The <dfn method for=StylePropertyMap>append(|property|, ...|values|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
@@ -425,6 +422,10 @@ if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
 but applies to [=strings=],
 rather than [=identifiers=];
 it can be used without invoking the CSS parser.)
+
+A [=string=] is a <dfn>valid CSS property</dfn>
+if it is a [=custom property name string=],
+or is a CSS property name recognized by the user agent.
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
