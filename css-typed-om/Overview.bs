@@ -202,7 +202,6 @@ interface StylePropertyMapReadOnly {
        see https://github.com/heycam/webidl/issues/60 */
     sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
-    sequence<DOMString> getProperties();
     stringifier;
 };
 
@@ -217,13 +216,23 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 };
 </xmp>
 
-A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
-which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
-This list is initialized differently depending on where the {{CSSStyleValue}} is used
-(see
-[[#computed-stylepropertymapreadonly-objects]],
-[[#declared-stylepropertymap-objects]], and
-[[#inline-stylepropertymap-objects]]).
+<div algorithm>
+    A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
+    which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
+    This list is initialized differently depending on where the {{CSSStyleValue}} is used
+    (see
+    [[#computed-stylepropertymapreadonly-objects]],
+    [[#declared-stylepropertymap-objects]], and
+    [[#inline-stylepropertymap-objects]]).
+
+    Unless otherwise stated,
+    the initial ordering of the [=StylePropertyMap/map entries=]
+    is based on the key of each entry:
+
+    1. Non-custom properties, sorted in increasing code-point order.
+        (Note that non-custom properties are always lowercased in {{StylePropertyMap}}s.)
+    2. Custom properties, sorted in increasing code-point order.
+</div>
 
 All properties stored on the [=StylePropertyMap/map entries=] in {{StylePropertyMapReadOnly}} are [=ASCII case-insensitive=].
 
@@ -399,13 +408,6 @@ probably in an appendix.
 </div>
 
 Issue: Do we need an updateAll() method that gets and sets a list?
-
-The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the contained properties maped in
-the [=StylePropertyMap/map entries=]. This list of properties is sorted in the following manner:
-
-*   normal properties are sorted alphabetically.
-*   custom properties are sorted by increasing code point order.
-*   custom properties are sorted after normal properties.
 
 [=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
 
