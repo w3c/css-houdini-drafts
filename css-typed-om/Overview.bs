@@ -675,9 +675,6 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
     };
 </xmp>
 
-Issue(482): Figure out how we want to represent the type of an expression in JS,
-and define the type() method accordingly.
-
 The methods on the {{CSSNumericValue}} superclass
 represent operations that all numeric values can perform.
 
@@ -1009,6 +1006,24 @@ The following are the arithmetic operations you can perform on dimensions:
     7. Return a new {{CSSMathSum}} object
         whose {{CSSMathSum/values}} internal slot
         is set to |result|.
+</div>
+
+<div algorithm="CSSNumericValue.type()">
+    The <dfn method for=CSSNumericValue>type()</dfn> method
+    returns a representation of the [=type=] of |this|.
+
+    When called, it must perform the following steps:
+
+    1. Let |result| be a new {{CSSNumericType}} with all attributes set to `null`.
+
+    2. For each |baseType| → |power| in the [=type=] of |this|,
+        1. If |power| is not 0,
+            set |result|'s |baseType| attribute to |power|.
+
+    3. If the [=percent hint=] of |this| is not null,
+        1. Set {{CSSNumericType/percentHint}} to the [=percent hint=] of |this|.
+
+    4. Return |result|.
 </div>
 
 <div algorithm="sum value">
