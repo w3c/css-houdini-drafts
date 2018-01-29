@@ -2071,15 +2071,17 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. If |x|, |y|, or |z| (if passed)
-        don't match <<length-percentage>>,
+    1. If |x| or |y| don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. Let |this| be a new {{CSSTranslate}} object,
+    2. If |z| was passed, but doesn't match <<length>>,
+        [=throw=] a {{TypeError}}.
+
+    3. Let |this| be a new {{CSSTranslate}} object,
         with its {{CSSTranslate/x}} and {{CSSTranslate/y}} internal slots
         set to |x| and |y|.
 
-    3. If |z| was passed,
+    4. If |z| was passed,
         set |this|’s {{CSSTranslate/z}} internal slot
         to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
@@ -2091,7 +2093,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
-    5. Return |this|.
+    6. Return |this|.
 </div>
 
 <div algorithm="CSSRotate(angle)">
