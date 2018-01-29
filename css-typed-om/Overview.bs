@@ -2071,10 +2071,10 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when invoked,
     perform the following steps:
 
-    1. If |x|, |y|, don't match <<length-percentage>>,
+    1. If |x| or |y| don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. If |z| (if passed) doesn't match <<length>>,
+    2. If |z| was passed, but doesn't match <<length>>,
         [=throw=] a {{TypeError}}.
 
     3. Let |this| be a new {{CSSTranslate}} object,
