@@ -195,6 +195,7 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <xmp class='idl'>
+[Exposed=Window,PaintWorklet]
 interface StylePropertyMapReadOnly {
     readonly maplike<DOMString, sequence<CSSStyleValue>>;
     any get(DOMString property);
@@ -208,7 +209,6 @@ interface StylePropertyMapReadOnly {
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
-[Exposed=Window,PaintWorklet]
 interface StylePropertyMap : StylePropertyMapReadOnly {
     maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
