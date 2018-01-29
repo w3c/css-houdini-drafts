@@ -382,9 +382,9 @@ probably in an appendix.
 
     5. Let |values to set| be an empty [=list=].
 
-    6. For each |value| in |values|:
-        1. [=Normalize a style value=] for |property| and |value|,
-            and append the result to |values to set|.
+    6. For each |value| in |values|,
+        [=normalize a style value=] for |property| and |value|,
+        and append the result to |values to set|.
 
     7. Set |props|[|property|] to |values to set|.
 
