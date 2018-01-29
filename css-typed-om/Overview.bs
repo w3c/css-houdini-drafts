@@ -209,6 +209,7 @@ interface StylePropertyMapReadOnly {
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
+[Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
     maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
