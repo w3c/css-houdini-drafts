@@ -572,6 +572,7 @@ Numeric Values: {#numeric-objects}
 
 {{CSSNumericValue}} objects represent CSS values that are numeric in nature
 (<<number>>s, <<percentage>>s, <<dimension>>s).
+There are two interfaces that inherit from {{CSSNumericValue}}:
 
 * {{CSSUnitValue}} objects represent values that contain a single unit type
     (for example "42px").
