@@ -208,11 +208,12 @@ interface StylePropertyMapReadOnly {
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
+[Exposed=Window,PaintWorklet]
 interface StylePropertyMap : StylePropertyMapReadOnly {
     maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
     void delete(DOMString property);
-    void set(DOMString property, (CSSStyleValue or DOMString)... values);
+    [Exposed=PaintWorklet] void set(DOMString property, (CSSStyleValue or DOMString)... values);
     void update(DOMString property, UpdateFunction updateFunction);
 };
 </xmp>
