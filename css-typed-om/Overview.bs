@@ -120,8 +120,8 @@ Some particular considerations:
 <xmp class='idl'>
 interface CSSStyleValue {
     stringifier;
-    static CSSStyleValue? parse(DOMString property, DOMString cssText);
-    static sequence<CSSStyleValue>? parseAll(DOMString property, DOMString cssText);
+    static CSSStyleValue parse(DOMString property, DOMString cssText);
+    static sequence<CSSStyleValue> parseAll(DOMString property, DOMString cssText);
 };
 </xmp>
 
@@ -136,50 +136,78 @@ return a normalized representation
 (see [[#stylevalue-normalization]])
 of the value the {{CSSStyleValue}} object represents.
 
-The <dfn method for=CSSStyleValue>parse(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
-when invoked, must [=parse a CSSStyleValue=] with property <var>property</var>, cssText <var>cssText</var>,
-and parseMultiple set to false.
+The <dfn method for=CSSStyleValue>parse(|property|, |cssText|)</dfn> method,
+when invoked, 
+must [=parse a CSSStyleValue=] 
+with property |property|, cssText |cssText|, and parseMultiple set to false.
 
-The <dfn method for=CSSStyleValue>parseAll(DOMString <var>property</var>, DOMString <var>cssText</var>)</dfn>,
-when invoked, must [=parse a CSSStyleValue=] with property <var>property</var>, cssText <var>cssText</var>,
-and parseMultiple set to true.
+The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn>,
+when invoked, 
+must [=parse a CSSStyleValue=] 
+with property |property|, cssText |cssText|, and parseMultiple set to true.
 
 <div algorithm="parse a CSSStyleValue">
-    To <dfn>parse a CSSStyleValue</dfn> given a <var>property</var>, <var>cssText</var>, and a
-    <var>parseMultiple</var> flag, run these steps:
+    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|, 
+    and a |parseMultiple| flag, run these steps:
 
-    1. Attempt to parse |property| as an <<ident>>.
-        If this fails,
-        [=throw=] a {{TypeError}} and exit this algorithm.
-        Otherwise, let |property| be the parsed result.
-        If |property| does not start with two dashes (U+002D HYPHEN),
+    1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [[=valid CSS property=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. Attempt to <a lt="parse something according to a CSS grammar">parse</a> |cssText| according to |property|’s grammar.
+    3. If |parseMultiple| is true,
+        but |property| is a [=single-valued property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. Attempt to [=CSS/parse=] |cssText| according to |property|’s grammar.
         If this fails,
         [=throw=] a {{TypeError}} and exit this algorithm.
         Otherwise,
-        let |value| be the parsed result.
+        let |whole value| be the parsed result.
 
-    4. If |parseMultiple| is true,
-        subdivide |value| into a list of {{CSSStyleValue}} objects,
-        each representing one [=list-valued property iteration=],
-        and let |value| be the result. Return |value| as a sequence of
-        {{CSSStyleValue}} objects.
+    4. [=Subdivide into iterations=] |whole value|,
+        according to |property|,
+        and let |values| be the result.
 
-    5. If |parseMultiple| is false
-        subdivide |value| into a list of {{CSSStyleValue}} objects,
-        each representing one [=list-valued property iteration=],
-        and let |value| be the first entry in this list.
+    5. [=list/For each=] |value| in |values|,
+        replace it with the result of [=normalize a CSS value|normalizing=] |value| for |property|.
 
-    6. return a {{CSSStyleValue}} representing |value|.
-
+    6. If |parseMultiple| is false,
+        return |values|[0].
+        Otherwise, return |values|.
 </div>
 
-Issue(305): appropriate failure indicators for this algorithm
+<div algorithm>
+    To <dfn export>subdivide into iterations</dfn>
+    a CSS value |whole value|
+    for a property |property|,
+    execute the following steps:
+
+    1. If |property| is a [=single-valued property=],
+        return a [=list=] containing |whole value|.
+
+    2. Otherwise,
+        divide |whole value| into individual iterations,
+        as appropriate for |property|,
+        and return a [=list=] containing the iterations in order.
+
+    <div class=note>
+        How to divide a [=list-valued property=] into iterations
+        is intentionally undefined and hand-wavey at the moment.
+        <em>Generally</em>,
+        you just split it on top-level commas
+        (corresponding to a top-level `<foo>#` term in the grammar),
+        but some legacy properties (such as 'counter-reset')
+        don't separate their iterations with commas,
+        and some properties (such as 'animation')
+        use a special singular value (generally ''animation/none'')
+        to indicate <strong>zero</strong> iterations.
+
+        It's expected to be rigorously defined in the future,
+        but at the moment is explicitly a "you know what we mean" thing.
+    </div>
+</div>
 
 <!--
  ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
@@ -377,7 +405,7 @@ probably in an appendix.
     2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/entry=],
+    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
     4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
@@ -2479,10 +2507,11 @@ Issue(159): Spec up ColorValue
 {{CSSStyleValue}} normalization {#stylevalue-normalization}
 ===========================================================
 
-This section describes how Typed OM objects are constructed from CSS values.
+This section describes how Typed OM objects are constructed from abstract CSS values
+(aka how to <dfn export>normalize a CSS value</dfn> for a given property).
 
 If a property's grammar is more complex than one of the types listed here,
-it produces a raw {{CSSStyleValue}},
+it [=normalizes=] to a raw {{CSSStyleValue}},
 with a <a for=CSSStyleValue>stringification behavior</a>
 that produces the CSSOM serialization of the property.
 
