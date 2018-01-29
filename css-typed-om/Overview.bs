@@ -284,7 +284,7 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    To <dfn>delete a StylePropertyMap</dfn> given a <var>property</var>, run these steps:
+    To <dfn>delete a value from a StylePropertyMap</dfn> given a <var>property</var>, run these steps:
 
     1. If |property| does not start with two dashes (U+002D HYPHEN),
         let |property| be |property| [=ASCII lowercased=].
