@@ -84,6 +84,7 @@ spec:infra;
     type: dfn;
         text: list
         text: code point
+        text: string
 </pre>
 
 Introduction {#intro}
@@ -193,33 +194,47 @@ Issue(305): appropriate failure indicators for this algorithm
 The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
-<pre class='idl'>
+<xmp class='idl'>
+[Exposed=Window,PaintWorklet]
 interface StylePropertyMapReadOnly {
-    CSSStyleValue? get(DOMString property);
-    sequence&lt;CSSStyleValue> getAll(DOMString property);
+    readonly maplike<DOMString, sequence<CSSStyleValue>>;
+    any get(DOMString property);
+    /* 'any' means (undefined or CSSStyleValue) here,
+       see https://github.com/heycam/webidl/issues/60 */
+    sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
-    iterable&lt;DOMString, (CSSStyleValue or sequence&lt;CSSStyleValue>)>;
-    sequence&lt;DOMString> getProperties();
     stringifier;
 };
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
+[Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
+    maplike<DOMString, sequence<CSSStyleValue>>;
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
     void delete(DOMString property);
     void set(DOMString property, (CSSStyleValue or DOMString)... values);
     void update(DOMString property, UpdateFunction updateFunction);
 };
-</pre>
+</xmp>
 
-A {{StylePropertyMapReadOnly}} object has an associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">contained properties map</dfn>,
-which is a [=map=] of property name ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects) pairs.
-This list is initialized differently depending on where the {{CSSStyleValue}} is used
-(see
-[[#computed-stylepropertymapreadonly-objects]],
-[[#declared-stylepropertymap-objects]], and
-[[#inline-stylepropertymap-objects]]).
+<div algorithm>
+    A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
+    which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
+    This list is initialized differently depending on where the {{CSSStyleValue}} is used
+    (see
+    [[#computed-stylepropertymapreadonly-objects]],
+    [[#declared-stylepropertymap-objects]], and
+    [[#inline-stylepropertymap-objects]]).
+
+    Unless otherwise stated,
+    the initial ordering of the [=StylePropertyMap/map entries=]
+    is based on the key of each entry:
+
+    1. Non-custom properties, sorted in increasing code-point order.
+        (Note that non-custom properties are always lowercased in {{StylePropertyMap}}s.)
+    2. Custom properties, sorted in increasing code-point order.
+</div>
 
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
@@ -240,25 +255,22 @@ probably in an appendix.
     that have transitioned from being [=single-valued=] to [=list-valued=].
     To ensure that code written at a time when a property was [=single-valued=]
     does not break when it becomes [=list-valued=] in the future,
-    the {{CSSPropertyMap}} is a <b>multi-map</b>;
+    the {{StylePropertyMap}} is a <b>multi-map</b>;
     it stores <em>list</em> of values for each key,
     but allows you to interact with it as if there was only a single value for each key as well.
 
-    This means that multiple values for a single property in a {{CSSPropertyMap}}
+    This means that multiple values for a single property in a {{StylePropertyMap}}
     do not represent multiple successive definition of that property's value;
     instead, they represent multiple comma-separated sub-values in a single property value,
     like each "layer" in a 'background-image' property.
 </div>
 
-The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
-(CSSStyleValue or DOMString)... <var>values</var>)</dfn> method, when invoked, must
-[=append to a StylePropertyMap=] with property <var>property</var> and values <var>values</var>.
-
 <div algorithm>
-    To <dfn>append to a StylePropertyMap</dfn> given a <var>property</var> and a list of
-    <var>values</var>, run these steps:
+    The <dfn method for=StylePropertyMap>append(|property|, ...|values|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
+    1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=supported property name=],
@@ -267,151 +279,147 @@ The <dfn method for=StylePropertyMap>append(DOMString <var>property</var>,
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    4. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        let |entry| be that entry.
-        Otherwise, create a new entry for |property| with an empty list,
-        add it to the [=contained properties map=],
-        and let |entry| be the newly-created entry.
+    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
-    5. Let |values to append| be the empty list.
+    5. If |props|[|property|] does not [=map/exist=],
+        [=map/set=] |props|[|property|] to an empty [=list=].
 
-    6. For each |value| in |values| if the <a>algorithm that coerces |value| into an appropriate type for a given property</a> does not throw an error, append the returned object to |values to append|.
+    6. Let |temp values| be an empty [=list=].
 
-    7. Append |values to append| to the end of |entry|’s list.
+    7. For each |value| in |values|,
+        [=normalize a style value=] with |property| and |value|,
+        and [=list/append=] the returned value to |temp values|.
+
+    <!-- Using a temp list so that nothing gets mutated if normalizing ends up throwing an error. -->
+
+    8. [=list/Append=] the entries of |temp values| to |props|[|property|].
 </div>
 
 <div algorithm>
-    To <dfn>delete a StylePropertyMap</dfn> given a <var>property</var>, run these steps:
+    The <dfn method for=StylePropertyMap>delete(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
+    1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        remove that entry from the [=contained properties map=].
+    3. If |this|’s [=StylePropertyMap/map entries=] [=contains=] |property|,
+        [=map/remove=] it.
 </div>
 
 <div algorithm>
-    This section describes the <dfn>algorithm that coerces value into an appropriate type for a given property</dfn>, or fails and throws a {{TypeError}}:
-        : If |value| is a {{CSSStyleValue}},
-        :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
-            [=throw=] a {{TypeError}} and exit this algorithm.
-            Otherwise, return the |value|.
-        : If |value| is a {{DOMString}},
-        ::    [=Parse a CSSStyleValue=] with property |property| and value |value| and return the resulting |value|.
-            If the result is null,
-            [=throw=] a {{TypeError}} and exit this algorithm.
-            Otherwise, append each [=list-valued property iteration=] in the result to a |values to append| object
-            and return |values to append|.
-</div>
-
-<div algorithm>
-    To <dfn>get a value from a StylePropertyMap</dfn>, run these steps:
-
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=supported property name=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        return the first value found in that entry.
-
-    4. Else, return `null`.
-</div>
-
-<div algorithm>
-    To <dfn>get all values from a StylePropertyMap</dfn>, run these steps:
-
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=supported property name=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-  
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|:
-        
-        1. If |property| is a [=list-valued property=],
-            return the list of |values| assigned to that property.
-        
-        2. If |property| is not a [=list-valued property=],
-            let |values| initially be the empty [=list=] and append 
-            the |value| assigned to the |property| to this list 
-            and return |values|.
-    
-    4. Else, return an empty [=list=].   
-
-</div>
-
-<div algorithm>
-    To <dfn>check if StylePropertyMap has a property</dfn>, run these steps:
-
-    1. Run the algorithm to [=get a value from a StylePropertyMap=] with property <var>property</var>,
-        1. If the algorithm returns a {{CSSStyleValue}} return true.
-
-        2. If the algorithm returns `null` return false.
-
-</div>
-
-
-<div algorithm>
-    To <dfn>set a value on a StylePropertyMap</dfn>,
+    To <dfn export>normalize a style value</dfn>,
     given a [=string=] |property|
-    and a [=list=] of {{CSSStyleValue}} objects |value|,
-    run these steps:
+    and a [=string=] or {{CSSStyleValue}} |value|:
 
-    1. If |property| does not start with two dashes (U+002D HYPHEN),
+    : If |value| is a {{CSSStyleValue}},
+    :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
+        [=throw=] a {{TypeError}} and exit this algorithm.
+        Otherwise, return the |value|.
+
+    : If |value| is a {{DOMString}},
+    ::  [=Parse a CSSStyleValue=] with property |property|, value |value|, and parseMultiple set to `false`,
+        and return the result.
+
+        Note: This can throw a {{TypeError}} instead.
+</div>
+
+<div algorithm>
+    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">get(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=supported property name=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If {{StylePropertyMap}}’s [=contained properties map=] contains an entry for |property|,
-        let |entry| be that entry.
-        Otherwise, exit the algorithm.
+    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
-    4. Empty the list of |values| currently stored on the |entry|.
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|][0].
 
-    5. Let |values to set| be an empty list.
-
-    6. For each |value| in |values| if the [=algorithm that coerces value into an appropriate type for a given property=] does not throw an error, append the returned object to |values to set|.
-
-    7. Set |values to set| to be |entry|’s list.
+        Otherwise, return `undefined`.
 </div>
-
-The <dfn method for=StylePropertyMap>update(DOMString <var>property</var>,
-UpdateFunction <var>updateFunction</var>)</dfn> method, when invoked, must
-[=update a value in a StylePropertyMap=] with property name
-<var>property</var>, update function <var>updateFunction</var>, and property
-map set to the object this method was invoked on .
 
 <div algorithm>
-    To <dfn>update a value in a StylePropertyMap</dfn> given a <var>property
-    name</var>, <var>update function</var>, and <var>property map</var>, run these
-    steps:
+    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">getAll(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-    1.  Let <var>old value</var> be the result of running the algorithm to
-        [=get a value from a StylePropertyMap=] with property name <var>property
-        name</var> and property map <var>property map</var>.
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
 
-    2.  Let <var>new value</var> be the return value given by [=invoking=] the callback
-        <var>update function</var> with a single input of <var>old value</var>.
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3.  Run the algorithm to [=set a value on a StylePropertyMap=] with property name <var>property name</var>,
-        value <var>new value</var>, and property map <var>property map</var>.
+    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
 
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|].
+        Otherwise, return an empty [=list=].
 </div>
 
-The <dfn method for=StylePropertyMap>getProperties()</dfn> method returns all of the contained properties maped in
-the [=contained properties map=]. This list of properties is sorted in the following manner:
+<div algorithm>
+    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
 
-*   normal properties are sorted alphabetically.
-*   custom properties are sorted by increasing code point order.
-*   custom properties are sorted after normal properties.
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=supported property name=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/entry=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
+
+    5. If |props|[|property|] [=map/exists=],
+        [=map/remove=] it.
+
+    6. Let |values to set| be an empty [=list=].
+
+    7. For each |value| in |values|,
+        [=normalize a style value=] for |property| and |value|,
+        and append the result to |values to set|.
+
+    8. Set |props|[|property|] to |values to set|.
+
+    Note: The property is deleted then added back
+    so that it gets put at the end of the [=ordered map=],
+    which gives the expected behavior in the face of [=shorthand properties=].
+</div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Let |old value| be the result of calling |this|.get(|property|)
+        (using the original value of {{StylePropertyMap/get()}}).
+
+    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
+
+    3. Call |this|.set(|property|, |new value|)
+        (using the original value of {{StylePropertyMap/set()}}).
+</div>
+
+Issue: Do we need an updateAll() method that gets and sets a list?
 
 [=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
+
+A [=string=] is a <dfn>custom property name string</dfn>
+if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
+(This corresponds to the <<custom-property-name>> production,
+but applies to [=strings=],
+rather than [=identifiers=];
+it can be used without invoking the CSS parser.)
 
 Issue(148): add detailed descriptions of the rest of the methods on {{StylePropertyMap}}
 
@@ -444,15 +452,15 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 
 <pre class='idl'>
 partial interface CSSStyleRule {
-    [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
+    [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 </pre>
 
 <dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>attributeStyleMap</dfn>
+in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
 attribute of {{CSSStyleRule}} objects.
 
-When constructed, the [=contained properties map=] for [=declared StylePropertyMap=]
+When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=]
 objects is initialized to contain
 an entry for each property that is paired with at least one valid value inside the
 {{CSSStyleRule}} that the object represents. The value for a given property is
@@ -463,16 +471,17 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 ----------------------------------------------------------------------
 
 <pre class='idl'>
-partial interface Element {
+partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
-<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations attached
-directly to {{Element}}s. They are accessed via the <dfn attribute for=Element>attributeStyleMap</dfn>
-attribute of {{Element}} objects.
+<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations 
+attached directly to {{Element}}s. 
+They are accessed via the <dfn attribute for=ElementCSSInlineStyle>attributeStyleMap</dfn> attribute of {{Element}} objects
+(via the {{ElementCSSInlineStyle}} mixin interface).
 
-When constructed, the [=contained properties map=] for [=inline StylePropertyMap=] objects
+When constructed, the [=StylePropertyMap/map entries=] for [=inline StylePropertyMap=] objects
 is initialized to contain an
 entry for each property that is paired with at least one valid value in the string
 representing the style attribute for the Element that the object is associated with.
@@ -670,6 +679,27 @@ All numeric CSS values
 are represented by subclasses of the {{CSSNumericValue}} interface.
 
 <xmp class=idl>
+    enum CSSNumericBaseType {
+        "length",
+        "angle",
+        "time",
+        "frequency",
+        "resolution",
+        "flex",
+        "percent",
+    };
+
+    dictionary CSSNumericType {
+        long length;
+        long angle;
+        long time;
+        long frequency;
+        long resolution;
+        long flex;
+        long percent;
+        CSSNumericBaseType percentHint;
+    };
+
     interface CSSNumericValue : CSSStyleValue {
         CSSNumericValue add(CSSNumberish... values);
         CSSNumericValue sub(CSSNumberish... values);
@@ -682,14 +712,11 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
         CSSUnitValue to(DOMString unit);
         CSSMathSum toSum(DOMString... units);
-        // ??? type();
+        CSSNumericType type();
 
         static CSSNumericValue parse(DOMString cssText);
     };
 </xmp>
-
-Issue(482): Figure out how we want to represent the type of an expression in JS,
-and define the type() method accordingly.
 
 The methods on the {{CSSNumericValue}} superclass
 represent operations that all numeric values can perform.
@@ -1024,6 +1051,24 @@ The following are the arithmetic operations you can perform on dimensions:
         is set to |result|.
 </div>
 
+<div algorithm="CSSNumericValue.type()">
+    The <dfn method for=CSSNumericValue>type()</dfn> method
+    returns a representation of the [=type=] of |this|.
+
+    When called, it must perform the following steps:
+
+    1. Let |result| be a new {{CSSNumericType}}.
+
+    2. For each |baseType| → |power| in the [=type=] of |this|,
+        1. If |power| is not 0,
+            set |result|[|baseType|] to |power|.
+
+    3. If the [=percent hint=] of |this| is not null,
+        1. Set {{CSSNumericType/percentHint}} to the [=percent hint=] of |this|.
+
+    4. Return |result|.
+</div>
+
 <div algorithm="sum value">
     A <dfn>sum value</dfn>
     is an abstract representation of a {{CSSNumericValue}}
@@ -1138,7 +1183,7 @@ The following are the arithmetic operations you can perform on dimensions:
                             1. Let |item| be a [=tuple=] with its [=sum value/value=]
                                 set to the product of the [=sum value/values=] of |item1| and |item2|,
                                 and its [=sum value/unit map=]
-                                set to the union of the [=sum value/unit maps=] of |item1| and |item2|,
+                                set to the [=product of two unit maps|product=] of the [=sum value/unit maps=] of |item1| and |item2|,
                                 with all [=map/entries=] with a zero value removed.
 
                             2. Append |item| to |temp|.
@@ -1212,6 +1257,21 @@ The following are the arithmetic operations you can perform on dimensions:
 
         3. Return the result of [=multiplying=] all the [=list/items=] of |types|.
     </div>
+
+    <div algorithm>
+        The <dfn>product of two unit maps</dfn> |units1| and |units2|
+        is the result given by the following steps:
+
+        1. Let |result| be a copy of |units1|.
+
+        2. [=map/For each=] |unit| → |power| in |units2|:
+
+            1. If |result|[|unit|] [=map/exists=],
+                increment |result|[|unit|] by |power|.
+            3. Otherwise, set |result|[|unit|] to |power|.
+
+        3. Return |result|.
+    </div>    
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
@@ -1927,7 +1987,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 
     [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
-    interface CSSTranslation : CSSTransformComponent {
+    interface CSSTranslate : CSSTransformComponent {
         attribute CSSNumericValue x;
         attribute CSSNumericValue y;
         attribute CSSNumericValue z;
@@ -1935,7 +1995,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     [Constructor(CSSNumericValue angle),
      Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
-    interface CSSRotation : CSSTransformComponent {
+    interface CSSRotate : CSSTransformComponent {
         attribute CSSNumberish x;
         attribute CSSNumberish y;
         attribute CSSNumberish z;
@@ -1975,7 +2035,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     indicates whether the transform is 2D or 3D.
     When it's `true`,
     the attributes of the transform that are relevant to 3D transforms
-    (such as the {{CSSTranslation/z|CSSTranslation.z}} attribute)
+    (such as the {{CSSTranslate/z|CSSTranslate.z}} attribute)
     simply have no effect on the transform they represent.
 
     Note: This affects the serialization of the object,
@@ -2004,8 +2064,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
     but also prevents "accidentally" flipping a 2D transform into becoming 3D.
 </details>
 
-<div algorithm="CSSTranslation()">
-    The <dfn constructor for=CSSTranslation>CSSTranslation(|x|, |y|, |z|)</dfn> constructor must,
+<div algorithm="CSSTranslate()">
+    The <dfn constructor for=CSSTranslate>CSSTranslate(|x|, |y|, |z|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
@@ -2013,18 +2073,18 @@ is a [=list=] of {{CSSTransformComponent}}s.
         don't match <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. Let |this| be a new {{CSSTranslation}} object,
-        with its {{CSSTranslation/x}} and {{CSSTranslation/y}} internal slots
+    2. Let |this| be a new {{CSSTranslate}} object,
+        with its {{CSSTranslate/x}} and {{CSSTranslate/y}} internal slots
         set to |x| and |y|.
 
     3. If |z| was passed,
-        set |this|’s {{CSSTranslation/z}} internal slot
+        set |this|’s {{CSSTranslate/z}} internal slot
         to |z|,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `false`.
 
     4. If |z| was not passed,
-        set |this|’s {{CSSTranslation/z}} internal slot
+        set |this|’s {{CSSTranslate/z}} internal slot
         to [=create a CSSUnitValue from a string|new unit value=] of ''0px'',
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
@@ -2032,26 +2092,26 @@ is a [=list=] of {{CSSTransformComponent}}s.
     5. Return |this|.
 </div>
 
-<div algorithm="CSSRotation(angle)">
-    The <dfn constructor for=CSSRotation>CSSRotation(|angle|)</dfn> constructor must,
+<div algorithm="CSSRotate(angle)">
+    The <dfn constructor for=CSSRotate>CSSRotate(|angle|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
     1. If |angle| doesn't match <<angle>>,
         [=throw=] a {{TypeError}}.
 
-    2. Return a new {{CSSRotation}}
-        with its {{CSSRotation/angle}} internal slot
+    2. Return a new {{CSSRotate}}
+        with its {{CSSRotate/angle}} internal slot
         set to |angle|,
-        its {{CSSRotation/x}} and {{CSSRotation/y}} internal slots
+        its {{CSSRotate/x}} and {{CSSRotate/y}} internal slots
         set to [=create a CSSUnitValue from a string|new unit values=] of ''0'',
-        its {{CSSRotation/z}} internal slot
+        its {{CSSRotate/z}} internal slot
         set to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
-<div algorithm="CSSRotation(x, y, z, angle)">
-    The <dfn constructor for=CSSRotation>CSSRotation(|x|, |y|, |z|, |angle|)</dfn> constructor must,
+<div algorithm="CSSRotate(x, y, z, angle)">
+    The <dfn constructor for=CSSRotate>CSSRotate(|x|, |y|, |z|, |angle|)</dfn> constructor must,
     when invoked,
     perform the following steps:
 
@@ -2065,10 +2125,10 @@ is a [=list=] of {{CSSTransformComponent}}s.
         don't match <<number>>,
         [=throw=] a {{TypeError}}.
 
-    4. Return a new {{CSSRotation}}
-        with its {{CSSRotation/angle}} internal slot
+    4. Return a new {{CSSRotate}}
+        with its {{CSSRotate/angle}} internal slot
         set to |angle|,
-        its {{CSSRotation/x}}, {{CSSRotation/y}}, {{CSSRotation/z}} internal slots set to |x|, |y|, and |z|,
+        its {{CSSRotate/x}}, {{CSSRotate/y}}, {{CSSRotate/z}} internal slots set to |x|, |y|, and |z|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
@@ -2168,7 +2228,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 <div class=note>
     Each {{CSSTransformComponent}} can correspond to
     one of a number of underlying transform functions.
-    For example, a {{CSSTranslation}}
+    For example, a {{CSSTranslate}}
     with an x value of ''10px''
     and y &amp; z values of ''0px'' could represent any of the following:
 
@@ -2675,8 +2735,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         : ''translate3d()''
         : ''translateZ()''
         ::
-            1. Return a new {{CSSTranslation}} object,
-                whose {{CSSTranslation/x}}, {{CSSTranslation/y}}, and {{CSSTranslation/z}} internal slots
+            1. Return a new {{CSSTranslate}} object,
+                whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
                 are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
                 or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
@@ -2703,10 +2763,10 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         : ''rotateY()''
         : ''rotateZ()''
         ::
-            1. Return a new {{CSSRotation}} object,
-                whose {{CSSRotation/angle}} internal slot
+            1. Return a new {{CSSRotate}} object,
+                whose {{CSSRotate/angle}} internal slot
                 is set to the [=normalize a numeric value|normalization=] of the specified angle,
-                and whose {{CSSRotation/x}}, {{CSSRotation/y}}, and {{CSSRotation/z}} internal slots
+                and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
                 are set to the specified rotation axis coordinates,
                 or the implicit axis coordinates if not specified in |func|
                 and whose {{CSSTransformComponent/is2D}} internal slot
@@ -3136,7 +3196,7 @@ Computed {{CSSTransformValue}} objects {#computed-transformvalue-objects}
 -------------------------------------------------------------------------
 
 During computation, any {{CSSNumericValue}} objects referenced by a {{CSSTransformComponent}}
-(e.g. the {{CSSTranslation/x}} attribute of a {{CSSTranslation}}) are
+(e.g. the {{CSSTranslate/x}} attribute of a {{CSSTranslate}}) are
 computed according to [[#computed-numericvalue-objects]], but the
 {{CSSTransformValue}} object is otherwise as specified.
 
