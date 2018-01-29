@@ -323,7 +323,7 @@ probably in an appendix.
         Otherwise, return the |value|.
 
     : If |value| is a {{DOMString}},
-    ::  [=Parse a CSSStyleValue=] with property |property|, value |value|, and parseMultiple set to `false`,
+    ::  [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple set to `false`,
         and return the result.
 
         Note: This can throw a {{TypeError}} instead.
