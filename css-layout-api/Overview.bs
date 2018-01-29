@@ -104,10 +104,8 @@ computed style and <a>box tree</a> changes.
 Layout API Containers {#layout-api-containers}
 ==============================================
 
-<pre class="propdef">
-    Name: <<display-inside>>
-    New values: layout(<<ident>>)
-</pre>
+A new <a href="https://www.w3.org/TR/css-values-3/#comb-one">alternative</a> value is added
+to the <<display-inside>> production: <code>layout(<<ident>>)</code>.
 
 <dl dfn-for="display" dfn-type=value>
     <dt><dfn>layout()</dfn>
