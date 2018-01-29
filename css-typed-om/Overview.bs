@@ -1327,7 +1327,7 @@ rather than on {{CSSNumericValue}} instances.
         and abort this algorithm.
 
     2. If |result| is not a <<number-token>>, <<percentage-token>>, <<dimension-token>>,
-        or a <<calc()>>,
+        or a [=math function=],
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
 
