@@ -1140,7 +1140,7 @@ The following are the arithmetic operations you can perform on dimensions:
                             1. Let |item| be a [=tuple=] with its [=sum value/value=]
                                 set to the product of the [=sum value/values=] of |item1| and |item2|,
                                 and its [=sum value/unit map=]
-                                set to the union of the [=sum value/unit maps=] of |item1| and |item2|,
+                                set to the [=product of two unit maps|product=] of the [=sum value/unit maps=] of |item1| and |item2|,
                                 with all [=map/entries=] with a zero value removed.
 
                             2. Append |item| to |temp|.
@@ -1214,6 +1214,21 @@ The following are the arithmetic operations you can perform on dimensions:
 
         3. Return the result of [=multiplying=] all the [=list/items=] of |types|.
     </div>
+
+    <div algorithm>
+        The <dfn>product of two unit maps</dfn> |units1| and |units2|
+        is the result given by the following steps:
+
+        1. Let |result| be a copy of |units1|.
+
+        2. [=map/For each=] |unit| → |power| in |units2|:
+
+            1. If |result|[|unit|] [=map/exists=],
+                increment |result|[|unit|] by |power|.
+            3. Otherwise, set |result|[|unit|] to |power|.
+
+        3. Return |result|.
+    </div>    
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
