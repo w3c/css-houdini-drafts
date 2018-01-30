@@ -2061,7 +2061,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
     };
 
     dictionary CSSMatrixComponentOptions {
-        boolean is2D;
+        required boolean is2D = false;
     };
 </xmp>
 
@@ -2250,10 +2250,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
         with its {{CSSMatrixComponent/matrix}} internal slot
         set to |matrix|.
 
-    2. If |options| was passed
-        and has a {{CSSMatrixComponentOptions}} field,
+    2. If |options| was passed,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
-        to the value of that field.
+        to the |option|'s {{CSSMatrixComponentOptions/is2D}} member.
 
     3. Otherwise,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
