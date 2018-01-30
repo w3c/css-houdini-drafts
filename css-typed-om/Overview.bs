@@ -1970,7 +1970,7 @@ They "contain" one or more {{CSSTransformComponent}}s,
 which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
-[Constructor(optional sequence<CSSTransformComponent> transforms)]
+[Constructor(sequence<CSSTransformComponent> transforms)]
 interface CSSTransformValue : CSSStyleValue {
     iterable<CSSTransformComponent>;
     readonly attribute unsigned long length;
@@ -1989,7 +1989,10 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when called,
     perform the following steps:
 
-    1. Return a new {{CSSTransformValue}} whose [=values to iterate over=] is |transforms|.
+    1. If |transforms| [=list/is empty=],
+        [=throw=] a {{TypeError}}.
+
+    2. Return a new {{CSSTransformValue}} whose [=values to iterate over=] is |transforms|.
 </div>
 
 <div algorithm="CSSTransformValue.is2D">
