@@ -543,9 +543,10 @@ interface CSSUnparsedValue : CSSStyleValue {
     getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
 };
 
+[Constructor(DOMString variable, optional CSSUnparsedValue fallback)]
 interface CSSVariableReferenceValue {
     attribute DOMString variable;
-    attribute CSSUnparsedValue? fallback;
+    readonly attribute CSSUnparsedValue? fallback;
 };
 </pre>
 
@@ -559,6 +560,19 @@ This list is the object's [=values to iterate over=].
 The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
 
 The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
+
+<div algorithm>
+    The <dfn constructor for=CSSVariableReferenceValue>CSSVariableReferenceValue(|variable|, |fallback|)</dfn> constructor must,
+    when called,
+    perform the following steps:
+
+    1. Return a new {{CSSVariableReferenceValue}}
+        with its {{CSSVariableReferenceValue/variable}} internal slot
+        set to |variable|
+        and its {{CSSVariableReferenceValue/fallback}} internal slot
+        set to |fallback| (if passed)
+        or `null` otherwise.
+</div>
 
 <!--
 ██    ██ ████████ ██    ██ ██      ██  ███████  ████████  ████████
