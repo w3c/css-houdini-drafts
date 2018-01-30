@@ -2789,9 +2789,9 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 {{CSSPositionValue}} normalization {#positionvalue-normalization}
 -----------------------------------------------------------------
 
-If the provided value matches the <<position>> production, then a {{CSSPositionValue}} is constructed
-with <var>x</var> and <var>y</var> components determined via the following process. If this process, or
-any sub-process referenced by this process fails, then normalization as a whole fails.
+CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var> 
+components determined via the following process. If this process, or any sub-process referenced by this 
+process fails, then normalization as a whole fails.
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
