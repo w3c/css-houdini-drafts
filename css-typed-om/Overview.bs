@@ -1620,19 +1620,21 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm>
-    To <dfn export>create a CSSUnitValue from a string</dfn> |str|,
+    To <dfn export>create a CSSUnitValue from a pair</dfn> (|num|, |unit|),
     return a new {{CSSUnitValue}} object
     with its {{CSSUnitValue/value}} internal slot
-    set to the numeric portion of |str| parsed into a number,
+    set to |num|,
     and its {{CSSUnitValue/unit}} internal slot
-    set to the unit portion of |str|,
-    or "number" or "percent" if |str| is a plain number or percent.
+    set to |unit|.
 
     <div class=example>
-        For example, [=create a CSSUnitValue from a string|creating a CSSUnitValue=] from ''5px''
+        For example, [=create a CSSUnitValue from a pair|creating a CSSUnitValue=] from `(5, "px")`
         creates an object equivalent to
         <code>new CSSUnitValue(5, "px")</code>.
     </div>
+
+    Note: This is a spec-internal algorithm,
+    meant simply to make it easier to create unit values in algorithms when needed.
 </div>
 
 <div algorithm>
@@ -2139,7 +2141,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 
     4. If |z| was not passed,
         set |this|’s {{CSSTranslate/z}} internal slot
-        to [=create a CSSUnitValue from a string|new unit value=] of ''0px'',
+        to [=create a CSSUnitValue from a pair|new unit value=] of `(0, "px")`,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
