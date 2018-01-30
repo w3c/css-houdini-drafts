@@ -1706,7 +1706,11 @@ interface CSSMathMax : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
-interface CSSNumericArray {}; // See issue below
+interface CSSNumericArray {
+    iterable<CSSNumericValue>;
+    readonly attribute unsigned long length;
+    getter CSSNumericValue (unsigned long index);
+};
 
 enum CSSMathOperator {
     "sum",
@@ -1717,10 +1721,6 @@ enum CSSMathOperator {
     "max",
 };
 </xmp>
-
-Issue(486): {{CSSNumericArray}} will be an Array-like
-restricted to containing CSSNumericValue objects.
-This is dependent on [WebIDL#345](https://github.com/heycam/webidl/issues/345) getting resolved properly.
 
 Note: CSSMathValue, being a pure superclass,
 cannot be directly constructed.
@@ -1832,6 +1832,9 @@ of all the "math" operations.
     </dl>
 </div>
 
+The <dfn attribute for=CSSNumericArray>length</dfn> attribute of {{CSSNumericArray}} indicates how many {{CSSNumericValue}}s are contained within the {{CSSNumericArray}}.
+
+The <dfn for=CSSNumericArray>indexed getter</dfn> of {{CSSNumericArray}} retrieves the {{CSSNumericValue}} at the provided index.
 
 <!--
 ██    ██ ██     ██ ██     ██        ██████   ██████   ██████
