@@ -504,8 +504,9 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     of a {{CSSVariableReferenceValue}} |this| must, on setting a
     variable |variable|, perform the following steps:
 
-    1. If |variable| does not start with two dashes (U+002D HYPHEN), [=throw=] a
-        {{TypeError}}, and exit this algorithm.
+    1. If |variable| is not a [=custom property name string=], 
+        [=throw=] a {{TypeError}},
+        and exit this algorithm.
 
     2. Otherwise, set |this|’s {{CSSVariableReferenceValue/variable}} internal slot,
         to |variable|.
