@@ -549,8 +549,6 @@ interface CSSVariableReferenceValue {
 };
 </pre>
 
-Issue(239): Is this the best representation for this object?
-
 {{CSSUnparsedValue}} objects represent values that reference custom properties.
 They represent a list of string fragments and variable references.
 
