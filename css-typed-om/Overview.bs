@@ -509,7 +509,8 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
         with its {{CSSVariableReferenceValue/variable}} internal slot
         set to |variable|
         and its {{CSSVariableReferenceValue/fallback}} internal slot
-        set to |fallback| (if passed).
+        set to |fallback| (if passed)
+        or `null` otherwise.
 </div>
 
 <!--
