@@ -1991,9 +1991,9 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when called,
     perform the following steps:
 
-    1. Let |matrix| be a 4x4 matrix,
-        initially set to the identity matrix.
-        Let |is2D| be a boolean initially set to `true`.
+    1. Let |matrix| be a new {{DOMMatrix}},
+        initialized to the identity matrix,
+        with its {{DOMMatrix/is2D}} internal slot set to `true`.
 
     2. [=list/For each=] |func| in |this|’s [=values to iterate over=]:
 
@@ -2001,12 +2001,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
             calling {{CSSTransformComponent/toMatrix()}} on |func|.
         2. Set |matrix| to the result of multiplying |matrix|
             and the matrix represented by |funcMatrix|.
-        3. If |funcMatrix|’s {{DOMMatrix/is2D}} internal slot is `false`,
-            set |is2D| to `false`.
 
-    3. Return a new {{DOMMatrix}}
-        representing |matrix|,
-        and with its internal [=matrix/is 2D=] flag set to |is2D|.
+    3. Return |matrix|.
 </div>
 
 
@@ -2100,22 +2096,24 @@ is a [=list=] of {{CSSTransformComponent}}s.
     when called,
     perform the following steps:
 
-    1. Let |is2D| be a boolean initially set to `true`.
-
-    2. Let |matrix| be |this|’s equivalent 4x4 transform matrix,
-        as defined in [[css-transforms-1#mathematical-description]].
+    1. Let |matrix| be a new {{DOMMatrix}} object,
+        initialized to |this|’s equivalent 4x4 transform matrix,
+        as defined in [[css-transforms-1#mathematical-description]],
+        and with its {{DOMMatrixReadOnly/is2D}} internal slot
+        set to the same value as |this|'s {{CSSTransformComponent/is2D}} internal slot.
+        
+        Note: Recall that the {{CSSTransformComponent/is2D}} flag
+        affects what transform,
+        and thus what equivalent matrix,
+        a {{CSSTransformComponent}} represents.
 
         As the entries of such a matrix are defined relative to the ''px'' unit,
         if any <<length>>s in |this| involved in generating the matrix
-        are not [=compatible units=] with ''px'',
+        are not [=compatible units=] with ''px''
+        (such as [=relative lengths=] or [=percentages=]),
         [=throw=] a {{TypeError}}.
 
-    3. If |this|’s {{CSSTransformComponent/is2D}} internal slot is `false`,
-        set |is2D| to `false`.
-
-    3. Return a new {{DOMMatrix}}
-        representing |matrix|,
-        and with its internal [=matrix/is 2D=] flag set to |is2D|.
+    2. Return |matrix|.
 </div>
 
 
