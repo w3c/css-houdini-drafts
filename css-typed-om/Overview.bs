@@ -3102,7 +3102,9 @@ length3.toString(); // "42px";
 ---------------------------------------------------------
 
 <div algorithm>
-    To <dfn export>serialize a {{CSSMathValue}}</dfn> |this|:
+    To <dfn export>serialize a {{CSSMathValue}}</dfn> |this|,
+    with additional flags |nested|, a boolean (defaulting to false if unspecified),
+    and |paren-less|, a boolean (defaulting to false if unspecified):
 
     1. Let |s| initially be the empty [=string=].
 
@@ -3110,77 +3112,102 @@ length3.toString(); // "42px";
         1. Append "min(" or "max(" to |s|, as appropriate.
 
         2. [=list/For each=] |arg| in |this|’s {{CSSMathMin/values}} internal slot,
-            serialize |arg| and append the result to |s|,
+            serialize |arg| with |nested| and |paren-less| both true,
+            and append the result to |s|,
             appending a ", " between successive values.
 
         3. Append ")" to |s|
             and return |s|.
 
     3. Otherwise, if |this| is a {{CSSMathSum}}:
-        1. If |this| is nested inside of another {{CSSMathValue}} object,
+        1. If |paren-less| is true,
+            continue to the next step;
+            otherwise, if |nested| is true,
             append "(" to |s|;
             otherwise, append "calc(" to |s|.
 
         2. Serialize the first [=list/item=] in |this|’s {{CSSMathSum/values}} internal slot
+            with |nested| set to true,
             and append the result to |s|.
 
         3. [=list/For each=] |arg| in |this|’s {{CSSMathSum/values}} internal slot beyond the first:
             1. If |arg| is a {{CSSMathNegate}},
                 append " - " to |s|,
-                then serialize |arg|'s {{CSSMathNegate/value}} internal slot
+                then serialize |arg|'s {{CSSMathNegate/value}} internal slot 
+                with |nested| set to true,
                 and append the result to |s|.
             2. Otherwise, append " + " to |s|,
                 then serialize |arg|
+                with |nested| set to true,
                 and append the result to |s|.
 
-        4. Append ")" to |s|,
-            and return |s|.
+        4. If |paren-less| is false,
+            append ")" to |s|,
+        
+        5. Return |s|.
 
     4. Otherwise, if |this| is a {{CSSMathNegate}}:
-        1. If |this| is nested inside of another {{CSSMathValue}} object,
+        1. If |paren-less| is true,
+            continue to the next step;
+            otherwise, if |nested| is true,
             append "(" to |s|;
             otherwise, append "calc(" to |s|.
 
         2. Append "-" to |s|.
 
         3. Serialize |this|’s {{CSSMathNegate/value}} internal slot
+            with |nested| set to true,
             and append the result to |s|.
 
-        4. Append ")" to |s|,
-            and return |s|.
+        4. If |paren-less| is false,
+            append ")" to |s|,
+        
+        5. Return |s|.
 
     5. Otherwise, if |this| is a {{CSSMathProduct}}:
-        1. If |this| is nested inside of another {{CSSMathValue}} object,
+        1. If |paren-less| is true,
+            continue to the next step;
+            otherwise, if |nested| is true,
             append "(" to |s|;
             otherwise, append "calc(" to |s|.
 
         2. Serialize the first [=list/item=] in |this|’s {{CSSMathProduct/values}} internal slot
+            with |nested| set to true,
             and append the result to |s|.
 
         3. [=list/For each=] |arg| in |this|’s {{CSSMathProduct/values}} internal slot beyond the first:
             1. If |arg| is a {{CSSMathInvert}},
                 append " / " to |s|,
                 then serialize |arg|'s {{CSSMathInvert/value}} internal slot
+                with |nested| set to true,
                 and append the result to |s|.
             2. Otherwise, append " * " to |s|,
                 then serialize |arg|
+                with |nested| set to true,
                 and append the result to |s|.
 
-        4. Append ")" to |s|,
-            and return |s|.
+        4. If |paren-less| is false,
+            append ")" to |s|,
+        
+        5. Return |s|.
 
     6. Otherwise, if |this| is a {{CSSMathInvert}}:
-        1. If |this| is nested inside of another {{CSSMathValue}} object,
+        1. If |paren-less| is true,
+            continue to the next step;
+            otherwise, if |nested| is true,
             append "(" to |s|;
             otherwise, append "calc(" to |s|.
 
         2. Append "1 / " to |s|.
 
         3. Serialize |this|’s {{CSSMathInvert/value}} internal slot
+            with |nested| set to true,
             and append the result to |s|.
 
-        4. Append ")" to |s|,
-            and return |s|.
+        4. If |paren-less| is false,
+            append ")" to |s|,
+        
+        5. Return |s|.
 </div>
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
