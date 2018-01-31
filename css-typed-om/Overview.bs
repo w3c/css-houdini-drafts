@@ -3101,86 +3101,87 @@ length3.toString(); // "42px";
 {{CSSMathValue}} Serialization {#calc-serialization}
 ---------------------------------------------------------
 
-{{CSSMathValue}} objects are serialized into a [=math function=] as follows:
+<div algorithm>
+    To <dfn export>serialize a {{CSSMathValue}}</dfn> |this|:
 
-1. Let |s| initially be the empty [=string=].
+    1. Let |s| initially be the empty [=string=].
 
-2. If the object is a {{CSSMathMin}} or {{CSSMathMax}}:
-    1. Append "min(" or "max(" to |s|, as appropriate.
+    2. If |this| is a {{CSSMathMin}} or {{CSSMathMax}}:
+        1. Append "min(" or "max(" to |s|, as appropriate.
 
-    2. [=list/For each=] |arg| in the object's {{CSSMathMin/values}} internal slot,
-        serialize |arg| and append the result to |s|,
-        appending a ", " between successive values.
+        2. [=list/For each=] |arg| in |this|’s {{CSSMathMin/values}} internal slot,
+            serialize |arg| and append the result to |s|,
+            appending a ", " between successive values.
 
-    3. Append ")" to |s|
-        and return |s|.
+        3. Append ")" to |s|
+            and return |s|.
 
-3. Otherwise, if the object is a {{CSSMathSum}}:
-    1. If this object is nested inside of another {{CSSMathValue}} object,
-        append "(" to |s|;
-        otherwise, append "calc(" to |s|.
+    3. Otherwise, if |this| is a {{CSSMathSum}}:
+        1. If |this| is nested inside of another {{CSSMathValue}} object,
+            append "(" to |s|;
+            otherwise, append "calc(" to |s|.
 
-    2. Serialize the first [=list/item=] in the object's {{CSSMathSum/values}} internal slot
-        and append the result to |s|.
-
-    3. [=list/For each=] |arg| in the object's {{CSSMathSum/values}} internal slot beyond the first:
-        1. If |arg| is a {{CSSMathNegate}},
-            append " - " to |s|,
-            then serialize |arg|'s {{CSSMathNegate/value}} internal slot
-            and append the result to |s|.
-        2. Otherwise, append " + " to |s|,
-            then serialize |arg|
+        2. Serialize the first [=list/item=] in |this|’s {{CSSMathSum/values}} internal slot
             and append the result to |s|.
 
-    4. Append ")" to |s|,
-        and return |s|.
+        3. [=list/For each=] |arg| in |this|’s {{CSSMathSum/values}} internal slot beyond the first:
+            1. If |arg| is a {{CSSMathNegate}},
+                append " - " to |s|,
+                then serialize |arg|'s {{CSSMathNegate/value}} internal slot
+                and append the result to |s|.
+            2. Otherwise, append " + " to |s|,
+                then serialize |arg|
+                and append the result to |s|.
 
-4. Otherwise, if the object is a {{CSSMathNegate}}:
-    1. If this object is nested inside of another {{CSSMathValue}} object,
-        append "(" to |s|;
-        otherwise, append "calc(" to |s|.
+        4. Append ")" to |s|,
+            and return |s|.
 
-    2. Append "-" to |s|.
+    4. Otherwise, if |this| is a {{CSSMathNegate}}:
+        1. If |this| is nested inside of another {{CSSMathValue}} object,
+            append "(" to |s|;
+            otherwise, append "calc(" to |s|.
 
-    3. Serialize the object's {{CSSMathNegate/value}} internal slot
-        and append the result to |s|.
+        2. Append "-" to |s|.
 
-    4. Append ")" to |s|,
-        and return |s|.
-
-5. Otherwise, if the object is a {{CSSMathProduct}}:
-    1. If this object is nested inside of another {{CSSMathValue}} object,
-        append "(" to |s|;
-        otherwise, append "calc(" to |s|.
-
-    2. Serialize the first [=list/item=] in the object's {{CSSMathProduct/values}} internal slot
-        and append the result to |s|.
-
-    3. [=list/For each=] |arg| in the object's {{CSSMathProduct/values}} internal slot beyond the first:
-        1. If |arg| is a {{CSSMathInvert}},
-            append " / " to |s|,
-            then serialize |arg|'s {{CSSMathInvert/value}} internal slot
-            and append the result to |s|.
-        2. Otherwise, append " * " to |s|,
-            then serialize |arg|
+        3. Serialize |this|’s {{CSSMathNegate/value}} internal slot
             and append the result to |s|.
 
-    4. Append ")" to |s|,
-        and return |s|.
+        4. Append ")" to |s|,
+            and return |s|.
 
-6. Otherwise, if the object is a {{CSSMathInvert}}:
-    1. If this object is nested inside of another {{CSSMathValue}} object,
-        append "(" to |s|;
-        otherwise, append "calc(" to |s|.
+    5. Otherwise, if |this| is a {{CSSMathProduct}}:
+        1. If |this| is nested inside of another {{CSSMathValue}} object,
+            append "(" to |s|;
+            otherwise, append "calc(" to |s|.
 
-    2. Append "1 / " to |s|.
+        2. Serialize the first [=list/item=] in |this|’s {{CSSMathProduct/values}} internal slot
+            and append the result to |s|.
 
-    3. Serialize the object's {{CSSMathInvert/value}} internal slot
-        and append the result to |s|.
+        3. [=list/For each=] |arg| in |this|’s {{CSSMathProduct/values}} internal slot beyond the first:
+            1. If |arg| is a {{CSSMathInvert}},
+                append " / " to |s|,
+                then serialize |arg|'s {{CSSMathInvert/value}} internal slot
+                and append the result to |s|.
+            2. Otherwise, append " * " to |s|,
+                then serialize |arg|
+                and append the result to |s|.
 
-    4. Append ")" to |s|,
-        and return |s|.
+        4. Append ")" to |s|,
+            and return |s|.
 
+    6. Otherwise, if |this| is a {{CSSMathInvert}}:
+        1. If |this| is nested inside of another {{CSSMathValue}} object,
+            append "(" to |s|;
+            otherwise, append "calc(" to |s|.
+
+        2. Append "1 / " to |s|.
+
+        3. Serialize |this|’s {{CSSMathInvert/value}} internal slot
+            and append the result to |s|.
+
+        4. Append ")" to |s|,
+            and return |s|.
+</div>
 
 {{CSSTransformValue}} Serialization {#transformvalue-serialization}
 -------------------------------------------------------------------
