@@ -595,7 +595,11 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     when called,
     perform the following steps:
 
-    1. Return a new {{CSSVariableReferenceValue}}
+    1. If |variable| is not a [=custom property name string=],
+        [=throw=] a {{TypeError}},
+        and exit this algorithm.
+
+    2. Return a new {{CSSVariableReferenceValue}}
         with its {{CSSVariableReferenceValue/variable}} internal slot
         set to |variable|
         and its {{CSSVariableReferenceValue/fallback}} internal slot
