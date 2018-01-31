@@ -118,10 +118,11 @@ Some particular considerations:
 ============================================
 
 <xmp class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSStyleValue {
     stringifier;
-    static CSSStyleValue parse(DOMString property, DOMString cssText);
-    static sequence<CSSStyleValue> parseAll(DOMString property, DOMString cssText);
+    [Exposed=Window] static CSSStyleValue parse(DOMString property, DOMString cssText);
+    [Exposed=Window] static sequence<CSSStyleValue> parseAll(DOMString property, DOMString cssText);
 };
 </xmp>
 
@@ -223,7 +224,7 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 ================================================
 
 <xmp class='idl'>
-[Exposed=Window,PaintWorklet]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface StylePropertyMapReadOnly {
     readonly maplike<DOMString, sequence<CSSStyleValue>>;
     any get(DOMString property);
@@ -245,6 +246,16 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     void update(DOMString property, UpdateFunction updateFunction);
 };
 </xmp>
+
+<!--
+    We restrict the read-write version from workers/worklets
+    because append()/set() require parsing to accept DOMStrings,
+    and leaving it with just delete() doesn't seem useful.
+    That said, theoretically we could still expose them and just only allow CSSStyleValue
+    (throwing on DOMString, I suppose).
+    But we don't have use-cases for setting property maps in workers yet anyway,
+    so we can wait until that matters.
+-->
 
 <div algorithm>
     A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
@@ -463,6 +474,7 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface Element {
     StylePropertyMapReadOnly computedStyleMap();
 };
@@ -483,6 +495,7 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface CSSStyleRule {
     [SameObject] readonly attribute StylePropertyMap styleMap;
 };
@@ -503,6 +516,7 @@ Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
 ----------------------------------------------------------------------
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
@@ -536,6 +550,7 @@ The value for a given property is the last valid value provided in the string.
 ----------------------------------------------
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor((DOMString or CSSVariableReferenceValue)... members)]
 interface CSSUnparsedValue : CSSStyleValue {
     iterable<(DOMString or CSSVariableReferenceValue)>;
@@ -543,6 +558,7 @@ interface CSSUnparsedValue : CSSStyleValue {
     getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(DOMString variable, optional CSSUnparsedValue fallback)]
 interface CSSVariableReferenceValue {
     attribute DOMString variable;
@@ -604,6 +620,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 {{CSSKeywordValue}} objects represent CSS keywords and other [=identifiers=].
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
     attribute DOMString value;
@@ -759,6 +776,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         CSSNumericBaseType percentHint;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     interface CSSNumericValue : CSSStyleValue {
         CSSNumericValue add(CSSNumberish... values);
         CSSNumericValue sub(CSSNumberish... values);
@@ -773,7 +791,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         CSSMathSum toSum(DOMString... units);
         CSSNumericType type();
 
-        static CSSNumericValue parse(DOMString cssText);
+        [Exposed=Window] static CSSNumericValue parse(DOMString cssText);
     };
 </xmp>
 
@@ -1593,6 +1611,7 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <xmp class=idl>
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(double value, DOMString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
@@ -1688,40 +1707,48 @@ are represented in this way.
 </div>
 
 <xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSMathValue : CSSNumericValue {
     readonly attribute CSSMathOperator operator;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish... args)]
 interface CSSMathSum : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish... args)]
 interface CSSMathProduct : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish arg)]
 interface CSSMathNegate : CSSMathValue {
     readonly attribute CSSNumericValue value;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish arg)]
 interface CSSMathInvert : CSSMathValue {
     readonly attribute CSSNumericValue value;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish... args)]
 interface CSSMathMin : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumberish... args)]
 interface CSSMathMax : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSNumericArray {
     iterable<CSSNumericValue>;
     readonly attribute unsigned long length;
@@ -1970,6 +1997,7 @@ They "contain" one or more {{CSSTransformComponent}}s,
 which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(sequence<CSSTransformComponent> transforms)]
 interface CSSTransformValue : CSSStyleValue {
     iterable<CSSTransformComponent>;
@@ -2029,12 +2057,14 @@ The <dfn attribute for=CSSTransformValue>length</dfn> attribute indicates how ma
 The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform component at the provided index.
 
 <xmp class=idl>
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     interface CSSTransformComponent {
         stringifier;
         attribute boolean is2D;
         DOMMatrix toMatrix();
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
     interface CSSTranslate : CSSTransformComponent {
         attribute CSSNumericValue x;
@@ -2042,6 +2072,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         attribute CSSNumericValue z;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(CSSNumericValue angle),
      Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
     interface CSSRotate : CSSTransformComponent {
@@ -2051,6 +2082,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         attribute CSSNumericValue angle;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)]
     interface CSSScale : CSSTransformComponent {
         attribute CSSNumberish x;
@@ -2058,17 +2090,20 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         attribute CSSNumberish z;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
     interface CSSSkew : CSSTransformComponent {
         attribute CSSNumericValue ax;
         attribute CSSNumericValue ay;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(CSSNumericValue length)]
     interface CSSPerspective : CSSTransformComponent {
         attribute CSSNumericValue length;
     };
 
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     [Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
     interface CSSMatrixComponent : CSSTransformComponent {
         attribute DOMMatrix matrix;
@@ -2351,6 +2386,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 used by properties such as 'object-position'.
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
     attribute CSSNumericValue x;
@@ -2430,6 +2466,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 <pre class='idl'>
 enum CSSResourceState {"unloaded", "loading", "loaded", "error"};
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSResourceValue : CSSStyleValue {
     readonly attribute CSSResourceState state;
 };
@@ -2473,12 +2510,14 @@ Issue(186): CSSResourceValues constructed within Worklets should be "unloaded".
 -----------------------------------------------
 
 <pre class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSImageValue : CSSResourceValue {
     readonly attribute double? intrinsicWidth;
     readonly attribute double? intrinsicHeight;
     readonly attribute double? intrinsicRatio;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 [Constructor(USVString url)]
 interface CSSURLImageValue : CSSImageValue {
     readonly attribute USVString url;
