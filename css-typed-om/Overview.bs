@@ -2191,6 +2191,13 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
 </div>
 
+<div algorithm="CSSRotate.x" dfn-type=attribute dfn-for=CSSRotate>
+    The <dfn>x</dfn>, <dfn>y</dfn>, and <dfn>z</dfn> attributes must,
+    on setting to a new value |val|,
+    [=rectify a numberish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
 <div algorithm="CSSScale()">
     The <dfn constructor for=CSSScale>CSSScale(|x|, |y|, |z|)</dfn> constructor must,
     when invoked,
@@ -2217,6 +2224,13 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
     6. Return |this|.
+</div>
+
+<div algorithm="CSSScale.x" dfn-type=attribute dfn-for=CSSScale>
+    The <dfn>x</dfn>, <dfn>y</dfn>, and <dfn>z</dfn> attributes must,
+    on setting to a new value |val|,
+    [=rectify a numberish value=] from |val|
+    and set the corresponding internal slot to the result of that.
 </div>
 
 <div algorithm="CSSSkew()">
