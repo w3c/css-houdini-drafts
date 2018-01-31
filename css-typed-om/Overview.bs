@@ -551,7 +551,8 @@ The value for a given property is the last valid value provided in the string.
 
 <pre class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor((DOMString or CSSVariableReferenceValue)... members)]
+ Constructor(sequence<DOMString or CSSVariableReferenceValue> members)]
+
 interface CSSUnparsedValue : CSSStyleValue {
     iterable<(DOMString or CSSVariableReferenceValue)>;
     readonly attribute unsigned long length;
