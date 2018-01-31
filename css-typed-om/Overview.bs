@@ -80,6 +80,7 @@ spec:css-syntax-3;
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
+    type:dfn; text:relative length
 spec:infra;
     type: dfn;
         text: list
@@ -2021,8 +2022,8 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
             As the entries of such a matrix are defined relative to the ''px'' unit,
             if any <<length>>s in |func| involved in generating the matrix
-            are not [=compatible units=] with ''px'',
-            [=throw=] a {{TypeError}}.
+            are not [=compatible units=] with ''px'', i.e. they are neither
+            [=relative lengths=] nor <<percentages>>, [=throw=] a {{TypeError}}.
         2. Set |matrix| to the result of multiplying |matrix|
             and |funcMatrix|.
         3. If |func|’s {{CSSTransformComponent/is2D}} internal slot is `false`,
