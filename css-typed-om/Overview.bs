@@ -550,16 +550,16 @@ The value for a given property is the last valid value provided in the string.
 ----------------------------------------------
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor((DOMString or CSSVariableReferenceValue)... members)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor((DOMString or CSSVariableReferenceValue)... members)]
 interface CSSUnparsedValue : CSSStyleValue {
     iterable<(DOMString or CSSVariableReferenceValue)>;
     readonly attribute unsigned long length;
     getter (DOMString or CSSVariableReferenceValue) (unsigned long index);
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(DOMString variable, optional CSSUnparsedValue fallback)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(DOMString variable, optional CSSUnparsedValue fallback)]
 interface CSSVariableReferenceValue {
     attribute DOMString variable;
     readonly attribute CSSUnparsedValue? fallback;
@@ -620,8 +620,8 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 {{CSSKeywordValue}} objects represent CSS keywords and other [=identifiers=].
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(DOMString value)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(DOMString value)]
 interface CSSKeywordValue : CSSStyleValue {
     attribute DOMString value;
 };
@@ -1611,8 +1611,8 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <xmp class=idl>
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(double value, DOMString unit)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(double value, DOMString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
         readonly attribute DOMString unit;
@@ -1712,38 +1712,38 @@ interface CSSMathValue : CSSNumericValue {
     readonly attribute CSSMathOperator operator;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish... args)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish... args)]
 interface CSSMathSum : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish... args)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish... args)]
 interface CSSMathProduct : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish arg)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish arg)]
 interface CSSMathNegate : CSSMathValue {
     readonly attribute CSSNumericValue value;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish arg)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish arg)]
 interface CSSMathInvert : CSSMathValue {
     readonly attribute CSSNumericValue value;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish... args)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish... args)]
 interface CSSMathMin : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumberish... args)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish... args)]
 interface CSSMathMax : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
@@ -1997,8 +1997,8 @@ They "contain" one or more {{CSSTransformComponent}}s,
 which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(sequence<CSSTransformComponent> transforms)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(sequence<CSSTransformComponent> transforms)]
 interface CSSTransformValue : CSSStyleValue {
     iterable<CSSTransformComponent>;
     readonly attribute unsigned long length;
@@ -2040,7 +2040,7 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
     1. Let |matrix| be a new {{DOMMatrix}},
         initialized to the identity matrix,
-        with its {{DOMMatrix/is2D}} internal slot set to `true`.
+        with its {{DOMMatrixReadOnly/is2D}} internal slot set to `true`.
 
     2. [=list/For each=] |func| in |this|’s [=values to iterate over=]:
 
@@ -2064,16 +2064,16 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         DOMMatrix toMatrix();
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z)]
     interface CSSTranslate : CSSTransformComponent {
         attribute CSSNumericValue x;
         attribute CSSNumericValue y;
         attribute CSSNumericValue z;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(CSSNumericValue angle),
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue angle),
      Constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle)]
     interface CSSRotate : CSSTransformComponent {
         attribute CSSNumberish x;
@@ -2082,29 +2082,29 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         attribute CSSNumericValue angle;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z)]
     interface CSSScale : CSSTransformComponent {
         attribute CSSNumberish x;
         attribute CSSNumberish y;
         attribute CSSNumberish z;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(CSSNumericValue ax, CSSNumericValue ay)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue ax, CSSNumericValue ay)]
     interface CSSSkew : CSSTransformComponent {
         attribute CSSNumericValue ax;
         attribute CSSNumericValue ay;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(CSSNumericValue length)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue length)]
     interface CSSPerspective : CSSTransformComponent {
         attribute CSSNumericValue length;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-    [Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
     interface CSSMatrixComponent : CSSTransformComponent {
         attribute DOMMatrix matrix;
     };
@@ -2386,8 +2386,8 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 used by properties such as 'object-position'.
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(CSSNumericValue x, CSSNumericValue y)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumericValue x, CSSNumericValue y)]
 interface CSSPositionValue : CSSStyleValue {
     attribute CSSNumericValue x;
     attribute CSSNumericValue y;
@@ -2517,8 +2517,8 @@ interface CSSImageValue : CSSResourceValue {
     readonly attribute double? intrinsicRatio;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-[Constructor(USVString url)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(USVString url)]
 interface CSSURLImageValue : CSSImageValue {
     readonly attribute USVString url;
 };
