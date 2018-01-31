@@ -3048,7 +3048,7 @@ length3.toString(); // "42px";
 </div>
 
 <div algorithm>
-    To <dfn>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
+    To <dfn export>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
 
     1. Let |s| initally be the [=string=] "var(".
 
@@ -3063,28 +3063,40 @@ length3.toString(); // "42px";
         and return |s|.
 </div>
 
+
 {{CSSKeywordValue}} Serialization {#keywordvalue-serialization}
 ---------------------------------------------------------------
 
-{{CSSKeywordValue}} objects are serialized to their contained
-{{CSSKeywordValue/value}} attribute.
+<div algorithm>
+    To <dfn export>serialize a {{CSSKeywordValue}}</dfn> |this|:
+
+    1. Return |this|’s {{CSSKeywordValue/value}} internal slot.
+</div>
+
 
 {{CSSUnitValue}} Serialization {#numericvalue-serialization}
---------------------------------------------------------------
+------------------------------------------------------------
 
-If their {{CSSUnitValue/unit}} is "number",
-{{CSSUnitValue}} objects are serialized
-to the string representation of their {{CSSUnitValue/value}}.
+<div algorithm>
+    To <dfn export>serialize a {{CSSUnitValue}}</dfn> |this|:
 
-Otherwise, if their {{CSSUnitValue/unit}} is "percent",
-{{CSSUnitValue}} objects are serialized
-to the string representation of their {{CSSUnitValue/value}}
-followed by the character U+0025 PERCENTAGE SIGN (%).
+    1. Let |value| and |unit| be 
+        |this|‘s {{CSSUnitValue/value}} and {{CSSUnitValue/unit}} internal slots.
 
-Otherwise,
-{{CSSUnitValue}} objects are serialized
-to the string representation of their {{CSSUnitValue/value}}
-followed by their {{CSSUnitValue/unit}}.
+    2. Set |s| to the result of serializing a <<number>> from |value|,
+        per [[cssom#serializing-css-values]].
+
+    3. If |unit| is "number",
+        return |s|.
+
+    4. Otherwise, if |unit| is "percentage",
+        append "%" to |s|,
+        then return |s|.
+
+    5. Otherwise, append |unit| to |s|,
+        then return |s|.
+</div>
+
 
 {{CSSMathValue}} Serialization {#calc-serialization}
 ---------------------------------------------------------
