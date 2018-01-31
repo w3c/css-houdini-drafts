@@ -356,7 +356,7 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">get(|property|)</dfn> method,
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
@@ -375,7 +375,7 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    The <dfn method for="StylePropertyMapReadonly, StylePropertyMap">getAll(|property|)</dfn> method,
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
