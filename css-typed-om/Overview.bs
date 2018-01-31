@@ -3218,6 +3218,12 @@ depending on the property they came from:
         return the result of serializing the <<length>> value.
     3. Otherwise, return the result of serializing the <<percentage>> value.
 
+: 'opacity'
+::
+    1. If the value is of type <<number>>,
+        return the result of serializing the <<number>> value.
+    2. Otherwise, return the result of serializing the <<percentage>> value.
+
 : 'right'
 ::
     1. If the value is the ''auto'' keyword,
