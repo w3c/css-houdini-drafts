@@ -2163,9 +2163,9 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         with its {{CSSRotate/angle}} internal slot
         set to |angle|,
         its {{CSSRotate/x}} and {{CSSRotate/y}} internal slots
-        set to [=create a CSSUnitValue from a string|new unit values=] of ''0'',
+        set to [=create a CSSUnitValue from a pair|new unit values=] of `(0, "number")`,
         its {{CSSRotate/z}} internal slot
-        set to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
+        set to a [=create a CSSUnitValue from a pair|new unit value=] of `(1, "number")`,
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
@@ -2213,7 +2213,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 
     5. If |z| was not passed,
         set |this|’s {{CSSScale/z}} internal slot
-        to a [=create a CSSUnitValue from a string|new unit value=] of ''1'',
+        to a [=create a CSSUnitValue from a pair|new unit value=] of `(1, "number")`,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
     6. Return |this|.
