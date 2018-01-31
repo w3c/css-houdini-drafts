@@ -3032,16 +3032,36 @@ length3.toString(); // "42px";
 {{CSSUnparsedValue}} Serialization {#unparsedvalue-serialization}
 -----------------------------------------------------------------
 
-{{CSSUnparsedValue}} objects are serialized by first serializing each
-{{CSSVariableReferenceValue}}, then concatenating the contained DOMStrings and
-{{CSSVariableReferenceValue}} serializations in order.
+<div algorithm>
+    To <dfn export>serialize a {{CSSUnparsedValue}}</dfn> |this|:
 
-{{CSSVariableReferenceValue}} objects are serialized by the following process:
-1.  the fallback {{CSSUnparsedValue}} is serialized
-2.  if the fallback serialization is the empty string, then the
-    {{CSSVariableReferenceValue}} serializes as "var(" + variable + ")"
-3.  otherwise, the {{CSSVariableReferenceValue}} serializes as
-    "var(" + variable + "," + fallback serialization + ")"
+    1. Let |s| initially be the empty [=string=].
+
+    2. [=list/For each=] |item| in |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot:
+        1. If |item| is a {{DOMString}},
+            append it to |s|.
+        2. Otherwise, |item| is a {{CSSVariableReferenceValue}}.
+            Serialize it,
+            then append the result to |s|.
+
+    3. Return |s|.
+</div>
+
+<div algorithm>
+    To <dfn>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
+
+    1. Let |s| initally be the [=string=] "var(".
+
+    2. Append |this|’s {{CSSVariableReferenceValue/variable}} internal slot to |s|.
+
+    3. If |this|’s {{CSSVariableReferenceValue/fallback}} internal slot is not `null`,
+        append ", " to |s|,
+        then serialize the {{CSSVariableReferenceValue/fallback}} internal slot
+        and append it to |s|.
+
+    4. Append ")" to |s| 
+        and return |s|.
+</div>
 
 {{CSSKeywordValue}} Serialization {#keywordvalue-serialization}
 ---------------------------------------------------------------
