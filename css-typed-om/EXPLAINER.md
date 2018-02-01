@@ -1,10 +1,10 @@
 # CSS Typed OM Explained
 
-CSS Typed OM is the extensable API for the CSSOM that reduces the burden of manipulating a CSS propeerty's value via string manipulation. It does so by exposing CSS values as typed JavaScript objects which help you circumvent the browser's CSS parser.
+CSS Typed OM is the extensible API for the CSSOM that reduces the burden of manipulating a CSS property's value via string manipulation. It does so by exposing CSS values as typed JavaScript objects rather than strings.
 
 ## Motivation
 
-The benefits of CSS Typed OM are as follows:
+The benefits of CSS Typed OM include:
 * Allows the performant manipulation of values assigned to CSS properties. 
 * Being able to write more maintainable code:
 	* Your code is easier to understand,
@@ -14,23 +14,25 @@ The benefits of CSS Typed OM are as follows:
 
 ### Getting a property's value
 
+In CSSOM land:
 To get specified and computed values for CSS properties of an element in CSSOM we get them via accessing them of the `.style` attribute on an element and the `getComputedStyle()` object respectively. 
 
-In Typed OM we get them of `StylePropertyMaps` on elements. 
+In Typed OM:
+We get them of `StylePropertyMaps` on elements. 
 
-To get the specified height of an element we would use the following JS:
+To get the specified height from an element we would use the following JS:
 ```
-element.attributeStyleMap.get('height');
+element.attributeStyleMap.get('height'); // returns a string
 ```
 
 Similarly to get the computed value of a CSS property we would do the following: 
 ```
-element.computedStyleMap.get('height')
+element.computedStyleMap().get('height'); // returns a CSSUnitValue
 ```
 
 ### Changing a propert's value
 
-To understand the power of Typed OM take a look at the example below:
+To understand the power of Typed OM take a look at the example in CSSOM below:
 
 ```
 let heightValue = target.style.height.slice(0,-2);
@@ -39,18 +41,19 @@ target.style.height = heightValue + 'px';
 ```
 
 In the above example, we are manipulating the `height` CSS property by:
+* extract the numeric portion of a string,
 * performing mathematical operation,
 * converting a number to a string,
 * appending a unit to the resulting string.
 
 The CSS parser will then parse the final string and convert it back to a number for the CSS engine. 
 
-With Typed OM you will be manipulating typed Javascript objects thereby eliminating the CSS Parser altogether. The above example will now read as follows:
+With Typed OM you can manipulate typed Javascript objects thereby eliminating the CSS Parser altogether. The above example will now read as follows:
 
 ```
 let heightValue = element.attributeStyleMap.get('height');
 heightValue.value++;
-target.attributeStyleMap.set('height', heightValue)
+target.attributeStyleMap.set('height', heightValue);
 ```
 
 In the above code, `heightValue` gets assigned a `CSSUnitValue` with a value set to the current value of the height and the unit set to 'px'. You can then modify the unit as you would do an integer and not have to incur the cost of manipulating a string.
@@ -59,7 +62,7 @@ In the above code, `heightValue` gets assigned a `CSSUnitValue` with a value set
 
 ### What is a CSSStyleValue?
 
-[CSSStyleValue](https://drafts.css-houdini.org/css-typed-om-1/#cssstylevalue) objects are the base class through which all CSS values are expressed. For a detailed list of what CSSStyleValue subclasses each CSS property maps to please see [here](PLACEHOLDER). Values that aren't supported as of yet will also be considered as CSSStyleValue objects.
+[CSSStyleValue](https://drafts.css-houdini.org/css-typed-om-1/#cssstylevalue) is the base class through which all CSS values are expressed. For a detailed list of what CSSStyleValue subclasses each CSS property maps to please see [here](PLACEHOLDER). Values that aren't supported yet will also be considered as CSSStyleValue objects.
 
 ### What are the different CSSStyleValue subclasses?
 
@@ -85,32 +88,28 @@ The class can be broken down into two subclasses:
 
 #### CSSPositionValue
 
-[CSSPositionValue](https://drafts.css-houdini.org/css-typed-om-1/#positionvalue-objects) help express the position of a object (e.g. background image) inside a positioning area (e.g. a div).
+[CSSPositionValue](https://drafts.css-houdini.org/css-typed-om-1/#positionvalue-objects) help express the position of an object (e.g. background image) inside a positioning area (e.g. a div).
 
 #### CSSResourceValue
 
 [CSSResourceValue](https://drafts.css-houdini.org/css-typed-om-1/#resourcevalue-objects) objects represent CSS values that require an asynchronous network fetch. Hence, they also describe the status the resource is in. Properties with image values (e.g. `background-image`), are represented by [CSSImageValues](https://drafts.css-houdini.org/css-typed-om-1/#cssimagevalue)
 
 
-### What about Custom properties?
+### What about Custom Properties?
 
-Unregistered custom Properties are represented by [CSSUnparsedValues](https://drafts.css-houdini.org/css-typed-om-1/#cssunparsedvalue) in the Typed OM API. Registered custom properties are represented using [CSSVariableReferenceValues](https://drafts.css-houdini.org/css-typed-om-1/#cssvariablereferencevalue).
+Unregistered custom properties are represented by [CSSUnparsedValues](https://drafts.css-houdini.org/css-typed-om-1/#cssunparsedvalue) in the Typed OM API. `var()` references are represented using [CSSVariableReferenceValues](https://drafts.css-houdini.org/css-typed-om-1/#cssvariablereferencevalue).
 
 ## Future Capabilities
 
-The current specification doesn't have support for the following, however they are under consideration for Typed OM Level 2:
-* Support for shorthand properties,
-* Support for gradients,
-* Corresponding FontFaceValue for `@font-face` rules,
-* Support for the following:
-	* Colors
-	* URLs
-	* Shapes, 
-	* Strings, 
-	* Counters, 
-	* etc.
+The current specification doesn't have support for the following, however support for the following is under consideration for Typed OM Level 2:
+* Colors,
+* URLs (that aren't images),
+* Shapes, 
+* Strings, 
+* Counters, 
+* etc.
 
-## Conclusion
+## Go ahead - try it!
 
 Currently you can try out CSS Typed OM in Chromium based browsers (it is behind a flag though.)
 
