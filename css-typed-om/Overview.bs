@@ -355,7 +355,7 @@ probably in an appendix.
     and a [=string=] or {{CSSStyleValue}} |value|:
 
     : If |value| is a {{CSSStyleValue}},
-    :: If |value| does not match the grammar of a [=list-valued property iteration=] of |property|,
+    :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
         [=throw=] a {{TypeError}} and exit this algorithm.
         Otherwise, return the |value|.
 
@@ -364,6 +364,18 @@ probably in an appendix.
         and return the result.
 
         Note: This can throw a {{TypeError}} instead.
+</div>
+
+<div algorithm>
+    A {{CSSStyleValue}} is said to <dfn>match a CSS production</dfn>
+    based on the following rules:
+
+    * A {{CSSKeywordValue}} always matches <<ident>>.
+    * A {{CSSTransformValue}} always matches <<transform>>.
+    * A {{CSSPositionValue}} always matches <<position>>.
+    * A {{CSSNumericValue}} matches what its type [=CSSNumericValue/matches=].
+    * A {{CSSURLImageValue}} always matches <<url>>.
+    * Any subclass of {{CSSImageValue}} always matches <<image>>.
 </div>
 
 <div algorithm>
