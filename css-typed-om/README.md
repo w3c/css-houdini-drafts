@@ -1,6 +1,6 @@
 # CSS Typed OM Explained
 
-CSS Typed OM is the extensible API for the CSSOM that reduces the burden of manipulating a CSS property's value via string manipulation. It does so by exposing CSS values as typed JavaScript objects rather than strings.
+CSS Typed OM is an extensible API for the CSSOM that reduces the burden of manipulating a CSS property's value via string manipulation. It does so by exposing CSS values as typed JavaScript objects rather than strings.
 
 ## Motivation
 
@@ -15,7 +15,7 @@ The benefits of CSS Typed OM include:
 ### Getting a property's value
 
 In CSSOM land:
-To get specified and computed values for CSS properties of an element in CSSOM we get them via accessing them of the `.style` attribute on an element and the `getComputedStyle()` object respectively. 
+We get specified and computed values for CSS properties of an element in CSSOM via the `.style` attribute on an element and the `getComputedStyle()` object respectively. 
 
 In Typed OM:
 We get them of `StylePropertyMaps` on elements. 
@@ -93,7 +93,6 @@ The class can be broken down into two subclasses:
 #### CSSResourceValue
 
 [CSSResourceValue](https://drafts.css-houdini.org/css-typed-om-1/#resourcevalue-objects) objects represent CSS values that require an asynchronous network fetch. Hence, they also describe the status the resource is in. Properties with image values (e.g. `background-image`), are represented by [CSSImageValues](https://drafts.css-houdini.org/css-typed-om-1/#cssimagevalue)
-
 
 ### What about Custom Properties?
 
