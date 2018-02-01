@@ -266,10 +266,8 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
     which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
     This list is initialized differently depending on where the {{CSSStyleValue}} is used
-    (see
-    [[#computed-stylepropertymapreadonly-objects]],
-    [[#declared-stylepropertymap-objects]], and
-    [[#inline-stylepropertymap-objects]]).
+    (see [[#computed-stylepropertymapreadonly-objects]]
+    and [[#declared-stylepropertymap-objects]]).
 
     Unless otherwise stated,
     the initial ordering of the [=StylePropertyMap/map entries=]
@@ -456,7 +454,9 @@ probably in an appendix.
 
 Issue: Do we need an updateAll() method that gets and sets a list?
 
-[=computed StylePropertyMap=], [=declared StylePropertyMap=] and [=inline StylePropertyMap=] are all live objects: the attributes and methods on these objects must operate on the actual underlying data, not a snapshot of the data.
+[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects: 
+the attributes and methods on these objects must operate on the actual underlying data, 
+not a snapshot of the data.
 
 A [=string=] is a <dfn>custom property name string</dfn>
 if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
@@ -498,7 +498,9 @@ and are accessed by calling the {{Element/computedStyleMap()}} method.
         whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of 
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
-        and every non-registered [=custom property=] which is not set to its initial value.
+        and every non-registered [=custom property=] which is not set to its initial value,
+        ordered by putting CSS-defined properties before custom properties,
+        then sorting by code-point order of property name within those two categories.
 </div>
 
 Note: like {{Window/getComputedStyle()|Window.getComputedStyle()}},
@@ -514,7 +516,7 @@ pseudo-element styles are intended to be obtainable
 by adding this method to the new {{PseudoElement}} interface
 (rather than using a `pseudoElt` argument like {{Window/getComputedStyle()|Window.getComputedStyle()}} does).
 
-Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
+Declared & Inline {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
@@ -522,39 +524,27 @@ Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 partial interface CSSStyleRule {
     [SameObject] readonly attribute StylePropertyMap styleMap;
 };
-</pre>
 
-<dfn>Declared StylePropertyMap</dfn> objects represent style property-value pairs embedded
-in a style rule, and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn>
-attribute of {{CSSStyleRule}} objects.
-
-When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=]
-objects is initialized to contain
-an entry for each property that is paired with at least one valid value inside the
-{{CSSStyleRule}} that the object represents. The value for a given property is
-the last valid value provided by the {{CSSStyleRule}} object.
-
-
-Inline {{StylePropertyMap}} objects {#inline-stylepropertymap-objects}
-----------------------------------------------------------------------
-
-<pre class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
-<dfn>Inline StylePropertyMap</dfn> objects represent inline style declarations 
-attached directly to {{Element}}s. 
-They are accessed via the <dfn attribute for=ElementCSSInlineStyle>attributeStyleMap</dfn> attribute of {{Element}} objects
-(via the {{ElementCSSInlineStyle}} mixin interface).
+<dfn>Declared StylePropertyMap</dfn> objects 
+represent style property-value pairs embedded in a style rule or inline style,
+and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> attribute of {{CSSStyleRule}} objects,
+or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute 
+of objects implementing the {{ElementCSSInlineStyle}} interface
+(such as {{Element}}s).
 
-When constructed, the [=StylePropertyMap/map entries=] for [=inline StylePropertyMap=] objects
-is initialized to contain an
-entry for each property that is paired with at least one valid value in the string
-representing the style attribute for the Element that the object is associated with.
-The value for a given property is the last valid value provided in the string.
+When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=] objects 
+is initialized to contain an entry 
+for each property with a valid value inside the {{CSSStyleRule}}
+or inline style 
+that the object represents,
+in the same order as the {{CSSStyleRule}} or inline style.
+
 
 {{CSSStyleValue}} subclasses {#stylevalue-subclasses}
 ==================================================
@@ -730,7 +720,7 @@ There are two interfaces that inherit from {{CSSNumericValue}}:
 {{CSSNumericValue}} objects are not range-restricted.
 Any valid numeric value can be represented by a {{CSSNumericValue}},
 and that value will not be clamped, rounded, or rejected
-when set on a [=declared StylePropertyMap=] or [=inline StylePropertyMap=].
+when set on a [=declared StylePropertyMap=].
 Instead, clamping and/or rounding will occur during computation of style.
 
 <div class='example'>
