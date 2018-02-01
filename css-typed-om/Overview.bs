@@ -510,7 +510,8 @@ and are accessed by calling the {{Element/computedStyleMap()}} method.
         whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of 
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
-        and every non-registered [=custom property=] which is not set to its initial value,
+        and every non-registered [=custom property=] which is not set to its initial value
+        on |this|,
         ordered by putting CSS-defined properties before custom properties,
         then sorting by code-point order of property name within those two categories.
 </div>
@@ -2444,7 +2445,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 
     2. If |options| was passed,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
-        to the |option|'s {{CSSMatrixComponentOptions/is2D}} member.
+        to the |options|'s {{CSSMatrixComponentOptions/is2D}} member.
 
     3. Otherwise,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
