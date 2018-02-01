@@ -30,7 +30,7 @@ Similarly to get the computed value of a CSS property we would do the following:
 element.computedStyleMap().get('height'); // returns a CSSUnitValue
 ```
 
-### Changing a propert's value
+### Changing a property's value
 
 To understand the power of Typed OM take a look at the example in CSSOM below:
 
