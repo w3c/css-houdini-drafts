@@ -2403,7 +2403,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 </div>
 
 <div algorithm="CSSSkew.is2D">
-    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute
+    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute 
     of a {{CSSSkew}}, {{CSSSkewX}}, or {{CSSSkewY}} object must,
     on setting,
     do nothing.
@@ -3325,31 +3325,204 @@ length3.toString(); // "42px";
         5. Return |s|.
 </div>
 
-{{CSSTransformValue}} Serialization {#transformvalue-serialization}
--------------------------------------------------------------------
+{{CSSTransformValue}} and {{CSSTransformComponent}} Serialization {#transformvalue-serialization}
+-------------------------------------------------------------------------------------------------
 
-{{CSSTransformValue}} objects are serialized by generating a space-separated list
-of serializations of the contained {{CSSTransformComponent}} objects.
+<div algorithm>
+    To <dfn export>serialize a {{CSSTransformValue}}</dfn> |this|:
 
-{{CSSTransformComponent}} objects are serialized according to the following rules:
+    1. Return the result of serializing each [=list/item=]
+        in |this|’s [=values to iterate over=],
+        then concatenating them separated by " ".
+</div>
 
-*   For all objects except {{CSSMatrixComponent}} objects, the serialization
-    is defined by the object constructors.
-*   When there are multiple constructors for a {{CSSMatrixComponent}} object, then
-    if the {{CSSTransformComponent/is2D}} attribute is set to true,
-    then the relevant constructor is the constructor with fewer arguments; otherwise
-    the relevant constructor is the constructor with more arguments.
-*   Each serialization is represented by a function
-*   The function's name is a lowercase version of the component object type,
-    without the CSS prefix
-*   The function's arguments are a comma-separated list that matches the
-    arguments to the relevant constructor. The values of the arguments are given
-    by the attributes contained in the {{CSSTransformComponent}}.
-*   {{CSSNumericValue}} attributes serialize using the rules above.
-    Doubles serialize to their string representation.
-*   {{CSSMatrixComponent}} objects serialize to a list of 6 components if
-    {{CSSTransformComponent/is2D}} is set, or 12 components otherwise.
-    Component order and format is given by [[CSS-TRANSFORMS-1]].
+<div algorithm>
+    To <dfn export>serialize a {{CSSTranslate}}</dfn> |this|:
+
+    1. Let |s| initially be the empty [=string=].
+
+    2. If |this|’s {{CSSTransformValue/is2D}} internal slot is `true`:
+        1. Append "translate3D(" to |s|.
+
+        2. Serialize |this|’s {{CSSTranslate/x}} internal slot,
+            and append it to |s|.
+
+        3. Append ", " to |s|.
+
+        4. Serialize |this|’s {{CSSTranslate/y}} internal slot,
+            and append it to |s|.
+
+        5. Append ", " to |s|.
+
+        6. Serialize |this|’s {{CSSTranslate/z}} internal slot,
+            and append it to |s|.
+
+        7. Append ")" to |s|,
+            and return |s|.
+
+    3. Otherwise:
+        1. Append "translate(" to |s|.
+
+        2. Serialize |this|’s {{CSSTranslate/x}} internal slot,
+            and append it to |s|.
+
+        3. Append ", " to |s|.
+
+        4. Serialize |this|’s {{CSSTranslate/y}} internal slot,
+            and append it to |s|.
+
+        5. Append ")" to |s|,
+            and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSRotate}}</dfn> |this|:
+
+    1. Let |s| initially be the empty [=string=].
+
+    2. If |this|’s {{CSSTransformValue/is2D}} internal slot is `true`:
+        1. Append "rotate3d(" to |s|.
+
+        2. Serialize |this|’s {{CSSRotate/x}} internal slot,
+            and append it to |s|.
+
+        3. Append ", " to |s|.
+
+        4. Serialize |this|’s {{CSSRotate/y}} internal slot,
+            and append it to |s|.
+
+        5. Append ", " to |s|.
+
+        6. Serialize |this|’s {{CSSRotate/z}} internal slot,
+            and append it to |s|.
+
+        7. Append "," to |s|.
+
+        8. Serialize |this|’s {{CSSRotate/angle}} internal slot,
+            and append it to |s|.
+
+        9. Append ")" to |s|,
+            and return |s|.
+
+    3. Otherwise:
+        1. Append "rotate(" to |s|.
+
+        2. Serialize |this|’s {{CSSRotate/angle}} internal slot,
+            and append it to |s|.
+
+        3. Append ")" to |s|,
+            and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSScale}}</dfn> |this|:
+
+    1. Let |s| initially be the empty [=string=].
+
+    2. If |this|’s {{CSSTransformValue/is2D}} internal slot is `true`:
+        1. Append "scale3d(" to |s|.
+
+        2. Serialize |this|’s {{CSSScale/x}} internal slot,
+            and append it to |s|.
+
+        3. Append ", " to |s|.
+
+        4. Serialize |this|’s {{CSSScale/y}} internal slot,
+            and append it to |s|.
+
+        5. Append ", " to |s|.
+
+        6. Serialize |this|’s {{CSSScale/z}} internal slot,
+            and append it to |s|.
+
+        7. Append ")" to |s|,
+            and return |s|.
+
+    3. Otherwise:
+        1. Append "scale(" to |s|.
+
+        2. Serialize |this|’s {{CSSScale/x}} internal slot,
+            and append it to |s|.
+
+        3. If |this|’s {{CSSScale/x}} and {{CSSScale/y}} internal slots
+            are [=equal numeric values=],
+            append ")" to |s|
+            and return |s|.
+
+        4. Otherwise, append ", " to |s|.
+
+        5. Serialize |this|’s {{CSSScale/y}} internal slot,
+            and append it to |s|.
+
+        6. Append ")" to |s|,
+            and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSSkew}}</dfn> |this|:
+
+    1. Let |s| initially be a [=string=] containing "skew(".
+
+    2. Serialize |this|’s {{CSSSkew/ax}} internal slot,
+        and append it to |s|.
+
+    3. If |this|’s {{CSSSkew/ay}} internal slot is a {{CSSUnitValue}}
+        with a {{CSSUnitValue/value}} of `0`,
+        then append ")" to |s|
+        and return |s|.
+
+    4. Otherwise, append ", " to |s|.
+
+    5. Serialize |this|’s {{CSSSkew/ay}} internal slot,
+        and append it to |s|.
+
+    6. Append ")" to |s|,
+        and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSSkewX}}</dfn> |this|:
+
+    1. Let |s| initially be a [=string=] containing "skewX(".
+
+    2. Serialize |this|’s {{CSSSkewX/ax}} internal slot,
+        and append it to |s|.
+
+    3. Append ")" to |s|,
+        and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSSkewY}}</dfn> |this|:
+
+    1. Let |s| initially be a [=string=] containing "skewX(".
+
+    2. Serialize |this|’s {{CSSSkewY/ay}} internal slot,
+        and append it to |s|.
+
+    3. Append ")" to |s|,
+        and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSPerspective}}</dfn> |this|:
+
+    1. Let |s| initially be a [=string=] containing "perspective(".
+
+    2. Serialize |this|’s {{CSSPerspective/length}} internal slot,
+        and append it to |s|.
+
+    3. Append ")" to |s|,
+        and return |s|.
+</div>
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSMatrixComponent}}</dfn> |this|:
+
+    1. Return the [=DOMMatrixReadOnly/stringification behavior|serialization=]
+        of |this|’s {{CSSMatrixComponent/matrix}} internal slot.
+</div>
+
 
 {{CSSPositionValue}} Serialization {#positionvalue-serialization}
 -----------------------------------------------------------------
