@@ -14,7 +14,7 @@ Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts
 Inline Github Issues: title
 Ignored Vars: type, unit
-Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS
+Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS, PseudoElement
 Markup Shorthands: markdown yes
 </pre>
 
@@ -80,6 +80,11 @@ spec:css-syntax-3;
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
+    type:dfn; text:relative length
+spec:cssom;
+    type: dfn;
+        text: resolved value
+        text: origin-clean flag; for: CSSStyleSheet
 spec:infra;
     type: dfn;
         text: list
@@ -480,16 +485,34 @@ partial interface Element {
 };
 </pre>
 
-<dfn>Computed StylePropertyMap</dfn> objects represent the computed style of an
-{{Element}} or pseudo element, and are accessed by calling the
-{{Element/computedStyleMap()}} method.
+<dfn>Computed StylePropertyMap</dfn> objects 
+represent the [=computed values=] of an {{Element}}, 
+and are accessed by calling the {{Element/computedStyleMap()}} method.
 
-When constructed, the [==] for [=computed StylePropertyMap=]
-objects is initialized to contain an entry for every valid CSS property supported by the User Agent.
+<div algorithm>
+    The <dfn method for="Element">computedStyleMap()</dfn> method must,
+    when called on an {{Element}} |this|,
+    perform the following steps:
 
-Note: The StylePropertyMap returned by computedStyleMap represents computed style,
-            not resolved style. In this regard it provides different values than those
-            in objects returned by getComputedStyle.
+    1. Return a live {{StylePropertyMapReadOnly}} object,
+        whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of 
+        every longhand CSS property supported by the User Agent,
+        every registered [=custom property=],
+        and every non-registered [=custom property=] which is not set to its initial value.
+</div>
+
+Note: like {{Window/getComputedStyle()|Window.getComputedStyle()}},
+this method can expose information from stylesheets with the [=CSSStyleSheet/origin-clean flag=] unset.
+
+Note: The {{StylePropertyMapReadOnly}} returned by this method represents the *actual* [=computed values=],
+not the [=resolved value=] concept used by {{Window/getComputedStyle()|Window.getComputedStyle()}}. 
+It can thus return different values than {{Window/getComputedStyle()|Window.getComputedStyle()}}
+for some properties (such as 'width').
+
+Note: Per [WG resolution](https://github.com/w3c/css-houdini-drafts/issues/350#issuecomment-294690156),
+pseudo-element styles are intended to be obtainable 
+by adding this method to the new {{PseudoElement}} interface
+(rather than using a `pseudoElt` argument like {{Window/getComputedStyle()|Window.getComputedStyle()}} does).
 
 Declared {{StylePropertyMap}} objects {#declared-stylepropertymap-objects}
 ----------------------------------------------------------------------------
