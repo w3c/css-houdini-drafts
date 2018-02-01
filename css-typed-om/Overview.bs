@@ -3343,7 +3343,7 @@ length3.toString(); // "42px";
     1. Let |s| initially be the empty [=string=].
 
     2. If |this|’s {{CSSTransformValue/is2D}} internal slot is `true`:
-        1. Append "translate3D(" to |s|.
+        1. Append "translate3d(" to |s|.
 
         2. Serialize |this|’s {{CSSTranslate/x}} internal slot,
             and append it to |s|.
