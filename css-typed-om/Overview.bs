@@ -2157,6 +2157,21 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     };
 
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue ax)]
+    interface CSSSkewX : CSSTransformComponent {
+        attribute CSSNumericValue ax;
+    };
+
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+     Constructor(CSSNumericValue ay)]
+    interface CSSSkewY : CSSTransformComponent {
+        attribute CSSNumericValue ay;
+    };
+
+    /* Note that skew(x,y) is *not* the same as skewX(x) skewY(y),
+       thus the separate interfaces for all three. */
+
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
      Constructor(CSSNumericValue length)]
     interface CSSPerspective : CSSTransformComponent {
         attribute CSSNumericValue length;
@@ -2359,12 +2374,41 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
+<div algorithm="CSSSkewX()">
+    The <dfn constructor for=CSSSkewX>CSSSkewX(|ax|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
+
+    1. If |ax| does not match <<angle>>,
+        [=throw=] a {{TypeError}}.
+
+    2. Return a new {{CSSSkewX}} object
+        with its {{CSSSkewX/ax}} internal slot
+        set to |ax|,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+</div>
+
+<div algorithm="CSSSkewY()">
+    The <dfn constructor for=CSSSkewY>CSSSkewY(|ay|)</dfn> constructor must,
+    when invoked,
+    perform the following steps:
+
+    1. If |ay| does not match <<angle>>,
+        [=throw=] a {{TypeError}}.
+
+    2. Return a new {{CSSSkewY}} object
+        with its {{CSSSkewY/ay}} internal slot
+        set to |ay|,
+        and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
+</div>
+
 <div algorithm="CSSSkew.is2D">
-    The <dfn attribute for=CSSSkew>is2D</dfn> attribute of a {{CSSSkew}} object must,
+    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute
+    of a {{CSSSkew}}, {{CSSSkewX}}, or {{CSSSkewY}} object must,
     on setting,
     do nothing.
 
-    Note: ''skew()'' functions always represent 2D transforms.
+    Note: ''skew()'', ''skewX()'', and ''skewY()'' functions always represent 2D transforms.
 </div>
 
 <div algorithm="CSSPerspective()">
@@ -2931,12 +2975,28 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
                 and `false` otherwise.
 
         : ''skew()''
-        : ''skewX()''
-        : ''skewY()''
         ::
             1. Return a new {{CSSSkew}} object,
                 whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
                 are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
+                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
+
+        : ''skewX()''
+        ::
+            1. Return a new {{CSSSkewX}} object,
+                whose {{CSSSkewX/ax}} internal slot
+                is set to the [=normalize a numeric value|normalization=] of the specified x angle,
+                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
+
+        : ''skewY()''
+        ::
+            1. Return a new {{CSSSkewY}} object,
+                whose {{CSSSkewY/ay}} internal slot
+                is set to the [=normalize a numeric value|normalization=] of the specified y angle,
                 or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
