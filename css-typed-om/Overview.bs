@@ -2498,8 +2498,8 @@ interface CSSPositionValue : CSSStyleValue {
 };
 </pre>
 
-The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of the container.
-{{CSSPositionValue/y}} expressions the offset from the top edge of the container.
+The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of the container;
+{{CSSPositionValue/y}} expresses the offset from the top edge of the container.
 
 <div algorithm>
     The <dfn constructor for=CSSPositionValue>CSSPositionValue(|x|, |y|)</dfn> constructor must,
