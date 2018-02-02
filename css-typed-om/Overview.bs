@@ -3106,16 +3106,14 @@ The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{C
 The table below lists out the possible {{CSSStyleValues}} that each property
 could normalize to, depending on its specified or computed value.
 
+List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-value-normalization}
+----------------------------------------------------------------------------------------------------
+
 <table>
- <th>
-     <td>CSS property</td>
-     <td>Specified value</td>
-     <td>Computed value</td>
- </th>
  <tr>
-     <td>Property</td>
-     <td>Specified values</td>
-     <td>Computed Value</td>
+     <td><b>CSS Property</b></td>
+     <td><b>Specified values</b></td>
+     <td><b>Computed Value</b></td>
  </tr>
  <tr>
      <td>display</td>
