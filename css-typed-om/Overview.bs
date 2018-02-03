@@ -3118,7 +3118,7 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
  <tr>
      <td>display</td>
      <td>CSSKeywordValue</td>
-     <td>CSSKeywordValu</td>
+     <td>CSSKeywordValue</td>
  </tr>
  <tr>
      <td>margin-top</td>
@@ -3286,7 +3286,7 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
      <td>CSSNumericValue, CSSKeywordValue</td>
  </tr>
  <tr>
-     <td>whitespace</td>
+     <td>white-space</td>
      <td>CSSKeywordValue</td>
      <td>CSSKeywordValue</td>
  </tr>
@@ -3381,7 +3381,7 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
      <td>CSSNumericValue</td>
  </tr>
  <tr>
-     <td>backround-repeat</td>
+     <td>background-repeat</td>
      <td>CSSKeywordValue</td>
      <td>CSSKeywordValue</td>
  </tr>
