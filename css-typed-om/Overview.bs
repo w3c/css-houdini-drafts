@@ -3103,7 +3103,7 @@ Normalization does not fail for {{CSSResourceValue}} objects.
 The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
 </div>
 
-The table below lists out the possible {{CSSStyleValues}} that each property
+The table below lists out the possible {{CSSStyleValue}}s that each property
 could normalize to, depending on its specified or computed value.
 
 List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-value-normalization}
