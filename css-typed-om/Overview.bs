@@ -2592,6 +2592,9 @@ A {{CSSResourceValue}} is in one of the following states, as reflected in the va
 :   "error"
 ::  The resource can't be fetched, or the fetched resource is invalid
 
+{{CSSResourceValue}} objects that do not require network data (for example linear and radial gradients)
+are initialized with {{CSSResourceValue/state}} "loaded".
+
 <div class='example'>
 For example, images that match the <<url>> production can be used immediately, but will not result
 in a visual change until the image data is fetched. {{CSSResourceValue}} objects represent this by
@@ -2631,9 +2634,6 @@ interface CSSURLImageValue : CSSImageValue {
 
 {{CSSImageValue}} objects represent values for properties that take <<image>> productions,
 for example 'background-image', 'list-style-image', and 'border-image-source'.
-
-{{CSSImageValue}} objects that do not require network data (for example linear and radial gradients)
-are initialized with {{CSSResourceValue/state}} "loaded".
 
 If the {{CSSImageValue}}'s {{CSSResourceValue/state}} is "loaded",
 and the resource has an intrinsic width, height, or aspect ratio,
