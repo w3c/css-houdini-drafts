@@ -2254,10 +2254,10 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |x| or |y| don't match <<length-percentage>>,
+    1. If |x| or |y| don't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. If |z| was passed, but doesn't match <<length>>,
+    2. If |z| was passed, but doesn't [=CSSNumericValue/match=] <<length>>,
         [=throw=] a {{TypeError}}.
 
     3. Let |this| be a new {{CSSTranslate}} object,
@@ -2284,7 +2284,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |angle| doesn't match <<angle>>,
+    1. If |angle| doesn't [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSRotate}}
@@ -2302,14 +2302,14 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |angle| doesn't match <<angle>>,
+    1. If |angle| doesn't [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Let |x|, |y|, and |z|
         be replaced by the result of [=rectifying a numberish value=].
 
     3. If |x|, |y|, or |z|
-        don't match <<number>>,
+        don't [=CSSNumericValue/match=] <<number>>,
         [=throw=] a {{TypeError}}.
 
     4. Return a new {{CSSRotate}}
@@ -2335,7 +2335,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         be replaced by the result of [=rectifying a numberish value=].
 
     2. If |x|, |y|, or |z| (if passed)
-        don't match <<number>>,
+        don't [=CSSNumericValue/match=] <<number>>,
         [=throw=] a {{TypeError}}.
 
     3. Let |this| be a new {{CSSScale}} object,
@@ -2366,7 +2366,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ax| or |ay| do not match <<angle>>,
+    1. If |ax| or |ay| do not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkew}} object
@@ -2380,7 +2380,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ax| does not match <<angle>>,
+    1. If |ax| does not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkewX}} object
@@ -2394,7 +2394,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ay| does not match <<angle>>,
+    1. If |ay| does not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkewY}} object
@@ -2417,7 +2417,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |length| does not match <<length>>,
+    1. If |length| does not [=CSSNumericValue/match=] <<length>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSPerspective}} object
@@ -2506,7 +2506,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     when called,
     perform the following steps:
 
-    1. If |x| or |y| doesn't match <<length-percentage>>,
+    1. If |x| or |y| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
     2. Otherwise, return a new {{CSSPositionValue}}
@@ -2519,7 +2519,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     on setting a value |value|,
     perform the following steps:
 
-    1. If |value| doesn't match <<length-percentage>>,
+    1. If |value| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
@@ -3063,7 +3063,7 @@ and <var>bias</var>. The process also updates <var>bias</var> based on the <var>
         {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
         {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
+1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
         [=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
         set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
         horizontal. Exit this process.
