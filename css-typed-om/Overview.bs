@@ -2650,11 +2650,11 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
     when called,
     perform the following steps:
 
-    1. If the |url| passed into the constructor doesn't correctly
-        parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
+    1. If the |url| passed into the constructor is not a valid url,
+        throw a {{TypeError}} and exit this algorithm.
     2. Else, return a new {{CSSURLImageValue}}
         with its {{CSSURLImageValue/url}} internal slot
-        set to |url|.
+        set to |url| with CSS character escapes processed.
 </div>
 
 Issue(159): Spec up ColorValue
