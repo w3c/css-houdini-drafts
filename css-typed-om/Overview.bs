@@ -2638,7 +2638,8 @@ are initialized with {{CSSResourceValue/state}} "loaded".
 If the {{CSSImageValue}}'s {{CSSResourceValue/state}} is "loaded",
 and the resource has an intrinsic width, height, or aspect ratio,
 then {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}}, and {{CSSImageValue/intrinsicRatio}} must reflect the resource's corresponding value.
-In all other cases, the attributes must be <code>null</code>.
+In this case, {{CSSImageValue/intrinsicWidth}} and {{CSSImageValue/intrinsicHeight}} has units `px`. 
+In all other cases, the attributes must be <code>null</code>. 
 
 Issue(186): Does the loading lifecycle need to be described here?
 
