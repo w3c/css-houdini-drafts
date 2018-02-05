@@ -2657,6 +2657,11 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
         set to |url|.
 </div>
 
+<div algorithm="CSSURLImageValue.url">
+    The getter for the <dfn attribute for=CSSURLImageValue>url</dfn> attribute
+    of a {{CSSURLImageValue}} must return its {{CSSURLImageValue/url}} internal slot.
+</div>
+
 Issue(159): Spec up ColorValue
 
 <!--
