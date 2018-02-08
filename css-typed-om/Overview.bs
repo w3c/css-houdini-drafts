@@ -2544,7 +2544,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     Will produce the following behavior:
 
     <pre class='lang-javascript'>
-    let map = document.querySelector('.example').attributeStyleMap;
+    let map = document.querySelector('.example').computedStyleMap();
 
     map.get('object-position').x;
     // CSS.percent(50)
