@@ -289,7 +289,7 @@ such as 'color',
 are <dfn export local-lt="single-valued">single-valued properties</dfn>;
 they take only a single (possibly complex) value.
 
-Issue: Define precisely which properties are list-valued and which aren't,
+Issue(644): Define precisely which properties are list-valued and which aren't,
 probably in an appendix.
 
 <div class='note'>
@@ -464,7 +464,7 @@ probably in an appendix.
         (using the original value of {{StylePropertyMap/set()}}).
 </div>
 
-Issue: Do we need an updateAll() method that gets and sets a list?
+Issue(645): Do we need an updateAll() method that gets and sets a list?
 
 [=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects: 
 the attributes and methods on these objects must operate on the actual underlying data, 
