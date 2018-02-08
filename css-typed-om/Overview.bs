@@ -2532,7 +2532,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
 <div class='example'>
     <<position>> values accept a complicated combination of keywords and values,
-    but in the Typed OM are always simplified to just two offsets.
+    but Typed OM always simplifies to just two offsets as per the [[#positionvalue-normalization]] algorithm.
     For example, the following style sheet:
 
     <pre class='lang-css'>
