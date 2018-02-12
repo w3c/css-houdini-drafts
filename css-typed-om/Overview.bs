@@ -360,7 +360,9 @@ probably in an appendix.
     : If |value| is a {{CSSStyleValue}},
     :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
         [=throw=] a {{TypeError}} and exit this algorithm.
-        Otherwise, return the |value|.
+        If the |property| only allows certain values, and is passed a {{CSSUnitValue}} |value| that is outside that range, 
+        wrap |value| in a {{CSSMathSum}}, with only one entry in |values|, so that it serializes to 'calc(' + |value| + ')'.
+        Return the |value|.
 
     : If |value| is a {{DOMString}},
     ::  [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple set to `false`,
