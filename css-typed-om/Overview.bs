@@ -160,15 +160,15 @@ with property |property|, cssText |cssText|, and parseMultiple set to true.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. If |parseMultiple| is true,
         but |property| is a [=single-valued property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. Attempt to [=CSS/parse=] |cssText| according to |property|’s grammar.
         If this fails,
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
         Otherwise,
         let |whole value| be the parsed result.
 
@@ -323,7 +323,7 @@ probably in an appendix.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
@@ -342,7 +342,7 @@ probably in an appendix.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
@@ -360,7 +360,7 @@ probably in an appendix.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
@@ -386,10 +386,10 @@ probably in an appendix.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [[=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
@@ -418,10 +418,10 @@ probably in an appendix.
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. If |property| is not a [=list-valued property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
@@ -464,7 +464,7 @@ Issue(645): Do we need an updateAll() method that gets and sets a list?
         let |property| be |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. If |this|’s {{[[declarations]]}} internal slot internal slot [=map/contains=] |property|,
         [=map/remove=] it.
@@ -485,7 +485,7 @@ Issue(645): Do we need an updateAll() method that gets and sets a list?
 
     : If |value| is a {{CSSStyleValue}},
     :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
         If any component of |property|’s CSS grammar has a limited numeric range,
         and the corresponding part of |value| is a {{CSSUnitValue}} that is outside of that range,
@@ -662,8 +662,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     variable |variable|, perform the following steps:
 
     1. If |variable| is not a [=custom property name string=],
-        [=throw=] a {{TypeError}},
-        and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSVariableReferenceValue/variable}} internal slot
         to |variable|.
@@ -675,8 +674,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     perform the following steps:
 
     1. If |variable| is not a [=custom property name string=],
-        [=throw=] a {{TypeError}},
-        and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSVariableReferenceValue}}
         with its {{CSSVariableReferenceValue/variable}} internal slot
@@ -715,8 +713,7 @@ interface CSSKeywordValue : CSSStyleValue {
     when called,
     perform the following steps:
 
-    1. If |value| is an empty string [=throw=] a {{TypeError}}
-        and exit this algorithm.
+    1. If |value| is an empty string [=throw=] a {{TypeError}}.
     2. Otherwise, return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |value|.
@@ -748,8 +745,7 @@ typedef (DOMString or CSSKeywordValue) CSSKeywordish;
     on setting a value |value|,
     perform the following steps:
 
-    1. If |value| is an empty string, [=throw=] a {{TypeError}},
-        and exit this algorithm.
+    1. If |value| is an empty string, [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSKeywordValue/value}} internal slot,
         to |value|.
@@ -2702,7 +2698,7 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
     perform the following steps:
 
     1. If the |url| passed into the constructor doesn't correctly
-        parse as a <<url>>, throw a {{TypeError}} and exit this algorithm.
+        parse as a <<url>>, throw a {{TypeError}}.
     2. Else, return a new {{CSSURLImageValue}}
         with its {{CSSURLImageValue/url}} internal slot
         set to |url|.
