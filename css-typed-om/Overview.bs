@@ -95,9 +95,9 @@ spec:infra;
 Introduction {#intro}
 =====================
 
-Converting Cascading Style Sheets Object Model (CSSOM) value strings into 
-meaningfully typed JavaScript representations and back can incur a significant 
-performance overhead. This specification exposes CSS values as typed JavaScript 
+Converting Cascading Style Sheets Object Model (CSSOM) value strings into
+meaningfully typed JavaScript representations and back can incur a significant
+performance overhead. This specification exposes CSS values as typed JavaScript
 objects to facilitate their performant manipulation.
 
 The API exposed by this specification is designed for performance rather than ergonomics.
@@ -143,17 +143,17 @@ return a normalized representation
 of the value the {{CSSStyleValue}} object represents.
 
 The <dfn method for=CSSStyleValue>parse(|property|, |cssText|)</dfn> method,
-when invoked, 
-must [=parse a CSSStyleValue=] 
+when invoked,
+must [=parse a CSSStyleValue=]
 with property |property|, cssText |cssText|, and parseMultiple set to false.
 
 The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn>,
-when invoked, 
-must [=parse a CSSStyleValue=] 
+when invoked,
+must [=parse a CSSStyleValue=]
 with property |property|, cssText |cssText|, and parseMultiple set to true.
 
 <div algorithm="parse a CSSStyleValue">
-    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|, 
+    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|,
     and a |parseMultiple| flag, run these steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -293,7 +293,7 @@ Issue(644): Define precisely which properties are list-valued and which aren't,
 probably in an appendix.
 
 <div class='note'>
-    There are multiple examples of CSS properties 
+    There are multiple examples of CSS properties
     that have transitioned from being [=single-valued=] to [=list-valued=].
     To ensure that code written at a time when a property was [=single-valued=]
     does not break when it becomes [=list-valued=] in the future,
@@ -348,7 +348,7 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If |this|’s [=StylePropertyMap/map entries=] [=contains=] |property|,
+    3. If |this|’s [=StylePropertyMap/map entries=] [=map/contains=] |property|,
         [=map/remove=] it.
 </div>
 
@@ -466,8 +466,8 @@ probably in an appendix.
 
 Issue(645): Do we need an updateAll() method that gets and sets a list?
 
-[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects: 
-the attributes and methods on these objects must operate on the actual underlying data, 
+[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects:
+the attributes and methods on these objects must operate on the actual underlying data,
 not a snapshot of the data.
 
 A [=string=] is a <dfn>custom property name string</dfn>
@@ -497,8 +497,8 @@ partial interface Element {
 };
 </pre>
 
-<dfn>Computed StylePropertyMap</dfn> objects 
-represent the [=computed values=] of an {{Element}}, 
+<dfn>Computed StylePropertyMap</dfn> objects
+represent the [=computed values=] of an {{Element}},
 and are accessed by calling the {{Element/computedStyleMap()}} method.
 
 <div algorithm>
@@ -507,7 +507,7 @@ and are accessed by calling the {{Element/computedStyleMap()}} method.
     perform the following steps:
 
     1. Return a live {{StylePropertyMapReadOnly}} object,
-        whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of 
+        whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
         and every non-registered [=custom property=] which is not set to its initial value
@@ -520,12 +520,12 @@ Note: like {{Window/getComputedStyle()|Window.getComputedStyle()}},
 this method can expose information from stylesheets with the [=CSSStyleSheet/origin-clean flag=] unset.
 
 Note: The {{StylePropertyMapReadOnly}} returned by this method represents the *actual* [=computed values=],
-not the [=resolved value=] concept used by {{Window/getComputedStyle()|Window.getComputedStyle()}}. 
+not the [=resolved value=] concept used by {{Window/getComputedStyle()|Window.getComputedStyle()}}.
 It can thus return different values than {{Window/getComputedStyle()|Window.getComputedStyle()}}
 for some properties (such as 'width').
 
 Note: Per [WG resolution](https://github.com/w3c/css-houdini-drafts/issues/350#issuecomment-294690156),
-pseudo-element styles are intended to be obtainable 
+pseudo-element styles are intended to be obtainable
 by adding this method to the new {{PseudoElement}} interface
 (rather than using a `pseudoElt` argument like {{Window/getComputedStyle()|Window.getComputedStyle()}} does).
 
@@ -544,17 +544,17 @@ partial interface ElementCSSInlineStyle {
 };
 </pre>
 
-<dfn>Declared StylePropertyMap</dfn> objects 
+<dfn>Declared StylePropertyMap</dfn> objects
 represent style property-value pairs embedded in a style rule or inline style,
 and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> attribute of {{CSSStyleRule}} objects,
-or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute 
+or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute
 of objects implementing the {{ElementCSSInlineStyle}} interface
 (such as {{Element}}s).
 
-When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=] objects 
-is initialized to contain an entry 
+When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=] objects
+is initialized to contain an entry
 for each property with a valid value inside the {{CSSStyleRule}}
-or inline style 
+or inline style
 that the object represents,
 in the same order as the {{CSSStyleRule}} or inline style.
 
@@ -599,7 +599,7 @@ interface CSSVariableReferenceValue {
 They represent a list of string fragments and variable references.
 
 They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
-which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects. 
+which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
 The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
@@ -611,7 +611,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     of a {{CSSVariableReferenceValue}} |this| must, on setting a
     variable |variable|, perform the following steps:
 
-    1. If |variable| is not a [=custom property name string=], 
+    1. If |variable| is not a [=custom property name string=],
         [=throw=] a {{TypeError}},
         and exit this algorithm.
 
@@ -1048,7 +1048,7 @@ The following are the arithmetic operations you can perform on dimensions:
     are <dfn export lt="equal numeric value">equal numeric values</dfn>,
     perform the following steps:
 
-    1. If |value1| and |value2| are not members of the same interface, 
+    1. If |value1| and |value2| are not members of the same interface,
         return `false`.
 
     2. If |value1| and |value2| are both {{CSSUnitValue}}s,
@@ -1061,7 +1061,7 @@ The following are the arithmetic operations you can perform on dimensions:
         1. If |value1|’s {{CSSMathSum/values}} and |value2|s {{CSSMathSum/values}} internal slots
             have different [=list/sizes=],
             return `false`.
-        
+
         2. If any [=list/item=] in |value1|'s {{CSSMathSum/values}} internal slot
             does not have a corresponding [=list/item=] in |value2|’s {{CSSMathSum/values}} internal slot
             that is an [=equal numeric value=],
@@ -1070,7 +1070,7 @@ The following are the arithmetic operations you can perform on dimensions:
         3. Return `true`.
 
     4. Assert: |value1| and |value2| are both {{CSSMathNegate}}s or {{CSSMathInvert}}s.
-    
+
     5. Return whether |value1|’s {{CSSMathNegate/value}}
         and |value2|’s {{CSSMathNegate/value}}
         are [=equal numeric values=].
@@ -1409,7 +1409,7 @@ The following are the arithmetic operations you can perform on dimensions:
             3. Otherwise, set |result|[|unit|] to |power|.
 
         3. Return |result|.
-    </div>    
+    </div>
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
@@ -2233,7 +2233,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         as defined in [[css-transforms-1#mathematical-description]],
         and with its {{DOMMatrixReadOnly/is2D}} internal slot
         set to the same value as |this|'s {{CSSTransformComponent/is2D}} internal slot.
-        
+
         Note: Recall that the {{CSSTransformComponent/is2D}} flag
         affects what transform,
         and thus what equivalent matrix,
@@ -2404,7 +2404,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 </div>
 
 <div algorithm="CSSSkew.is2D">
-    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute 
+    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute
     of a {{CSSSkew}}, {{CSSSkewX}}, or {{CSSSkewY}} object must,
     on setting,
     do nothing.
@@ -3013,8 +3013,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 {{CSSPositionValue}} normalization {#positionvalue-normalization}
 -----------------------------------------------------------------
 
-CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var> 
-components determined via the following process. If this process, or any sub-process referenced by this 
+CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
+components determined via the following process. If this process, or any sub-process referenced by this
 process fails, then normalization as a whole fails.
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
@@ -3522,7 +3522,7 @@ length3.toString(); // "42px";
         then serialize the {{CSSVariableReferenceValue/fallback}} internal slot
         and append it to |s|.
 
-    4. Append ")" to |s| 
+    4. Append ")" to |s|
         and return |s|.
 </div>
 
@@ -3543,7 +3543,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSUnitValue}}</dfn> |this|:
 
-    1. Let |value| and |unit| be 
+    1. Let |value| and |unit| be
         |this|‘s {{CSSUnitValue/value}} and {{CSSUnitValue/unit}} internal slots.
 
     2. Set |s| to the result of serializing a <<number>> from |value|,
@@ -3596,7 +3596,7 @@ length3.toString(); // "42px";
         3. [=list/For each=] |arg| in |this|’s {{CSSMathSum/values}} internal slot beyond the first:
             1. If |arg| is a {{CSSMathNegate}},
                 append " - " to |s|,
-                then serialize |arg|'s {{CSSMathNegate/value}} internal slot 
+                then serialize |arg|'s {{CSSMathNegate/value}} internal slot
                 with |nested| set to true,
                 and append the result to |s|.
             2. Otherwise, append " + " to |s|,
@@ -3606,7 +3606,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     4. Otherwise, if |this| is a {{CSSMathNegate}}:
@@ -3624,7 +3624,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     5. Otherwise, if |this| is a {{CSSMathProduct}}:
@@ -3651,7 +3651,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     6. Otherwise, if |this| is a {{CSSMathInvert}}:
@@ -3669,7 +3669,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 </div>
 
