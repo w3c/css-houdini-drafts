@@ -486,7 +486,19 @@ Issue(645): Do we need an updateAll() method that gets and sets a list?
     : If |value| is a {{CSSStyleValue}},
     :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
         [=throw=] a {{TypeError}} and exit this algorithm.
-        Otherwise, return the |value|.
+
+        If any component of |property|’s CSS grammar has a limited numeric range,
+        and the corresponding part of |value| is a {{CSSUnitValue}} that is outside of that range,
+        replace that value with the result of wrapping it in a fresh {{CSSMathSum}}
+        whose {{CSSMathSum/values}} internal slot contains only that part of |value|.
+
+        (If |value| is a direct instance of {{CSSStyleValue}},
+        rather than one of its subclasses,
+        do the same with the abstract representation of the property's value that |value| contains,
+        replacing any out-of-range number, percentage, or dimension components
+        by wrapping them in a ''calc()'' expression.)
+
+        Return the |value|.
 
     : If |value| is a {{DOMString}},
     ::  [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple set to `false`,
