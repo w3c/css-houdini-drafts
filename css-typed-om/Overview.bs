@@ -652,7 +652,8 @@ They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
 which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
-The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the length
+of the <dfn attribute for=CSSUnparsedValue>[[tokens]]</dfn> internal slot.
 
 The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
 
