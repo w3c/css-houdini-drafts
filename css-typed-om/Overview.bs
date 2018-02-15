@@ -491,7 +491,6 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface Element {
     StylePropertyMapReadOnly computedStyleMap();
 };
@@ -533,12 +532,10 @@ Declared & Inline {{StylePropertyMap}} objects {#declared-stylepropertymap-objec
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface CSSStyleRule {
     [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
