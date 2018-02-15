@@ -265,7 +265,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 <div algorithm>
     A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
     which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
-    This list is initialized differently depending on where the {{CSSStyleValue}} is used
+    This list is initialized differently depending on where the {{StylePropertyMap}} is used
     (see [[#computed-stylepropertymapreadonly-objects]]
     and [[#declared-stylepropertymap-objects]]).
 
