@@ -231,12 +231,13 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface StylePropertyMapReadOnly {
-    readonly maplike<DOMString, sequence<CSSStyleValue>>;
+    iterable<DOMString, sequence<CSSStyleValue>>;
     any get(DOMString property);
     /* 'any' means (undefined or CSSStyleValue) here,
        see https://github.com/heycam/webidl/issues/60 */
     sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
+    readonly attribute long size;
     stringifier;
 };
 
@@ -244,11 +245,11 @@ callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
 [Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
-    maplike<DOMString, sequence<CSSStyleValue>>;
-    void append(DOMString property, (CSSStyleValue or DOMString)... values);
-    void delete(DOMString property);
     void set(DOMString property, (CSSStyleValue or DOMString)... values);
+    void append(DOMString property, (CSSStyleValue or DOMString)... values);
     void update(DOMString property, UpdateFunction updateFunction);
+    void delete(DOMString property);
+    void clear();
 };
 </xmp>
 
@@ -262,21 +263,27 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     so we can wait until that matters.
 -->
 
-<div algorithm>
-    A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
-    which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
+<div algorithm="StylePropertyMap.[[declarations]]">
+    A {{StylePropertyMapReadOnly}} object
+    has a <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
+    which contains a <dfn export for="StylePropertyMapReadonly, StylePropertyMap">declarations map</dfn>,
+    which is a [=map=] whose keys are [=strings=] (representing property names)
+    and whose values are [=lists=] of {{CSSStyleValue}} objects.
     This list is initialized differently depending on where the {{StylePropertyMap}} is used
     (see [[#computed-stylepropertymapreadonly-objects]]
     and [[#declared-stylepropertymap-objects]]).
 
     Unless otherwise stated,
-    the initial ordering of the [=StylePropertyMap/map entries=]
+    the initial ordering of the {{[[declarations]]}} internal slot internal slot
     is based on the key of each entry:
 
     1. Non-custom properties, sorted in increasing code-point order.
         (Note that non-custom properties are always lowercased in {{StylePropertyMap}}s.)
     2. Custom properties, sorted in increasing code-point order.
 </div>
+
+The [=value pairs to iterate over=] for a {{StylePropertyMapReadOnly}} object
+are the keys and values of the object's {{[[declarations]]}} slot.
 
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
@@ -308,6 +315,101 @@ probably in an appendix.
 </div>
 
 <div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|][0].
+
+        Otherwise, return `undefined`.
+</div>
+
+<div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|].
+        Otherwise, return an empty [=list=].
+</div>
+
+<div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">has(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return `true`.
+        Otherwise, return `false`.
+</div>
+
+<div algorithm>
+    The <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">size</dfn> attribute,
+    on getting from a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+</div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        let |property| be |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [[=valid CSS property=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
+        [=throw=] a {{TypeError}} and exit this algorithm.
+
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+
+    5. If |props|[|property|] [=map/exists=],
+        [=map/remove=] it.
+
+    6. Let |values to set| be an empty [=list=].
+
+    7. For each |value| in |values|,
+        [=normalize a style value=] for |property| and |value|,
+        and append the result to |values to set|.
+
+    8. Set |props|[|property|] to |values to set|.
+
+    Note: The property is deleted then added back
+    so that it gets put at the end of the [=ordered map=],
+    which gives the expected behavior in the face of [=shorthand properties=].
+</div>
+
+<div algorithm>
     The <dfn method for=StylePropertyMap>append(|property|, ...|values|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
@@ -321,7 +423,7 @@ probably in an appendix.
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
 
     5. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
@@ -338,6 +440,22 @@ probably in an appendix.
 </div>
 
 <div algorithm>
+    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Let |old value| be the result of calling |this|.get(|property|)
+        (using the original value of {{StylePropertyMap/get()}}).
+
+    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
+
+    3. Call |this|.set(|property|, |new value|)
+        (using the original value of {{StylePropertyMap/set()}}).
+</div>
+
+Issue(645): Do we need an updateAll() method that gets and sets a list?
+
+<div algorithm>
     The <dfn method for=StylePropertyMap>delete(|property|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
@@ -348,8 +466,16 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}} and exit this algorithm.
 
-    3. If |this|’s [=StylePropertyMap/map entries=] [=map/contains=] |property|,
+    3. If |this|’s {{[[declarations]]}} internal slot internal slot [=map/contains=] |property|,
         [=map/remove=] it.
+</div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>clear()</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Replace the value of |this|’s {{[[declarations]]}} internal slot internal slot with a fresh empty [=declarations map=].
 </div>
 
 <div algorithm>
@@ -380,91 +506,6 @@ probably in an appendix.
     * A {{CSSURLImageValue}} always matches <<url>>.
     * Any subclass of {{CSSImageValue}} always matches <<image>>.
 </div>
-
-<div algorithm>
-    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|][0].
-
-        Otherwise, return `undefined`.
-</div>
-
-<div algorithm>
-    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|].
-        Otherwise, return an empty [=list=].
-</div>
-
-<div algorithm>
-    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [[=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    5. If |props|[|property|] [=map/exists=],
-        [=map/remove=] it.
-
-    6. Let |values to set| be an empty [=list=].
-
-    7. For each |value| in |values|,
-        [=normalize a style value=] for |property| and |value|,
-        and append the result to |values to set|.
-
-    8. Set |props|[|property|] to |values to set|.
-
-    Note: The property is deleted then added back
-    so that it gets put at the end of the [=ordered map=],
-    which gives the expected behavior in the face of [=shorthand properties=].
-</div>
-
-<div algorithm>
-    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. Let |old value| be the result of calling |this|.get(|property|)
-        (using the original value of {{StylePropertyMap/get()}}).
-
-    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
-
-    3. Call |this|.set(|property|, |new value|)
-        (using the original value of {{StylePropertyMap/set()}}).
-</div>
-
-Issue(645): Do we need an updateAll() method that gets and sets a list?
 
 [=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects:
 the attributes and methods on these objects must operate on the actual underlying data,
@@ -506,7 +547,7 @@ and are accessed by calling the {{Element/computedStyleMap()}} method.
     perform the following steps:
 
     1. Return a live {{StylePropertyMapReadOnly}} object,
-        whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of
+        whose {{[[declarations]]}} internal slot internal slot are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
         and every non-registered [=custom property=] which is not set to its initial value
@@ -548,7 +589,7 @@ or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attrib
 of objects implementing the {{ElementCSSInlineStyle}} interface
 (such as {{Element}}s).
 
-When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=] objects
+When constructed, the {{[[declarations]]}} internal slot internal slot for [=declared StylePropertyMap=] objects
 is initialized to contain an entry
 for each property with a valid value inside the {{CSSStyleRule}}
 or inline style
