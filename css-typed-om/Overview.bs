@@ -1627,7 +1627,7 @@ A [=type=] is said to <dfn for=CSSNumericValue>match</dfn> a CSS production in s
 Many specifications use ''[ <<length>> | <<percentage>> ]''
 instead of ''<<length-percentage>>'' in their grammar,
 and specify in prose that the <<length>> and <<percentage>> can be combined.
-For the purposes of [=matching=],
+For the purposes of [=CSSNumericValue/matching=],
 these cases should be treated as <<length-percentage>>.
 Similarly for <<angle-percentage>>, etc.
 
@@ -3152,13 +3152,13 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-style
  </tr>
  <tr>
      <td>'background-color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'padding-left'</td>
@@ -3187,8 +3187,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-style
  </tr>
  <tr>
      <td>'border-color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'border-left-width'</td>
@@ -3272,8 +3272,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-style
  </tr>
  <tr>
      <td>'text-decoration-color'</td>
-     <td>{{CSSColorValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'line-height'</td>
@@ -3367,8 +3367,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-style
  </tr>
  <tr>
      <td>'outline-color'</td>
-     <td>{{CSSColorValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'outline-style'</td>
