@@ -722,23 +722,6 @@ Any place that accepts a {{CSSKeywordValue}}
 also accepts a raw {{DOMString}},
 by using the following typedef and algorithm:
 
-<pre class=idl>
-typedef (DOMString or CSSKeywordValue) CSSKeywordish;
-</pre>
-
-<div algorithm>
-    To <dfn export>rectify a keywordish value</dfn> |val|,
-    perform the following steps:
-
-    1. If |val| is a {{CSSKeywordValue}},
-        return |val|.
-
-    2. If |val| is a {{DOMString}},
-        return a new {{CSSKeywordValue}}
-        with its {{CSSKeywordValue/value}} internal slot
-        set to |val|.
-</div>
-
 <div algorithm="CSSKeywordValue.value">
     The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
     on setting a value |value|,
