@@ -899,7 +899,7 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
         and {{CSSUnitValue/value}} internal slot is set to the sum of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values|.
+        of the [=list/items=] in |values| (from left to right).
 
     4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
@@ -960,7 +960,7 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to "number",
         and {{CSSUnitValue/value}} internal slot is set to the product of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values|.
+        of the [=list/items=] in |values| (from left to right).
 
     4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         with {{CSSUnitValue/unit}} internal slot set to "number"
@@ -969,7 +969,7 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to |unit|,
         and {{CSSUnitValue/value}} internal slot is set to the product of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values|.
+        of the [=list/items=] in |values| (from left to right).
 
     5. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
