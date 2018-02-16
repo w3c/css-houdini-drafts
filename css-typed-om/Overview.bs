@@ -240,13 +240,10 @@ interface StylePropertyMapReadOnly {
     readonly attribute long size;
 };
 
-callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
-
 [Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
     void set(DOMString property, (CSSStyleValue or DOMString)... values);
     void append(DOMString property, (CSSStyleValue or DOMString)... values);
-    void update(DOMString property, UpdateFunction updateFunction);
     void delete(DOMString property);
     void clear();
 };
@@ -437,22 +434,6 @@ probably in an appendix.
 
     8. [=list/Append=] the entries of |temp values| to |props|[|property|].
 </div>
-
-<div algorithm>
-    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. Let |old value| be the result of calling |this|.get(|property|)
-        (using the original value of {{StylePropertyMap/get()}}).
-
-    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
-
-    3. Call |this|.set(|property|, |new value|)
-        (using the original value of {{StylePropertyMap/set()}}).
-</div>
-
-Issue(645): Do we need an updateAll() method that gets and sets a list?
 
 <div algorithm>
     The <dfn method for=StylePropertyMap>delete(|property|)</dfn> method,
