@@ -238,7 +238,6 @@ interface StylePropertyMapReadOnly {
     sequence<CSSStyleValue> getAll(DOMString property);
     boolean has(DOMString property);
     readonly attribute long size;
-    stringifier;
 };
 
 callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
