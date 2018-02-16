@@ -632,11 +632,20 @@ They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
 which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
-The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the length
+of the <dfn attribute for=CSSUnparsedValue>[[tokens]]</dfn> internal slot.
 
-The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
+The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the {{CSSUnparsedSegment}}
+from [[tokens]] at the provided index.
+
+The <dfn for=CSSUnparsedValue>indexed setter</dfn> sets the CSSUnparsedSegment
+from [[tokens]] at the provided index to the provided {{CSSUnparsedValue}}.
 
 <div algorithm="CSSVariableReferenceValue.variable">
+    The getter for the <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
+    of a {{CSSVariableReferenceValue}} |this|
+    must return its {{CSSVariableReferenceValue/variable}} internal slot.
+
     The <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
     of a {{CSSVariableReferenceValue}} |this| must, on setting a
     variable |variable|, perform the following steps:
