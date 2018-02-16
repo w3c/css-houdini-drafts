@@ -986,7 +986,7 @@ The following are the arithmetic operations you can perform on dimensions:
             [=throw=] a {{RangeError}}.
         2. Else return a new {{CSSUnitValue}}
             with the {{CSSUnitValue/unit}} internal slot set to "number",
-            and a {{CSSUnitValue/value}} internal slot set to the inverse of |this|’s.
+            and a {{CSSUnitValue/value}} internal slot set to 1 divided by |this|’s {CSSUnitValue/value}} internal slot.
 
     3. Otherwise,
         return a new {{CSSMathInvert}} object
