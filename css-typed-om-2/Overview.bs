@@ -6,7 +6,7 @@ ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om-2
 Level: 2
 Abstract:
-Editor: Shane Stephens, shanestephens@google.com
+Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Repository: w3c/css-houdini-drafts
 </pre>
 
@@ -31,3 +31,5 @@ Issue(142): Do we want a font value class? How about a FontWeightValue (for 100,
 Issue(144): Add more CSS3 properties. This table currently only contains CSS2.1 properties and CSS3 properties alphabetically to border-radius.
 
 Issue(136): Need an array-buffer custom property type.
+
+Issue(310): consider using properties in addition to get/set.

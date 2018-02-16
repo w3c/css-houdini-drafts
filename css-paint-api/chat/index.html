@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<style>
+#example {
+  background-image:
+    url('http://lorempixel.com/200/200/cats/1/'),
+    url('http://lorempixel.com/200/200/cats/3/'),
+    url('http://lorempixel.com/200/200/food/1/'),
+    url('http://lorempixel.com/200/200/food/2/'),
+    url('http://lorempixel.com/200/200/food/10/');
+
+  border: solid 0;                                                                                   
+  border-image: paint(chat);                                                                         
+  border-image-slice: 0 fill;
+                                                                                               
+  width: 120px;                                                                                      
+  height: 120px;
+
+  --chat-images-num: 1;
+  transition: --chat-images-num 0.25s ease-in-out;
+}
+</style>
+
+<div id="example"></div>
+<button id="add">Add</button>
+<button id="remove">Remove</button>
+
+<script>
+CSS.registerProperty({
+  name: '--chat-images-num',
+  syntax: '<number>',
+  inherits: false,
+  initialValue: '0',
+});
+
+(async function() {
+  await (CSS.paintWorklet.addModule || paintWorkle.import)('chat.js');
+  
+  const elem = document.getElementById('example');
+  const add = document.getElementById('add');
+  const remove = document.getElementById('remove');
+
+  let num = 1;
+  add.addEventListener('click', () => {
+    elem.style = `--chat-images-num: ${++num}`;
+  });
+  remove.addEventListener('click', () => {
+    elem.style = `--chat-images-num: ${--num}`;
+  });
+})();
+</script>

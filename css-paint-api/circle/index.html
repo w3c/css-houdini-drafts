@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<style>
+  #example {
+    --circle-color: deepskyblue;
+
+    background-image: paint(circle);
+		font-family: sans-serif;
+    font-size: 36px;
+    transition: --circle-color 1s;
+  }
+
+  #example:focus {
+    --circle-color: purple;
+  }
+</style>
+
+<textarea id="example">
+  CSS is awesome.
+</textarea>
+
+<script>
+    CSS.registerProperty({
+      name: '--circle-color',
+      syntax: '<color>',
+      initialValue: 'black',
+      inherits: false
+    });
+    (CSS.paintWorklet.addModule || paintWorkle.import)('circle.js');
+</script>
+

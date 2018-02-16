@@ -1,14 +1,19 @@
 <pre class='metadata'>
-Title:  CSS Parser API Level 1
-Status: DREAM
-Group: houdini
-ED: https://drafts.css-houdini.org/css-parser-api-1/
+Title: CSS Parser API
 Shortname: css-parser-api
 Level: 1
-Abstract: This specification is not currently being worked on in the Houdini TF. Instead, it will be worked on in a WICG repository. This document will link to that repository once it exists.
-Editor: Tab Atkins, jackalmage@gmail.com
-Editor: Shane Stephens, shanestephens@google.com
-Editor: Daniel Glazman, danie.glazman@disruptiveinnovations.com
-Editor: Brian Kardell, bkardell@gmail.com
-Warning: Replaced by http://example.com/filler-url
+Status: UD
+Group: HOUDINI
+URL: https://drafts.css-houdini.org/css-parser-api/
+Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
+Abstract: An API exposing the CSS parser more directly,
+Abstract: for parsing arbitrary CSS-like languages into a mildly typed representation.
 </pre>
+
+Introduction {#intro}
+=====================
+
+This spec is intentionally left blank,
+as it is currently being developed in the WICG
+at <a href="https://github.com/wicg/css-parser-api/">https://github.com/wicg/css-parser-api/</a>
+(<a href="https://wicg.github.io/CSS-Parser-API/">live spec</a>).
