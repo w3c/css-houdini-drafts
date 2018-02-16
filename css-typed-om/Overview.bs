@@ -999,7 +999,7 @@ The following are the arithmetic operations you can perform on dimensions:
         return |this|’s {{CSSMathInvert/value}} internal slot.
 
     2. If |this| is a {{CSSUnitValue}} object with {{CSSUnitValue/unit}} internal slot set to "number":
-        1. If |this|’s {{CSSUnitValue/value}} internal slot is set to 0,
+        1. If |this|’s {{CSSUnitValue/value}} internal slot is set to 0 or -0,
             [=throw=] a {{RangeError}}.
         2. Else return a new {{CSSUnitValue}}
             with the {{CSSUnitValue/unit}} internal slot set to "number",
