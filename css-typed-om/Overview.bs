@@ -1106,9 +1106,10 @@ The following are the arithmetic operations you can perform on dimensions:
             return `false`.
 
         2. If any [=list/item=] in |value1|'s {{CSSMathSum/values}} internal slot
-            does not have a corresponding [=list/item=] in |value2|’s {{CSSMathSum/values}} internal slot
-            that is an [=equal numeric value=],
-            return `false`
+            is not an [=equal numeric value=]
+            to the [=list/item=] in |value2|’s {{CSSMathSum/values}} internal slot
+            at the same index,
+            return `false`.
 
         3. Return `true`.
 
