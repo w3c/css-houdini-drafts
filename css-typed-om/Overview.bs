@@ -896,7 +896,12 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
         and {{CSSUnitValue/value}} internal slot is set to the sum of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values| (from left to right).
+        of the [=list/items=] in |values|.
+        This addition must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 + 2) + 3) + 4).
+        (This detail is necessary to ensure interoperability
+        in the presence of floating-point arithmetic.)
 
     4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
@@ -957,7 +962,13 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to "number",
         and {{CSSUnitValue/value}} internal slot is set to the product of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values| (from left to right).
+        of the [=list/items=] in |values|.
+
+        This multiplication must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 × 2) × 3) × 4).
+        (This detail is necessary to ensure interoperability
+        in the presence of floating-point arithmetic.)
 
     4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         with {{CSSUnitValue/unit}} internal slot set to "number"
@@ -966,7 +977,11 @@ The following are the arithmetic operations you can perform on dimensions:
         whose {{CSSUnitValue/unit}} internal slot is set to |unit|,
         and {{CSSUnitValue/value}} internal slot is set to the product of
         the {{CSSUnitValue/value}} internal slots
-        of the [=list/items=] in |values| (from left to right).
+        of the [=list/items=] in |values|.
+
+        This multiplication must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 × 2) × 3) × 4).
 
     5. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
