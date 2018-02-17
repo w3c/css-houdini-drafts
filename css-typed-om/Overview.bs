@@ -625,21 +625,45 @@ interface CSSVariableReferenceValue {
 };
 </xmp>
 
-{{CSSUnparsedValue}} objects represent values that reference custom properties.
-They represent a list of string fragments and variable references.
+{{CSSUnparsedValue}} objects represent property values that reference custom properties.
+They are comprised of a list of string fragments and variable references.
 
 They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
 which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
-The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the length
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the [=list/size=]
 of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
 
-The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the {{CSSUnparsedSegment}}
-from {{CSSUnparsedValue/[[tokens]]}} at the provided index.
+<div algorithm="CSSUnparsedValue indexed properties">
+    The [=supported property indices|supported property indexes=]
+    of a {{CSSUnparsedValue}} |this|
+    are the integers greater than or equal to 0,
+    and less than the [=list/size=] of |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
 
-The <dfn for=CSSUnparsedValue>indexed setter</dfn> sets the CSSUnparsedSegment
-from {{CSSUnparsedValue/[[tokens]]}} at the provided index to the provided {{CSSUnparsedValue}}.
+    To [=determine the value of an indexed property=]
+    of a {{CSSUnparsedValue}} |this|
+    and an index |n|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
+    and return |tokens|[|n|].
+
+    To [=set the value of an existing indexed property=]
+    of a {{CSSUnparsedValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
+    and set |tokens|[|n|] to |new value|.
+
+    To [=set the value of a new indexed property=]
+    of a {{CSSUnparsedValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+    If |n| is not equal to the [=list/size=] of |tokens|,
+    [=throw=] a {{RangeError}}.
+    Otherwise,
+    [=list/append=] |new value| to |tokens|.
+</div>
 
 <div algorithm="CSSVariableReferenceValue.variable">
     The getter for the <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
