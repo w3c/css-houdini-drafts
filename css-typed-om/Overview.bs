@@ -42,10 +42,18 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec
 </pre>
 
 <pre class=link-defaults>
-spec:dom; type:interface;
-    text:Document
-    text:Element;
+spec:css21; type:property;
+    text:max-height;
+    text:max-width;
+    text:min-height;
+    text:min-width;
+spec:cssom;
+    type: dfn;
+        text: resolved value
+        text: origin-clean flag; for: CSSStyleSheet
 spec:css-color-3; type:property; text:color;
+spec:css-position-3; type:value; for:left; text:auto;
+spec:css-sizing-3; type:property; text:box-sizing
 spec:css-speech-1; type:property;
     text:cue-after;
     text:cue-before;
@@ -53,17 +61,13 @@ spec:css-speech-1; type:property;
     text:pause-before;
     text:speak;
     text:voice-family;
-spec:css21; type:property;
-    text:max-height;
-    text:max-width;
-    text:min-height;
-    text:min-width;
+spec:css-syntax-3;
+    type:dfn; text:identifier
 spec:css-tables-3; type:property;
     text:border-collapse;
     text:caption-side;
     text:empty-cells;
     text:table-layout;
-spec:css-position-3; type:value; for:left; text:auto;
 spec:css-transforms-1;
     type:type;
         text:<transform-list>;
@@ -75,21 +79,20 @@ spec:css-transforms-1;
         text:perspective-origin;
         text:transform-origin;
         text:transform-style;
-spec:css-syntax-3;
-    type:dfn; text:identifier
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
     type:dfn; text:relative length
-spec:cssom;
-    type: dfn;
-        text: resolved value
-        text: origin-clean flag; for: CSSStyleSheet
+spec:dom; type:interface;
+    text:Document
+    text:Element;
+spec:geometry-1; type:dfn; for:DOMMatrixReadOnly; text:stringification behavior
 spec:infra;
     type: dfn;
         text: list
         text: code point
         text: string
+
 </pre>
 
 Introduction {#intro}
