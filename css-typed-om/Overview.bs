@@ -1198,7 +1198,6 @@ The following are the arithmetic operations you can perform on dimensions:
         then return a new {{CSSMathSum}} object
         whose {{CSSMathSum/values}} internal slot is set to |values|.
 
-
     5. Otherwise,
         let |result| initially be an empty [=list=].
         [=list/For each=] |unit| in |units|:
@@ -1216,7 +1215,7 @@ The following are the arithmetic operations you can perform on dimensions:
             2. If |value unit| is a [=compatible unit=] with |unit|,
                 then:
 
-                1.[=convert a CSSUnitValue|convert=] |value| to |unit|.
+                1. [=convert a CSSUnitValue|Convert=] |value| to |unit|.
                 2. Increment |temp|’s {{CSSUnitValue/value}} internal slot
                     by the value of |value|’s {{CSSUnitValue/value}} internal slot.
                 3. [=list/Remove=] |value| from |values|.
