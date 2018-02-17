@@ -2694,9 +2694,7 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
     when called,
     perform the following steps:
 
-    1. If the |url| passed into the constructor doesn't correctly
-        parse as a <<url>>, throw a {{TypeError}}.
-    2. Else, return a new {{CSSURLImageValue}}
+    1. Return a new {{CSSURLImageValue}}
         with its {{CSSURLImageValue/url}} internal slot
         set to |url|.
 </div>
