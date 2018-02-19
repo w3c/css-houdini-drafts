@@ -552,6 +552,8 @@ partial interface Element {
 <dfn>Computed StylePropertyMap</dfn> objects
 represent the [=computed values=] of an {{Element}},
 and are accessed by calling the {{Element/computedStyleMap()}} method.
+An {{Element}} must return the same {{StylePropertyMapReadOnly}} object
+for every call of the {{Element/computedStyleMap()}} method.
 
 <div algorithm>
     The <dfn method for="Element">computedStyleMap()</dfn> method must,
