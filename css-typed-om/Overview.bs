@@ -2159,7 +2159,39 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 The <dfn attribute for=CSSTransformValue>length</dfn> attribute indicates how many transform components are contained within the {{CSSTransformValue}}.
 
-The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform component at the provided index.
+They have a <dfn attribute for=CSSTransformValue>\[[values]]</dfn> internal slot,
+which is a [=list=] of {{CSSTransformComponent}} objects.
+This list is the object's [=values to iterate over=].
+
+<div algorithm="CSSTransformValue indexed properties">
+    The [=supported property indices|supported property indexes=]
+    of a {{CSSTransformValue}} |this|
+    are the integers greater than or equal to 0,
+    and less than the [=list/size=] of |this|’s {{CSSTransformValue/[[values]]}} internal slot.
+
+    To [=determine the value of an indexed property=]
+    of a {{CSSTransformValue}} |this|
+    and an index |n|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot,
+    and return |values|[|n|].
+
+    To [=set the value of an existing indexed property=]
+    of a {{CSSTransformValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot,
+    and set |values|[|n|] to |new value|.
+
+    To [=set the value of a new indexed property=]
+    of a {{CSSTransformValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot.
+    If |n| is not equal to the [=list/size=] of |values|,
+    [=throw=] a {{RangeError}}.
+    Otherwise,
+    [=list/append=] |new value| to |values|.
+</div>
 
 <xmp class=idl>
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
