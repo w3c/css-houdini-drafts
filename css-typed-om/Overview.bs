@@ -534,12 +534,18 @@ partial interface Element {
 represent the [=computed values=] of an {{Element}},
 and are accessed by calling the {{Element/computedStyleMap()}} method.
 
+Every {{Element}} has a <dfn attribute for=Element>\[[computedStyleMapCache]]</dfn> internal slot,
+initially set to `null`,
+which caches the result of the {{Element/computedStyleMap()}} method
+when it is first called.
+
 <div algorithm>
     The <dfn method for="Element">computedStyleMap()</dfn> method must,
     when called on an {{Element}} |this|,
     perform the following steps:
 
-    1. Return a live {{StylePropertyMapReadOnly}} object,
+    1. If |this|'s {{Element/[[computedStyleMapCache]]}} internal slot is set to `null`,
+        set its value to a live {{StylePropertyMapReadOnly}} object,
         whose {{[[declarations]]}} internal slot internal slot are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
@@ -547,6 +553,8 @@ and are accessed by calling the {{Element/computedStyleMap()}} method.
         on |this|,
         ordered by putting CSS-defined properties before custom properties,
         then sorting by code-point order of property name within those two categories.
+
+    2. Return |this|'s {{Element/[[computedStyleMapCache]]}} internal slot.
 </div>
 
 Note: like {{Window/getComputedStyle()|Window.getComputedStyle()}},
