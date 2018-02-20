@@ -2243,7 +2243,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     };
 
     dictionary CSSMatrixComponentOptions {
-        boolean is2D = false;
+        boolean is2D;
     };
 </xmp>
 
@@ -2501,9 +2501,10 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         with its {{CSSMatrixComponent/matrix}} internal slot
         set to |matrix|.
 
-    2. If |options| was passed,
+    2. If |options| was passed
+        and has a {{CSSMatrixComponentOptions/is2D}} field,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
-        to the |options|'s {{CSSMatrixComponentOptions/is2D}} member.
+        to the value of that field.
 
     3. Otherwise,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
