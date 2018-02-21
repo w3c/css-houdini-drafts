@@ -2624,7 +2624,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
 <div class='example'>
     <<position>> values accept a complicated combination of keywords and values,
-    but Typed OM always simplifies to just two offsets as per the [[#positionvalue-reification]] algorithm.
+    but Typed OM always simplifies to just two offsets as per the [[#reify-position]] algorithm.
     For example, the following style sheet:
 
     <pre class='lang-css'>
@@ -2888,7 +2888,7 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 </div>
 
 <div algorithm>
-    To <dfnexport>reify a math expression</dfn> |num|:
+    To <dfn export>reify a math expression</dfn> |num|:
 
     1. If |num| is a ''min()'' or ''max()'' expression:
         1. Let |values| be the result of [=reify a math expression|reifying=]
@@ -3106,8 +3106,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
     </dl>
 </div>
 
-{{CSSPositionValue}} Reification {#reify-positionvalue}
------------------------------------------------------------------
+<<position>> Values {#reify-position}
+-----------------------------------------------
 
 CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
 components determined via the following process. If this process, or any sub-process referenced by this
@@ -3180,7 +3180,7 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
         adding <var>adjustment</var> to it.
 
-{{CSSResourceValue}} Reification {#reify-resourcevalue}
+<<url>> (and subtype) Values {#reify-url}
 --------------------------------------------------------------
 
 Resource references are reified by determining whether the reference is invalid
