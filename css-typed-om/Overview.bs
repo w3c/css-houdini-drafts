@@ -163,10 +163,6 @@ with property |property|, cssText |cssText|, and parseMultiple set to true.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
-    3. If |parseMultiple| is true,
-        but |property| is a [=single-valued property=],
-        [=throw=] a {{TypeError}}.
-
     3. Attempt to [=CSS/parse=] |cssText| according to |property|’s grammar.
         If this fails,
         [=throw=] a {{TypeError}}.
