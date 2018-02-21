@@ -42,10 +42,18 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec
 </pre>
 
 <pre class=link-defaults>
-spec:dom; type:interface;
-    text:Document
-    text:Element;
+spec:css21; type:property;
+    text:max-height;
+    text:max-width;
+    text:min-height;
+    text:min-width;
+spec:cssom;
+    type: dfn;
+        text: resolved value
+        text: origin-clean flag; for: CSSStyleSheet
 spec:css-color-3; type:property; text:color;
+spec:css-position-3; type:value; for:left; text:auto;
+spec:css-sizing-3; type:property; text:box-sizing
 spec:css-speech-1; type:property;
     text:cue-after;
     text:cue-before;
@@ -53,17 +61,13 @@ spec:css-speech-1; type:property;
     text:pause-before;
     text:speak;
     text:voice-family;
-spec:css21; type:property;
-    text:max-height;
-    text:max-width;
-    text:min-height;
-    text:min-width;
+spec:css-syntax-3;
+    type:dfn; text:identifier
 spec:css-tables-3; type:property;
     text:border-collapse;
     text:caption-side;
     text:empty-cells;
     text:table-layout;
-spec:css-position-3; type:value; for:left; text:auto;
 spec:css-transforms-1;
     type:type;
         text:<transform-list>;
@@ -75,39 +79,36 @@ spec:css-transforms-1;
         text:perspective-origin;
         text:transform-origin;
         text:transform-style;
-spec:css-syntax-3;
-    type:dfn; text:identifier
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
     type:dfn; text:relative length
-spec:cssom;
-    type: dfn;
-        text: resolved value
-        text: origin-clean flag; for: CSSStyleSheet
+spec:dom; type:interface;
+    text:Document
+    text:Element;
+spec:geometry-1; type:dfn; for:DOMMatrixReadOnly; text:stringification behavior
 spec:infra;
     type: dfn;
         text: list
         text: code point
         text: string
+
 </pre>
 
 Introduction {#intro}
 =====================
 
-Converting Cascading Style Sheets Object Model (CSSOM) value strings into 
-meaningfully typed JavaScript representations and back can incur a significant 
-performance overhead. This specification exposes CSS values as typed JavaScript 
+Converting Cascading Style Sheets Object Model (CSSOM) value strings into
+meaningfully typed JavaScript representations and back can incur a significant
+performance overhead. This specification exposes CSS values as typed JavaScript
 objects to facilitate their performant manipulation.
 
 The API exposed by this specification is designed for performance rather than ergonomics.
 Some particular considerations:
-*   retrieved JavaScript representations of CSS values are not mutable - instead updates
-        must explicitly be set using the API.
-*   objects are organized for consistency rather than ease of access. For example, even
-        though lengths are often numeric pixel values, a declared {{CSSNumericValue}} can't be
-        treated as a number without first explicitly casting it to a {{CSSUnitValue}}, as calc
-        expressions and keywords are also valid lengths.
+
+* the objects representing CSS values are not "live"--
+    mutating them does not directly affect the page's style,
+    as they must instead be explicitly set back in the API.
 
 <!--
  ██████   ██████   ██████   ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ██       ██     ██ ████████
@@ -126,49 +127,45 @@ Some particular considerations:
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSStyleValue {
     stringifier;
-    [Exposed=Window] static CSSStyleValue parse(DOMString property, DOMString cssText);
-    [Exposed=Window] static sequence<CSSStyleValue> parseAll(DOMString property, DOMString cssText);
+    [Exposed=Window] static CSSStyleValue parse(USVString property, USVString cssText);
+    [Exposed=Window] static sequence<CSSStyleValue> parseAll(USVString property, USVString cssText);
 };
 </xmp>
 
-{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+{{CSSStyleValue}} objects are the base class of all CSS values accessible via the Typed OM API.
 
 Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
 are also represented as {{CSSStyleValue}} objects. These {{CSSStyleValue}} objects are only
 considered valid for the property that it was parsed with.
 
-The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects is to
-return a normalized representation
-(see [[#stylevalue-normalization]])
-of the value the {{CSSStyleValue}} object represents.
+The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects
+is defined in [[#stylevalue-serialization]].
 
 The <dfn method for=CSSStyleValue>parse(|property|, |cssText|)</dfn> method,
-when invoked, 
-must [=parse a CSSStyleValue=] 
-with property |property|, cssText |cssText|, and parseMultiple set to false.
+when invoked,
+must [=parse a CSSStyleValue=]
+with property |property|, cssText |cssText|, and parseMultiple set to false,
+and return the result.
 
 The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn>,
-when invoked, 
-must [=parse a CSSStyleValue=] 
-with property |property|, cssText |cssText|, and parseMultiple set to true.
+when invoked,
+must [=parse a CSSStyleValue=]
+with property |property|, cssText |cssText|, and parseMultiple set to true,
+and return the result.
 
 <div algorithm="parse a CSSStyleValue">
-    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|, 
+    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|,
     and a |parseMultiple| flag, run these steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. If |parseMultiple| is true,
-        but |property| is a [=single-valued property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. Attempt to [=CSS/parse=] |cssText| according to |property|’s grammar.
         If this fails,
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
         Otherwise,
         let |whole value| be the parsed result.
 
@@ -177,7 +174,7 @@ with property |property|, cssText |cssText|, and parseMultiple set to true.
         and let |values| be the result.
 
     5. [=list/For each=] |value| in |values|,
-        replace it with the result of [=normalize a CSS value|normalizing=] |value| for |property|.
+        replace it with the result of [=reifying=] |value| for |property|.
 
     6. If |parseMultiple| is false,
         return |values|[0].
@@ -198,17 +195,14 @@ with property |property|, cssText |cssText|, and parseMultiple set to true.
         as appropriate for |property|,
         and return a [=list=] containing the iterations in order.
 
-    <div class=note>
+    <div class=issue>
         How to divide a [=list-valued property=] into iterations
         is intentionally undefined and hand-wavey at the moment.
         <em>Generally</em>,
         you just split it on top-level commas
         (corresponding to a top-level `<foo>#` term in the grammar),
         but some legacy properties (such as 'counter-reset')
-        don't separate their iterations with commas,
-        and some properties (such as 'animation')
-        use a special singular value (generally ''animation/none'')
-        to indicate <strong>zero</strong> iterations.
+        don't separate their iterations with commas.
 
         It's expected to be rigorously defined in the future,
         but at the moment is explicitly a "you know what we mean" thing.
@@ -231,52 +225,55 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface StylePropertyMapReadOnly {
-    readonly maplike<DOMString, sequence<CSSStyleValue>>;
-    any get(DOMString property);
+    iterable<USVString, sequence<CSSStyleValue>>;
+    any get(USVString property);
     /* 'any' means (undefined or CSSStyleValue) here,
        see https://github.com/heycam/webidl/issues/60 */
-    sequence<CSSStyleValue> getAll(DOMString property);
-    boolean has(DOMString property);
-    stringifier;
+    sequence<CSSStyleValue> getAll(USVString property);
+    boolean has(USVString property);
+    readonly attribute long size;
 };
-
-callback UpdateFunction = CSSStyleValue (CSSStyleValue oldValue);
 
 [Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
-    maplike<DOMString, sequence<CSSStyleValue>>;
-    void append(DOMString property, (CSSStyleValue or DOMString)... values);
-    void delete(DOMString property);
-    void set(DOMString property, (CSSStyleValue or DOMString)... values);
-    void update(DOMString property, UpdateFunction updateFunction);
+    void set(USVString property, (CSSStyleValue or USVString)... values);
+    void append(USVString property, (CSSStyleValue or USVString)... values);
+    void delete(USVString property);
+    void clear();
 };
 </xmp>
 
 <!--
     We restrict the read-write version from workers/worklets
-    because append()/set() require parsing to accept DOMStrings,
+    because append()/set() require parsing to accept USVStrings,
     and leaving it with just delete() doesn't seem useful.
     That said, theoretically we could still expose them and just only allow CSSStyleValue
-    (throwing on DOMString, I suppose).
+    (throwing on USVString, I suppose).
     But we don't have use-cases for setting property maps in workers yet anyway,
     so we can wait until that matters.
 -->
 
-<div algorithm>
-    A {{StylePropertyMapReadOnly}} object has associated <dfn export for="StylePropertyMapReadonly, StylePropertyMap">map entries</dfn>,
-    which is a [=map=] of property names ([=string=]) → values ([=list=] of {{CSSStyleValue}} objects).
-    This list is initialized differently depending on where the {{CSSStyleValue}} is used
+<div algorithm="StylePropertyMap.[[declarations]]">
+    A {{StylePropertyMapReadOnly}} object
+    has a <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
+    which contains a <dfn export for="StylePropertyMapReadonly, StylePropertyMap">declarations map</dfn>,
+    which is a [=map=] whose keys are [=strings=] (representing property names)
+    and whose values are [=lists=] of {{CSSStyleValue}} objects.
+    This list is initialized differently depending on where the {{StylePropertyMap}} is used
     (see [[#computed-stylepropertymapreadonly-objects]]
     and [[#declared-stylepropertymap-objects]]).
 
     Unless otherwise stated,
-    the initial ordering of the [=StylePropertyMap/map entries=]
+    the initial ordering of the {{[[declarations]]}} internal slot
     is based on the key of each entry:
 
     1. Non-custom properties, sorted in increasing code-point order.
         (Note that non-custom properties are always lowercased in {{StylePropertyMap}}s.)
     2. Custom properties, sorted in increasing code-point order.
 </div>
+
+The [=value pairs to iterate over=] for a {{StylePropertyMapReadOnly}} object
+are the keys and values of the object's {{[[declarations]]}} slot.
 
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
@@ -289,11 +286,11 @@ such as 'color',
 are <dfn export local-lt="single-valued">single-valued properties</dfn>;
 they take only a single (possibly complex) value.
 
-Issue: Define precisely which properties are list-valued and which aren't,
+Issue(644): Define precisely which properties are list-valued and which aren't,
 probably in an appendix.
 
 <div class='note'>
-    There are multiple examples of CSS properties 
+    There are multiple examples of CSS properties
     that have transitioned from being [=single-valued=] to [=list-valued=].
     To ensure that code written at a time when a property was [=single-valued=]
     does not break when it becomes [=list-valued=] in the future,
@@ -308,20 +305,115 @@ probably in an appendix.
 </div>
 
 <div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        set |property| to |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}}.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|][0].
+
+        Otherwise, return `undefined`.
+</div>
+
+<div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        set |property| to |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}}.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return |props|[|property|].
+        Otherwise, return an empty [=list=].
+</div>
+
+<div algorithm>
+    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">has(|property|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        set |property| to |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [=valid CSS property=],
+        [=throw=] a {{TypeError}}.
+
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    4. If |props|[|property|] [=map/exists=],
+        return `true`.
+        Otherwise, return `false`.
+</div>
+
+<div algorithm>
+    The <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">size</dfn> attribute,
+    on getting from a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot.
+</div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. If |property| is not a [=custom property name string=],
+        set |property| to |property| [=ASCII lowercased=].
+
+    2. If |property| is not a [[=valid CSS property=],
+        [=throw=] a {{TypeError}}.
+
+    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
+        [=throw=] a {{TypeError}}.
+
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    5. If |props|[|property|] [=map/exists=],
+        [=map/remove=] it.
+
+    6. Let |values to set| be an empty [=list=].
+
+    7. For each |value| in |values|,
+        [=normalize a style value=] for |property| and |value|,
+        and append the result to |values to set|.
+
+    8. Set |props|[|property|] to |values to set|.
+
+    Note: The property is deleted then added back
+    so that it gets put at the end of the [=ordered map=],
+    which gives the expected behavior in the face of [=shorthand properties=].
+</div>
+
+<div algorithm>
     The <dfn method for=StylePropertyMap>append(|property|, ...|values|)</dfn> method,
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     3. If |property| is not a [=list-valued property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
-    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     5. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
@@ -343,13 +435,21 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
-    3. If |this|’s [=StylePropertyMap/map entries=] [=contains=] |property|,
+    3. If |this|’s {{[[declarations]]}} internal slot [=map/contains=] |property|,
         [=map/remove=] it.
+</div>
+
+<div algorithm>
+    The <dfn method for=StylePropertyMap>clear()</dfn> method,
+    when called on a {{StylePropertyMap}} |this|,
+    must perform the following steps:
+
+    1. Replace the value of |this|’s {{[[declarations]]}} internal slot with a fresh empty [=declarations map=].
 </div>
 
 <div algorithm>
@@ -359,10 +459,22 @@ probably in an appendix.
 
     : If |value| is a {{CSSStyleValue}},
     :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
-        [=throw=] a {{TypeError}} and exit this algorithm.
-        Otherwise, return the |value|.
+        [=throw=] a {{TypeError}}.
 
-    : If |value| is a {{DOMString}},
+        If any component of |property|’s CSS grammar has a limited numeric range,
+        and the corresponding part of |value| is a {{CSSUnitValue}} that is outside of that range,
+        replace that value with the result of wrapping it in a fresh {{CSSMathSum}}
+        whose {{CSSMathSum/values}} internal slot contains only that part of |value|.
+
+        (If |value| is a direct instance of {{CSSStyleValue}},
+        rather than one of its subclasses,
+        do the same with the abstract representation of the property's value that |value| contains,
+        replacing any out-of-range number, percentage, or dimension components
+        by wrapping them in a ''calc()'' expression.)
+
+        Return the |value|.
+
+    : If |value| is a {{USVString}},
     ::  [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple set to `false`,
         and return the result.
 
@@ -381,93 +493,8 @@ probably in an appendix.
     * Any subclass of {{CSSImageValue}} always matches <<image>>.
 </div>
 
-<div algorithm>
-    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|][0].
-
-        Otherwise, return `undefined`.
-</div>
-
-<div algorithm>
-    The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|].
-        Otherwise, return an empty [=list=].
-</div>
-
-<div algorithm>
-    The <dfn method for=StylePropertyMap>set(|property|, ...|values|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
-
-    2. If |property| is not a [[=valid CSS property=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
-        [=throw=] a {{TypeError}} and exit this algorithm.
-
-    4. Let |props| be |this|’s [=StylePropertyMap/map entries=].
-
-    5. If |props|[|property|] [=map/exists=],
-        [=map/remove=] it.
-
-    6. Let |values to set| be an empty [=list=].
-
-    7. For each |value| in |values|,
-        [=normalize a style value=] for |property| and |value|,
-        and append the result to |values to set|.
-
-    8. Set |props|[|property|] to |values to set|.
-
-    Note: The property is deleted then added back
-    so that it gets put at the end of the [=ordered map=],
-    which gives the expected behavior in the face of [=shorthand properties=].
-</div>
-
-<div algorithm>
-    The <dfn method for=StylePropertyMap>update(|property|, |updateFn|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
-    must perform the following steps:
-
-    1. Let |old value| be the result of calling |this|.get(|property|)
-        (using the original value of {{StylePropertyMap/get()}}).
-
-    2. Let |new value| be the result of [=invoking=] |updateFn| with |old value|.
-
-    3. Call |this|.set(|property|, |new value|)
-        (using the original value of {{StylePropertyMap/set()}}).
-</div>
-
-Issue: Do we need an updateAll() method that gets and sets a list?
-
-[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects: 
-the attributes and methods on these objects must operate on the actual underlying data, 
+[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects:
+the attributes and methods on these objects must operate on the actual underlying data,
 not a snapshot of the data.
 
 A [=string=] is a <dfn>custom property name string</dfn>
@@ -491,41 +518,48 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 --------------------------------------------------------------------------
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface Element {
     StylePropertyMapReadOnly computedStyleMap();
 };
 </pre>
 
-<dfn>Computed StylePropertyMap</dfn> objects 
-represent the [=computed values=] of an {{Element}}, 
+<dfn>Computed StylePropertyMap</dfn> objects
+represent the [=computed values=] of an {{Element}},
 and are accessed by calling the {{Element/computedStyleMap()}} method.
+
+Every {{Element}} has a <dfn attribute for=Element>\[[computedStyleMapCache]]</dfn> internal slot,
+initially set to `null`,
+which caches the result of the {{Element/computedStyleMap()}} method
+when it is first called.
 
 <div algorithm>
     The <dfn method for="Element">computedStyleMap()</dfn> method must,
     when called on an {{Element}} |this|,
     perform the following steps:
 
-    1. Return a live {{StylePropertyMapReadOnly}} object,
-        whose [=StylePropertyMap/map entries=] are the name and [=computed value=] of 
+    1. If |this|'s {{Element/[[computedStyleMapCache]]}} internal slot is set to `null`,
+        set its value to a live {{StylePropertyMapReadOnly}} object,
+        whose {{[[declarations]]}} internal slot are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
         and every non-registered [=custom property=] which is not set to its initial value
         on |this|,
         ordered by putting CSS-defined properties before custom properties,
         then sorting by code-point order of property name within those two categories.
+
+    2. Return |this|'s {{Element/[[computedStyleMapCache]]}} internal slot.
 </div>
 
 Note: like {{Window/getComputedStyle()|Window.getComputedStyle()}},
 this method can expose information from stylesheets with the [=CSSStyleSheet/origin-clean flag=] unset.
 
 Note: The {{StylePropertyMapReadOnly}} returned by this method represents the *actual* [=computed values=],
-not the [=resolved value=] concept used by {{Window/getComputedStyle()|Window.getComputedStyle()}}. 
+not the [=resolved value=] concept used by {{Window/getComputedStyle()|Window.getComputedStyle()}}.
 It can thus return different values than {{Window/getComputedStyle()|Window.getComputedStyle()}}
 for some properties (such as 'width').
 
 Note: Per [WG resolution](https://github.com/w3c/css-houdini-drafts/issues/350#issuecomment-294690156),
-pseudo-element styles are intended to be obtainable 
+pseudo-element styles are intended to be obtainable
 by adding this method to the new {{PseudoElement}} interface
 (rather than using a `pseudoElt` argument like {{Window/getComputedStyle()|Window.getComputedStyle()}} does).
 
@@ -533,28 +567,26 @@ Declared & Inline {{StylePropertyMap}} objects {#declared-stylepropertymap-objec
 ----------------------------------------------------------------------------
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface CSSStyleRule {
     [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial interface ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
 
-<dfn>Declared StylePropertyMap</dfn> objects 
+<dfn>Declared StylePropertyMap</dfn> objects
 represent style property-value pairs embedded in a style rule or inline style,
 and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> attribute of {{CSSStyleRule}} objects,
-or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute 
+or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute
 of objects implementing the {{ElementCSSInlineStyle}} interface
 (such as {{Element}}s).
 
-When constructed, the [=StylePropertyMap/map entries=] for [=declared StylePropertyMap=] objects 
-is initialized to contain an entry 
+When constructed, the {{[[declarations]]}} internal slot for [=declared StylePropertyMap=] objects
+is initialized to contain an entry
 for each property with a valid value inside the {{CSSStyleRule}}
-or inline style 
+or inline style
 that the object represents,
 in the same order as the {{CSSStyleRule}} or inline style.
 
@@ -585,35 +617,67 @@ interface CSSUnparsedValue : CSSStyleValue {
     setter CSSUnparsedSegment (unsigned long index, CSSUnparsedSegment val);
 };
 
-typedef (DOMString or CSSVariableReferenceValue) CSSUnparsedSegment;
+typedef (USVString or CSSVariableReferenceValue) CSSUnparsedSegment;
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(DOMString variable, optional CSSUnparsedValue fallback)]
+ Constructor(USVString variable, optional CSSUnparsedValue? fallback)]
 interface CSSVariableReferenceValue {
-    attribute DOMString variable;
+    attribute USVString variable;
     readonly attribute CSSUnparsedValue? fallback;
 };
 </xmp>
 
-{{CSSUnparsedValue}} objects represent values that reference custom properties.
-They represent a list of string fragments and variable references.
+{{CSSUnparsedValue}} objects represent property values that reference custom properties.
+They are comprised of a list of string fragments and variable references.
 
 They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
-which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects. 
+which is a [=list=] of {{USVString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
-The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute indicates how many string fragments and variable references are contained within the {{CSSUnparsedValue}}.
+The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the [=list/size=]
+of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
 
-The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment or variable reference at the provided index.
+<div algorithm="CSSUnparsedValue indexed properties">
+    The [=supported property indices|supported property indexes=]
+    of a {{CSSUnparsedValue}} |this|
+    are the integers greater than or equal to 0,
+    and less than the [=list/size=] of |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+
+    To [=determine the value of an indexed property=]
+    of a {{CSSUnparsedValue}} |this|
+    and an index |n|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
+    and return |tokens|[|n|].
+
+    To [=set the value of an existing indexed property=]
+    of a {{CSSUnparsedValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
+    and set |tokens|[|n|] to |new value|.
+
+    To [=set the value of a new indexed property=]
+    of a {{CSSUnparsedValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+    If |n| is not equal to the [=list/size=] of |tokens|,
+    [=throw=] a {{RangeError}}.
+    Otherwise,
+    [=list/append=] |new value| to |tokens|.
+</div>
 
 <div algorithm="CSSVariableReferenceValue.variable">
-    The <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
+    The getter for the <dfn attribute for=CSSVariableReferenceValue>variable</dfn> attribute
+    of a {{CSSVariableReferenceValue}} |this|
+    must return its {{CSSVariableReferenceValue/variable}} internal slot.
+
+    The {{CSSVariableReferenceValue/variable}} attribute
     of a {{CSSVariableReferenceValue}} |this| must, on setting a
     variable |variable|, perform the following steps:
 
-    1. If |variable| is not a [=custom property name string=], 
-        [=throw=] a {{TypeError}},
-        and exit this algorithm.
+    1. If |variable| is not a [=custom property name string=],
+        [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSVariableReferenceValue/variable}} internal slot
         to |variable|.
@@ -625,8 +689,7 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
     perform the following steps:
 
     1. If |variable| is not a [=custom property name string=],
-        [=throw=] a {{TypeError}},
-        and exit this algorithm.
+        [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSVariableReferenceValue}}
         with its {{CSSVariableReferenceValue/variable}} internal slot
@@ -654,9 +717,9 @@ The <dfn for=CSSUnparsedValue>indexed getter</dfn> retrieves the string fragment
 
 <pre class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(DOMString value)]
+ Constructor(USVString value)]
 interface CSSKeywordValue : CSSStyleValue {
-    attribute DOMString value;
+    attribute USVString value;
 };
 </pre>
 
@@ -665,41 +728,22 @@ interface CSSKeywordValue : CSSStyleValue {
     when called,
     perform the following steps:
 
-    1. If |value| is an empty string [=throw=] a {{TypeError}}
-        and exit this algorithm.
+    1. If |value| is an empty string, [=throw=] a {{TypeError}}.
     2. Otherwise, return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |value|.
 </div>
 
 Any place that accepts a {{CSSKeywordValue}}
-also accepts a raw {{DOMString}},
+also accepts a raw {{USVString}},
 by using the following typedef and algorithm:
-
-<pre class=idl>
-typedef (DOMString or CSSKeywordValue) CSSKeywordish;
-</pre>
-
-<div algorithm>
-    To <dfn export>rectify a keywordish value</dfn> |val|,
-    perform the following steps:
-
-    1. If |val| is a {{CSSKeywordValue}},
-        return |val|.
-
-    2. If |val| is a {{DOMString}},
-        return a new {{CSSKeywordValue}}
-        with its {{CSSKeywordValue/value}} internal slot
-        set to |val|.
-</div>
 
 <div algorithm="CSSKeywordValue.value">
     The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
     on setting a value |value|,
     perform the following steps:
 
-    1. If |value| is an empty string, [=throw=] a {{TypeError}},
-        and exit this algorithm.
+    1. If |value| is an empty string, [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSKeywordValue/value}} internal slot,
         to |value|.
@@ -820,11 +864,11 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
         boolean equals(CSSNumberish... value);
 
-        CSSUnitValue to(DOMString unit);
-        CSSMathSum toSum(DOMString... units);
+        CSSUnitValue to(USVString unit);
+        CSSMathSum toSum(USVString... units);
         CSSNumericType type();
 
-        [Exposed=Window] static CSSNumericValue parse(DOMString cssText);
+        [Exposed=Window] static CSSNumericValue parse(USVString cssText);
     };
 </xmp>
 
@@ -854,6 +898,11 @@ The following are the arithmetic operations you can perform on dimensions:
         and {{CSSUnitValue/value}} internal slot is set to the sum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
+        This addition must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 + 2) + 3) + 4).
+        (This detail is necessary to ensure interoperability
+        in the presence of floating-point arithmetic.)
 
     4. Let |type| be the result of [=adding=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
@@ -916,6 +965,12 @@ The following are the arithmetic operations you can perform on dimensions:
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
 
+        This multiplication must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 × 2) × 3) × 4).
+        (This detail is necessary to ensure interoperability
+        in the presence of floating-point arithmetic.)
+
     4. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         with {{CSSUnitValue/unit}} internal slot set to "number"
         except one which is set to |unit|,
@@ -924,6 +979,10 @@ The following are the arithmetic operations you can perform on dimensions:
         and {{CSSUnitValue/value}} internal slot is set to the product of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
+
+        This multiplication must be done "left to right" -
+        if |values| is « 1, 2, 3, 4 »,
+        the result must be (((1 × 2) × 3) × 4).
 
     5. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
@@ -954,11 +1013,11 @@ The following are the arithmetic operations you can perform on dimensions:
         return |this|’s {{CSSMathInvert/value}} internal slot.
 
     2. If |this| is a {{CSSUnitValue}} object with {{CSSUnitValue/unit}} internal slot set to "number":
-        1. If |this|’s {{CSSUnitValue/value}} internal slot is set to 0,
+        1. If |this|’s {{CSSUnitValue/value}} internal slot is set to 0 or -0,
             [=throw=] a {{RangeError}}.
         2. Else return a new {{CSSUnitValue}}
             with the {{CSSUnitValue/unit}} internal slot set to "number",
-            and a {{CSSUnitValue/value}} internal slot set to the inverse of |this|’s.
+            and a {{CSSUnitValue/value}} internal slot set to 1 divided by |this|’s {CSSUnitValue/value}} internal slot.
 
     3. Otherwise,
         return a new {{CSSMathInvert}} object
@@ -1048,7 +1107,7 @@ The following are the arithmetic operations you can perform on dimensions:
     are <dfn export lt="equal numeric value">equal numeric values</dfn>,
     perform the following steps:
 
-    1. If |value1| and |value2| are not members of the same interface, 
+    1. If |value1| and |value2| are not members of the same interface,
         return `false`.
 
     2. If |value1| and |value2| are both {{CSSUnitValue}}s,
@@ -1061,16 +1120,17 @@ The following are the arithmetic operations you can perform on dimensions:
         1. If |value1|’s {{CSSMathSum/values}} and |value2|s {{CSSMathSum/values}} internal slots
             have different [=list/sizes=],
             return `false`.
-        
+
         2. If any [=list/item=] in |value1|'s {{CSSMathSum/values}} internal slot
-            does not have a corresponding [=list/item=] in |value2|’s {{CSSMathSum/values}} internal slot
-            that is an [=equal numeric value=],
-            return `false`
+            is not an [=equal numeric value=]
+            to the [=list/item=] in |value2|’s {{CSSMathSum/values}} internal slot
+            at the same index,
+            return `false`.
 
         3. Return `true`.
 
     4. Assert: |value1| and |value2| are both {{CSSMathNegate}}s or {{CSSMathInvert}}s.
-    
+
     5. Return whether |value1|’s {{CSSMathNegate/value}}
         and |value2|’s {{CSSMathNegate/value}}
         are [=equal numeric values=].
@@ -1155,7 +1215,6 @@ The following are the arithmetic operations you can perform on dimensions:
         then return a new {{CSSMathSum}} object
         whose {{CSSMathSum/values}} internal slot is set to |values|.
 
-
     5. Otherwise,
         let |result| initially be an empty [=list=].
         [=list/For each=] |unit| in |units|:
@@ -1173,7 +1232,7 @@ The following are the arithmetic operations you can perform on dimensions:
             2. If |value unit| is a [=compatible unit=] with |unit|,
                 then:
 
-                1.[=convert a CSSUnitValue|convert=] |value| to |unit|.
+                1. [=convert a CSSUnitValue|Convert=] |value| to |unit|.
                 2. Increment |temp|’s {{CSSUnitValue/value}} internal slot
                     by the value of |value|’s {{CSSUnitValue/value}} internal slot.
                 3. [=list/Remove=] |value| from |values|.
@@ -1409,7 +1468,7 @@ The following are the arithmetic operations you can perform on dimensions:
             3. Otherwise, set |result|[|unit|] to |power|.
 
         3. Return |result|.
-    </div>    
+    </div>
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
@@ -1434,7 +1493,7 @@ rather than on {{CSSNumericValue}} instances.
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
 
-    3. [=Normalize a numeric value=] |result|,
+    3. [=Reify a numeric value=] |result|,
         and return the result.
 </div>
 
@@ -1627,7 +1686,7 @@ A [=type=] is said to <dfn for=CSSNumericValue>match</dfn> a CSS production in s
 Many specifications use ''[ <<length>> | <<percentage>> ]''
 instead of ''<<length-percentage>>'' in their grammar,
 and specify in prose that the <<length>> and <<percentage>> can be combined.
-For the purposes of [=matching=],
+For the purposes of [=CSSNumericValue/matching=],
 these cases should be treated as <<length-percentage>>.
 Similarly for <<angle-percentage>>, etc.
 
@@ -1671,10 +1730,10 @@ are represented as {{CSSUnitValue}}s.
 
 <xmp class=idl>
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
-     Constructor(double value, DOMString unit)]
+     Constructor(double value, USVString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
-        readonly attribute DOMString unit;
+        readonly attribute USVString unit;
     };
 </xmp>
 
@@ -2114,7 +2173,39 @@ is a [=list=] of {{CSSTransformComponent}}s.
 
 The <dfn attribute for=CSSTransformValue>length</dfn> attribute indicates how many transform components are contained within the {{CSSTransformValue}}.
 
-The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform component at the provided index.
+They have a <dfn attribute for=CSSTransformValue>\[[values]]</dfn> internal slot,
+which is a [=list=] of {{CSSTransformComponent}} objects.
+This list is the object's [=values to iterate over=].
+
+<div algorithm="CSSTransformValue indexed properties">
+    The [=supported property indices|supported property indexes=]
+    of a {{CSSTransformValue}} |this|
+    are the integers greater than or equal to 0,
+    and less than the [=list/size=] of |this|’s {{CSSTransformValue/[[values]]}} internal slot.
+
+    To [=determine the value of an indexed property=]
+    of a {{CSSTransformValue}} |this|
+    and an index |n|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot,
+    and return |values|[|n|].
+
+    To [=set the value of an existing indexed property=]
+    of a {{CSSTransformValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot,
+    and set |values|[|n|] to |new value|.
+
+    To [=set the value of a new indexed property=]
+    of a {{CSSTransformValue}} |this|,
+    an index |n|,
+    and a value |new value|,
+    let |values| be |this|’s {{CSSTransformValue/[[values]]}} internal slot.
+    If |n| is not equal to the [=list/size=] of |values|,
+    [=throw=] a {{RangeError}}.
+    Otherwise,
+    [=list/append=] |new value| to |values|.
+</div>
 
 <xmp class=idl>
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -2185,7 +2276,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     };
 
     dictionary CSSMatrixComponentOptions {
-        boolean is2D = false;
+        boolean is2D;
     };
 </xmp>
 
@@ -2233,7 +2324,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         as defined in [[css-transforms-1#mathematical-description]],
         and with its {{DOMMatrixReadOnly/is2D}} internal slot
         set to the same value as |this|'s {{CSSTransformComponent/is2D}} internal slot.
-        
+
         Note: Recall that the {{CSSTransformComponent/is2D}} flag
         affects what transform,
         and thus what equivalent matrix,
@@ -2254,10 +2345,10 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |x| or |y| don't match <<length-percentage>>,
+    1. If |x| or |y| don't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
-    2. If |z| was passed, but doesn't match <<length>>,
+    2. If |z| was passed, but doesn't [=CSSNumericValue/match=] <<length>>,
         [=throw=] a {{TypeError}}.
 
     3. Let |this| be a new {{CSSTranslate}} object,
@@ -2284,7 +2375,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |angle| doesn't match <<angle>>,
+    1. If |angle| doesn't [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSRotate}}
@@ -2302,14 +2393,14 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |angle| doesn't match <<angle>>,
+    1. If |angle| doesn't [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Let |x|, |y|, and |z|
         be replaced by the result of [=rectifying a numberish value=].
 
     3. If |x|, |y|, or |z|
-        don't match <<number>>,
+        don't [=CSSNumericValue/match=] <<number>>,
         [=throw=] a {{TypeError}}.
 
     4. Return a new {{CSSRotate}}
@@ -2335,7 +2426,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         be replaced by the result of [=rectifying a numberish value=].
 
     2. If |x|, |y|, or |z| (if passed)
-        don't match <<number>>,
+        don't [=CSSNumericValue/match=] <<number>>,
         [=throw=] a {{TypeError}}.
 
     3. Let |this| be a new {{CSSScale}} object,
@@ -2366,7 +2457,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ax| or |ay| do not match <<angle>>,
+    1. If |ax| or |ay| do not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkew}} object
@@ -2380,7 +2471,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ax| does not match <<angle>>,
+    1. If |ax| does not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkewX}} object
@@ -2394,7 +2485,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |ay| does not match <<angle>>,
+    1. If |ay| does not [=CSSNumericValue/match=] <<angle>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSSkewY}} object
@@ -2404,7 +2495,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
 </div>
 
 <div algorithm="CSSSkew.is2D">
-    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute 
+    The <dfn attribute for="CSSSkew, CSSSkewX, CSSSkewY">is2D</dfn> attribute
     of a {{CSSSkew}}, {{CSSSkewX}}, or {{CSSSkewY}} object must,
     on setting,
     do nothing.
@@ -2417,7 +2508,7 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
     when invoked,
     perform the following steps:
 
-    1. If |length| does not match <<length>>,
+    1. If |length| does not [=CSSNumericValue/match=] <<length>>,
         [=throw=] a {{TypeError}}.
 
     2. Return a new {{CSSPerspective}} object
@@ -2443,9 +2534,10 @@ The <dfn for=CSSTransformValue>indexed getter</dfn> retrieves the transform comp
         with its {{CSSMatrixComponent/matrix}} internal slot
         set to |matrix|.
 
-    2. If |options| was passed,
+    2. If |options| was passed
+        and has a {{CSSMatrixComponentOptions/is2D}} field,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
-        to the |options|'s {{CSSMatrixComponentOptions/is2D}} member.
+        to the value of that field.
 
     3. Otherwise,
         set |this|’s {{CSSTransformValue/is2D}} internal slot
@@ -2506,7 +2598,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     when called,
     perform the following steps:
 
-    1. If |x| or |y| doesn't match <<length-percentage>>,
+    1. If |x| or |y| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
     2. Otherwise, return a new {{CSSPositionValue}}
@@ -2519,7 +2611,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     on setting a value |value|,
     perform the following steps:
 
-    1. If |value| doesn't match <<length-percentage>>,
+    1. If |value| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
         [=throw=] a {{TypeError}}.
 
     2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
@@ -2532,7 +2624,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
 <div class='example'>
     <<position>> values accept a complicated combination of keywords and values,
-    but in the Typed OM are always simplified to just two offsets.
+    but Typed OM always simplifies to just two offsets as per the [[#reify-position]] algorithm.
     For example, the following style sheet:
 
     <pre class='lang-css'>
@@ -2544,7 +2636,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
     Will produce the following behavior:
 
     <pre class='lang-javascript'>
-    let map = document.querySelector('.example').attributeStyleMap;
+    let map = document.querySelector('.example').computedStyleMap();
 
     map.get('object-position').x;
     // CSS.percent(50)
@@ -2592,6 +2684,9 @@ A {{CSSResourceValue}} is in one of the following states, as reflected in the va
 :   "error"
 ::  The resource can't be fetched, or the fetched resource is invalid
 
+{{CSSResourceValue}} objects that do not require network data (for example linear and radial gradients)
+are initialized with {{CSSResourceValue/state}} "loaded".
+
 <div class='example'>
 For example, images that match the <<url>> production can be used immediately, but will not result
 in a visual change until the image data is fetched. {{CSSResourceValue}} objects represent this by
@@ -2632,12 +2727,10 @@ interface CSSURLImageValue : CSSImageValue {
 {{CSSImageValue}} objects represent values for properties that take <<image>> productions,
 for example 'background-image', 'list-style-image', and 'border-image-source'.
 
-{{CSSImageValue}} objects that do not require network data (for example linear and radial gradients)
-are initialized with {{CSSResourceValue/state}} "loaded".
-
 If the {{CSSImageValue}}'s {{CSSResourceValue/state}} is "loaded",
 and the resource has an intrinsic width, height, or aspect ratio,
 then {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}}, and {{CSSImageValue/intrinsicRatio}} must reflect the resource's corresponding value.
+In this case, {{CSSImageValue/intrinsicWidth}} and {{CSSImageValue/intrinsicHeight}} has units `px`.
 In all other cases, the attributes must be <code>null</code>.
 
 Issue(186): Does the loading lifecycle need to be described here?
@@ -2653,8 +2746,14 @@ objects, the {{CSSURLImageValue/url}} attribute contains the URL that references
     1. If the |url| passed into the constructor is not a valid url,
         throw a {{TypeError}} and exit this algorithm.
     2. Else, return a new {{CSSURLImageValue}}
+    1. Return a new {{CSSURLImageValue}}
         with its {{CSSURLImageValue/url}} internal slot
         set to |url| with CSS character escapes processed.
+</div>
+
+<div algorithm="CSSURLImageValue.url">
+    The getter for the <dfn attribute for=CSSURLImageValue>url</dfn> attribute
+    of a {{CSSURLImageValue}} must return its {{CSSURLImageValue/url}} internal slot.
 </div>
 
 Issue(159): Spec up ColorValue
@@ -2669,15 +2768,15 @@ Issue(159): Spec up ColorValue
  ██████   ██████   ██████                ██           ███████  ██     ██
 -->
 
-{{CSSStyleValue}} normalization {#stylevalue-normalization}
+{{CSSStyleValue}} Reification {#reify-stylevalue}
 ===========================================================
 
 This section describes how Typed OM objects are constructed from abstract CSS values
-(aka how to <dfn export>normalize a CSS value</dfn> for a given property).
+(aka how to <dfn export for=CSS>reify</dfn> a CSS value for a given property).
 
 If a property's grammar is more complex than one of the types listed here,
-it [=normalizes=] to a raw {{CSSStyleValue}},
-with a <a for=CSSStyleValue>stringification behavior</a>
+it [=reifies=] to a raw {{CSSStyleValue}},
+with a [=CSSStyleValue/stringification behavior=]
 that produces the CSSOM serialization of the property.
 
 Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
@@ -2685,7 +2784,7 @@ We instead need to strictly define the serialization of every property.
 This should be done according to CSSOM principles, tho
 (generally, shortest possible value).
 
-Raw CSS tokens: properties with ''var()'' references {#normalize-tokens}
+Raw CSS tokens: properties with ''var()'' references {#reify-tokens}
 --------------------------------------------------
 
 Regardless of what the property's grammar is otherwise,
@@ -2694,12 +2793,12 @@ is represented as a [=list=] of [=component values=],
 which becomes a {{CSSUnparsedValue}} in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a list of component values</dfn>
+    To <dfn export>reify a list of component values</dfn>
     from a |list|:
 
     1. Replace all ''var()'' references in |list|
         with {{CSSVariableReferenceValue}} objects,
-        as described in [[#normalize-var]].
+        as described in [[#reify-var]].
     2. Replace each remaining maximal subsequence of [=component values=] in |list|
         with a single string of their concatenated serializations.
     3. Return a new {{CSSUnparsedValue}}
@@ -2728,13 +2827,13 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
     * the string ")"
 </div>
 
-''var()'' References {#normalize-var}
+''var()'' References {#reify-var}
 -------------------------------------
 
 ''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a ''var()'' reference</dfn> |var|:
+    To <dfn export>reify a ''var()'' reference</dfn> |var|:
 
     1. Let |object| be a new {{CSSVariableReferenceValue}}.
 
@@ -2743,36 +2842,36 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 
     3. If |var| has a fallback value,
         set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
-        to the result of [=normalize a list of component values|normalizing the fallback's component values=].
+        to the result of [=reify a list of component values|reifying the fallback's component values=].
         Otherwise,
         set it to `null`.
 
     4. Return |object|.
 </div>
 
-[=Identifier=] Values {#normalize-ident}
+[=Identifier=] Values {#reify-ident}
 -----------------------------------
 
 CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize an [=identifier=]</dfn> |ident|:
+    To <dfn export>reify an [=identifier=]</dfn> |ident|:
 
     1. Return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to the serialization of |ident|.
 </div>
 
-<<number>>, <<percentage>>, and <<dimension>> values {#normalize-numeric}
+<<number>>, <<percentage>>, and <<dimension>> values {#reify-numeric}
 -------------------------------------------------------------------------
 
 CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a numeric value</dfn> |num|:
+    To <dfn export>reify a numeric value</dfn> |num|:
 
     1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
-        [=normalize a math expression=] from |num|
+        [=reify a math expression=] from |num|
         and return the result.
 
     2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
@@ -2792,10 +2891,10 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 </div>
 
 <div algorithm>
-    To <dfn for=CSSMath export local-lt="normalize">normalize a math expression</dfn> |num|:
+    To <dfn export>reify a math expression</dfn> |num|:
 
     1. If |num| is a ''min()'' or ''max()'' expression:
-        1. Let |values| be the result of [=CSSMath/normalizing=]
+        1. Let |values| be the result of [=reify a math expression|reifying=]
             the arguments to the expression,
             treating each argument as if it were the contents of a ''calc()'' expression.
 
@@ -2841,7 +2940,7 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
                 with its {{CSSMathInvert/value}} internal slot
                 set to its argument
             : leaf node
-            :: normalized as appropriate
+            :: [=reified=] as appropriate
         </dl>
 
     <div class=example>
@@ -2897,23 +2996,23 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 </div>
 
 
-<<transform-list>> and <<transform-function>> values {#transformvalue-normalization}
+<<transform-list>> and <<transform-function>> values {#reify-transformvalue}
 ------------------------------------------------------------------------------------
 
 CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
 while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 
 <div algorithm>
-    To <dfn export>normalize a <<transform-list>></dfn> |list|:
+    To <dfn export>reify a <<transform-list>></dfn> |list|:
 
     1. Return a new {{CSSTransformValue}}
         whose [=values to iterate over=]
-        are the result of mapping the [=normalize a &lt;transform-function>=] algorithm
+        are the result of mapping the [=reify a &lt;transform-function>=] algorithm
         over |list|.
 </div>
 
 <div algorithm>
-    To <dfn export>normalize a <<transform-function>></dfn> |func|,
+    To <dfn export>reify a <<transform-function>></dfn> |func|,
     perform the appropriate set of steps below,
     based on |func|:
 
@@ -2937,8 +3036,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSTranslate}} object,
                 whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
-                are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
-                or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
+                are set to the [=reify a numeric value|reification=] of the specified x/y/z offsets,
+                or the [=reify a numeric value|reification=] of ''0px'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
                 and `false` otherwise.
@@ -2965,7 +3064,7 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSRotate}} object,
                 whose {{CSSRotate/angle}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified angle,
+                is set to the [=reify a numeric value|reification=] of the specified angle,
                 and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
                 are set to the specified rotation axis coordinates,
                 or the implicit axis coordinates if not specified in |func|
@@ -2977,8 +3076,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkew}} object,
                 whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-                are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                are set to the [=reify a numeric value|reification=] of the specified x and y angles,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -2986,8 +3085,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkewX}} object,
                 whose {{CSSSkewX/ax}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified x angle,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                is set to the [=reify a numeric value|reification=] of the specified x angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -2995,8 +3094,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkewY}} object,
                 whose {{CSSSkewY/ay}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified y angle,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                is set to the [=reify a numeric value|reification=] of the specified y angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -3004,18 +3103,18 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSPerspective}} object,
                 whose {{CSSPerspective/length}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified length
+                is set to the [=reify a numeric value|reification=] of the specified length
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `false`.
     </dl>
 </div>
 
-{{CSSPositionValue}} normalization {#positionvalue-normalization}
------------------------------------------------------------------
+<<position>> Values {#reify-position}
+-----------------------------------------------
 
-CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var> 
-components determined via the following process. If this process, or any sub-process referenced by this 
-process fails, then normalization as a whole fails.
+CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
+components determined via the following process. If this process, or any sub-process referenced by this
+process fails, then reification as a whole fails.
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
@@ -3063,8 +3162,8 @@ and <var>bias</var>. The process also updates <var>bias</var> based on the <var>
         {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
         {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> matches the <<length-percentage>> production, then set <var>norm</var> to the result of
-        [=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
+1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
+        [=reify a numeric value|reifying |value| as a numeric value=]. If <var>bias</var> is vertical,
         set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
         horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
@@ -3075,19 +3174,19 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 <var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
 <var>length</var>.
 
-1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
+1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
         <var>keyword</var>, using the provided <var>bias</var>
-1.  let <var>adjustment</var> be the result of
-    [=normalize a numeric value|normalizing |length| as a numeric value=].
+1.  Let <var>adjustment</var> be the result of
+    [=reify a numeric value|reifying |length| as a numeric value=].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
         <var>adjustment</var> from a zero length.
-1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
+1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
         adding <var>adjustment</var> to it.
 
-{{CSSResourceValue}} normalization {#resourcevalue-normalization}
+<<url>> (and subtype) Values {#reify-url}
 --------------------------------------------------------------
 
-Resource references are normalized by determining whether the reference is invalid
+Resource references are reified by determining whether the reference is invalid
 (in which case {{CSSResourceValue/state}} is set to ''error'') or
 requires network data (in which case {{CSSResourceValue/state}}
 is set to ''loading''). If data is not required and the reference is valid then
@@ -3097,17 +3196,18 @@ If {{CSSResourceValue/state}} is set to ''loading'' then the image
 reference is reevaluated once the pending data becomes available, according to the
 same rules referenced above.
 
-Normalization does not fail for {{CSSResourceValue}} objects.
+Reification can not fail for {{CSSResourceValue}} objects.
 
 <div class='example'>
 The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
 </div>
 
-The table below lists out the possible {{CSSStyleValue}}s that each property
-could normalize to, depending on its specified or computed value.
 
-List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-value-normalization}
+List of CSS properties to their {{CSSStyleValue}} reification {#reify-property-style-value}
 ----------------------------------------------------------------------------------------------------
+
+The table below lists out the possible {{CSSStyleValue}}s that each property
+could reify to, depending on its specified or computed value.
 
 <table>
  <tr>
@@ -3152,13 +3252,13 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
  </tr>
  <tr>
      <td>'background-color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'padding-left'</td>
@@ -3187,8 +3287,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
  </tr>
  <tr>
      <td>'border-color'</td>
-     <td>{{CSSColorValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'border-left-width'</td>
@@ -3272,8 +3372,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
  </tr>
  <tr>
      <td>'text-decoration-color'</td>
-     <td>{{CSSColorValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'line-height'</td>
@@ -3367,8 +3467,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
  </tr>
  <tr>
      <td>'outline-color'</td>
-     <td>{{CSSColorValue}}</td>
-     <td>{{CSSColorValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
+     <td>{{CSSKeywordValue}}</td>
  </tr>
  <tr>
      <td>'outline-style'</td>
@@ -3467,8 +3567,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-stle-
 
 The way that a {{CSSStyleValue}} serializes is dependent on how the value was constructed.
 
-:   if the value was constructed from a DOMString
-::  the serialization is the DOMString from which the value was constructed.
+:   if the value was constructed from a USVString
+::  the serialization is the USVString from which the value was constructed.
 :   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
@@ -3501,7 +3601,7 @@ length3.toString(); // "42px";
     1. Let |s| initially be the empty [=string=].
 
     2. [=list/For each=] |item| in |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot:
-        1. If |item| is a {{DOMString}},
+        1. If |item| is a {{USVString}},
             append it to |s|.
         2. Otherwise, |item| is a {{CSSVariableReferenceValue}}.
             Serialize it,
@@ -3522,7 +3622,7 @@ length3.toString(); // "42px";
         then serialize the {{CSSVariableReferenceValue/fallback}} internal slot
         and append it to |s|.
 
-    4. Append ")" to |s| 
+    4. Append ")" to |s|
         and return |s|.
 </div>
 
@@ -3543,7 +3643,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSUnitValue}}</dfn> |this|:
 
-    1. Let |value| and |unit| be 
+    1. Let |value| and |unit| be
         |this|‘s {{CSSUnitValue/value}} and {{CSSUnitValue/unit}} internal slots.
 
     2. Set |s| to the result of serializing a <<number>> from |value|,
@@ -3596,7 +3696,7 @@ length3.toString(); // "42px";
         3. [=list/For each=] |arg| in |this|’s {{CSSMathSum/values}} internal slot beyond the first:
             1. If |arg| is a {{CSSMathNegate}},
                 append " - " to |s|,
-                then serialize |arg|'s {{CSSMathNegate/value}} internal slot 
+                then serialize |arg|'s {{CSSMathNegate/value}} internal slot
                 with |nested| set to true,
                 and append the result to |s|.
             2. Otherwise, append " + " to |s|,
@@ -3606,7 +3706,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     4. Otherwise, if |this| is a {{CSSMathNegate}}:
@@ -3624,7 +3724,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     5. Otherwise, if |this| is a {{CSSMathProduct}}:
@@ -3651,7 +3751,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 
     6. Otherwise, if |this| is a {{CSSMathInvert}}:
@@ -3669,7 +3769,7 @@ length3.toString(); // "42px";
 
         4. If |paren-less| is false,
             append ")" to |s|,
-        
+
         5. Return |s|.
 </div>
 
