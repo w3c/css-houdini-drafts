@@ -160,7 +160,7 @@ and return the result.
     and a |parseMultiple| flag, run these steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -312,7 +312,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -331,7 +331,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -349,7 +349,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -375,7 +375,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [[=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -407,7 +407,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -437,7 +437,7 @@ probably in an appendix.
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
-        let |property| be |property| [=ASCII lowercased=].
+        set |property| to |property| [=ASCII lowercased=].
 
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
@@ -3173,13 +3173,13 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 <var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
 <var>length</var>.
 
-1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
+1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
         <var>keyword</var>, using the provided <var>bias</var>
-1.  let <var>adjustment</var> be the result of
+1.  Let <var>adjustment</var> be the result of
     [=normalize a numeric value|normalizing |length| as a numeric value=].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
         <var>adjustment</var> from a zero length.
-1.  amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
+1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
         adding <var>adjustment</var> to it.
 
 {{CSSResourceValue}} normalization {#resourcevalue-normalization}
