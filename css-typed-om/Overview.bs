@@ -199,17 +199,14 @@ with property |property|, cssText |cssText|, and parseMultiple set to true.
         as appropriate for |property|,
         and return a [=list=] containing the iterations in order.
 
-    <div class=note>
+    <div class=issue>
         How to divide a [=list-valued property=] into iterations
         is intentionally undefined and hand-wavey at the moment.
         <em>Generally</em>,
         you just split it on top-level commas
         (corresponding to a top-level `<foo>#` term in the grammar),
         but some legacy properties (such as 'counter-reset')
-        don't separate their iterations with commas,
-        and some properties (such as 'animation')
-        use a special singular value (generally ''animation/none'')
-        to indicate <strong>zero</strong> iterations.
+        don't separate their iterations with commas.
 
         It's expected to be rigorously defined in the future,
         but at the moment is explicitly a "you know what we mean" thing.
