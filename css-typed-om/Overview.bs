@@ -266,7 +266,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     and [[#declared-stylepropertymap-objects]]).
 
     Unless otherwise stated,
-    the initial ordering of the {{[[declarations]]}} internal slot internal slot
+    the initial ordering of the {{[[declarations]]}} internal slot
     is based on the key of each entry:
 
     1. Non-custom properties, sorted in increasing code-point order.
@@ -317,7 +317,7 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
-    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     4. If |props|[|property|] [=map/exists=],
         return |props|[|property|][0].
@@ -336,7 +336,7 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
-    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     4. If |props|[|property|] [=map/exists=],
         return |props|[|property|].
@@ -354,7 +354,7 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
-    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     4. If |props|[|property|] [=map/exists=],
         return `true`.
@@ -366,7 +366,7 @@ probably in an appendix.
     on getting from a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
-    1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot.
 </div>
 
 <div algorithm>
@@ -383,7 +383,7 @@ probably in an appendix.
     3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
         [=throw=] a {{TypeError}}.
 
-    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     5. If |props|[|property|] [=map/exists=],
         [=map/remove=] it.
@@ -415,7 +415,7 @@ probably in an appendix.
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}}.
 
-    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot internal slot.
+    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     5. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
@@ -442,7 +442,7 @@ probably in an appendix.
     2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
-    3. If |this|’s {{[[declarations]]}} internal slot internal slot [=map/contains=] |property|,
+    3. If |this|’s {{[[declarations]]}} internal slot [=map/contains=] |property|,
         [=map/remove=] it.
 </div>
 
@@ -451,7 +451,7 @@ probably in an appendix.
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
-    1. Replace the value of |this|’s {{[[declarations]]}} internal slot internal slot with a fresh empty [=declarations map=].
+    1. Replace the value of |this|’s {{[[declarations]]}} internal slot with a fresh empty [=declarations map=].
 </div>
 
 <div algorithm>
@@ -541,7 +541,7 @@ when it is first called.
 
     1. If |this|'s {{Element/[[computedStyleMapCache]]}} internal slot is set to `null`,
         set its value to a live {{StylePropertyMapReadOnly}} object,
-        whose {{[[declarations]]}} internal slot internal slot are the name and [=computed value=] of
+        whose {{[[declarations]]}} internal slot are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
         and every non-registered [=custom property=] which is not set to its initial value
@@ -585,7 +585,7 @@ or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attrib
 of objects implementing the {{ElementCSSInlineStyle}} interface
 (such as {{Element}}s).
 
-When constructed, the {{[[declarations]]}} internal slot internal slot for [=declared StylePropertyMap=] objects
+When constructed, the {{[[declarations]]}} internal slot for [=declared StylePropertyMap=] objects
 is initialized to contain an entry
 for each property with a valid value inside the {{CSSStyleRule}}
 or inline style
