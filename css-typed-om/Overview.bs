@@ -132,7 +132,7 @@ interface CSSStyleValue {
 };
 </xmp>
 
-{{CSSStyleValue}} objects are the base class of all CSS Values accessible via the Typed OM API.
+{{CSSStyleValue}} objects are the base class of all CSS values accessible via the Typed OM API.
 
 Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
 are also represented as {{CSSStyleValue}} objects. These {{CSSStyleValue}} objects are only
