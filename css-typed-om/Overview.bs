@@ -146,12 +146,14 @@ of the value the {{CSSStyleValue}} object represents.
 The <dfn method for=CSSStyleValue>parse(|property|, |cssText|)</dfn> method,
 when invoked,
 must [=parse a CSSStyleValue=]
-with property |property|, cssText |cssText|, and parseMultiple set to false.
+with property |property|, cssText |cssText|, and parseMultiple set to false,
+and return the result.
 
 The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn>,
 when invoked,
 must [=parse a CSSStyleValue=]
-with property |property|, cssText |cssText|, and parseMultiple set to true.
+with property |property|, cssText |cssText|, and parseMultiple set to true,
+and return the result.
 
 <div algorithm="parse a CSSStyleValue">
     To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|,
