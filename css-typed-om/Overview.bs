@@ -3207,347 +3207,346 @@ The table below lists out the possible {{CSSStyleValue}}s that each property
 could reify to, depending on its specified or computed value.
 
 <table>
- <tr>
-     <td><b>CSS Property</b></td>
-     <td><b>Specified values</b></td>
-     <td><b>Computed Value</b></td>
- </tr>
- <tr>
-     <td>'display'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'margin-top'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'margin-left'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'margin-bottom'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'margin-right'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'height'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'background-color'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'color'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'padding-left'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'padding-top'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'padding-bottom'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'padding-right'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'border-style'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'border-color'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'border-left-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'border-top-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'border-bottom-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'border-right-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'position'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'font-size'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'top'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'left'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'bottom'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'right'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'text-align'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td></td>
- </tr>
- <tr>
-     <td>'font-weight'</td>
-     <td>{{CSSKeywordValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSKeywordValue}}, {{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'float'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'opacity'</td>
-     <td>{{CSSNumericValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'text-decoration-style'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'text-decoration-line'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'text-decoration-color'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'line-height'</td>
-     <td>c</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'vertical-align'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'white-space'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'z-index'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'cursor'</td>
-     <td>{{CSSKeywordValue}}, {{CSSImageValue}}</td>
-     <td>{{CSSKeywordValue}}, {{CSSImageValue}}</td>
- </tr>
- <tr>
-     <td>'background-image'</td>
-     <td>{{CSSImageValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSImageValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'border-top-left-radius'</td>
-     <td>{{CSSNumericValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'border-top-right-radius'</td>
-     <td>{{CSSNumericValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'border-bottom-left-radius'</td>
-     <td>{{CSSNumericValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'border-bottom-right-radius'</td>
-     <td>{{CSSNumericValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'min-height'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'max-height'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'min-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'max-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'visibility'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'background-position'</td>
-     <td>{{CSSPositionValue}}</td>
-     <td>{{CSSPositionValue}}</td>
- </tr>
- <tr>
-     <td>'content'</td>
-     <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'box-sizing'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'outline-color'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'outline-style'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'outline-width'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'background-repeat'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'font-style'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'background-size'</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}</td>
-     <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'clear'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'text-overflow'</td>
-     <td>{{CSSKeywordValue}}. {{CSSStyleValue}}</td>
-     <td>{{CSSKeywordValue}}. {{CSSStyleValue}}</td>
- </tr>
- <tr>
-     <td>'transform'</td>
-     <td>{{CSSTransformValue}}</td>
-     <td>{{CSSTransformValue}}</td>
- </tr>
- <tr>
-     <td>'overflow-y'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'overflow-x'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'text-transform'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'list-style-image'</td>
-     <td>{{CSSImageValue}}, {{CSSKeywordValue}}</td>
-     <td>{{CSSImageValue}}, {{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'list-style-position'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'list-style-type'</td>
-     <td>{{CSSKeywordValue}}</td>
-     <td>{{CSSKeywordValue}}</td>
- </tr>
- <tr>
-     <td>'transition-duration'</td>
-     <td>{{CSSNumericValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
- <tr>
-     <td>'transition-delay'</td>
-     <td>{{CSSNumericValue}}</td>
-     <td>{{CSSNumericValue}}</td>
- </tr>
-</table>
+    <tr>
+        <td><b>CSS Property</b>
+        <td><b>Specified values</b>
+        <td><b>Computed Value</b>
+
+    <tr>
+        <td>'display'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'margin-top'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'margin-left'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'margin-bottom'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'margin-right'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'height'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'background-color'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'color'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'padding-left'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'padding-top'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'padding-bottom'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'padding-right'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'border-style'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'border-color'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'border-left-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'border-top-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'border-bottom-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'border-right-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'position'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'font-size'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'top'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'left'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'bottom'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'right'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'text-align'
+        <td>{{CSSKeywordValue}}
+        <td>
+
+    <tr>
+        <td>'font-weight'
+        <td>{{CSSKeywordValue}}, {{CSSStyleValue}}
+        <td>{{CSSKeywordValue}}, {{CSSStyleValue}}
+
+    <tr>
+        <td>'float'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'opacity'
+        <td>{{CSSNumericValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'text-decoration-style'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'text-decoration-line'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'text-decoration-color'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'line-height'
+        <td>c
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'vertical-align'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'white-space'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'z-index'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'cursor'
+        <td>{{CSSKeywordValue}}, {{CSSImageValue}}
+        <td>{{CSSKeywordValue}}, {{CSSImageValue}}
+
+    <tr>
+        <td>'background-image'
+        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
+        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'border-top-left-radius'
+        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
+        <td>{{CSSStyleValue}}
+
+    <tr>
+        <td>'border-top-right-radius'
+        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
+        <td>{{CSSStyleValue}}
+
+    <tr>
+        <td>'border-bottom-left-radius'
+        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
+        <td>{{CSSStyleValue}}
+
+    <tr>
+        <td>'border-bottom-right-radius'
+        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
+        <td>{{CSSStyleValue}}
+
+    <tr>
+        <td>'min-height'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'max-height'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'min-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'max-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'visibility'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'background-position'
+        <td>{{CSSPositionValue}}
+        <td>{{CSSPositionValue}}
+
+    <tr>
+        <td>'content'
+        <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}
+        <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}
+
+    <tr>
+        <td>'box-sizing'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'outline-color'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'outline-style'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'outline-width'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'background-repeat'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'font-style'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'background-size'
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}
+        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}
+
+    <tr>
+        <td>'clear'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'text-overflow'
+        <td>{{CSSKeywordValue}}. {{CSSStyleValue}}
+        <td>{{CSSKeywordValue}}. {{CSSStyleValue}}
+
+    <tr>
+        <td>'transform'
+        <td>{{CSSTransformValue}}
+        <td>{{CSSTransformValue}}
+
+    <tr>
+        <td>'overflow-y'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'overflow-x'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'text-transform'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'list-style-image'
+        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
+        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
+
+    <tr>
+        <td>'list-style-position'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'list-style-type'
+        <td>{{CSSKeywordValue}}
+        <td>{{CSSKeywordValue}}
+
+    <tr>
+        <td>'transition-duration'
+        <td>{{CSSNumericValue}}
+        <td>{{CSSNumericValue}}
+
+    <tr>
+        <td>'transition-delay'
+        <td>{{CSSNumericValue}}
+        <td>{{CSSNumericValue}}
+ </table>
 
 <!--
  ██████  ████████ ████████  ████    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
