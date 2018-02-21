@@ -127,8 +127,8 @@ Some particular considerations:
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSStyleValue {
     stringifier;
-    [Exposed=Window] static CSSStyleValue parse(DOMString property, DOMString cssText);
-    [Exposed=Window] static sequence<CSSStyleValue> parseAll(DOMString property, DOMString cssText);
+    [Exposed=Window] static CSSStyleValue parse(USVString property, USVString cssText);
+    [Exposed=Window] static sequence<CSSStyleValue> parseAll(USVString property, USVString cssText);
 };
 </xmp>
 
@@ -227,30 +227,30 @@ The {{StylePropertyMap}} {#the-stylepropertymap}
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface StylePropertyMapReadOnly {
-    iterable<DOMString, sequence<CSSStyleValue>>;
-    any get(DOMString property);
+    iterable<USVString, sequence<CSSStyleValue>>;
+    any get(USVString property);
     /* 'any' means (undefined or CSSStyleValue) here,
        see https://github.com/heycam/webidl/issues/60 */
-    sequence<CSSStyleValue> getAll(DOMString property);
-    boolean has(DOMString property);
+    sequence<CSSStyleValue> getAll(USVString property);
+    boolean has(USVString property);
     readonly attribute long size;
 };
 
 [Exposed=Window]
 interface StylePropertyMap : StylePropertyMapReadOnly {
-    void set(DOMString property, (CSSStyleValue or DOMString)... values);
-    void append(DOMString property, (CSSStyleValue or DOMString)... values);
-    void delete(DOMString property);
+    void set(USVString property, (CSSStyleValue or USVString)... values);
+    void append(USVString property, (CSSStyleValue or USVString)... values);
+    void delete(USVString property);
     void clear();
 };
 </xmp>
 
 <!--
     We restrict the read-write version from workers/worklets
-    because append()/set() require parsing to accept DOMStrings,
+    because append()/set() require parsing to accept USVStrings,
     and leaving it with just delete() doesn't seem useful.
     That said, theoretically we could still expose them and just only allow CSSStyleValue
-    (throwing on DOMString, I suppose).
+    (throwing on USVString, I suppose).
     But we don't have use-cases for setting property maps in workers yet anyway,
     so we can wait until that matters.
 -->
@@ -476,7 +476,7 @@ probably in an appendix.
 
         Return the |value|.
 
-    : If |value| is a {{DOMString}},
+    : If |value| is a {{USVString}},
     ::  [=Parse a CSSStyleValue=] with property |property|, cssText |value|, and parseMultiple set to `false`,
         and return the result.
 
@@ -619,12 +619,12 @@ interface CSSUnparsedValue : CSSStyleValue {
     setter CSSUnparsedSegment (unsigned long index, CSSUnparsedSegment val);
 };
 
-typedef (DOMString or CSSVariableReferenceValue) CSSUnparsedSegment;
+typedef (USVString or CSSVariableReferenceValue) CSSUnparsedSegment;
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(DOMString variable, optional CSSUnparsedValue? fallback)]
+ Constructor(USVString variable, optional CSSUnparsedValue? fallback)]
 interface CSSVariableReferenceValue {
-    attribute DOMString variable;
+    attribute USVString variable;
     readonly attribute CSSUnparsedValue? fallback;
 };
 </xmp>
@@ -633,7 +633,7 @@ interface CSSVariableReferenceValue {
 They are comprised of a list of string fragments and variable references.
 
 They have a <dfn attribute for=CSSUnparsedValue>\[[tokens]]</dfn> internal slot,
-which is a [=list=] of {{DOMString}}s and {{CSSVariableReferenceValue}} objects.
+which is a [=list=] of {{USVString}}s and {{CSSVariableReferenceValue}} objects.
 This list is the object's [=values to iterate over=].
 
 The <dfn attribute for=CSSUnparsedValue>length</dfn> attribute returns the [=list/size=]
@@ -719,9 +719,9 @@ of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
 
 <pre class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(DOMString value)]
+ Constructor(USVString value)]
 interface CSSKeywordValue : CSSStyleValue {
-    attribute DOMString value;
+    attribute USVString value;
 };
 </pre>
 
@@ -737,7 +737,7 @@ interface CSSKeywordValue : CSSStyleValue {
 </div>
 
 Any place that accepts a {{CSSKeywordValue}}
-also accepts a raw {{DOMString}},
+also accepts a raw {{USVString}},
 by using the following typedef and algorithm:
 
 <div algorithm="CSSKeywordValue.value">
@@ -866,11 +866,11 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
 
         boolean equals(CSSNumberish... value);
 
-        CSSUnitValue to(DOMString unit);
-        CSSMathSum toSum(DOMString... units);
+        CSSUnitValue to(USVString unit);
+        CSSMathSum toSum(USVString... units);
         CSSNumericType type();
 
-        [Exposed=Window] static CSSNumericValue parse(DOMString cssText);
+        [Exposed=Window] static CSSNumericValue parse(USVString cssText);
     };
 </xmp>
 
@@ -1732,10 +1732,10 @@ are represented as {{CSSUnitValue}}s.
 
 <xmp class=idl>
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
-     Constructor(double value, DOMString unit)]
+     Constructor(double value, USVString unit)]
     interface CSSUnitValue : CSSNumericValue {
         attribute double value;
-        readonly attribute DOMString unit;
+        readonly attribute USVString unit;
     };
 </xmp>
 
@@ -3565,8 +3565,8 @@ List of CSS properties to their {{CSSStyleValue}} normalization {#property-style
 
 The way that a {{CSSStyleValue}} serializes is dependent on how the value was constructed.
 
-:   if the value was constructed from a DOMString
-::  the serialization is the DOMString from which the value was constructed.
+:   if the value was constructed from a USVString
+::  the serialization is the USVString from which the value was constructed.
 :   otherwise, if the value was constructed using an IDL constructor
 ::  the serialization is specified in the sections below.
 :   otherwise, if the value was extracted from the CSSOM
@@ -3599,7 +3599,7 @@ length3.toString(); // "42px";
     1. Let |s| initially be the empty [=string=].
 
     2. [=list/For each=] |item| in |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot:
-        1. If |item| is a {{DOMString}},
+        1. If |item| is a {{USVString}},
             append it to |s|.
         2. Otherwise, |item| is a {{CSSVariableReferenceValue}}.
             Serialize it,
