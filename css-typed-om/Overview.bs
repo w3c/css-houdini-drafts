@@ -138,10 +138,8 @@ Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
 are also represented as {{CSSStyleValue}} objects. These {{CSSStyleValue}} objects are only
 considered valid for the property that it was parsed with.
 
-The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects is to
-return a normalized representation
-(see [[#stylevalue-normalization]])
-of the value the {{CSSStyleValue}} object represents.
+The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects
+is defined in [[#stylevalue-serialization]].
 
 The <dfn method for=CSSStyleValue>parse(|property|, |cssText|)</dfn> method,
 when invoked,
@@ -176,7 +174,7 @@ and return the result.
         and let |values| be the result.
 
     5. [=list/For each=] |value| in |values|,
-        replace it with the result of [=normalize a CSS value|normalizing=] |value| for |property|.
+        replace it with the result of [=reifying=] |value| for |property|.
 
     6. If |parseMultiple| is false,
         return |values|[0].
@@ -1495,7 +1493,7 @@ rather than on {{CSSNumericValue}} instances.
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
 
-    3. [=Normalize a numeric value=] |result|,
+    3. [=Reify a numeric value=] |result|,
         and return the result.
 </div>
 
@@ -2626,7 +2624,7 @@ The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of 
 
 <div class='example'>
     <<position>> values accept a complicated combination of keywords and values,
-    but Typed OM always simplifies to just two offsets as per the [[#positionvalue-normalization]] algorithm.
+    but Typed OM always simplifies to just two offsets as per the [[#positionvalue-reification]] algorithm.
     For example, the following style sheet:
 
     <pre class='lang-css'>
@@ -2767,15 +2765,15 @@ Issue(159): Spec up ColorValue
  ██████   ██████   ██████                ██           ███████  ██     ██
 -->
 
-{{CSSStyleValue}} normalization {#stylevalue-normalization}
+{{CSSStyleValue}} Reification {#reify-stylevalue}
 ===========================================================
 
 This section describes how Typed OM objects are constructed from abstract CSS values
-(aka how to <dfn export>normalize a CSS value</dfn> for a given property).
+(aka how to <dfn export for=CSS>reify</dfn> a CSS value for a given property).
 
 If a property's grammar is more complex than one of the types listed here,
-it [=normalizes=] to a raw {{CSSStyleValue}},
-with a <a for=CSSStyleValue>stringification behavior</a>
+it [=reifies=] to a raw {{CSSStyleValue}},
+with a [=CSSStyleValue/stringification behavior=]
 that produces the CSSOM serialization of the property.
 
 Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
@@ -2783,7 +2781,7 @@ We instead need to strictly define the serialization of every property.
 This should be done according to CSSOM principles, tho
 (generally, shortest possible value).
 
-Raw CSS tokens: properties with ''var()'' references {#normalize-tokens}
+Raw CSS tokens: properties with ''var()'' references {#reify-tokens}
 --------------------------------------------------
 
 Regardless of what the property's grammar is otherwise,
@@ -2792,12 +2790,12 @@ is represented as a [=list=] of [=component values=],
 which becomes a {{CSSUnparsedValue}} in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a list of component values</dfn>
+    To <dfn export>reify a list of component values</dfn>
     from a |list|:
 
     1. Replace all ''var()'' references in |list|
         with {{CSSVariableReferenceValue}} objects,
-        as described in [[#normalize-var]].
+        as described in [[#reify-var]].
     2. Replace each remaining maximal subsequence of [=component values=] in |list|
         with a single string of their concatenated serializations.
     3. Return a new {{CSSUnparsedValue}}
@@ -2826,13 +2824,13 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
     * the string ")"
 </div>
 
-''var()'' References {#normalize-var}
+''var()'' References {#reify-var}
 -------------------------------------
 
 ''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a ''var()'' reference</dfn> |var|:
+    To <dfn export>reify a ''var()'' reference</dfn> |var|:
 
     1. Let |object| be a new {{CSSVariableReferenceValue}}.
 
@@ -2841,36 +2839,36 @@ is converted into a {{CSSUnparsedValue}} that contains a sequence with:
 
     3. If |var| has a fallback value,
         set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
-        to the result of [=normalize a list of component values|normalizing the fallback's component values=].
+        to the result of [=reify a list of component values|reifying the fallback's component values=].
         Otherwise,
         set it to `null`.
 
     4. Return |object|.
 </div>
 
-[=Identifier=] Values {#normalize-ident}
+[=Identifier=] Values {#reify-ident}
 -----------------------------------
 
 CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize an [=identifier=]</dfn> |ident|:
+    To <dfn export>reify an [=identifier=]</dfn> |ident|:
 
     1. Return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to the serialization of |ident|.
 </div>
 
-<<number>>, <<percentage>>, and <<dimension>> values {#normalize-numeric}
+<<number>>, <<percentage>>, and <<dimension>> values {#reify-numeric}
 -------------------------------------------------------------------------
 
 CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValue}}s in the Typed OM.
 
 <div algorithm>
-    To <dfn export>normalize a numeric value</dfn> |num|:
+    To <dfn export>reify a numeric value</dfn> |num|:
 
     1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
-        [=normalize a math expression=] from |num|
+        [=reify a math expression=] from |num|
         and return the result.
 
     2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
@@ -2890,10 +2888,10 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 </div>
 
 <div algorithm>
-    To <dfn for=CSSMath export local-lt="normalize">normalize a math expression</dfn> |num|:
+    To <dfnexport>reify a math expression</dfn> |num|:
 
     1. If |num| is a ''min()'' or ''max()'' expression:
-        1. Let |values| be the result of [=CSSMath/normalizing=]
+        1. Let |values| be the result of [=reify a math expression|reifying=]
             the arguments to the expression,
             treating each argument as if it were the contents of a ''calc()'' expression.
 
@@ -2939,7 +2937,7 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
                 with its {{CSSMathInvert/value}} internal slot
                 set to its argument
             : leaf node
-            :: normalized as appropriate
+            :: [=reified=] as appropriate
         </dl>
 
     <div class=example>
@@ -2995,23 +2993,23 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 </div>
 
 
-<<transform-list>> and <<transform-function>> values {#transformvalue-normalization}
+<<transform-list>> and <<transform-function>> values {#reify-transformvalue}
 ------------------------------------------------------------------------------------
 
 CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
 while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 
 <div algorithm>
-    To <dfn export>normalize a <<transform-list>></dfn> |list|:
+    To <dfn export>reify a <<transform-list>></dfn> |list|:
 
     1. Return a new {{CSSTransformValue}}
         whose [=values to iterate over=]
-        are the result of mapping the [=normalize a &lt;transform-function>=] algorithm
+        are the result of mapping the [=reify a &lt;transform-function>=] algorithm
         over |list|.
 </div>
 
 <div algorithm>
-    To <dfn export>normalize a <<transform-function>></dfn> |func|,
+    To <dfn export>reify a <<transform-function>></dfn> |func|,
     perform the appropriate set of steps below,
     based on |func|:
 
@@ -3035,8 +3033,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSTranslate}} object,
                 whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
-                are set to the [=normalize a numeric value|normalization=] of the specified x/y/z offsets,
-                or the [=normalize a numeric value|normalization=] of ''0px'' if not specified in |func|,
+                are set to the [=reify a numeric value|reification=] of the specified x/y/z offsets,
+                or the [=reify a numeric value|reification=] of ''0px'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
                 and `false` otherwise.
@@ -3063,7 +3061,7 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSRotate}} object,
                 whose {{CSSRotate/angle}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified angle,
+                is set to the [=reify a numeric value|reification=] of the specified angle,
                 and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
                 are set to the specified rotation axis coordinates,
                 or the implicit axis coordinates if not specified in |func|
@@ -3075,8 +3073,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkew}} object,
                 whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-                are set to the [=normalize a numeric value|normalization=] of the specified x and y angles,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                are set to the [=reify a numeric value|reification=] of the specified x and y angles,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -3084,8 +3082,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkewX}} object,
                 whose {{CSSSkewX/ax}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified x angle,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                is set to the [=reify a numeric value|reification=] of the specified x angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -3093,8 +3091,8 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSSkewY}} object,
                 whose {{CSSSkewY/ay}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified y angle,
-                or the [=normalize a numeric value|normalization=] of ''0deg'' if not specified in |func|,
+                is set to the [=reify a numeric value|reification=] of the specified y angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `true`.
 
@@ -3102,18 +3100,18 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSPerspective}} object,
                 whose {{CSSPerspective/length}} internal slot
-                is set to the [=normalize a numeric value|normalization=] of the specified length
+                is set to the [=reify a numeric value|reification=] of the specified length
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `false`.
     </dl>
 </div>
 
-{{CSSPositionValue}} normalization {#positionvalue-normalization}
+{{CSSPositionValue}} Reification {#reify-positionvalue}
 -----------------------------------------------------------------
 
 CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
 components determined via the following process. If this process, or any sub-process referenced by this
-process fails, then normalization as a whole fails.
+process fails, then reification as a whole fails.
 
 1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
 1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
@@ -3162,7 +3160,7 @@ and <var>bias</var>. The process also updates <var>bias</var> based on the <var>
 1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
         {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
 1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
-        [=normalize a numeric value|normalizing |value| as a numeric value=]. If <var>bias</var> is vertical,
+        [=reify a numeric value|reifying |value| as a numeric value=]. If <var>bias</var> is vertical,
         set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
         horizontal. Exit this process.
 1.  If <var>value</var> is not the keyword "center", then this process fails.
@@ -3176,16 +3174,16 @@ The following process sets a value for either <var>x</var> or<var>y</var>, depen
 1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
         <var>keyword</var>, using the provided <var>bias</var>
 1.  Let <var>adjustment</var> be the result of
-    [=normalize a numeric value|normalizing |length| as a numeric value=].
+    [=reify a numeric value|reifying |length| as a numeric value=].
 1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
         <var>adjustment</var> from a zero length.
 1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
         adding <var>adjustment</var> to it.
 
-{{CSSResourceValue}} normalization {#resourcevalue-normalization}
+{{CSSResourceValue}} Reification {#reify-resourcevalue}
 --------------------------------------------------------------
 
-Resource references are normalized by determining whether the reference is invalid
+Resource references are reified by determining whether the reference is invalid
 (in which case {{CSSResourceValue/state}} is set to ''error'') or
 requires network data (in which case {{CSSResourceValue/state}}
 is set to ''loading''). If data is not required and the reference is valid then
@@ -3195,17 +3193,18 @@ If {{CSSResourceValue/state}} is set to ''loading'' then the image
 reference is reevaluated once the pending data becomes available, according to the
 same rules referenced above.
 
-Normalization does not fail for {{CSSResourceValue}} objects.
+Reification can not fail for {{CSSResourceValue}} objects.
 
 <div class='example'>
 The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
 </div>
 
-The table below lists out the possible {{CSSStyleValue}}s that each property
-could normalize to, depending on its specified or computed value.
 
-List of CSS properties to their {{CSSStyleValue}} normalization {#property-style-value-normalization}
+List of CSS properties to their {{CSSStyleValue}} reification {#reify-property-style-value}
 ----------------------------------------------------------------------------------------------------
+
+The table below lists out the possible {{CSSStyleValue}}s that each property
+could reify to, depending on its specified or computed value.
 
 <table>
  <tr>
