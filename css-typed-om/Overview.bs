@@ -51,12 +51,20 @@ spec:cssom;
     type: dfn;
         text: resolved value
         text: origin-clean flag; for: CSSStyleSheet
+spec:css-align-3; type:property; text:column-gap
 spec:css-color-3; type:property; text:color;
 spec:css-position-3; type:value; for:left; text:auto;
+spec:css-shapes-1; type: property;
+    text: shape-margin
+    text: shape-outside
+spec:css-shapes-2; type: property;
+    text: shape-inside
 spec:css-sizing-3; type:property; text:box-sizing
 spec:css-speech-1; type:property;
+    text: cue
     text:cue-after;
     text:cue-before;
+    text:pause
     text:pause-after;
     text:pause-before;
     text:speak;
@@ -74,11 +82,7 @@ spec:css-transforms-1;
         text:<transform-function>;
     type:property;
         text:transform;
-        text:backface-visibility;
-        text:perspective;
-        text:perspective-origin;
         text:transform-origin;
-        text:transform-style;
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
@@ -92,7 +96,19 @@ spec:infra;
         text: list
         text: code point
         text: string
-
+spec:svg2;
+    type: property;
+        text: fill
+        text: fill-opacity
+        text: fill-rule
+        text: stroke
+        text: stroke-dasharray
+        text: stroke-dashoffset
+        text: stroke-linecap
+        text: stroke-linejoin
+        text: stroke-miterlimit
+        text: stroke-opacity
+        text: stroke-width
 </pre>
 
 Introduction {#intro}
@@ -3206,6 +3222,10 @@ List of CSS properties to their {{CSSStyleValue}} reification {#reify-property-s
 The table below lists out the possible {{CSSStyleValue}}s that each property
 could reify to, depending on its specified or computed value.
 
+Issue: This section is under construction.
+Below this table is a listing of *every* CSS property currently supported,
+which will be filled in with more detail as we go.
+
 <table>
     <tr>
         <td><b>CSS Property</b>
@@ -3546,7 +3566,1333 @@ could reify to, depending on its specified or computed value.
         <td>'transition-delay'
         <td>{{CSSNumericValue}}
         <td>{{CSSNumericValue}}
- </table>
+</table>
+
+<dl link-type=property>
+: [=custom properties=]
+::
+
+: <a>align-content</a>
+::
+
+: <a>align-items</a>
+::
+
+: <a>align-self</a>
+::
+
+: <a>alignment-baseline</a>
+::
+
+: <a>all</a>
+::
+
+: <a>animation-composition</a>
+::
+
+: <a>appearance</a>
+::
+
+: <a>azimuth</a>
+::
+
+: <a>backdrop-filter</a>
+::
+
+: <a>backface-visibility</a>
+::
+
+: <a>background</a>
+::
+
+: <a>background-attachment</a>
+::
+
+: <a>background-blend-mode</a>
+::
+
+: <a>background-color</a>
+::
+
+: <a>background-image</a>
+::
+
+: <a>background-image-transform</a>
+::
+
+: <a>background-position</a>
+::
+
+: <a>background-repeat</a>
+::
+
+: <a>baseline-shift</a>
+::
+
+: <a>block-size</a>
+::
+
+: <a>block-step</a>
+::
+
+: <a>block-step-align</a>
+::
+
+: <a>block-step-insert</a>
+::
+
+: <a>block-step-round</a>
+::
+
+: <a>block-step-size</a>
+::
+
+: <a>bookmark-label</a>
+::
+
+: <a>bookmark-level</a>
+::
+
+: <a>bookmark-state</a>
+::
+
+: <a>border</a>
+::
+
+: <a>border-block</a>
+::
+
+: <a>border-block-color</a>
+::
+
+: <a>border-block-end</a>
+::
+
+: <a>border-block-end-color</a>
+::
+
+: <a>border-block-end-style</a>
+::
+
+: <a>border-block-end-width</a>
+::
+
+: <a>border-block-start</a>
+::
+
+: <a>border-block-start-color</a>
+::
+
+: <a>border-block-start-style</a>
+::
+
+: <a>border-block-start-width</a>
+::
+
+: <a>border-block-style</a>
+::
+
+: <a>border-block-width</a>
+::
+
+: <a>border-bottom</a>
+::
+
+: <a>border-bottom-color</a>
+::
+
+: <a>border-bottom-style</a>
+::
+
+: <a>border-bottom-width</a>
+::
+
+: <a>border-boundary</a>
+::
+
+: <a>border-collapse</a>
+::
+
+: <a>border-color</a>
+::
+
+: <a>border-image-transform</a>
+::
+
+: <a>border-inline</a>
+::
+
+: <a>border-inline-color</a>
+::
+
+: <a>border-inline-end</a>
+::
+
+: <a>border-inline-end-color</a>
+::
+
+: <a>border-inline-end-style</a>
+::
+
+: <a>border-inline-end-width</a>
+::
+
+: <a>border-inline-start</a>
+::
+
+: <a>border-inline-start-color</a>
+::
+
+: <a>border-inline-start-style</a>
+::
+
+: <a>border-inline-start-width</a>
+::
+
+: <a>border-inline-style</a>
+::
+
+: <a>border-inline-width</a>
+::
+
+: <a>border-left</a>
+::
+
+: <a>border-left-color</a>
+::
+
+: <a>border-left-style</a>
+::
+
+: <a>border-left-width</a>
+::
+
+: <a>border-radius</a>
+::
+
+: <a>border-right</a>
+::
+
+: <a>border-right-color</a>
+::
+
+: <a>border-right-style</a>
+::
+
+: <a>border-right-width</a>
+::
+
+: <a>border-spacing</a>
+::
+
+: <a>border-style</a>
+::
+
+: <a>border-top</a>
+::
+
+: <a>border-top-color</a>
+::
+
+: <a>border-top-style</a>
+::
+
+: <a>border-top-width</a>
+::
+
+: <a>border-width</a>
+::
+
+: <a>bottom</a>
+::
+
+: <a>box-decoration-break</a>
+::
+
+: <a>box-sizing</a>
+::
+
+: <a>box-snap</a>
+::
+
+: <a>break-after</a>
+::
+
+: <a>break-before</a>
+::
+
+: <a>break-inside</a>
+::
+
+: <a>caption-side</a>
+::
+
+: <a>caret</a>
+::
+
+: <a>caret-color</a>
+::
+
+: <a>caret-shape</a>
+::
+
+: <a>clear</a>
+::
+
+: <a>clip</a>
+::
+
+: <a>clip-path</a>
+::
+
+: <a>clip-rule</a>
+::
+
+: <a>color</a>
+::
+
+: <a>color-adjust</a>
+::
+
+: <a>color-interpolation</a>
+::
+
+: <a>color-rendering</a>
+::
+
+: <a>column-gap</a>
+::
+
+: <a>column-span</a>
+::
+
+: <a>contain</a>
+::
+
+: <a>content</a>
+::
+
+: <a>continue</a>
+::
+
+: <a>copy-into</a>
+::
+
+: <a>counter-increment</a>
+::
+
+: <a>counter-reset</a>
+::
+
+: <a>counter-set</a>
+::
+
+: <a>cue</a>
+::
+
+: <a>cue-after</a>
+::
+
+: <a>cue-before</a>
+::
+
+: <a>cursor</a>
+::
+
+: <a>cx</a>
+::
+
+: <a>cy</a>
+::
+
+: <a>d</a>
+::
+
+: <a>direction</a>
+::
+
+: <a>display</a>
+::
+
+: <a>dominant-baseline</a>
+::
+
+: <a>elevation</a>
+::
+
+: <a>empty-cells</a>
+::
+
+: <a>fill</a>
+::
+
+: <a>fill-break</a>
+::
+
+: <a>fill-color</a>
+::
+
+: <a>fill-image</a>
+::
+
+: <a>fill-opacity</a>
+::
+
+: <a>fill-origin</a>
+::
+
+: <a>fill-position</a>
+::
+
+: <a>fill-repeat</a>
+::
+
+: <a>fill-rule</a>
+::
+
+: <a>fill-size</a>
+::
+
+: 'filter-margin-top, filter-margin-right, filter-margin-bottom, filter-margin-left'
+::
+
+: <a>flex</a>
+::
+
+: <a>flex-basis</a>
+::
+
+: <a>flex-direction</a>
+::
+
+: <a>flex-flow</a>
+::
+
+: <a>flex-grow</a>
+::
+
+: <a>flex-shrink</a>
+::
+
+: <a>flex-wrap</a>
+::
+
+: <a>float</a>
+::
+
+: <a>float-defer</a>
+::
+
+: <a>font</a>
+::
+
+: <a>font-family</a>
+::
+
+: <a>font-language-override</a>
+::
+
+: <a>font-max-size</a>
+::
+
+: <a>font-min-size</a>
+::
+
+: <a>font-optical-sizing</a>
+::
+
+: <a>font-palette</a>
+::
+
+: <a>font-presentation</a>
+::
+
+: <a>font-size</a>
+::
+
+: <a>font-size-adjust</a>
+::
+
+: <a>font-stretch</a>
+::
+
+: <a>font-style</a>
+::
+
+: <a>font-synthesis</a>
+::
+
+: <a>font-variant</a>
+::
+
+: <a>font-variant-alternates</a>
+::
+
+: <a>font-variant-emoji</a>
+::
+
+: <a>font-variation-settings</a>
+::
+
+: <a>font-weight</a>
+::
+
+: <a>gap</a>
+::
+
+: <a>globalcompositeoperation</a>
+::
+
+: <a>glyph-orientation-vertical</a>
+::
+
+: <a>grid</a>
+::
+
+: <a>grid-area</a>
+::
+
+: <a>grid-auto-columns</a>
+::
+
+: <a>grid-auto-flow</a>
+::
+
+: <a>grid-auto-rows</a>
+::
+
+: <a>grid-column</a>
+::
+
+: <a>grid-column-end</a>
+::
+
+: <a>grid-column-gap</a>
+::
+
+: <a>grid-column-start</a>
+::
+
+: <a>grid-gap</a>
+::
+
+: <a>grid-row</a>
+::
+
+: <a>grid-row-end</a>
+::
+
+: <a>grid-row-gap</a>
+::
+
+: <a>grid-row-start</a>
+::
+
+: <a>grid-template</a>
+::
+
+: <a>grid-template-areas</a>
+::
+
+: <a>grid-template-columns</a>
+::
+
+: <a>grid-template-rows</a>
+::
+
+: <a>height</a>
+::
+
+: <a>image-rendering</a>
+::
+
+: <a>image-resolution</a>
+::
+
+: <a>initial-letter</a>
+::
+
+: <a>initial-letter-align</a>
+::
+
+: <a>initial-letter-wrap</a>
+::
+
+: <a>inline-size</a>
+::
+
+: <a>inset</a>
+::
+
+: <a>inset-block</a>
+::
+
+: <a>inset-block-end</a>
+::
+
+: <a>inset-block-start</a>
+::
+
+: <a>inset-inline</a>
+::
+
+: <a>inset-inline-end</a>
+::
+
+: <a>inset-inline-start</a>
+::
+
+: <a>isolation</a>
+::
+
+: <a>justify-content</a>
+::
+
+: <a>justify-items</a>
+::
+
+: <a>justify-self</a>
+::
+
+: <a>left</a>
+::
+
+: <a>letter-spacing</a>
+::
+
+: <a>line-grid</a>
+::
+
+: <a>line-height</a>
+::
+
+: <a>line-height-step</a>
+::
+
+: <a>line-snap</a>
+::
+
+: <a>list-style</a>
+::
+
+: <a>list-style-image</a>
+::
+
+: <a>list-style-position</a>
+::
+
+: <a>list-style-type</a>
+::
+
+: <a>margin</a>
+::
+
+: <a>margin-block</a>
+::
+
+: <a>margin-block-end</a>
+::
+
+: <a>margin-block-start</a>
+::
+
+: <a>margin-bottom</a>
+::
+
+: <a>margin-inline</a>
+::
+
+: <a>margin-inline-end</a>
+::
+
+: <a>margin-inline-start</a>
+::
+
+: <a>margin-left</a>
+::
+
+: <a>margin-right</a>
+::
+
+: <a>margin-top</a>
+::
+
+: <a>marker</a>
+::
+
+: <a>marker-end</a>
+::
+
+: <a>marker-mid</a>
+::
+
+: <a>marker-side</a>
+::
+
+: <a>marker-start</a>
+::
+
+: <a>mask</a>
+::
+
+: <a>mask-border</a>
+::
+
+: <a>mask-border-mode</a>
+::
+
+: <a>mask-border-outset</a>
+::
+
+: <a>mask-border-repeat</a>
+::
+
+: <a>mask-border-slice</a>
+::
+
+: <a>mask-border-source</a>
+::
+
+: <a>mask-border-width</a>
+::
+
+: <a>mask-clip</a>
+::
+
+: <a>mask-composite</a>
+::
+
+: <a>mask-image</a>
+::
+
+: <a>mask-mode</a>
+::
+
+: <a>mask-origin</a>
+::
+
+: <a>mask-position</a>
+::
+
+: <a>mask-repeat</a>
+::
+
+: <a>mask-size</a>
+::
+
+: <a>mask-type</a>
+::
+
+: <a>max-block-size</a>
+::
+
+: <a>max-height</a>
+::
+
+: <a>max-inline-size</a>
+::
+
+: <a>max-lines</a>
+::
+
+: <a>max-width</a>
+::
+
+: <a>min-block-size</a>
+::
+
+: <a>min-height</a>
+::
+
+: <a>min-inline-size</a>
+::
+
+: <a>min-width</a>
+::
+
+: <a>mix-blend-mode</a>
+::
+
+: <a>nav-down</a>
+::
+
+: <a>nav-left</a>
+::
+
+: <a>nav-right</a>
+::
+
+: <a>nav-up</a>
+::
+
+: <a>object-fit</a>
+::
+
+: <a>offset</a>
+::
+
+: <a>offset-after</a>
+::
+
+: <a>offset-anchor</a>
+::
+
+: <a>offset-before</a>
+::
+
+: <a>offset-distance</a>
+::
+
+: <a>offset-end</a>
+::
+
+: <a>offset-path</a>
+::
+
+: <a>offset-position</a>
+::
+
+: <a>offset-rotate</a>
+::
+
+: <a>offset-start</a>
+::
+
+: <a>opacity</a>
+::
+
+: <a>order</a>
+::
+
+: <a>orphans</a>
+::
+
+: <a>outline</a>
+::
+
+: <a>outline-color</a>
+::
+
+: <a>outline-offset</a>
+::
+
+: <a>outline-style</a>
+::
+
+: <a>outline-width</a>
+::
+
+: <a>overflow</a>
+::
+
+: <a>overflow-anchor</a>
+::
+
+: <a>overflow-x</a>
+::
+
+: <a>overflow-y</a>
+::
+
+: <a>padding</a>
+::
+
+: <a>padding-block</a>
+::
+
+: <a>padding-block-end</a>
+::
+
+: <a>padding-block-start</a>
+::
+
+: <a>padding-bottom</a>
+::
+
+: <a>padding-inline</a>
+::
+
+: <a>padding-inline-end</a>
+::
+
+: <a>padding-inline-start</a>
+::
+
+: <a>padding-left</a>
+::
+
+: <a>padding-right</a>
+::
+
+: <a>padding-top</a>
+::
+
+: <a>page</a>
+::
+
+: <a>page-break-after</a>
+::
+
+: <a>page-break-before</a>
+::
+
+: <a>page-break-inside</a>
+::
+
+: <a>paint-order</a>
+::
+
+: <a>pause</a>
+::
+
+: <a>pause-after</a>
+::
+
+: <a>pause-before</a>
+::
+
+: <a>perspective</a>
+::
+
+: <a>perspective-origin</a>
+::
+
+: <a>pitch</a>
+::
+
+: <a>pitch-range</a>
+::
+
+: <a>place-content</a>
+::
+
+: <a>place-items</a>
+::
+
+: <a>place-self</a>
+::
+
+: <a>play-during</a>
+::
+
+: <a>pointer-events</a>
+::
+
+: <a>position</a>
+::
+
+: <a>presentation-level</a>
+::
+
+: <a>quotes</a>
+::
+
+: <a>r</a>
+::
+
+: <a>region-fragment</a>
+::
+
+: <a>resize</a>
+::
+
+: <a>rest</a>
+::
+
+: <a>rest-after</a>
+::
+
+: <a>rest-before</a>
+::
+
+: <a>richness</a>
+::
+
+: <a>right</a>
+::
+
+: <a>rotate</a>
+::
+
+: <a>row-gap</a>
+::
+
+: <a>ruby-align</a>
+::
+
+: <a>ruby-merge</a>
+::
+
+: <a>ruby-position</a>
+::
+
+: <a>rx</a>
+::
+
+: <a>ry</a>
+::
+
+: <a>scale</a>
+::
+
+: <a>scroll-behavior</a>
+::
+
+: <a>scroll-margin</a>
+::
+
+: <a>scroll-margin-block</a>
+::
+
+: <a>scroll-margin-block-end</a>
+::
+
+: <a>scroll-margin-block-start</a>
+::
+
+: <a>scroll-margin-bottom</a>
+::
+
+: <a>scroll-margin-inline</a>
+::
+
+: <a>scroll-margin-inline-end</a>
+::
+
+: <a>scroll-margin-inline-start</a>
+::
+
+: <a>scroll-margin-left</a>
+::
+
+: <a>scroll-margin-right</a>
+::
+
+: <a>scroll-margin-top</a>
+::
+
+: <a>scroll-padding</a>
+::
+
+: <a>scroll-padding-block</a>
+::
+
+: <a>scroll-padding-block-end</a>
+::
+
+: <a>scroll-padding-block-start</a>
+::
+
+: <a>scroll-padding-bottom</a>
+::
+
+: <a>scroll-padding-inline</a>
+::
+
+: <a>scroll-padding-inline-end</a>
+::
+
+: <a>scroll-padding-inline-start</a>
+::
+
+: <a>scroll-padding-left</a>
+::
+
+: <a>scroll-padding-right</a>
+::
+
+: <a>scroll-padding-top</a>
+::
+
+: <a>scroll-snap-align</a>
+::
+
+: <a>scroll-snap-stop</a>
+::
+
+: <a>scroll-snap-type</a>
+::
+
+: <a>scrollbar-3dlight-color</a>
+::
+
+: <a>scrollbar-arrow-color</a>
+::
+
+: <a>scrollbar-base-color</a>
+::
+
+: <a>scrollbar-darkshadow-color</a>
+::
+
+: <a>scrollbar-face-color</a>
+::
+
+: <a>scrollbar-gutter</a>
+::
+
+: <a>scrollbar-highlight-color</a>
+::
+
+: <a>scrollbar-shadow-color</a>
+::
+
+: <a>scrollbar-track-color</a>
+::
+
+: <a>shape-inside</a>
+::
+
+: <a>shape-margin</a>
+::
+
+: <a>shape-padding</a>
+::
+
+: <a>shape-rendering</a>
+::
+
+: <a>shape-subtract</a>
+::
+
+: <a>size</a>
+::
+
+: <a>solid-color</a>
+::
+
+: <a>solid-opacity</a>
+::
+
+: <a>speak</a>
+::
+
+: <a>speak-as</a>
+::
+
+: <a>speak-header</a>
+::
+
+: <a>speak-numeral</a>
+::
+
+: <a>speak-punctuation</a>
+::
+
+: <a>speech-rate</a>
+::
+
+: <a>stop-color</a>
+::
+
+: <a>stop-opacity</a>
+::
+
+: <a>stress</a>
+::
+
+: <a>stroke</a>
+::
+
+: <a>stroke-align</a>
+::
+
+: <a>stroke-break</a>
+::
+
+: <a>stroke-color</a>
+::
+
+: <a>stroke-dash-corner</a>
+::
+
+: <a>stroke-dash-justify</a>
+::
+
+: <a>stroke-dasharray</a>
+::
+
+: <a>stroke-dashoffset</a>
+::
+
+: <a>stroke-image</a>
+::
+
+: <a>stroke-linecap</a>
+::
+
+: <a>stroke-linejoin</a>
+::
+
+: <a>stroke-miterlimit</a>
+::
+
+: <a>stroke-opacity</a>
+::
+
+: <a>stroke-origin</a>
+::
+
+: <a>stroke-position</a>
+::
+
+: <a>stroke-repeat</a>
+::
+
+: <a>stroke-size</a>
+::
+
+: <a>stroke-width</a>
+::
+
+: <a>table-layout</a>
+::
+
+: <a>text-align</a>
+::
+
+: <a>text-anchor</a>
+::
+
+: <a>text-combine-upright</a>
+::
+
+: <a>text-decoration</a>
+::
+
+: <a>text-decoration-fill</a>
+::
+
+: <a>text-decoration-skip</a>
+::
+
+: <a>text-decoration-skip-ink</a>
+::
+
+: <a>text-decoration-stroke</a>
+::
+
+: <a>text-decoration-width</a>
+::
+
+: <a>text-emphasis-skip</a>
+::
+
+: <a>text-indent</a>
+::
+
+: <a>text-orientation</a>
+::
+
+: <a>text-overflow</a>
+::
+
+: <a>text-rendering</a>
+::
+
+: <a>text-size-adjust</a>
+::
+
+: <a>text-transform</a>
+::
+
+: <a>text-underline-offset</a>
+::
+
+: <a>top</a>
+::
+
+: <a>transform-style</a>
+::
+
+: <a>transition</a>
+::
+
+: <a>transition-delay</a>
+::
+
+: <a>transition-duration</a>
+::
+
+: <a>transition-property</a>
+::
+
+: <a>transition-timing-function</a>
+::
+
+: <a>translate</a>
+::
+
+: <a>unicode-bidi</a>
+::
+
+: <a>user-select</a>
+::
+
+: <a>vector-effect</a>
+::
+
+: <a>vertical-align</a>
+::
+
+: <a>visibility</a>
+::
+
+: <a>voice-balance</a>
+::
+
+: <a>voice-duration</a>
+::
+
+: <a>voice-family</a>
+::
+
+: <a>voice-pitch</a>
+::
+
+: <a>voice-range</a>
+::
+
+: <a>voice-rate</a>
+::
+
+: <a>voice-stress</a>
+::
+
+: <a>voice-volume</a>
+::
+
+: <a>volume</a>
+::
+
+: <a>white-space</a>
+::
+
+: <a>widows</a>
+::
+
+: <a>width</a>
+::
+
+: <a>will-change</a>
+::
+
+: <a>word-spacing</a>
+::
+
+: <a>writing-mode</a>
+::
+
+: <a>x</a>
+::
+
+: <a>y</a>
+::
+
+: <a>z-index</a>
+::
+
+</dl>
 
 <!--
  ██████  ████████ ████████  ████    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
