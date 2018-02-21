@@ -730,7 +730,7 @@ interface CSSKeywordValue : CSSStyleValue {
     when called,
     perform the following steps:
 
-    1. If |value| is an empty string [=throw=] a {{TypeError}}.
+    1. If |value| is an empty string, [=throw=] a {{TypeError}}.
     2. Otherwise, return a new {{CSSKeywordValue}}
         with its {{CSSKeywordValue/value}} internal slot
         set to |value|.
