@@ -644,7 +644,7 @@ interface CSSUnparsedValue : CSSStyleValue {
 typedef (USVString or CSSVariableReferenceValue) CSSUnparsedSegment;
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(USVString variable, optional CSSUnparsedValue? fallback)]
+ Constructor(USVString variable, optional CSSUnparsedValue? fallback = null)]
 interface CSSVariableReferenceValue {
     attribute USVString variable;
     readonly attribute CSSUnparsedValue? fallback;
@@ -719,8 +719,7 @@ of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
         with its {{CSSVariableReferenceValue/variable}} internal slot
         set to |variable|
         and its {{CSSVariableReferenceValue/fallback}} internal slot
-        set to |fallback| (if passed)
-        or `null` otherwise.
+        set to |fallback|.
 </div>
 
 
