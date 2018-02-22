@@ -192,6 +192,8 @@ and return the result.
     5. [=list/For each=] |value| in |values|,
         replace it with the result of [=reifying=] |value| for |property|.
 
+        Issue: Define the global.
+
     6. If |parseMultiple| is false,
         return |values|[0].
         Otherwise, return |values|.
@@ -279,6 +281,8 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     (see [[#computed-stylepropertymapreadonly-objects]]
     and [[#declared-stylepropertymap-objects]]).
 
+    Issue: Define the global.
+
     Unless otherwise stated,
     the initial ordering of the {{[[declarations]]}} internal slot
     is based on the key of each entry:
@@ -355,6 +359,8 @@ probably in an appendix.
     4. If |props|[|property|] [=map/exists=],
         return |props|[|property|].
         Otherwise, return an empty [=list=].
+
+        Issue: Define the global.
 </div>
 
 <div algorithm>
@@ -433,6 +439,8 @@ probably in an appendix.
 
     5. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
+
+        Issue: Define the global.
 
     6. Let |temp values| be an empty [=list=].
 
@@ -1334,7 +1342,7 @@ The following are the arithmetic operations you can perform on dimensions:
         : {{CSSMathSum}}
         ::
             <div algorithm="sum value from CSSMathSum">
-                1. Let |values| initially be an empty list.
+                1. Let |values| initially be an empty [=list=].
 
                 2. [=list/For each=] |item| in <var ignore>this</var>’s {{CSSMathSum/values}} internal slot:
 
@@ -4955,7 +4963,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
 
-    1. Let |s| initally be the [=string=] "var(".
+    1. Let |s| initally be "var(".
 
     2. Append |this|’s {{CSSVariableReferenceValue/variable}} internal slot to |s|.
 
@@ -5251,7 +5259,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSSkew}}</dfn> |this|:
 
-    1. Let |s| initially be a [=string=] containing "skew(".
+    1. Let |s| initially be "skew(".
 
     2. Serialize |this|’s {{CSSSkew/ax}} internal slot,
         and append it to |s|.
@@ -5273,7 +5281,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSSkewX}}</dfn> |this|:
 
-    1. Let |s| initially be a [=string=] containing "skewX(".
+    1. Let |s| initially be "skewX(".
 
     2. Serialize |this|’s {{CSSSkewX/ax}} internal slot,
         and append it to |s|.
@@ -5285,7 +5293,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSSkewY}}</dfn> |this|:
 
-    1. Let |s| initially be a [=string=] containing "skewX(".
+    1. Let |s| initially be "skewX(".
 
     2. Serialize |this|’s {{CSSSkewY/ay}} internal slot,
         and append it to |s|.
@@ -5297,7 +5305,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSPerspective}}</dfn> |this|:
 
-    1. Let |s| initially be a [=string=] containing "perspective(".
+    1. Let |s| initially be "perspective(".
 
     2. Serialize |this|’s {{CSSPerspective/length}} internal slot,
         and append it to |s|.
