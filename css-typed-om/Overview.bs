@@ -1126,6 +1126,21 @@ The following are the arithmetic operations you can perform on dimensions:
     3. Return `true`.
 </div>
 
+<div class=note>
+    This notion of equality is purposely fairly exacting;
+    all the values must be the exact same type and value, in the same order.
+    For example, `CSSMathSum(CSS.px(1), CSS.px(2))`
+    is <em>not</em> equal to `CSSMathSum(CSS.px(2), CSS.px(1))`.
+
+    This precise notion is used because it allows structural equality to be tested for very quickly;
+    if we were to use a slower and more forgiving notion of equality,
+    such as allowing the arguments to match in any order,
+    we'd probably want to go all the way
+    and perform other simplifications,
+    like considering ''96px'' to be equal to ''1in'';
+    this looser notion of equality might be added in the future.
+</div>
+
 <div algorithm>
     To determine whether two {{CSSNumericValue}}s |value1| and |value2|
     are <dfn export lt="equal numeric value">equal numeric values</dfn>,
