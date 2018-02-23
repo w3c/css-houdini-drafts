@@ -250,7 +250,7 @@ interface StylePropertyMapReadOnly {
        see https://github.com/heycam/webidl/issues/60 */
     sequence<CSSStyleValue> getAll(USVString property);
     boolean has(USVString property);
-    readonly attribute long size;
+    readonly attribute unsigned long size;
 };
 
 [Exposed=Window]
