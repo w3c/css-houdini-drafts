@@ -3200,375 +3200,93 @@ Issue: This section is under construction.
 Below this table is a listing of *every* CSS property currently supported,
 which will be filled in with more detail as we go.
 
-<table>
-    <tr>
-        <td><b>CSS Property</b>
-        <td><b>Specified values</b>
-        <td><b>Computed Value</b>
-
-    <tr>
-        <td>'display'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'margin-top'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'margin-left'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'margin-bottom'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'margin-right'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'height'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'background-color'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'color'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'padding-left'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'padding-top'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'padding-bottom'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'padding-right'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'border-style'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'border-color'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'border-left-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'border-top-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'border-bottom-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'border-right-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'position'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'font-size'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'top'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'left'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'bottom'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'right'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'text-align'
-        <td>{{CSSKeywordValue}}
-        <td>
-
-    <tr>
-        <td>'font-weight'
-        <td>{{CSSKeywordValue}}, {{CSSStyleValue}}
-        <td>{{CSSKeywordValue}}, {{CSSStyleValue}}
-
-    <tr>
-        <td>'float'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'opacity'
-        <td>{{CSSNumericValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'text-decoration-style'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'text-decoration-line'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'text-decoration-color'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'line-height'
-        <td>c
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'vertical-align'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'white-space'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'z-index'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'cursor'
-        <td>{{CSSKeywordValue}}, {{CSSImageValue}}
-        <td>{{CSSKeywordValue}}, {{CSSImageValue}}
-
-    <tr>
-        <td>'background-image'
-        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
-        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'border-top-left-radius'
-        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
-        <td>{{CSSStyleValue}}
-
-    <tr>
-        <td>'border-top-right-radius'
-        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
-        <td>{{CSSStyleValue}}
-
-    <tr>
-        <td>'border-bottom-left-radius'
-        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
-        <td>{{CSSStyleValue}}
-
-    <tr>
-        <td>'border-bottom-right-radius'
-        <td>{{CSSNumericValue}}, {{CSSStyleValue}}
-        <td>{{CSSStyleValue}}
-
-    <tr>
-        <td>'min-height'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'max-height'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'min-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'max-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'visibility'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'background-position'
-        <td>{{CSSPositionValue}}
-        <td>{{CSSPositionValue}}
-
-    <tr>
-        <td>'content'
-        <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}
-        <td>{{CSSKeywordValue}}, {{CSSResourceValue}}, {{CSSStyleValue}}
-
-    <tr>
-        <td>'box-sizing'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'outline-color'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'outline-style'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'outline-width'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'background-repeat'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'font-style'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'background-size'
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}
-        <td>{{CSSNumericValue}}, {{CSSKeywordValue}}, {{CSSStyleValue}}
-
-    <tr>
-        <td>'clear'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'text-overflow'
-        <td>{{CSSKeywordValue}}. {{CSSStyleValue}}
-        <td>{{CSSKeywordValue}}. {{CSSStyleValue}}
-
-    <tr>
-        <td>'transform'
-        <td>{{CSSTransformValue}}
-        <td>{{CSSTransformValue}}
-
-    <tr>
-        <td>'overflow-y'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'overflow-x'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'text-transform'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'list-style-image'
-        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
-        <td>{{CSSImageValue}}, {{CSSKeywordValue}}
-
-    <tr>
-        <td>'list-style-position'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'list-style-type'
-        <td>{{CSSKeywordValue}}
-        <td>{{CSSKeywordValue}}
-
-    <tr>
-        <td>'transition-duration'
-        <td>{{CSSNumericValue}}
-        <td>{{CSSNumericValue}}
-
-    <tr>
-        <td>'transition-delay'
-        <td>{{CSSNumericValue}}
-        <td>{{CSSNumericValue}}
-</table>
-
 <dl link-type=property>
-: [=custom properties=]
-::
+: unregistered [=custom properties=]
+:: For both specified and computed values,
+    [=reify a list of component values=] from the value,
+    and return the result.
+
+: registered [=custom properties=] [[css-properties-values-api-1]]
+:: Issue: Should be defined by the Props & Values spec
 
 : <a>align-content</a>
 ::
 
 : <a>align-items</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css> or <css>stretch</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is <css>baseline</css> or <css>first baseline,</css>,
+        [=reify an identifier=] "baseline"
+        and return the result.
+
+    3. If the value is a <<self-position>> with no <<overflow-position>>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    4. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>align-self</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>, <css>normal</css>, or <css>stretch</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is <css>baseline</css> or <css>first baseline,</css>,
+        [=reify an identifier=] "baseline"
+        and return the result.
+
+    3. If the value is a <<self-position>> with no <<overflow-position>>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    4. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>alignment-baseline</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>all</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>animation-composition</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>appearance</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>azimuth</a>
 ::
+    : For specified values:
+    ::
+        1. If the value is an <<angle>>,
+            [=reify a numeric value=] from the value
+            and return the result.
+
+        2. If the value is a single keyword,
+            [=reify an identifier=] from the value
+            and return the result.
+
+        3. Otherwise,
+            reify as a {{CSSStyleValue}}
+            and return the result.
+    : For computed values:
+    ::
+        [=Reify a numeric value=] from the angle
+        and return the result.
 
 : <a>backdrop-filter</a>
 ::
