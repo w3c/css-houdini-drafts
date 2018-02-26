@@ -3211,6 +3211,11 @@ which will be filled in with more detail as we go.
 
 : <a>align-content</a>
 ::
+    1. If the specified or computed value is the ''normal'' keyword,
+        return the result of reifying the "normal" keyword.
+    2. If the value is a keyword from <<content-distribution>>,
+        return the result of reifying the keyword value.
+    3. Otherwise, the value is not supported.
 
 : <a>align-items</a>
 :: For both specified and computed values:
@@ -4493,6 +4498,11 @@ which will be filled in with more detail as we go.
 
 : <a>top</a>
 ::
+    1. If the specified or computed value is the ''auto'' keyword,
+        return the result of reifying the "auto" keyword.
+    2. If the specified or computed value is of type <<length>>,
+        return the result of reifying the <<length>> value.
+    3. Otherwise, return the result of reifying the <<percentage>> value.
 
 : <a>transform-style</a>
 ::
