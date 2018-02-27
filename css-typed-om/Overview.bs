@@ -3289,127 +3289,235 @@ which will be filled in with more detail as we go.
         and return the result.
 
 : <a>backdrop-filter</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise,
+        reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>backface-visibility</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>background</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>background-attachment</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>background-blend-mode</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
+
+: <a>background-clip</a>
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>background-color</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>background-image</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is a ''url()'' function,
+        [=reify a url=] from the value
+        and return the result.
+
+    3. Otherwise,
+        [=reify an image=] from the value
+        and return the result.
 
 : <a>background-image-transform</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>background-position</a>
-::
+:: For both specified and computed values,
+    [=reify a position=] from the value
+    and return the result.
 
 : <a>background-repeat</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is a single keyword,
+        or the same keyword repeated twice,
+        [=reify an identifier=] from the keyword
+        and return the result.
+
+    2. If the value is <css>repeat no-repeat</css>,
+        [=reify an identifier=] "repeat-x"
+        and return the result.
+
+    3. If the value is <css>no-repeat repeat</css>,
+        [=reify an identifier=] "repeat-y"
+        and return the result.
+
+    4. Otherwise,
+        reify to a {{CSSStyleValue}}
+        and return the result.
 
 : <a>baseline-shift</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>sub</css> or <css>super</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise,
+        [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>block-size</a>
-::
+:: Same as for 'width'
 
 : <a>block-step</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>block-step-align</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>block-step-insert</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>block-step-round</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>block-step-size</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise,
+        [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>bookmark-label</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>bookmark-level</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise,
+        [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>bookmark-state</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>border</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-block</a>
-::
+:: Same as 'border-block-start'
 
 : <a>border-block-color</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-block-end</a>
-::
+:: Same as 'border-block-start'
 
 : <a>border-block-end-color</a>
-::
+:: Same as 'border-top-color'
 
 : <a>border-block-end-style</a>
-::
+:: Same as 'border-top-style'
 
 : <a>border-block-end-width</a>
-::
+:: Same as 'border-top-width'
 
 : <a>border-block-start</a>
-::
+:: Same as 'border-top'
 
 : <a>border-block-start-color</a>
-::
+:: Same as 'border-top-color'
 
 : <a>border-block-start-style</a>
-::
+:: Same as 'border-top-style'
 
 : <a>border-block-start-width</a>
-::
+:: Same as 'border-top-width'
 
 : <a>border-block-style</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-block-width</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-bottom</a>
-::
+:: Same as 'border-top'
 
 : <a>border-bottom-color</a>
-::
+:: Same as 'border-top-color'
 
 : <a>border-bottom-style</a>
-::
+:: Same as 'border-top-style'
 
 : <a>border-bottom-width</a>
-::
+:: Same as 'border-top-width'
 
 : <a>border-boundary</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>border-collapse</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>border-color</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-image-transform</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>border-inline</a>
 ::
