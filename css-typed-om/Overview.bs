@@ -2767,447 +2767,15 @@ has the same behavior as in normal CSS.
 {{CSSStyleValue}} Reification {#reify-stylevalue}
 ===========================================================
 
-This section describes how Typed OM objects are constructed from abstract CSS values
-(aka how to <dfn export for=CSS>reify</dfn> a CSS value for a given property).
-
-If a property's grammar is more complex than one of the types listed here,
-it [=reifies=] to a raw {{CSSStyleValue}},
-with a [=CSSStyleValue/stringification behavior=]
-that produces the CSSOM serialization of the property.
-
-Issue(268): Per F2F, "CSSOM serialization" isn't well-defined/interoperable enough.
-We instead need to strictly define the serialization of every property.
-This should be done according to CSSOM principles, tho
-(generally, shortest possible value).
-
-Raw CSS tokens: properties with ''var()'' references {#reify-tokens}
---------------------------------------------------
-
-Regardless of what the property's grammar is otherwise,
-a property value with an un-substituted ''var()'' reference
-is represented as a [=list=] of [=component values=],
-which becomes a {{CSSUnparsedValue}} in the Typed OM.
-
-<div algorithm>
-    To <dfn export>reify a list of component values</dfn>
-    from a |list|:
-
-    1. Replace all ''var()'' references in |list|
-        with {{CSSVariableReferenceValue}} objects,
-        as described in [[#reify-var]].
-    2. Replace each remaining maximal subsequence of [=component values=] in |list|
-        with a single string of their concatenated serializations.
-    3. Return a new {{CSSUnparsedValue}}
-        whose {{CSSUnparsedValue/[[tokens]]}} slot is set to |list|.
-</div>
-
-<div class='example'>
-The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
-is converted into a {{CSSUnparsedValue}} that contains a sequence with:
-
-    * the string "calc(42px + "
-    * a {{CSSVariableReferenceValue}} with:
-        * {{CSSVariableReferenceValue/variable}} "--foo"
-        * {{CSSVariableReferenceValue/fallback}} a
-            {{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
-    * the string " + "
-    * a {{CSSVariableReferenceValue}} with:
-        * {{CSSVariableReferenceValue/variable}} "--bar"
-        * {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
-            with a sequence containing:
-            * the string " "
-            * a {{CSSVariableReferenceValue}} with
-                * {{CSSVariableReferenceValue/variable}} "--far"
-                * {{CSSVariableReferenceValue/fallback}} null
-            * the string " + 15px"
-    * the string ")"
-</div>
-
-''var()'' References {#reify-var}
--------------------------------------
-
-''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
-
-<div algorithm>
-    To <dfn export>reify a ''var()'' reference</dfn> |var|:
-
-    1. Let |object| be a new {{CSSVariableReferenceValue}}.
-
-    2. Set |object|’s {{CSSVariableReferenceValue/variable}} internal slot
-        to the serialization of the <<custom-ident>> providing the variable name.
-
-    3. If |var| has a fallback value,
-        set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
-        to the result of [=reify a list of component values|reifying the fallback's component values=].
-        Otherwise,
-        set it to `null`.
-
-    4. Return |object|.
-</div>
-
-[=Identifier=] Values {#reify-ident}
------------------------------------
-
-CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
-
-<div algorithm>
-    To <dfn export>reify an [=identifier=]</dfn> |ident|:
-
-    1. Return a new {{CSSKeywordValue}}
-        with its {{CSSKeywordValue/value}} internal slot
-        set to the serialization of |ident|.
-</div>
-
-<<number>>, <<percentage>>, and <<dimension>> values {#reify-numeric}
--------------------------------------------------------------------------
-
-CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValue}}s in the Typed OM.
-
-<div algorithm>
-    To <dfn export>reify a numeric value</dfn> |num|:
-
-    1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
-        [=reify a math expression=] from |num|
-        and return the result.
-
-    2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
-        return a new {{CSSUnitValue}}
-        with its {{CSSUnitValue/value}} internal slot
-        set to 0,
-        and its {{CSSUnitValue/unit}} internal slot
-        set to "px".
-
-    3. Return a new {{CSSUnitValue}}
-        with its {{CSSUnitValue/value}} internal slot
-        set to the numeric value of |num|,
-        and its {{CSSUnitValue/unit}} internal slot
-        set to "number" if |num| is a <<number>>,
-        "percent" if |num| is a <<percentage>>,
-        and |num|’s unit if |num| is a <<dimension>>.
-</div>
-
-<div algorithm>
-    To <dfn export>reify a math expression</dfn> |num|:
-
-    1. If |num| is a ''min()'' or ''max()'' expression:
-        1. Let |values| be the result of [=reify a math expression|reifying=]
-            the arguments to the expression,
-            treating each argument as if it were the contents of a ''calc()'' expression.
-
-        2. Return a new {{CSSMathMin}} or {{CSSMathMax}} object, respectively,
-            with its {{CSSMathMin/values}} internal slot
-            set to |values|.
-
-    2. Assert: Otherwise, |num| is a ''calc()''.
-
-    3. Turn |num|’s argument
-        into an expression tree
-        using standard PEMDAS precedence rules,
-        with the following exceptions/clarification:
-
-        * Treat subtraction as instead being addition,
-            with the RHS argument instead wrapped in a special "negate" node.
-        * Treat division as instead being multiplication,
-            with the RHS argument instead wrapped in a special "invert" node.
-        * Addition and multiplication are N-ary;
-            each node can have any number of arguments.
-        * If an expression has only a single value in it,
-            and no operation,
-            treat it as an addition node with the single argument.
-
-    4. Recursively transform the expression tree into objects,
-        as follows:
-
-        <dl class=switch>
-            : addition node
-            :: becomes a new {{CSSMathSum}} object,
-                with its {{CSSMathSum/values}} internal slot
-                set to its list of arguments
-            : multiplication node
-            :: becomes a new {{CSSMathProduct}} object,
-                with its {{CSSMathProduct/values}} internal slot
-                set to its list of arguments
-            : negate node
-            :: becomes a new {{CSSMathNegate}} object,
-                with its {{CSSMathNegate/value}} internal slot
-                set to its argument
-            : invert node
-            :: becomes a new {{CSSMathInvert}} object,
-                with its {{CSSMathInvert/value}} internal slot
-                set to its argument
-            : leaf node
-            :: [=reified=] as appropriate
-        </dl>
-
-    <div class=example>
-        For example, ''calc(1px - 2 * 3em)''
-        produces the structure:
-
-        <pre>
-            CSSMathSum(
-                CSS.px(1),
-                CSSMathNegate(
-                    CSSMathProduct(
-                        2,
-                        CSS.em(3)
-                    )
-                )
-            )
-        </pre>
-    </div>
-
-    <div class=example>
-        Note that addition and multiplication are N-ary,
-        so ''calc(1px + 2px + 3px)''
-        produces the structure:
-
-        <pre>
-            CSSMathSum(
-                CSS.px(1),
-                CSS.px(2),
-                CSS.px(3)
-            )
-        </pre>
-
-        but ''calc(calc(1px + 2px) + 3px)''
-        produces the structure:
-
-        <pre>
-            CSSMathSum(
-                CSSMathSum(
-                    CSS.px(1),
-                    CSS.px(2)
-                ),
-                CSS.px(3)
-            )
-        </pre>
-    </div>
-
-    Note: The value computation process may transform different units into identical ones,
-    simplifying the resulting expression.
-    For example, ''calc(1px + 2em)'' as a specified value
-    results in a <nobr><code>CSSMathSum(CSS.px(1), CSS.em(2))</code></nobr>,
-    but as a computed value will give <nobr><code>CSS.px(33)</code></nobr> or similar
-    (depending on the value of an ''em'' in that context).
-</div>
-
-
-<<transform-list>> and <<transform-function>> values {#reify-transformvalue}
-------------------------------------------------------------------------------------
-
-CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
-while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
-
-<div algorithm>
-    To <dfn export>reify a <<transform-list>></dfn> |list|:
-
-    1. Return a new {{CSSTransformValue}}
-        whose [=values to iterate over=]
-        are the result of mapping the [=reify a &lt;transform-function>=] algorithm
-        over |list|.
-</div>
-
-<div algorithm>
-    To <dfn export>reify a <<transform-function>></dfn> |func|,
-    perform the appropriate set of steps below,
-    based on |func|:
-
-    <dl class=switch>
-        : ''matrix()''
-        : ''matrix3d()''
-        ::
-            1. Return a new {{CSSMatrixComponent}} object,
-                whose {{CSSMatrixComponent/matrix}} internal slot
-                is set to a 4x4 matrix representing the same information
-                as |func|,
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true` if |func| is ''matrix()'',
-                and `false` otherwise.
-
-        : ''translate()''
-        : ''translateX()''
-        : ''translateY()''
-        : ''translate3d()''
-        : ''translateZ()''
-        ::
-            1. Return a new {{CSSTranslate}} object,
-                whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
-                are set to the [=reify a numeric value|reification=] of the specified x/y/z offsets,
-                or the [=reify a numeric value|reification=] of ''0px'' if not specified in |func|,
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
-                and `false` otherwise.
-
-        : ''scale()''
-        : ''scaleX()''
-        : ''scaleY()''
-        : ''scale3d()''
-        : ''scaleZ()''
-        ::
-            1. Return a new {{CSSScale}} object,
-                whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
-                are set to the specified x/y/z scales,
-                or to ''1'' if not specified in |func|
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true` if |func| is ''scale()'', ''scaleX()'', or ''scaleY()'',
-                and `false` otherwise.
-
-        : ''rotate()''
-        : ''rotate3d()''
-        : ''rotateX()''
-        : ''rotateY()''
-        : ''rotateZ()''
-        ::
-            1. Return a new {{CSSRotate}} object,
-                whose {{CSSRotate/angle}} internal slot
-                is set to the [=reify a numeric value|reification=] of the specified angle,
-                and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
-                are set to the specified rotation axis coordinates,
-                or the implicit axis coordinates if not specified in |func|
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true` if |func| is ''rotate()'',
-                and `false` otherwise.
-
-        : ''skew()''
-        ::
-            1. Return a new {{CSSSkew}} object,
-                whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
-                are set to the [=reify a numeric value|reification=] of the specified x and y angles,
-                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true`.
-
-        : ''skewX()''
-        ::
-            1. Return a new {{CSSSkewX}} object,
-                whose {{CSSSkewX/ax}} internal slot
-                is set to the [=reify a numeric value|reification=] of the specified x angle,
-                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true`.
-
-        : ''skewY()''
-        ::
-            1. Return a new {{CSSSkewY}} object,
-                whose {{CSSSkewY/ay}} internal slot
-                is set to the [=reify a numeric value|reification=] of the specified y angle,
-                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `true`.
-
-        : ''perspective()''
-        ::
-            1. Return a new {{CSSPerspective}} object,
-                whose {{CSSPerspective/length}} internal slot
-                is set to the [=reify a numeric value|reification=] of the specified length
-                and whose {{CSSTransformComponent/is2D}} internal slot
-                is `false`.
-    </dl>
-</div>
-
-<<position>> Values {#reify-position}
------------------------------------------------
-
-CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
-components determined via the following process. If this process, or any sub-process referenced by this
-process fails, then reification as a whole fails.
-
-1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
-1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
-        the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
-        by the provided value and an auto <var>bias</var>.
-1.  Otherwise, if the provided value consists of a combination of two keywords, then:
-
-        1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
-                first keyword and an auto <var>bias</var>.
-        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-        1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
-
-1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and
-        calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
-        <var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
-        procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
-1.  Otherwise:
-
-        1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
-                the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
-                keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
-        1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
-                set to the first component of the provided value and an auto <var>bias</var>.
-        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-        1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
-                the procedure outlined in
-                [[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
-                <var>bias</var>.
-        1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
-                calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
-                <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
-                the existing <var>bias</var>.
-        1.  Otherwise, the process fails.
-
-<h4 id='from-single-keyword'>Determining <var>x</var> or <var>y</var> from a single value</h4>
-
-The following process sets a value for either <var>x</var> or <var>y</var>, depending on an input <var>value</var>
-and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
-
-1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
-        {{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
-1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a
-        {{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
-1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-        {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-        {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
-        [=reify a numeric value|reifying |value| as a numeric value=]. If <var>bias</var> is vertical,
-        set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
-        horizontal. Exit this process.
-1.  If <var>value</var> is not the keyword "center", then this process fails.
-
-<h4 id='from-keyword-and-length'>Determining <var>x</var> or <var>y</var> from a keyword and a length</h4>
-
-The following process sets a value for either <var>x</var> or<var>y</var>, depending on an input <var>keyword</var>,
-<var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
-<var>length</var>.
-
-1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
-        <var>keyword</var>, using the provided <var>bias</var>
-1.  Let <var>adjustment</var> be the result of
-    [=reify a numeric value|reifying |length| as a numeric value=].
-1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
-        <var>adjustment</var> from a zero length.
-1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
-        adding <var>adjustment</var> to it.
-
-<<url>> (and subtype) Values {#reify-url}
---------------------------------------------------------------
-
-Resource references are reified by determining whether the reference is invalid
-(in which case {{CSSResourceValue/state}} is set to ''error'') or
-requires network data (in which case {{CSSResourceValue/state}}
-is set to ''loading''). If data is not required and the reference is valid then
-{{CSSResourceValue/state}} is set to ''loaded''.
-
-If {{CSSResourceValue/state}} is set to ''loading'' then the image
-reference is reevaluated once the pending data becomes available, according to the
-same rules referenced above.
-
-Reification can not fail for {{CSSResourceValue}} objects.
-
-<div class='example'>
-The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
-</div>
-
-
-List of CSS properties to their {{CSSStyleValue}} reification {#reify-property-style-value}
-----------------------------------------------------------------------------------------------------
-
-The table below lists out the possible {{CSSStyleValue}}s that each property
-could reify to, depending on its specified or computed value.
-
-Issue: This section is under construction.
-Below this table is a listing of *every* CSS property currently supported,
-which will be filled in with more detail as we go.
+This section describes how Typed OM objects are constructed from abstract CSS values,
+a process called <dfn export for=CSS lt="reify | reification">reification</dfn>. 
+
+The following list defines the [=reification=] behavior for every single property in CSS,
+for both specified and computed values.
+
+When a property is [=list-valued=],
+this list defines how to reify a single iteration of the property;
+multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
 
 <dl link-type=property>
 : unregistered [=custom properties=]
@@ -4702,6 +4270,428 @@ which will be filled in with more detail as we go.
 ::
 
 </dl>
+
+
+Raw CSS tokens: properties with ''var()'' references {#reify-tokens}
+--------------------------------------------------
+
+Regardless of what the property's grammar is otherwise,
+a property value with an un-substituted ''var()'' reference
+is represented as a [=list=] of [=component values=],
+which becomes a {{CSSUnparsedValue}} in the Typed OM.
+
+<div algorithm>
+    To <dfn export>reify a list of component values</dfn>
+    from a |list|:
+
+    1. Replace all ''var()'' references in |list|
+        with {{CSSVariableReferenceValue}} objects,
+        as described in [[#reify-var]].
+    2. Replace each remaining maximal subsequence of [=component values=] in |list|
+        with a single string of their concatenated serializations.
+    3. Return a new {{CSSUnparsedValue}}
+        whose {{CSSUnparsedValue/[[tokens]]}} slot is set to |list|.
+</div>
+
+<div class='example'>
+The string "calc(42px + var(--foo, 15em) + var(--bar, var(--far) + 15px))"
+is converted into a {{CSSUnparsedValue}} that contains a sequence with:
+
+    * the string "calc(42px + "
+    * a {{CSSVariableReferenceValue}} with:
+        * {{CSSVariableReferenceValue/variable}} "--foo"
+        * {{CSSVariableReferenceValue/fallback}} a
+            {{CSSUnparsedValue}} with a single-valued sequence containing " 15em"
+    * the string " + "
+    * a {{CSSVariableReferenceValue}} with:
+        * {{CSSVariableReferenceValue/variable}} "--bar"
+        * {{CSSVariableReferenceValue/fallback}} a {{CSSUnparsedValue}}
+            with a sequence containing:
+            * the string " "
+            * a {{CSSVariableReferenceValue}} with
+                * {{CSSVariableReferenceValue/variable}} "--far"
+                * {{CSSVariableReferenceValue/fallback}} null
+            * the string " + 15px"
+    * the string ")"
+</div>
+
+''var()'' References {#reify-var}
+-------------------------------------
+
+''var()'' references become {{CSSVariableReferenceValue}}s in the Typed OM.
+
+<div algorithm>
+    To <dfn export>reify a ''var()'' reference</dfn> |var|:
+
+    1. Let |object| be a new {{CSSVariableReferenceValue}}.
+
+    2. Set |object|’s {{CSSVariableReferenceValue/variable}} internal slot
+        to the serialization of the <<custom-ident>> providing the variable name.
+
+    3. If |var| has a fallback value,
+        set |object|’s {{CSSVariableReferenceValue/fallback}} internal slot
+        to the result of [=reify a list of component values|reifying the fallback's component values=].
+        Otherwise,
+        set it to `null`.
+
+    4. Return |object|.
+</div>
+
+[=Identifier=] Values {#reify-ident}
+-----------------------------------
+
+CSS [=identifiers=] become {{CSSKeywordValue}}s in the Typed OM.
+
+<div algorithm>
+    To <dfn export>reify an [=identifier=]</dfn> |ident|:
+
+    1. Return a new {{CSSKeywordValue}}
+        with its {{CSSKeywordValue/value}} internal slot
+        set to the serialization of |ident|.
+</div>
+
+<<number>>, <<percentage>>, and <<dimension>> values {#reify-numeric}
+-------------------------------------------------------------------------
+
+CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValue}}s in the Typed OM.
+
+<div algorithm>
+    To <dfn export>reify a numeric value</dfn> |num|:
+
+    1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
+        [=reify a math expression=] from |num|
+        and return the result.
+
+    2. If |num| is the unitless value ''0'' and |num| is a <<dimension>>,
+        return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot
+        set to 0,
+        and its {{CSSUnitValue/unit}} internal slot
+        set to "px".
+
+    3. Return a new {{CSSUnitValue}}
+        with its {{CSSUnitValue/value}} internal slot
+        set to the numeric value of |num|,
+        and its {{CSSUnitValue/unit}} internal slot
+        set to "number" if |num| is a <<number>>,
+        "percent" if |num| is a <<percentage>>,
+        and |num|’s unit if |num| is a <<dimension>>.
+</div>
+
+<div algorithm>
+    To <dfn export>reify a math expression</dfn> |num|:
+
+    1. If |num| is a ''min()'' or ''max()'' expression:
+        1. Let |values| be the result of [=reify a math expression|reifying=]
+            the arguments to the expression,
+            treating each argument as if it were the contents of a ''calc()'' expression.
+
+        2. Return a new {{CSSMathMin}} or {{CSSMathMax}} object, respectively,
+            with its {{CSSMathMin/values}} internal slot
+            set to |values|.
+
+    2. Assert: Otherwise, |num| is a ''calc()''.
+
+    3. Turn |num|’s argument
+        into an expression tree
+        using standard PEMDAS precedence rules,
+        with the following exceptions/clarification:
+
+        * Treat subtraction as instead being addition,
+            with the RHS argument instead wrapped in a special "negate" node.
+        * Treat division as instead being multiplication,
+            with the RHS argument instead wrapped in a special "invert" node.
+        * Addition and multiplication are N-ary;
+            each node can have any number of arguments.
+        * If an expression has only a single value in it,
+            and no operation,
+            treat it as an addition node with the single argument.
+
+    4. Recursively transform the expression tree into objects,
+        as follows:
+
+        <dl class=switch>
+            : addition node
+            :: becomes a new {{CSSMathSum}} object,
+                with its {{CSSMathSum/values}} internal slot
+                set to its list of arguments
+            : multiplication node
+            :: becomes a new {{CSSMathProduct}} object,
+                with its {{CSSMathProduct/values}} internal slot
+                set to its list of arguments
+            : negate node
+            :: becomes a new {{CSSMathNegate}} object,
+                with its {{CSSMathNegate/value}} internal slot
+                set to its argument
+            : invert node
+            :: becomes a new {{CSSMathInvert}} object,
+                with its {{CSSMathInvert/value}} internal slot
+                set to its argument
+            : leaf node
+            :: [=reified=] as appropriate
+        </dl>
+
+    <div class=example>
+        For example, ''calc(1px - 2 * 3em)''
+        produces the structure:
+
+        <pre>
+            CSSMathSum(
+                CSS.px(1),
+                CSSMathNegate(
+                    CSSMathProduct(
+                        2,
+                        CSS.em(3)
+                    )
+                )
+            )
+        </pre>
+    </div>
+
+    <div class=example>
+        Note that addition and multiplication are N-ary,
+        so ''calc(1px + 2px + 3px)''
+        produces the structure:
+
+        <pre>
+            CSSMathSum(
+                CSS.px(1),
+                CSS.px(2),
+                CSS.px(3)
+            )
+        </pre>
+
+        but ''calc(calc(1px + 2px) + 3px)''
+        produces the structure:
+
+        <pre>
+            CSSMathSum(
+                CSSMathSum(
+                    CSS.px(1),
+                    CSS.px(2)
+                ),
+                CSS.px(3)
+            )
+        </pre>
+    </div>
+
+    Note: The value computation process may transform different units into identical ones,
+    simplifying the resulting expression.
+    For example, ''calc(1px + 2em)'' as a specified value
+    results in a <nobr><code>CSSMathSum(CSS.px(1), CSS.em(2))</code></nobr>,
+    but as a computed value will give <nobr><code>CSS.px(33)</code></nobr> or similar
+    (depending on the value of an ''em'' in that context).
+</div>
+
+
+<<transform-list>> and <<transform-function>> values {#reify-transformvalue}
+------------------------------------------------------------------------------------
+
+CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
+while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
+
+<div algorithm>
+    To <dfn export>reify a <<transform-list>></dfn> |list|:
+
+    1. Return a new {{CSSTransformValue}}
+        whose [=values to iterate over=]
+        are the result of mapping the [=reify a &lt;transform-function>=] algorithm
+        over |list|.
+</div>
+
+<div algorithm>
+    To <dfn export>reify a <<transform-function>></dfn> |func|,
+    perform the appropriate set of steps below,
+    based on |func|:
+
+    <dl class=switch>
+        : ''matrix()''
+        : ''matrix3d()''
+        ::
+            1. Return a new {{CSSMatrixComponent}} object,
+                whose {{CSSMatrixComponent/matrix}} internal slot
+                is set to a 4x4 matrix representing the same information
+                as |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''matrix()'',
+                and `false` otherwise.
+
+        : ''translate()''
+        : ''translateX()''
+        : ''translateY()''
+        : ''translate3d()''
+        : ''translateZ()''
+        ::
+            1. Return a new {{CSSTranslate}} object,
+                whose {{CSSTranslate/x}}, {{CSSTranslate/y}}, and {{CSSTranslate/z}} internal slots
+                are set to the [=reify a numeric value|reification=] of the specified x/y/z offsets,
+                or the [=reify a numeric value|reification=] of ''0px'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''translate()'', ''translateX()'', or ''translateY()'',
+                and `false` otherwise.
+
+        : ''scale()''
+        : ''scaleX()''
+        : ''scaleY()''
+        : ''scale3d()''
+        : ''scaleZ()''
+        ::
+            1. Return a new {{CSSScale}} object,
+                whose {{CSSScale/x}}, {{CSSScale/y}}, and {{CSSScale/z}} internal slots
+                are set to the specified x/y/z scales,
+                or to ''1'' if not specified in |func|
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''scale()'', ''scaleX()'', or ''scaleY()'',
+                and `false` otherwise.
+
+        : ''rotate()''
+        : ''rotate3d()''
+        : ''rotateX()''
+        : ''rotateY()''
+        : ''rotateZ()''
+        ::
+            1. Return a new {{CSSRotate}} object,
+                whose {{CSSRotate/angle}} internal slot
+                is set to the [=reify a numeric value|reification=] of the specified angle,
+                and whose {{CSSRotate/x}}, {{CSSRotate/y}}, and {{CSSRotate/z}} internal slots
+                are set to the specified rotation axis coordinates,
+                or the implicit axis coordinates if not specified in |func|
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true` if |func| is ''rotate()'',
+                and `false` otherwise.
+
+        : ''skew()''
+        ::
+            1. Return a new {{CSSSkew}} object,
+                whose {{CSSSkew/ax}} and {{CSSSkew/ay}} internal slots
+                are set to the [=reify a numeric value|reification=] of the specified x and y angles,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
+
+        : ''skewX()''
+        ::
+            1. Return a new {{CSSSkewX}} object,
+                whose {{CSSSkewX/ax}} internal slot
+                is set to the [=reify a numeric value|reification=] of the specified x angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
+
+        : ''skewY()''
+        ::
+            1. Return a new {{CSSSkewY}} object,
+                whose {{CSSSkewY/ay}} internal slot
+                is set to the [=reify a numeric value|reification=] of the specified y angle,
+                or the [=reify a numeric value|reification=] of ''0deg'' if not specified in |func|,
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `true`.
+
+        : ''perspective()''
+        ::
+            1. Return a new {{CSSPerspective}} object,
+                whose {{CSSPerspective/length}} internal slot
+                is set to the [=reify a numeric value|reification=] of the specified length
+                and whose {{CSSTransformComponent/is2D}} internal slot
+                is `false`.
+    </dl>
+</div>
+
+<<position>> Values {#reify-position}
+-----------------------------------------------
+
+CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
+components determined via the following process. If this process, or any sub-process referenced by this
+process fails, then reification as a whole fails.
+
+1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
+1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
+        the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
+        by the provided value and an auto <var>bias</var>.
+1.  Otherwise, if the provided value consists of a combination of two keywords, then:
+
+        1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
+                first keyword and an auto <var>bias</var>.
+        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+        1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
+
+1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and
+        calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
+        <var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
+        procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
+1.  Otherwise:
+
+        1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
+                the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
+                keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
+        1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
+                set to the first component of the provided value and an auto <var>bias</var>.
+        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
+        1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
+                the procedure outlined in
+                [[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
+                <var>bias</var>.
+        1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
+                calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
+                <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
+                the existing <var>bias</var>.
+        1.  Otherwise, the process fails.
+
+<h4 id='from-single-keyword'>Determining <var>x</var> or <var>y</var> from a single value</h4>
+
+The following process sets a value for either <var>x</var> or <var>y</var>, depending on an input <var>value</var>
+and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
+
+1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
+        {{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
+1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a
+        {{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
+1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
+        {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
+1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
+        {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
+1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
+        [=reify a numeric value|reifying |value| as a numeric value=]. If <var>bias</var> is vertical,
+        set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
+        horizontal. Exit this process.
+1.  If <var>value</var> is not the keyword "center", then this process fails.
+
+<h4 id='from-keyword-and-length'>Determining <var>x</var> or <var>y</var> from a keyword and a length</h4>
+
+The following process sets a value for either <var>x</var> or<var>y</var>, depending on an input <var>keyword</var>,
+<var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
+<var>length</var>.
+
+1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
+        <var>keyword</var>, using the provided <var>bias</var>
+1.  Let <var>adjustment</var> be the result of
+    [=reify a numeric value|reifying |length| as a numeric value=].
+1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
+        <var>adjustment</var> from a zero length.
+1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
+        adding <var>adjustment</var> to it.
+
+<<url>> (and subtype) Values {#reify-url}
+--------------------------------------------------------------
+
+Resource references are reified by determining whether the reference is invalid
+(in which case {{CSSResourceValue/state}} is set to ''error'') or
+requires network data (in which case {{CSSResourceValue/state}}
+is set to ''loading''). If data is not required and the reference is valid then
+{{CSSResourceValue/state}} is set to ''loaded''.
+
+If {{CSSResourceValue/state}} is set to ''loading'' then the image
+reference is reevaluated once the pending data becomes available, according to the
+same rules referenced above.
+
+Reification can not fail for {{CSSResourceValue}} objects.
+
+<div class='example'>
+The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
+</div>
+
+
+
 
 <!--
  ██████  ████████ ████████  ████    ███    ██       ████ ████████    ███    ████████ ████  ███████  ██    ██
