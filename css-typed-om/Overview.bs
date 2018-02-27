@@ -288,9 +288,18 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     the initial ordering of the {{[[declarations]]}} internal slot
     is based on the key of each entry:
 
-    1. Non-custom properties, sorted in increasing code-point order.
-        (Note that non-custom properties are always lowercased in {{StylePropertyMap}}s.)
-    2. Custom properties, sorted in increasing code-point order.
+    1. Standardized properties
+        (not [=custom properties=] or vendor-prefixed properties),
+        [=ASCII-lowercased=]
+        and then sorted in increasing code-point order.
+    2. Vendor-prefixed/experimental properties
+        (those whose name starts with a single dash),
+        [=ASCII-lowercased=]
+        and then sorted in increasing code-point order.
+    3. [=Custom properties=], 
+        sorted in increasing code-point order.
+        (These are never lower-cased;
+        they are preserved exactly as written.)
 </div>
 
 The [=value pairs to iterate over=] for a {{StylePropertyMapReadOnly}} object
