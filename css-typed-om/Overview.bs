@@ -479,6 +479,18 @@ probably in an appendix.
         and that slot's value is anything other than |property|,
         [=throw=] a {{TypeError}}.
 
+    5. If the [=list/size=] of |values| is two or more,
+        and one or more of the [=list/items=] are a {{CSSUnparsedValue}} or {{CSSVariableReferenceValue}} object,
+        [=throw=] a {{TypeError}}.
+
+        Note: When a property is set via string-based APIs,
+        the presence of ''var()'' in a property
+        prevents the entire thing from being interpreted.
+        In other words,
+        everything *besides* the ''var()'' is a plain [=component value=],
+        not a meaningful type.
+        This step's restriction preserves the same semantics in the Typed OM.
+
     5. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     6. If |props|[|property|] [=map/exists=],
@@ -513,14 +525,27 @@ probably in an appendix.
 
     4. If any of the [=list/items=] in |values| have a non-null {{[[associatedProperty]]}} internal slot,
         and that slot's value is anything other than |property|,
+        [=throw=] a {{TypeError}}.    
+
+    5. If any of the [=list/items=] in |values| 
+        are a {{CSSUnparsedValue}} or {{CSSVariableReferenceValue}} object,
         [=throw=] a {{TypeError}}.
+
+        Note: When a property is set via string-based APIs,
+        the presence of ''var()'' in a property
+        prevents the entire thing from being interpreted.
+        In other words,
+        everything *besides* the ''var()'' is a plain [=component value=],
+        not a meaningful type.
+        This step's restriction preserves the same semantics in the Typed OM.
 
     5. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     6. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
 
-        Issue: Define the global.
+    7. If |props|[|property|] contains a ''var()'' reference,
+        [=throw=] a {{TypeError}}.
 
     7. Let |temp values| be an empty [=list=].
 
