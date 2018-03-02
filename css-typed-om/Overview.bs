@@ -298,6 +298,10 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 };
 </xmp>
 
+{{StylePropertyMap}} is an alternate way to represent a [=CSS declarations block=] as an object
+(when fetched via the [[cssom]],
+[=CSS declaration blocks=] are instead represented as {{CSSStyleDeclarations}} objects.)
+
 <!--
     We restrict the read-write version from workers/worklets
     because append()/set() require parsing to accept USVStrings,
@@ -311,14 +315,12 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 <div algorithm="StylePropertyMap.[[declarations]]">
     A {{StylePropertyMapReadOnly}} object
     has a <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
-    which contains a <dfn export for="StylePropertyMapReadonly, StylePropertyMap">declarations map</dfn>,
-    which is a [=map=] whose keys are [=strings=] (representing property names)
-    and whose values are [=underlying values=].
-    This list is initialized differently depending on where the {{StylePropertyMap}} is used
-    (see [[#computed-stylepropertymapreadonly-objects]]
-    and [[#declared-stylepropertymap-objects]]).
+    which is a [=map=] reflecting the [=CSS declaration block=]'s [=CSSStyleDeclaration/declarations=].
 
-    Issue: Define the global.
+    Note: The [=CSSStyleDeclaration/declarations=] are not yet defined using [[infra]] terminology,
+    but for the purpose of this spec
+    it's assumed to be a [=map=] whose keys are [=strings=] (representing property names)
+    and whose values are [=underlying values=] for those properties.
 
     Unless otherwise stated,
     the initial ordering of the {{[[declarations]]}} internal slot
@@ -549,7 +551,7 @@ probably in an appendix.
     when called on a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
-    1. Replace the value of |this|’s {{[[declarations]]}} internal slot with a fresh empty [=declarations map=].
+    1. [=map/Remove=] all of the declarations in |this|’s {{[[declarations]]}} internal slot.
 </div>
 
 <div algorithm>
