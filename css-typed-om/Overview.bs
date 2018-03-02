@@ -595,10 +595,6 @@ probably in an appendix.
     * Any subclass of {{CSSImageValue}} always matches <<image>>.
 </div>
 
-[=Computed StylePropertyMaps=] and [=declared StylePropertyMaps=] are all live objects:
-the attributes and methods on these objects must operate on the actual underlying data,
-not a snapshot of the data.
-
 A [=string=] is a <dfn>custom property name string</dfn>
 if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
 (This corresponds to the <<custom-property-name>> production,
@@ -615,7 +611,7 @@ Computed {{StylePropertyMapReadOnly}} objects {#computed-stylepropertymapreadonl
 
 <pre class='idl'>
 partial interface Element {
-    StylePropertyMapReadOnly computedStyleMap();
+    [SameObject] StylePropertyMapReadOnly computedStyleMap();
 };
 </pre>
 
@@ -634,14 +630,21 @@ when it is first called.
     perform the following steps:
 
     1. If |this|'s {{Element/[[computedStyleMapCache]]}} internal slot is set to `null`,
-        set its value to a live {{StylePropertyMapReadOnly}} object,
+        set its value to a new {{StylePropertyMapReadOnly}} object,
         whose {{[[declarations]]}} internal slot are the name and [=computed value=] of
         every longhand CSS property supported by the User Agent,
         every registered [=custom property=],
         and every non-registered [=custom property=] which is not set to its initial value
         on |this|,
-        ordered by putting CSS-defined properties before custom properties,
-        then sorting by code-point order of property name within those two categories.
+        in the standard order.
+
+        The [=computed values=] in the {{[[declarations]]}} of this object 
+        must remain up-to-date,
+        changing as style resolution changes the properties on |this|
+        and how they're computed.
+
+        Note: In practice, since the values are "hidden" behind a `.get()` method call,
+        UAs can delay computing anything until a given property is actually requested.
 
     2. Return |this|'s {{Element/[[computedStyleMapCache]]}} internal slot.
 </div>
