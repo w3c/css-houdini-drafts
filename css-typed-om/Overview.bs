@@ -115,17 +115,35 @@ spec:svg2;
 Introduction {#intro}
 =====================
 
-Converting Cascading Style Sheets Object Model (CSSOM) value strings into
-meaningfully typed JavaScript representations and back can incur a significant
-performance overhead. This specification exposes CSS values as typed JavaScript
-objects to facilitate their performant manipulation.
+CSS stylesheets are parsed into abstract UA-internal data structures,
+the <dfn>underlying values</dfn> of CSS,
+which various specification algorithms manipulate.
 
-The API exposed by this specification is designed for performance rather than ergonomics.
-Some particular considerations:
+Underlying values can't be directly manipulated,
+as they are implemenation-dependent;
+UAs have to agree on how to *interpret* the underlying values,
+but the values themselves are purposely left undefined
+so that UAs can store and manipulate CSS
+in whatever way is most efficient for them.
 
-* the objects representing CSS values are not "live"--
-    mutating them does not directly affect the page's style,
-    as they must instead be explicitly set back in the API.
+Previously, the only way to read or write to the underlying values
+was via strings--
+stylesheets or the CSSOM allowed authors to send strings to the UA,
+which were parsed into underlying values,
+and the CSSOM allowed authors to request 
+that the UA serialize their underlying values back into strings.
+
+This specification introduces a new way to interact with [=underlying values=],
+by representing them with specialized JS objects
+that can be manipulated and understood more easily and more reliably
+than string parsing/concatenation.
+This new approach is both easier for authors
+(for example, numeric values are reflected with actual JS numbers,
+and have unit-aware mathematical operations defined for them)
+and in many cases are more performant,
+as values can be directly manipulated
+and then cheaply translated back into [=underlying values=]
+without having to build and then parse strings of CSS.
 
 <!--
  ██████   ██████   ██████   ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ██       ██     ██ ████████
@@ -150,10 +168,6 @@ interface CSSStyleValue {
 </xmp>
 
 {{CSSStyleValue}} objects are the base class of all CSS values accessible via the Typed OM API.
-
-Values that can't yet be directly supported by a {{CSSStyleValue}} subclass
-are also represented as {{CSSStyleValue}} objects. These {{CSSStyleValue}} objects are only
-considered valid for the property that it was parsed with.
 
 The <a for="CSSStyleValue">stringification behavior</a> of {{CSSStyleValue}} objects
 is defined in [[#stylevalue-serialization]].
@@ -227,6 +241,28 @@ and return the result.
         but at the moment is explicitly a "you know what we mean" thing.
     </div>
 </div>
+
+
+Direct {{CSSStyleValue}} Objects {#direct-cssstylevalue}
+------------------------------------------------
+
+Values that can't yet be directly supported by a more specialized {{CSSStyleValue}} subclass
+are instead represented as {{CSSStyleValue}} objects.
+
+Each {{CSSStyleValue}} object is associated with a particular CSS property,
+via its {{[[associatedProperty]]}} internal slot,
+and a particular, immutable, [=underlying value=].
+These objects are said to "represent" the particular [=underlying value=]
+they were [=reified=] from,
+such that if they are set back into a stylesheet for the same property,
+they reproduce an equivalent [=underlying value=].
+
+These {{CSSStyleValue}} objects are only considered valid for the property that they were parsed for.
+This is enforced by {{CSSStyleValue}} objects having a <dfn attribute for=CSSStyleValue>\[[associatedProperty]]</dfn> internal slot,
+which is either `null` (the default)
+or a [=string=] specifying a property name.
+
+Note: This slot is checked by {{StylePropertyMap}}.{{set()}}/{{append()}}
 
 <!--
  ██████  ████████ ██    ██ ██       ████████ ██     ██    ███    ████████
@@ -413,18 +449,22 @@ probably in an appendix.
     3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
         [=throw=] a {{TypeError}}.
 
-    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+    4. If any of the [=list/items=] in |values| have a non-null {{[[associatedProperty]]}} internal slot,
+        and that slot's value is anything other than |property|,
+        [=throw=] a {{TypeError}}.
 
-    5. If |props|[|property|] [=map/exists=],
+    5. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    6. If |props|[|property|] [=map/exists=],
         [=map/remove=] it.
 
-    6. Let |values to set| be an empty [=list=].
+    7. Let |values to set| be an empty [=list=].
 
-    7. For each |value| in |values|,
+    8. For each |value| in |values|,
         [=normalize a style value=] for |property| and |value|,
         and append the result to |values to set|.
 
-    8. Set |props|[|property|] to |values to set|.
+    9. Set |props|[|property|] to |values to set|.
 
     Note: The property is deleted then added back
     so that it gets put at the end of the [=ordered map=],
@@ -445,22 +485,26 @@ probably in an appendix.
     3. If |property| is not a [=list-valued property=],
         [=throw=] a {{TypeError}}.
 
-    4. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+    4. If any of the [=list/items=] in |values| have a non-null {{[[associatedProperty]]}} internal slot,
+        and that slot's value is anything other than |property|,
+        [=throw=] a {{TypeError}}.
 
-    5. If |props|[|property|] does not [=map/exist=],
+    5. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
+
+    6. If |props|[|property|] does not [=map/exist=],
         [=map/set=] |props|[|property|] to an empty [=list=].
 
         Issue: Define the global.
 
-    6. Let |temp values| be an empty [=list=].
+    7. Let |temp values| be an empty [=list=].
 
-    7. For each |value| in |values|,
+    8. For each |value| in |values|,
         [=normalize a style value=] with |property| and |value|,
         and [=list/append=] the returned value to |temp values|.
 
     <!-- Using a temp list so that nothing gets mutated if normalizing ends up throwing an error. -->
 
-    8. [=list/Append=] the entries of |temp values| to |props|[|property|].
+    9. [=list/Append=] the entries of |temp values| to |props|[|property|].
 </div>
 
 <div algorithm>
@@ -4270,6 +4314,26 @@ multiple iterations are reflected by returning multiple values from {{StylePrope
 ::
 
 </dl>
+
+
+Unrepresentable Values {#reify-failure}
+---------------------------------------
+
+Not all [=underlying values=] are simple enough to be [=reified=]
+with the current set of {{CSSStyleValue}} subclasses.
+When this is the case,
+the property is [=reified as a CSSStyleValue=].
+
+<div algorithm>
+    To <dfn export lt="reify as a CSSStyleValue | reified as a CSSStyleValue">reify as a CSSStyleValue</dfn>
+    a |value|
+    for a |property|:
+
+    1. Return a new {{CSSStyleValue}} object
+        representing |value|
+        whose {{[[associatedProperty]]}} internal slot
+        is set to |property|.
+</div>
 
 
 Raw CSS tokens: properties with ''var()'' references {#reify-tokens}
