@@ -47,10 +47,12 @@ spec:css21; type:property;
     text:max-width;
     text:min-height;
     text:min-width;
-spec:cssom;
+spec:cssom-1;
     type: dfn;
         text: resolved value
         text: origin-clean flag; for: CSSStyleSheet
+        text: CSS declaration block
+        text: declarations; for: CSSStyleDeclaration
 spec:css-align-3; type:property; text:column-gap
 spec:css-color-3; type:property; text:color;
 spec:css-position-3; type:value; for:left; text:auto;
@@ -298,9 +300,9 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 };
 </xmp>
 
-{{StylePropertyMap}} is an alternate way to represent a [=CSS declarations block=] as an object
+{{StylePropertyMap}} is an alternate way to represent a [=CSS declaration block=] as an object
 (when fetched via the [[cssom]],
-[=CSS declaration blocks=] are instead represented as {{CSSStyleDeclarations}} objects.)
+[=CSS declaration blocks=] are instead represented as {{CSSStyleDeclaration}} objects.)
 
 <!--
     We restrict the read-write version from workers/worklets
@@ -350,7 +352,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     2. Let |value pairs| be an empty [=list=].
 
     3. [=map/For each=] |prop| → |value| in |declarations|:
-        1. Let |iterations| be the result of [=dividing into iterations=] |value|.
+        1. Let |iterations| be the result of [=subdivide into iterations|dividing into iterations=] |value|.
         2. [=Reify=] each [=list/item=] of |iterations|,
             and let |objects| be the result.
         3. Append |prop|/|objects| to |value pairs|.
@@ -485,7 +487,7 @@ probably in an appendix.
     7. Let |values to set| be an empty [=list=].
 
     8. For each |value| in |values|,
-        [=normalize a style value=] for |property| and |value|,
+        [=create an underlying value=] for |property| and |value|,
         and append the result to |values to set|.
 
     9. Set |props|[|property|] to |values to set|.
@@ -523,7 +525,7 @@ probably in an appendix.
     7. Let |temp values| be an empty [=list=].
 
     8. For each |value| in |values|,
-        [=normalize a style value=] with |property| and |value|,
+        [=create an underlying value=] with |property| and |value|,
         and [=list/append=] the returned value to |temp values|.
 
     <!-- Using a temp list so that nothing gets mutated if normalizing ends up throwing an error. -->
@@ -555,11 +557,15 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    To <dfn export>normalize a style value</dfn>,
+    To <dfn export>create an underlying value</dfn>,
     given a [=string=] |property|
     and a [=string=] or {{CSSStyleValue}} |value|:
 
-    : If |value| is a {{CSSStyleValue}},
+    : If |value| is a direct {{CSSStyleValue}},
+    ::
+        Return |value|'s associated value.
+
+    : If |value| is a {{CSSStyleValue}} subclass,
     :: If |value| does not [=match a CSS production|match the grammar=] of a [=list-valued property iteration=] of |property|,
         [=throw=] a {{TypeError}}.
 
@@ -567,12 +573,6 @@ probably in an appendix.
         and the corresponding part of |value| is a {{CSSUnitValue}} that is outside of that range,
         replace that value with the result of wrapping it in a fresh {{CSSMathSum}}
         whose {{CSSMathSum/values}} internal slot contains only that part of |value|.
-
-        (If |value| is a direct instance of {{CSSStyleValue}},
-        rather than one of its subclasses,
-        do the same with the abstract representation of the property's value that |value| contains,
-        replacing any out-of-range number, percentage, or dimension components
-        by wrapping them in a ''calc()'' expression.)
 
         Return the |value|.
 
