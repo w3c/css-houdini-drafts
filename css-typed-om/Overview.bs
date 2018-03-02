@@ -313,7 +313,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     has a <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
     which contains a <dfn export for="StylePropertyMapReadonly, StylePropertyMap">declarations map</dfn>,
     which is a [=map=] whose keys are [=strings=] (representing property names)
-    and whose values are [=lists=] of {{CSSStyleValue}} objects.
+    and whose values are [=underlying values=].
     This list is initialized differently depending on where the {{StylePropertyMap}} is used
     (see [[#computed-stylepropertymapreadonly-objects]]
     and [[#declared-stylepropertymap-objects]]).
@@ -338,8 +338,23 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
         they are preserved exactly as written.)
 </div>
 
-The [=value pairs to iterate over=] for a {{StylePropertyMapReadOnly}} object
-are the keys and values of the object's {{[[declarations]]}} slot.
+<div algorithm="CSSStyleValue.iterator">
+    The [=value pairs to iterate over=] 
+    for a {{StylePropertyMapReadOnly}} object |this|
+    are obtained as follows:
+
+    1. Let |declarations| be |this|'s {{[[declarations]]}} slot.
+
+    2. Let |value pairs| be an empty [=list=].
+
+    3. [=map/For each=] |prop| → |value| in |declarations|:
+        1. Let |iterations| be the result of [=dividing into iterations=] |value|.
+        2. [=Reify=] each [=list/item=] of |iterations|,
+            and let |objects| be the result.
+        3. Append |prop|/|objects| to |value pairs|.
+    
+    4. Return |value pairs|.
+</div>
 
 Some CSS properties are <dfn export local-lt="list-valued">list-valued properties</dfn>,
 such as 'background-image' or 'animation';
@@ -384,9 +399,13 @@ probably in an appendix.
     3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|][0].
+        [=subdivide into iterations=] |props|[|property|],
+        then [=reify=] the first item of the result
+        and return it.
 
         Otherwise, return `undefined`.
+
+        Issue: Define the global.
 </div>
 
 <div algorithm>
@@ -403,7 +422,10 @@ probably in an appendix.
     3. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
 
     4. If |props|[|property|] [=map/exists=],
-        return |props|[|property|].
+        [=subdivide into iterations=] |props|[|property|],
+        then [=reify=] each [=list/item=] of the result,
+        and return the list.
+
         Otherwise, return an empty [=list=].
 
         Issue: Define the global.
@@ -2811,13 +2833,13 @@ has the same behavior as in normal CSS.
 {{CSSStyleValue}} Reification {#reify-stylevalue}
 ===========================================================
 
-This section describes how Typed OM objects are constructed from abstract CSS values,
+This section describes how Typed OM objects are constructed from [=underlying values=],
 a process called <dfn export for=CSS lt="reify | reification">reification</dfn>. 
 
 The following list defines the [=reification=] behavior for every single property in CSS,
 for both specified and computed values.
 
-When a property is [=list-valued=],
+If an [=underlying value=] is from a [=list-valued=] property,
 this list defines how to reify a single iteration of the property;
 multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
 
