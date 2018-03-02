@@ -2842,6 +2842,10 @@ If an [=underlying value=] is from a [=list-valued=] property,
 this list defines how to reify a single iteration of the property;
 multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
 
+If an [=underlying value=] contains a ''var()'' reference,
+then it is reified by [=reify a list of component values|reifying a list of component values=],
+regardless of what property it is for.
+
 <dl link-type=property>
 : unregistered [=custom properties=]
 :: For both specified and computed values,
