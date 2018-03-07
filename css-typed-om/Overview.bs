@@ -3227,31 +3227,33 @@ regardless of what property it is for.
 ::
 
 : <a>border-left</a>
-::
+:: Same as 'border-top'
 
 : <a>border-left-color</a>
-::
+:: Same as 'border-top-color'
 
 : <a>border-left-style</a>
-::
+:: Same as 'border-top-style'
 
 : <a>border-left-width</a>
-::
+:: Same as 'border-top-width'
 
 : <a>border-radius</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-right</a>
-::
+:: Same as 'border-top'
 
 : <a>border-right-color</a>
-::
+:: Same as 'border-top-color'
 
 : <a>border-right-style</a>
-::
+:: Same as 'border-top-style'
 
 : <a>border-right-width</a>
-::
+:: Same as 'border-top-width'
 
 : <a>border-spacing</a>
 ::
@@ -3260,28 +3262,56 @@ regardless of what property it is for.
 ::
 
 : <a>border-top</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>border-top-color</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>currentcolor</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>border-top-style</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>border-top-width</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is a <<length>>,
+        [=reify a numeric value=] from the value
+        and return the result.
+    2. Otherwise, [=reify an identifier=] from the value
+        and return the result.
 
 : <a>border-width</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>bottom</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>box-decoration-break</a>
 ::
 
 : <a>box-sizing</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>box-snap</a>
 ::
@@ -3302,13 +3332,22 @@ regardless of what property it is for.
 ::
 
 : <a>caret-color</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>currentcolor</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>caret-shape</a>
 ::
 
 : <a>clear</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>clip</a>
 ::
@@ -3320,7 +3359,14 @@ regardless of what property it is for.
 ::
 
 : <a>color</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>currentcolor</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>color-adjust</a>
 ::
@@ -3380,10 +3426,14 @@ regardless of what property it is for.
 ::
 
 : <a>direction</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>display</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>dominant-baseline</a>
 ::
@@ -3392,7 +3442,9 @@ regardless of what property it is for.
 ::
 
 : <a>empty-cells</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>fill</a>
 ::
@@ -3449,7 +3501,9 @@ regardless of what property it is for.
 ::
 
 : <a>float</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>float-defer</a>
 ::
@@ -3656,7 +3710,9 @@ regardless of what property it is for.
 ::
 
 : <a>margin</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>margin-block</a>
 ::
@@ -3866,7 +3922,9 @@ regardless of what property it is for.
 ::
 
 : <a>padding</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>padding-block</a>
 ::
