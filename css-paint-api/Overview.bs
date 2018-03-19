@@ -566,6 +566,14 @@ with), given |concreteObjectSize| it <em>must</em> run the following steps:
         in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>, unless the user agent is under
         memory constraints.
 
+        <div class='note'>
+            User-agents have to attempt to introduce some non-determinism in the selection process
+            above. For example they could:
+                - Each frame select a random global scope from the list.
+                - After invocation(s) of <a>draw a paint image</a> randomly choose to switch to a
+                    different global scope.
+        </div>
+
         Note: This is to ensure that authors do not rely on being able to store state on the global
             object or non-regeneratable state on the class.
 
