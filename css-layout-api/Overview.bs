@@ -349,17 +349,11 @@ registerLayout('block-like', class {
     }
 
     *layout(constraints, children, styleMap, edges) {
-        const inlineSize = resolveInlineSize(constraints, styleMap);
-
-        const availableInlineSize = inlineSize - edges.all.inline;
-        const availableBlockSize =
-            resolveBlockSize(constraints, styleMap) - edges.all.block;
+        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = (constraints.fixedBlockSize || Infinity) - edges.all.block;
 
         const childFragments = [];
-        const childConstraints = new LayoutConstraints({
-            inlineSize: availableInlineSize,
-            blockSize: availableBlockSize,
-        });
+        const childConstraints = { availableInlineSize, availableBlockSize };
 
         const childFragments = yield children.map((child) => {
             return child.layoutNextFragment(childConstraints);
@@ -409,11 +403,11 @@ Layout Constraints {#layout-constraints}
 <pre class='idl'>
 [Constructor(optional LayoutConstraintsOptions options),Exposed=LayoutWorklet]
 interface LayoutConstraints {
-    readonly attribute double inlineSize;
-    readonly attribute double blockSize;
+    readonly attribute double availableInlineSize;
+    readonly attribute double availableBlockSize;
 
-    readonly attribute boolean inlineSizeFixed;
-    readonly attribute boolean blockSizeFixed;
+    readonly attribute double? fixedInlineSize;
+    readonly attribute double? fixedBlockSize;
 
     readonly attribute double percentageInlineSize;
     readonly attribute double percentageBlockSize;
@@ -425,67 +419,40 @@ interface LayoutConstraints {
 };
 
 dictionary LayoutConstraintsOptions {
-    double inlineSize = Infinity;
-    double blockSize = Infinity;
+    double availableInlineSize = 0;
+    double availableBlockSize = 0;
 
-    boolean inlineSizeFixed = false;
-    boolean blockSizeFixed = false;
+    double fixedInlineSize;
+    double fixedBlockSize;
 
-    double? percentageInlineSize = null;
-    double? percentageBlockSize = null;
+    double percentageInlineSize;
+    double percentageBlockSize;
 
-    double? blockFragmentationOffset = null;
+    double blockFragmentationOffset;
     BlockFragmentationType blockFragmentationType = "none";
 
-    any data = null;
+    any data;
 };
 
 enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
 
-<div class="issue">
-Issue: Should {{LayoutConstraintsOptions}} be instead:
+A {{LayoutConstraints}} object is passed into the layout method which represents the all the
+constraints for the <a>current layout</a> to perform layout inside. It is also used to pass
+information about the available space into a <a>child layout</a>.
 
-<pre class="lang-javascript">
-const options = {
-  availableInlineSize: 100,
-  availableBlockSize: Infinity,
-
-  fixedInlineSize: 150, // This makes the engine ignore availableInlineSize.
-  fixedBlockSize: 150, // This makes the engine ignore availableBlockSize.
-
-  percentageInlineSize: 100, // This defaults to fixedInlineSize,
-                             // then availableInlineSize if not set.
-  percentageBlockSize: 100,  // This defaults to fixedBlockSize,
-                             // then availableBlockSize if not set.
-
-  blockFragmentationOffset: 200,
-  blockFragmentationType: 'column',
-
-  data: {floatPositions: [{x: 20, y: 30}]}, // Author data.
-};
-</pre>
-
-The layout constraints object would mirror this, additionally with the blockSize, and inlineSize
-attributes which represent the resolved inline and block sizes for the fragment.
-
-</div>
-
-A {{LayoutConstraints}} object is passed into the layout method which represents the available space
-for the <a>current layout</a> to perform layout inside. It is also used to pass information about
-the available space into a <a>child layout</a>.
-
-The {{LayoutConstraints}} object has {{LayoutConstraints/inlineSize}} and
-{{LayoutConstraints/blockSize}} attributes. This represents the <a>available space</a> for a
-{{Fragment}} which the layout should respect.
+The {{LayoutConstraints}} object has {{LayoutConstraints/availableInlineSize}} and
+{{LayoutConstraints/availableBlockSize}} attributes. This represents the <a>available space</a> for
+a {{Fragment}} which the layout should respect.
 
 Note: Some layouts may need to produce a {{Fragment}} which exceed this size. For example a
     <a>replaced element</a>. The <a>parent layout</a> should expect this to occur and deal with it
     appropriately.
 
 A <a>parent layout</a> may require the <a>current layout</a> to be exactly a particular size. If
-the {{LayoutConstraints/inlineSizeFixed}} or {{LayoutConstraints/blockSizeFixed}} are true the
-<a>current layout</a> should produce a {{Fragment}} with a fixed size in the appropriate direction.
+the {{LayoutConstraints/fixedInlineSize}} or {{LayoutConstraints/fixedBlockSize}} are specified the
+<a>current layout</a> should produce a {{Fragment}} with a the specified size in the appropriate
+direction.
 
 <div class="example">
 The layout algorithm performs a flexbox-like distribution of spare space in the inline direction. It
@@ -494,6 +461,7 @@ creates child layout constraints which specify that a child should be a fixed in
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
     *intrinsicSizes(styleMap, children) {
+      // TODO - Fix this example, below is slightly wrong.
       const childrenSizes = yield children.map((child) => {
           return child.intrinsicSizes();
       });
@@ -509,17 +477,14 @@ registerLayout('flex-distribution-like', class {
       return {maxContentSize, minContentSize};
     }
 
-    *layout(constraints, children, styleMap, edges, breakToken) {
-        const inlineSize = resolveInlineSize(constraints, styleMap);
+    *layout(constraints, children, styleMap, edges) {
 
-        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
         const availableBlockSize =
-            resolveBlockSize(constraints, styleMap) - edges.all.block;
+            (constraints.fixedInlineSize || Infinity) - edges.all.block;
 
-        const childConstraints = new LayoutConstraints({
-            inlineSize: availableInlineSize,
-            blockSize: availableBlockSize,
-        });
+        const childConstraints = { availableInlineSize, availableBlockSize };
 
         const unconstrainedChildFragments = yield children.map((child) => {
             return child.layoutNextFragment(childConstraints);
@@ -536,11 +501,10 @@ registerLayout('flex-distribution-like', class {
         const extraSpace = remainingSpace / children.length;
 
         const childFragments = yield children.map((child, i) => {
-            return child.layoutNextFragment(new LayoutConstraints({
-                inlineSize: unconstrainedSizes[i] + extraSpace,
-                inlineSizeFixed: true,
-                blockSize: availableBlockSize
-            }));
+            return child.layoutNextFragment({
+                fixedInlineSize: unconstrainedSizes[i] + extraSpace,
+                availableBlockSize
+            });
         });
 
         // Position the fragments.
@@ -554,13 +518,9 @@ registerLayout('flex-distribution-like', class {
             maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
         }
 
-        // Resolve our block size.
-        const blockSize = resolveBlockSize(constraints, styleMap, maxChildBlockSize);
-
         return {
-            inlineSize: inlineSize,
-            blockSize: blockSize,
-            childFragments: childFragments,
+            autoBlockSize: maxChildBlockSize + edges.all.block,
+            childFragments,
         };
     }
 });
@@ -573,9 +533,9 @@ percentages should be resolved against while performing layout.
 
 The {{LayoutConstraints}} has a {{LayoutConstraints/blockFragmentationType}} attribute. The
 <a>current layout</a> should produce a {{Fragment}} which fragments at the
-{{LayoutConstraints/blockSize}} if possible. 
+{{LayoutConstraints/blockFragmentationOffset}} if possible. 
 
-The <a>current layout</a> may choose not to fragment a {{LayoutChild}} based on the
+The <a>current layout</a> can choose not to fragment a {{LayoutChild}} based on the
 {{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like
 ''break-inside: avoid-page;''.
 
@@ -633,13 +593,12 @@ registerLayout('indent-lines', class {
     static inputProperties = ['--indent', '--indent-lines'];
 
     *layout(constraints, children, styleMap, edges, breakToken) {
-        // Resolve our inline size.
-        const inlineSize = resolveInlineSize(constraints, styleMap);
 
         // Determine our (inner) available size.
-        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
         const availableBlockSize =
-            resolveBlockSize(constraints, styleMap) - edges.all.block;
+            (constraints.fixedBlockSize || Infinity) - edges.all.block;
 
         // Detrermine the number of lines to indent, and the indent amount.
         const indent = resolveLength(constraints, styleMap.get('--indent'));
@@ -664,12 +623,12 @@ registerLayout('indent-lines', class {
             const childAvailableInlineSize = shouldIndent ?
                 availableInlineSize - indent : availableInlineSize;
 
-            const childConstraints = new LayoutConstraints({
-                inlineSize: childAvailableInlineSize,
-                blockSize: availableBlockSize,
+            const childConstraints = {
+                availableInlineSize: childAvailableInlineSize,
+                availableBlockSize,
                 percentageInlineSize: availableInlineSize,
                 blockFragmentationType: constraints.blockFragmentationType,
-            });
+            };
 
             const fragment = yield child.layoutNextFragment(childConstraints,
                                                             childBreakToken);
@@ -698,14 +657,10 @@ registerLayout('indent-lines', class {
         }
 
         const autoBlockSize = blockOffset + edges.all.blockEnd;
-        const blockSize = resolveBlockSize(constraints,
-                                           styleMap,
-                                           autoBlockSize);
 
         // Return our fragment.
         const result = {
-            inlineSize: inlineSize,
-            blockSize: blockSize,
+            autoBlockSize,
             childFragments: childFragments,
         }
 
@@ -813,10 +768,9 @@ User agents must use the {{LayoutConstraints}} object to communicate to the <a>c
 the size they would like the fragment to be.
 
 If the user agent wishes to force a size on the box, it can use the
-{{LayoutConstraints/inlineSizeFixed}} and {{LayoutConstraints/blockSizeFixed}} attributes to do so.
+{{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}} attributes to do so.
 
-Issue: Do we want the inlineSize to always be fixed? This would remove the resolveInlineSize call,
-    and just rely on the pre-defined behaviour by the user agent.
+Issue: Do we want the inlineSize to always be fixed?
 
     The downside to this is that we won't be able to things like MathML in the initial version of
     the specifcation, which is able to "bubble" up inline sizes to its parent.
@@ -825,8 +779,8 @@ Issue: Do we want the inlineSize to always be fixed? This would remove the resol
     fragment which is undergoing fragmentation, isn't able to be automatically resolved.
 
 If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and has
-an ''width/auto'' inline size, the user agent <em>must</em> set the {{LayoutConstraints/inlineSize}}
-to the <a>stretch-fit inline size</a>.
+an ''width/auto'' inline size, the user agent <em>must</em> set the
+{{LayoutConstraints/fixedInlineSize}} to the <a>stretch-fit inline size</a>.
 
 <div class="note">
     Note: In the example below the <a>layout API container</a> has its inline size set to 50.
@@ -854,8 +808,8 @@ to the <a>stretch-fit inline size</a>.
 
 If a <a>layout API container</a> is out-of-flow positioned the user agent <em>must</em> solve the
 positioned size equations ([[css-position-3#abs-non-replaced-width]],
-[[css-position-3#abs-non-replaced-height]]), and set the appropriate fixed
-{{LayoutConstraints/inlineSize}} and {{LayoutConstraints/blockSize}}.
+[[css-position-3#abs-non-replaced-height]]), and set the appropriate
+{{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}}.
 
 <div class="note">
     Note: In the example below the <a>layout API container</a> has its inline and block size fixed
