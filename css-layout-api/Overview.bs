@@ -309,29 +309,6 @@ interface Fragment {
 
     readonly attribute ChildBreakToken? breakToken;
 };
-
-/* NOTE EVERYTHING BELOW HERE IS SPECULATIVE */
-interface LineFragment : Fragment {
-    readonly attribute sequence&lt;LineFragmentSegment> segments;
-};
-
-interface LineFragmentSegment {
-    readonly attribute LineFragmentSegmentType type;
-    readonly attribute LineFragmentSegmentBreakType breakType;
-    readonly attribute FontMetrics? metrics;
-    readonly attribute double inlineOffset;
-};
-
-enum LineFragmentSegmentType {
-    "word-break",
-    "atomic-inline",
-    /* TODO add others here, not sure yet. */
-};
-
-enum LineFragmentSegmentBreakType {
-    "something"
-    /* TODO add others here, not sure yet. */
-};
 </pre>
 
 A {{Fragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred on
