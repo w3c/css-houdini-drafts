@@ -150,16 +150,19 @@ Box Tree Transformations {#layout-api-box-tree}
 -----------------------------------------------
 
 The <a>layout API children</a> can act in different ways depending on the value of <a for="document
-layout definition">child display</a> (set by <code>childDisplay</code> on the class).
+layout definition">layout options</a>' {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code> on the class).
 
-If the value of <a for="document layout definition">child display</a> is <code>"block"</code> the
-'display' value of that child is <a>blockified</a>. This is similar to children of <a>flex
-containers</a> or <a>grid containers</a>. See [[!css3-display]].
+If the value of <a for="document layout definition">layout options</a>'
+{{LayoutOptions/childDisplay}} is <code>"block"</code> the 'display' value of that child is
+<a>blockified</a>. This is similar to children of <a>flex containers</a> or <a>grid containers</a>.
+See [[!css3-display]].
 
-If the value of <a for="document layout definition">child display</a> is <code>"normal"</code>, no
-<a>blockification</a> occurs. Instead children with a <<display-outside>> <a>computed value</a> of
-''inline'' (a <a>root inline box</a>) will produce a single {{Fragment}} representing each line when
-{{LayoutChild/layoutNextFragment()}} is called.
+If the value of <a for="document layout definition">layout options</a>'
+{{LayoutOptions/childDisplay}} is <code>"normal"</code>, no <a>blockification</a> occurs. Instead
+children with a <<display-outside>> <a>computed value</a> of ''inline'' (a <a>root inline box</a>)
+will produce a single {{Fragment}} representing each line when {{LayoutChild/layoutNextFragment()}}
+is called.
 
 Note: This allows authors to adjust the available inline size of each line, and position each line
     separately.
@@ -566,8 +569,8 @@ enum BreakType { "none", "line", "column", "page", "region" };
 A {{LayoutChild}} can produce multiple {{Fragment}}s. A {{LayoutChild}} may fragment in the block
 direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  Additionally
 {{LayoutChild}} which represents <a>inline-level</a> content, may fragment line by line if the
-<a for="document layout definition">child display</a> (set by <code>childDisplay</code>) is
-<code>"normal"</code>.
+<a for="document layout definition">layout options</a>' {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code>) is <code>"normal"</code>.
 
 A subsequent {{Fragment}} is produced by using the previous {{Fragment}}'s {{Fragment/breakToken}}.
 This tells the <a>child layout</a> to produce a {{Fragment}} starting at the point encoded in the
@@ -589,7 +592,7 @@ resume the layout.
 
 <pre class="lang-javascript">
 registerLayout('indent-lines', class {
-    static childDisplay = 'normal';
+    static layoutOptions = {childDisplay: 'normal'};
     static inputProperties = ['--indent', '--indent-lines'];
 
     *layout(constraints, children, styleMap, edges, breakToken) {
@@ -770,17 +773,36 @@ the size they would like the fragment to be.
 If the user agent wishes to force a size on the box, it can use the
 {{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}} attributes to do so.
 
-Issue: Do we want the inlineSize to always be fixed?
+The <a>layout API container</a> can be passed size information in different ways depending on the
+value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} (set by
+<code>layoutOptions</code> on the class).
 
-    The downside to this is that we won't be able to things like MathML in the initial version of
-    the specifcation, which is able to "bubble" up inline sizes to its parent.
+If the value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} is
+<code>"block-like"</code>, then the {{LayoutConstraints}} passed to the <a>layout API container</a>:
+    - <em>Must</em> calculate and set {{LayoutConstraints/fixedInlineSize}} based off the rules
+        specified in [[!css-sizing-3]] and the formatting context in which it participates, e.g.
 
-    We can't do a similar thing for the blockSize due to fragmentation. E.g. the size of the
-    fragment which is undergoing fragmentation, isn't able to be automatically resolved.
+        - As a <a>block-level</a> box in a <a>block formatting context</a>, it is sized like a
+            <a>block box</a> that establishes a formatting context, with an ''width/auto'' <a>inline
+            size</a> calculated as for non-replaced block boxes.
 
-If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and has
-an ''width/auto'' inline size, the user agent <em>must</em> set the
-{{LayoutConstraints/fixedInlineSize}} to the <a>stretch-fit inline size</a>.
+        - As an <a>inline-level</a> box in an <a>inline formatting context</a>, it is sized as an
+            atomic inline-level box (such as an inline-block).
+
+    - <em>Must</em> calculate and set {{LayoutConstraints/fixedBlockSize}} based off the rules
+        specified in [[!css-sizing-3]], and the formatting context in which it participates. If the
+        <a>layout API container</a> has an ''height/auto'' <a>block size</a>, and cannot be determined
+        ahead of time, {{LayoutConstraints/fixedBlockSize}} must be set to <code>null</code>.
+
+If the value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} is
+<code>"manual"</code>, then the user-agent shouldn't pre-calculate
+{{LayoutConstraints/fixedInlineSize}} and/or {{LayoutConstraints/fixedBlockSize}} ahead of time,
+except when it is being forced to a particular size by the formatting context in which it
+participates, for example:
+
+    - If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and
+      has an ''width/auto'' inline size, the user agent <em>must</em> set the
+      {{LayoutConstraints/fixedInlineSize}} to the <a>stretch-fit inline size</a>.
 
 <div class="note">
     Note: In the example below the <a>layout API container</a> has its inline size set to 50.
@@ -1012,7 +1034,7 @@ A <dfn>layout definition</dfn> is a <a>struct</a> which describes the informatio
  - <dfn for="layout definition">child input properties</dfn> which is a <a>list</a> of
      <code>DOMStrings</code>.
 
- - <dfn for="layout definition">child display</dfn> a {{ChildDisplayType}}.
+ - <dfn for="layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 A <dfn>document layout definition</dfn> is a <a>struct</a> which describes the information needed by
 the <a>document</a> about the author defined layout (which can be referenced by the ''layout()''
@@ -1024,7 +1046,7 @@ function). It consists of:
  - <dfn for="document layout definition">child input properties</dfn> which is a <a>list</a> of
      <code>DOMStrings</code>.
 
- - <dfn for="document layout definition">child display</dfn> a {{ChildDisplayType}}.
+ - <dfn for="document layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 Layout Worklet {#layout-worklet}
 --------------------------------
@@ -1054,9 +1076,21 @@ Registering A Layout {#registering-layout}
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
+dictionary LayoutOptions {
+  ChildDisplayType childDisplay = "block";
+  LayoutSizingMode sizing = "block-like";
+};
+
+[Exposed=LayoutWorklet]
 enum ChildDisplayType {
     "block",
     "normal",
+};
+
+[Exposed=LayoutWorklet]
+enum LayoutSizingMode {
+    "block-like",
+    "manual",
 };
 </pre>
 
@@ -1109,40 +1143,38 @@ is called, the user agent <em>must</em> run the following steps:
         <code>sequence&lt;DOMString></code>. If an exception is <a>thrown</a>, rethrow the exception
         and abort all these steps.
 
-    10. Let |childDisplay| be a {{ChildDisplayType}} set to <code>"block"</code>.
+    10. Let |layoutOptionsValue| be the result of <a>Get</a>(|layoutCtor|, "layoutOptions").
 
-    11. Let |childDisplayValue| be the result of <a>Get</a>(|layoutCtor|, "childDisplay").
+    11. Let |layoutOptions| be the result of <a>converting</a> |layoutOptionsValue| to a
+        {{LayoutOptions}}. If an exception is <a>thrown</a>, rethrow the exception and abort all
+        these steps.
 
-    12. If |childDisplayValue| if not undefined, then then |childDisplay| to the result of
-        <a>converting</a> |childDisplayValue| to a {{ChildDisplayType}}. If an exception is
-        <a>thrown</a>, rethrow the exception and abort all these steps.
-
-    13. If the result of <a>IsConstructor</a>(|layoutCtor|) is false, <a>throw</a> a
+    12. If the result of <a>IsConstructor</a>(|layoutCtor|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    14. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, "prototype").
+    13. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, "prototype").
 
-    15. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    14. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    16. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+    15. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
 
-    17. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
+    16. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    18. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
+    17. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
         <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    19. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
+    18. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
         <code>"intrinsicSizes"</code>).
 
-    20. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
+    19. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    21. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
+    20. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
         <code>"generator"</code>, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    22. Let |definition| be a new <a>layout definition</a> with:
+    21. Let |definition| be a new <a>layout definition</a> with:
 
         - <a>class constructor</a> being |layoutCtor|.
 
@@ -1156,11 +1188,11 @@ is called, the user agent <em>must</em> run the following steps:
 
         - <a for="layout definition">child input properties</a> being |childInputProperties|.
 
-        - <a for="layout definition">child display</a> being |childDisplay|.
+        - <a for="layout definition">layout options</a> being |layoutOptions|.
 
-    23. <a for=map>Set</a> |layoutDefinitionMap|[|name|] to |definition|.
+    22. <a for=map>Set</a> |layoutDefinitionMap|[|name|] to |definition|.
 
-    24. <a>Queue a task</a> to run the following steps:
+    23. <a>Queue a task</a> to run the following steps:
 
         1. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document layout
             definitions</a> <a>map</a>.
@@ -1172,7 +1204,7 @@ is called, the user agent <em>must</em> run the following steps:
             - <a for="document layout definition">child input properties</a> being
                 |childInputProperties|.
 
-            - <a for="document layout definition">child display</a> being |childDisplay|.
+            - <a for="document layout definition">layout options</a> being |layoutOptions|.
 
         3. If |documentLayoutDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
 
@@ -1184,13 +1216,13 @@ is called, the user agent <em>must</em> run the following steps:
             3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
                 <a for="document layout definition">input properties</a>, <a for="document layout
                 definition">child input properties</a>, and <a for="document layout
-                definition">child display</a> are different), then:
+                definition">layout options</a> are different), then:
 
                 <a for=map>Set</a> |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
 
                 Log an error to the debugging console stating that the same class was registered
                 with different <code>inputProperties</code>, <code>childInputProperties</code>, or
-                <code>childDisplay</code>.
+                <code>layoutOptions</code>.
 
         4. Otherwise, <a for=map>set</a> |documentLayoutDefinitionMap|[|name|] to
             |documentDefinition|.
@@ -1201,7 +1233,9 @@ is called, the user agent <em>must</em> run the following steps:
         class MyLayout {
             static get inputProperties() { return ['--foo']; }
             static get childrenInputProperties() { return ['--bar']; }
-            static get childDisplay() { return 'normal'; }
+            static get layoutOptions() {
+              return {childDisplay: 'normal', sizing: 'block-like'}
+            }
 
             *intrinsicSizes(children, styleMap) {
                 // Intrinsic sizes code goes here.
