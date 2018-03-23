@@ -336,23 +336,23 @@ direction), while centering its children in the inline direction.
 
 <pre class="lang-javascript">
 registerLayout('block-like', class {
-    *intrinsicSizes(styleMap, children) {
+    *intrinsicSizes(children, edges, styleMap) {
       const childrenSizes = yield children.map((child) => {
           return child.intrinsicSizes();
       });
 
       const maxContentSize = childrenSizes.reduce((max, childSizes) => {
           return Math.max(max, childSizes.maxContentContribution);
-      }, 0);
+      }, 0) + edges.all.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
           return Math.max(max, childSizes.minContentContribution);
-      }, 0);
+      }, 0) + edges.all.inline;
 
       return {maxContentSize, minContentSize};
     }
 
-    *layout(constraints, children, styleMap, edges) {
+    *layout(children, edges, constraints, styleMap) {
         const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
         const availableBlockSize = (constraints.fixedBlockSize || Infinity) - edges.all.block;
 
@@ -464,24 +464,23 @@ creates child layout constraints which specify that a child should be a fixed in
 
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
-    *intrinsicSizes(styleMap, children) {
-      // TODO - Fix this example, below is slightly wrong.
+    *intrinsicSizes(children, edges, styleMap) {
       const childrenSizes = yield children.map((child) => {
           return child.intrinsicSizes();
       });
 
       const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
           return sum + childSizes.maxContentContribution;
-      }, 0);
+      }, 0) + edges.all.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
           return sum + childSizes.minContentContribution;
-      }, 0);
+      }, 0) + edges.all.inline;
 
       return {maxContentSize, minContentSize};
     }
 
-    *layout(constraints, children, styleMap, edges) {
+    *layout(children, edges, constraints, styleMap) {
 
         const availableInlineSize =
             constraints.fixedInlineSize - edges.all.inline;
@@ -596,7 +595,7 @@ registerLayout('indent-lines', class {
     static layoutOptions = {childDisplay: 'normal'};
     static inputProperties = ['--indent', '--indent-lines'];
 
-    *layout(constraints, children, styleMap, edges, breakToken) {
+    *layout(children, edges, constraints, styleMap, breakToken) {
 
         // Determine our (inner) available size.
         const availableInlineSize =
@@ -750,7 +749,7 @@ This example shows an node styled by CSS, and what its respective {{LayoutEdges}
 
 <pre class="lang-javascript">
 registerLayout('box-edges', class {
-    *layout(constraints, children, styleMap, edges, breakToken) {
+    *layout(children, edges, constraints, styleMap, breakToken) {
         edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
         edges.border.blockEnd; // 2
         edges.scrollbar.inlineEnd; // UA-dependent, may be 0 or >0 (e.g. 16).
@@ -1238,11 +1237,11 @@ is called, the user agent <em>must</em> run the following steps:
               return {childDisplay: 'normal', sizing: 'block-like'}
             }
 
-            *intrinsicSizes(children, styleMap) {
+            *intrinsicSizes(children, edges, styleMap) {
                 // Intrinsic sizes code goes here.
             }
 
-            *layout(constraints, children, styleMap, edges, breakToken) {
+            *layout(children, edges, constraints, styleMap, breakToken) {
                 // Layout code goes here.
             }
         }
@@ -1434,41 +1433,44 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
     4. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
         properties</a>.
 
-    5. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed value</a>'s for properties listed in |inputProperties| for |box|.
-
-    6. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
+    5. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
         represent |childBoxes|.
 
         The {{LayoutChild/styleMap}} on each {{LayoutChild}} should be a new
         {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed value</a>'s for
         properties listed in |childInputProperties|.
 
-    7. At this stage the user agent may re-use the <a>intrinsic sizes</a> from a previous invocation
+    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
+        <a>box model edges</a> for |box|.
+
+    7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+        <a>computed value</a>'s for properties listed in |inputProperties| for |box|.
+
+    8. At this stage the user agent may re-use the <a>intrinsic sizes</a> from a previous invocation
         if |children|, |styleMap| are equivalent to that previous invocation. If so let the
         intrinsic sizes the cached intrinsic sizes and abort all these steps.
 
-    8. Let |intrinsicSizesGeneratorFunction| be |definition|'s <a>intrinsic sizes generator
+    9. Let |intrinsicSizesGeneratorFunction| be |definition|'s <a>intrinsic sizes generator
         function</a>.
 
-    9. Let |intrinsicSizesGenerator| be the result of
-        <a>Invoke</a>(|intrinsicSizesGeneratorFunction|, |layoutInstance|, «|styleMap|,
-        |children|»).
+    10. Let |intrinsicSizesGenerator| be the result of
+        <a>Invoke</a>(|intrinsicSizesGeneratorFunction|, |layoutInstance|, «|children|, |edges|,
+        |styleMap|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
 
-    10. Let |intrinsicSizesValue| be the result of <a>run a generator</a> given
+    11. Let |intrinsicSizesValue| be the result of <a>run a generator</a> given
         |intrinsicSizesGenerator|, and <code>"intrinsic-sizes"</code>.
 
         If <a>run a generator</a> returned failure, then let |box| fallback to the <a>flow
         layout</a> and abort all these steps.
 
-    11. Let |intrinsicSizes| be the result of <a>converting</a> |intrinsicSizesValue| to a
+    12. Let |intrinsicSizes| be the result of <a>converting</a> |intrinsicSizesValue| to a
         {{IntrinsicSizesResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    12. Set the <a>intrinsic sizes</a> of |box|:
+    13. Set the <a>intrinsic sizes</a> of |box|:
 
         - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/minContentSize}} be the
             <a>min-content size</a> of |box|.
@@ -1551,21 +1553,21 @@ following steps:
     4. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
         properties</a>.
 
-    5. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed value</a>'s for properties listed in |inputProperties| for |box|.
-
-    6. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
+    5. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
         represent |childBoxes|.
 
         The {{LayoutChild/styleMap}} on each {{LayoutChild}} should be a new
         {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed value</a>'s for
         properties listed in |childInputProperties|.
 
+    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
+        <a>box model edges</a> for |box|.
+
     7. Let |layoutConstraints| be a new {{LayoutConstraints}} object populated with the appropriate
         information from |internalLayoutConstraints|.
 
-    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
-        <a>box model edges</a> for |box|.
+    8. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+        <a>computed value</a>'s for properties listed in |inputProperties| for |box|.
 
     9. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
         |internalBreakToken|.
@@ -1579,7 +1581,7 @@ following steps:
     11. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
 
     12. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
-        |layoutInstance|, «|styleMap|, |children|, |layoutConstraints|, |edges|, |breakToken|»).
+        |layoutInstance|, «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
