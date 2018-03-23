@@ -3617,7 +3617,14 @@ regardless of what property it is for.
     and return the result.
 
 : <a>font-variant-alternates</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css> or <css>historical-forms</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-variant-emoji</a>
 :: For both specified and computed values,
@@ -3627,7 +3634,7 @@ regardless of what property it is for.
 : <a>font-variation-settings</a>
 :: For both specified and computed values:
 
-    1. If the value is <css>none</css>,
+    1. If the value is <css>normal</css>,
         [=reify an identifier=] from the value
         and return the result.
 
