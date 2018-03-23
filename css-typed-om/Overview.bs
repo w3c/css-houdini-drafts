@@ -3592,14 +3592,9 @@ regardless of what property it is for.
         and return the result.
 
 : <a>font-style</a>
-:: For both specified and computed values:
-
-    1. If the value is <css>normal</css> or <css>italic</css>, 
-        [=reify an identifier=] from the value
-        and return the result.
-
-    2. Otherwise, reify as a {{CSSStyleValue}}
-        and return the result.
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>font-synthesis</a>
 :: For both specified and computed values:
@@ -3644,12 +3639,11 @@ regardless of what property it is for.
 : <a>font-weight</a>
 :: For both specified and computed values:
 
-    1. If the value is <css>normal</css>, <css>bold</css>, <css>bolder</css> or <css>lighter</css>,
-        [=reify an identifier=] from the value
+    1. If the value is a <<number>>,
+        [=reify a numeric value=] from the value
         and return the result.
 
-    2. Otherwise, [=reify a numeric value=] from the value
-        and return the result.
+    2. Otherwise, [=reify an identifier=] from the value
 
 : <a>gap</a>
 ::
@@ -3715,7 +3709,15 @@ regardless of what property it is for.
 ::
 
 : <a>height</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is a <<length>> or <<percentage>>,
+        [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>image-rendering</a>
 ::
@@ -3769,7 +3771,14 @@ regardless of what property it is for.
 ::
 
 : <a>left</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>letter-spacing</a>
 ::
@@ -3778,7 +3787,14 @@ regardless of what property it is for.
 ::
 
 : <a>line-height</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>line-height-step</a>
 ::
@@ -3790,10 +3806,23 @@ regardless of what property it is for.
 ::
 
 : <a>list-style-image</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is a ''url()'' function,
+        [=reify a url=] from the value
+        and return the result.
+
+    3. Otherwise, [=reify an image=] from the value
+        and return the result.
 
 : <a>list-style-position</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>list-style-type</a>
 ::
@@ -3813,7 +3842,7 @@ regardless of what property it is for.
 ::
 
 : <a>margin-bottom</a>
-::
+:: Same as 'margin-top'
 
 : <a>margin-inline</a>
 ::
@@ -3825,13 +3854,20 @@ regardless of what property it is for.
 ::
 
 : <a>margin-left</a>
-::
+:: Same as 'margin-top'
 
 : <a>margin-right</a>
-::
+:: Same as 'margin-top'
 
 : <a>margin-top</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>marker</a>
 ::
@@ -3879,7 +3915,14 @@ regardless of what property it is for.
 ::
 
 : <a>mask-image</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify an image=] from the value
+        and return the result.
 
 : <a>mask-mode</a>
 ::
@@ -3975,7 +4018,9 @@ regardless of what property it is for.
 ::
 
 : <a>opacity</a>
-::
+:: For both specified and computed values,
+    [=reify a numeric value=] from the value
+    and return the result.
 
 : <a>order</a>
 ::
@@ -3987,28 +4032,45 @@ regardless of what property it is for.
 ::
 
 : <a>outline-color</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>currentcolor</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>outline-offset</a>
 ::
 
 : <a>outline-style</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>outline-width</a>
 ::
 
 : <a>overflow</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>overflow-anchor</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>overflow-x</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>overflow-y</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>padding</a>
 :: For both specified and computed values,
@@ -4025,7 +4087,7 @@ regardless of what property it is for.
 ::
 
 : <a>padding-bottom</a>
-::
+:: Same as 'padding-top'
 
 : <a>padding-inline</a>
 ::
@@ -4037,13 +4099,15 @@ regardless of what property it is for.
 ::
 
 : <a>padding-left</a>
-::
+:: Same as 'padding-top'
 
 : <a>padding-right</a>
-::
+:: Same as 'padding-top'
 
 : <a>padding-top</a>
-::
+:: For both specified and computed values,
+    [=reify a numeric value=] from the value
+    and return the result.
 
 : <a>page</a>
 ::
@@ -4097,7 +4161,9 @@ regardless of what property it is for.
 ::
 
 : <a>position</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>presentation-level</a>
 ::
@@ -4112,7 +4178,9 @@ regardless of what property it is for.
 ::
 
 : <a>resize</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>rest</a>
 ::
@@ -4127,7 +4195,14 @@ regardless of what property it is for.
 ::
 
 : <a>right</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>rotate</a>
 ::
@@ -4367,7 +4442,9 @@ regardless of what property it is for.
 ::
 
 : <a>text-align</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>text-anchor</a>
 ::
@@ -4412,13 +4489,22 @@ regardless of what property it is for.
 ::
 
 : <a>text-transform</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>text-underline-offset</a>
 ::
 
 : <a>top</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>transform-style</a>
 ::
@@ -4451,10 +4537,19 @@ regardless of what property it is for.
 ::
 
 : <a>vertical-align</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>baseline</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>visibility</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>voice-balance</a>
 ::
@@ -4484,13 +4579,23 @@ regardless of what property it is for.
 ::
 
 : <a>white-space</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>widows</a>
 ::
 
 : <a>width</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>auto</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. If the value is a <<length>> or <<percentage>>,
+        [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>will-change</a>
 ::
