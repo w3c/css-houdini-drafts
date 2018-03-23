@@ -150,15 +150,18 @@ Box Tree Transformations {#layout-api-box-tree}
 -----------------------------------------------
 
 The <a>layout API children</a> can act in different ways depending on the value of <a for="document
-layout definition">child display</a> (set by <code>childDisplay</code> on the class).
+layout definition">layout options</a>' {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code> on the class).
 
-If the value of <a for="document layout definition">child display</a> is <code>"block"</code> the
-'display' value of that child is <a>blockified</a>. This is similar to children of <a>flex
-containers</a> or <a>grid containers</a>. See [[!css3-display]].
+If the value of <a for="document layout definition">layout options</a>'
+{{LayoutOptions/childDisplay}} is <code>"block"</code> the 'display' value of that child is
+<a>blockified</a>. This is similar to children of <a>flex containers</a> or <a>grid containers</a>.
+See [[!css3-display]].
 
-If the value of <a for="document layout definition">child display</a> is <code>"normal"</code>, no
-<a>blockification</a> occurs. Instead children with a <<display-outside>> <a>computed value</a> of
-''inline'' (a <a>root inline box</a>) will produce a single {{Fragment}} representing each line when
+If the value of <a for="document layout definition">layout options</a>'
+{{LayoutOptions/childDisplay}} is <code>"normal"</code>, no <a>blockification</a> occurs. Instead
+children with a <<display-outside>> <a>computed value</a> of ''inline'' (a <a>root inline box</a>)
+will produce a single {{LayoutFragment}} representing each line when
 {{LayoutChild/layoutNextFragment()}} is called.
 
 Note: This allows authors to adjust the available inline size of each line, and position each line
@@ -213,7 +216,7 @@ interface LayoutChild {
     readonly attribute StylePropertyMapReadOnly styleMap;
 
     IntrinsicSizesRequest intrinsicSizes();
-    FragmentRequest layoutNextFragment(ConstraintSpace space, ChildBreakToken breakToken);
+    LayoutFragmentRequest layoutNextFragment(LayoutConstraints constraints, ChildBreakToken breakToken);
 };
 </pre>
 
@@ -221,7 +224,7 @@ A {{LayoutChild}} represents either a CSS generated <a>box</a> before layout has
 or boxes will all have a computed value of 'display' that is not ''none'').
 
 The {{LayoutChild}} does not contain any layout information itself (like inline or block size) but
-can be used to generate {{Fragment}}s which do contain layout information.
+can be used to generate {{LayoutFragment}}s which do contain layout information.
 
 An author cannot construct a {{LayoutChild}} with this API, this happens at a separate stage of the
 rendering engine (post style resolution).
@@ -274,7 +277,7 @@ Multiple non-<a>atomic inlines</a> are placed within the same {{LayoutChild}} to
 engines to perform text shaping across element boundaries.
 
 <div class="note">
-    Note: As an example the following should produce one {{Fragment}} but is from
+    Note: As an example the following should produce one {{LayoutFragment}} but is from
     three non-<a>atomic inlines</a>:
     <pre class="lang-html">
         &#x639;&lt;span style="color: blue">&#x639;&lt;/span>&#x639;
@@ -288,7 +291,7 @@ An array of {{LayoutChild}}ren is passed into the layout method which represents
 current box which is being laid out.
 
 To perform layout on a box the author can invoke the {{LayoutChild/layoutNextFragment()}} method.
-This will produce a {{Fragment}} which contains layout information.
+This will produce a {{LayoutFragment}} which contains layout information.
 
 The {{LayoutChild/layoutNextFragment()}} method may be invoked multiple times with different
 arguments to query the {{LayoutChild}} for different layout information.
@@ -298,7 +301,7 @@ Layout Fragments {#layout-fragments}
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
-interface Fragment {
+interface LayoutFragment {
     readonly attribute double inlineSize;
     readonly attribute double blockSize;
 
@@ -309,45 +312,23 @@ interface Fragment {
 
     readonly attribute ChildBreakToken? breakToken;
 };
-
-/* NOTE EVERYTHING BELOW HERE IS SPECULATIVE */
-interface LineFragment : Fragment {
-    readonly attribute sequence&lt;LineFragmentSegment> segments;
-};
-
-interface LineFragmentSegment {
-    readonly attribute LineFragmentSegmentType type;
-    readonly attribute LineFragmentSegmentBreakType breakType;
-    readonly attribute FontMetrics? metrics;
-    readonly attribute double inlineOffset;
-};
-
-enum LineFragmentSegmentType {
-    "word-break",
-    "atomic-inline",
-    /* TODO add others here, not sure yet. */
-};
-
-enum LineFragmentSegmentBreakType {
-    "something"
-    /* TODO add others here, not sure yet. */
-};
 </pre>
 
-A {{Fragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred on
-that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
+A {{LayoutFragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred
+on that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
 
-The {{Fragment}} has {{Fragment/inlineSize}} and {{Fragment/blockSize}} attributes, which are set by
-the respective child's layout algorithm. They cannot be changed. If the <a>current layout</a>
-requires a different {{Fragment/inlineSize}} or {{Fragment/blockSize}} the author must perform
-{{LayoutChild/layoutNextFragment()}} again with different arguments in order to get different
-results.
+The {{LayoutFragment}} has {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}}
+attributes, which are set by the respective child's layout algorithm. They cannot be changed. If the
+<a>current layout</a> requires a different {{LayoutFragment/inlineSize}} or
+{{LayoutFragment/blockSize}} the author must perform {{LayoutChild/layoutNextFragment()}} again with
+different arguments in order to get different results.
 
-The author inside the current layout can position a resulting {{Fragment}} by setting its
-{{Fragment/inlineOffset}} and {{Fragment/blockOffset}} attributes. If not set by the author they
-default to zero. The {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} attributes represent the
-position of the {{Fragment}} relative to its parent's border box, before transform or positioning
-(e.g. if a fragment is <a>relatively positioned</a>) has been applied.
+The author inside the current layout can position a resulting {{LayoutFragment}} by setting its
+{{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} attributes. If not set by the
+author they default to zero. The {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}
+attributes represent the position of the {{LayoutFragment}} relative to its parent's border box,
+before transform or positioning (e.g. if a fragment is <a>relatively positioned</a>) has been
+applied.
 
 <div class="example">
 The layout algorithm performs a block-like layout (positioning fragments sequentially in the block
@@ -371,21 +352,15 @@ registerLayout('block-like', class {
       return {maxContentSize, minContentSize};
     }
 
-    *layout(space, children, styleMap, edges) {
-        const inlineSize = resolveInlineSize(space, styleMap);
-
-        const availableInlineSize = inlineSize - edges.all.inline;
-        const availableBlockSize =
-            resolveBlockSize(constraintSpace, styleMap) - edges.all.block;
+    *layout(constraints, children, styleMap, edges) {
+        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = (constraints.fixedBlockSize || Infinity) - edges.all.block;
 
         const childFragments = [];
-        const childConstraintSpace = new ConstraintSpace({
-            inlineSize: availableInlineSize,
-            blockSize: availableBlockSize,
-        });
+        const childConstraints = { availableInlineSize, availableBlockSize };
 
         const childFragments = yield children.map((child) => {
-            return child.layoutNextFragment(childConstraintSpace);
+            return child.layoutNextFragment(childConstraints);
         });
 
         let blockOffset = edges.all.blockStart;
@@ -401,13 +376,10 @@ registerLayout('block-like', class {
         }
 
         const autoBlockSize = blockOffset + edges.all.blockEnd;
-        const blockSize = resolveBlockSize(
-            constraintSpace, styleMap, autoBlockSize);
 
         return {
-            inlineSize: inlineSize,
-            blockSize: blockSize,
-            childFragments: childFragments,
+            autoBlockSize,
+            childFragments,
         };
     }
 });
@@ -415,31 +387,31 @@ registerLayout('block-like', class {
 </div>
 
 A <a>layout API container</a> can communicate with other <a>layout API containers</a> by using the
-{{Fragment/data}} attribute. This is set by the {{FragmentResultOptions/data}} member in the
+{{LayoutFragment/data}} attribute. This is set by the {{FragmentResultOptions/data}} member in the
 {{FragmentResultOptions}} dictionary.
 
-The {{Fragment}}'s {{Fragment/breakToken}} specifies where the {{LayoutChild}} last fragmented. If
-the {{Fragment/breakToken}} is null the {{LayoutChild}} wont produce any more {{Fragment}}s for that
-token chain. The {{Fragment/breakToken}} can be passed to the {{LayoutChild/layoutNextFragment()}}
-function to produce the next {{Fragment}} for a particular child. The {{Fragment/breakToken}} cannot
-be changed.
-If the <a>current layout</a> requires a different {{Fragment/breakToken}} the author must perform
+The {{LayoutFragment}}'s {{LayoutFragment/breakToken}} specifies where the {{LayoutChild}} last
+fragmented. If the {{LayoutFragment/breakToken}} is null the {{LayoutChild}} wont produce any more
+{{LayoutFragment}}s for that token chain. The {{LayoutFragment/breakToken}} can be passed to the
+{{LayoutChild/layoutNextFragment()}} function to produce the next {{LayoutFragment}} for a
+particular child. The {{LayoutFragment/breakToken}} cannot be changed.
+If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
 Note: In a future level of the specification there may be a way to query for additional baseline
       information, for example where the alphabetic or center baseline is positioned.
 
-Constraint Spaces {#constraint-spaces}
---------------------------------------
+Layout Constraints {#layout-constraints}
+----------------------------------------
 
 <pre class='idl'>
-[Constructor(optional ConstraintSpaceOptions options),Exposed=LayoutWorklet]
-interface ConstraintSpace {
-    readonly attribute double inlineSize;
-    readonly attribute double blockSize;
+[Constructor(optional LayoutConstraintsOptions options),Exposed=LayoutWorklet]
+interface LayoutConstraints {
+    readonly attribute double availableInlineSize;
+    readonly attribute double availableBlockSize;
 
-    readonly attribute boolean inlineSizeFixed;
-    readonly attribute boolean blockSizeFixed;
+    readonly attribute double? fixedInlineSize;
+    readonly attribute double? fixedBlockSize;
 
     readonly attribute double percentageInlineSize;
     readonly attribute double percentageBlockSize;
@@ -450,76 +422,50 @@ interface ConstraintSpace {
     readonly attribute any data;
 };
 
-dictionary ConstraintSpaceOptions {
-    double inlineSize = Infinity;
-    double blockSize = Infinity;
+dictionary LayoutConstraintsOptions {
+    double availableInlineSize = 0;
+    double availableBlockSize = 0;
 
-    boolean inlineSizeFixed = false;
-    boolean blockSizeFixed = false;
+    double fixedInlineSize;
+    double fixedBlockSize;
 
-    double? percentageInlineSize = null;
-    double? percentageBlockSize = null;
+    double percentageInlineSize;
+    double percentageBlockSize;
 
-    double? blockFragmentationOffset = null;
+    double blockFragmentationOffset;
     BlockFragmentationType blockFragmentationType = "none";
 
-    any data = null;
+    any data;
 };
 
 enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
 
-<div class="issue">
-Issue: Should {{ConstraintSpaceOptions}} be instead:
+A {{LayoutConstraints}} object is passed into the layout method which represents the all the
+constraints for the <a>current layout</a> to perform layout inside. It is also used to pass
+information about the available space into a <a>child layout</a>.
 
-<pre class="lang-javascript">
-const options = {
-  availableInlineSize: 100,
-  availableBlockSize: Infinity,
+The {{LayoutConstraints}} object has {{LayoutConstraints/availableInlineSize}} and
+{{LayoutConstraints/availableBlockSize}} attributes. This represents the <a>available space</a> for
+a {{LayoutFragment}} which the layout should respect.
 
-  fixedInlineSize: 150, // This makes the engine ignore availableInlineSize.
-  fixedBlockSize: 150, // This makes the engine ignore availableBlockSize.
-
-  percentageInlineSize: 100, // This defaults to fixedInlineSize,
-                             // then availableInlineSize if not set.
-  percentageBlockSize: 100,  // This defaults to fixedBlockSize,
-                             // then availableBlockSize if not set.
-
-  blockFragmentationOffset: 200,
-  blockFragmentationType: 'column',
-
-  data: {floatPositions: [{x: 20, y: 30}]}, // Author data.
-};
-</pre>
-
-The constraint space would mirror this, additionally with the blockSize, and inlineSize attributes
-which represent the resolved inline and block sizes for the fragment.
-
-</div>
-
-A {{ConstraintSpace}} is passed into the layout method which represents the available space for the
-<a>current layout</a> to perform layout inside. It is also used to pass information about the
-available space into a <a>child layout</a>.
-
-The {{ConstraintSpace}} has {{ConstraintSpace/inlineSize}} and {{ConstraintSpace/blockSize}}
-attributes. This represents the <a>available space</a> for a {{Fragment}} which the layout should
-respect.
-
-Note: Some layouts may need to produce a {{Fragment}} which exceed this size. For example a
+Note: Some layouts may need to produce a {{LayoutFragment}} which exceed this size. For example a
     <a>replaced element</a>. The <a>parent layout</a> should expect this to occur and deal with it
     appropriately.
 
 A <a>parent layout</a> may require the <a>current layout</a> to be exactly a particular size. If
-the {{ConstraintSpace/inlineSizeFixed}} or {{ConstraintSpace/blockSizeFixed}} are true the
-<a>current layout</a> should produce a {{Fragment}} with a fixed size in the appropriate direction.
+the {{LayoutConstraints/fixedInlineSize}} or {{LayoutConstraints/fixedBlockSize}} are specified the
+<a>current layout</a> should produce a {{LayoutFragment}} with a the specified size in the
+appropriate direction.
 
 <div class="example">
 The layout algorithm performs a flexbox-like distribution of spare space in the inline direction. It
-creates child constraint spaces which specify that a child should be a fixed inline size.
+creates child layout constraints which specify that a child should be a fixed inline size.
 
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
     *intrinsicSizes(styleMap, children) {
+      // TODO - Fix this example, below is slightly wrong.
       const childrenSizes = yield children.map((child) => {
           return child.intrinsicSizes();
       });
@@ -535,20 +481,17 @@ registerLayout('flex-distribution-like', class {
       return {maxContentSize, minContentSize};
     }
 
-    *layout(space, children, styleMap, edges, breakToken) {
-        const inlineSize = resolveInlineSize(space, styleMap);
+    *layout(constraints, children, styleMap, edges) {
 
-        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
         const availableBlockSize =
-            resolveBlockSize(space, styleMap) - edges.all.block;
+            (constraints.fixedInlineSize || Infinity) - edges.all.block;
 
-        const childConstraintSpace = new ConstraintSpace({
-            inlineSize: availableInlineSize,
-            blockSize: availableBlockSize,
-        });
+        const childConstraints = { availableInlineSize, availableBlockSize };
 
         const unconstrainedChildFragments = yield children.map((child) => {
-            return child.layoutNextFragment(childConstraintSpace);
+            return child.layoutNextFragment(childConstraints);
         });
 
         const unconstrainedSizes = [];
@@ -562,11 +505,10 @@ registerLayout('flex-distribution-like', class {
         const extraSpace = remainingSpace / children.length;
 
         const childFragments = yield children.map((child, i) => {
-            return child.layoutNextFragment(new ConstraintSpace({
-                inlineSize: unconstrainedSizes[i] + extraSpace,
-                inlineSizeFixed: true,
-                blockSize: availableBlockSize
-            }));
+            return child.layoutNextFragment({
+                fixedInlineSize: unconstrainedSizes[i] + extraSpace,
+                availableBlockSize
+            });
         });
 
         // Position the fragments.
@@ -580,29 +522,25 @@ registerLayout('flex-distribution-like', class {
             maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
         }
 
-        // Resolve our block size.
-        const blockSize = resolveBlockSize(space, styleMap, maxChildBlockSize);
-
         return {
-            inlineSize: inlineSize,
-            blockSize: blockSize,
-            childFragments: childFragments,
+            autoBlockSize: maxChildBlockSize + edges.all.block,
+            childFragments,
         };
     }
 });
 </pre>
 </div>
 
-The {{ConstraintSpace}} has {{ConstraintSpace/percentageInlineSize}} and
-{{ConstraintSpace/percentageBlockSize}} attributes. These represent the size that a layout
+The {{LayoutConstraints}} object has {{LayoutConstraints/percentageInlineSize}} and
+{{LayoutConstraints/percentageBlockSize}} attributes. These represent the size that a layout
 percentages should be resolved against while performing layout.
 
-The {{ConstraintSpace}} has a {{ConstraintSpace/blockFragmentationType}} attribute. The <a>current
-layout</a> should produce a {{Fragment}} which fragments at the {{ConstraintSpace/blockSize}} if
-possible. 
+The {{LayoutConstraints}} has a {{LayoutConstraints/blockFragmentationType}} attribute. The
+<a>current layout</a> should produce a {{LayoutFragment}} which fragments at the
+{{LayoutConstraints/blockFragmentationOffset}} if possible. 
 
-The <a>current layout</a> may choose not to fragment a {{LayoutChild}} based on the
-{{ConstraintSpace/blockFragmentationType}}, for example if the child has a property like
+The <a>current layout</a> can choose not to fragment a {{LayoutChild}} based on the
+{{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like
 ''break-inside: avoid-page;''.
 
 Breaking and Fragmentation {#breaking-and-fragmentation}
@@ -629,14 +567,15 @@ dictionary BreakTokenOptions {
 enum BreakType { "none", "line", "column", "page", "region" };
 </pre>
 
-A {{LayoutChild}} can produce multiple {{Fragment}}s. A {{LayoutChild}} may fragment in the block
-direction if a {{ConstraintSpace/blockFragmentationType}} is not none.  Additionally {{LayoutChild}}
-which represents <a>inline-level</a> content, may fragment line by line if the <a for="document
-layout definition">child display</a> (set by <code>childDisplay</code>) is <code>"normal"</code>.
+A {{LayoutChild}} can produce multiple {{LayoutFragment}}s. A {{LayoutChild}} may fragment in the
+block direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  Additionally
+{{LayoutChild}} which represents <a>inline-level</a> content, may fragment line by line if the
+<a for="document layout definition">layout options</a>' {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code>) is <code>"normal"</code>.
 
-A subsequent {{Fragment}} is produced by using the previous {{Fragment}}'s {{Fragment/breakToken}}.
-This tells the <a>child layout</a> to produce a {{Fragment}} starting at the point encoded in the
-{{ChildBreakToken}}.
+A subsequent {{LayoutFragment}} is produced by using the previous {{LayoutFragment}}'s
+{{LayoutFragment/breakToken}}. This tells the <a>child layout</a> to produce a {{LayoutFragment}}
+starting at the point encoded in the {{ChildBreakToken}}.
 
 Issue: Explain resuming the author defined layout.
 
@@ -644,30 +583,29 @@ Issue: Explain resuming the author defined layout.
 This example shows a simple layout which indents child fragments for a certain number of
 lines.
 
-This example also demonstrates using the previous {{Fragment/breakToken}} of a {{Fragment}} to
-produce the next fragment for the {{LayoutChild}}.
+This example also demonstrates using the previous {{LayoutFragment/breakToken}} of a
+{{LayoutFragment}} to produce the next fragment for the {{LayoutChild}}.
 
-It also demonstrates using the {{BreakToken}} to respect the {{ConstraintSpace}}'s
-{{ConstraintSpace/blockFragmentationType}}, it resumes it layout from the previous {{BreakToken}}.
+It also demonstrates using the {{BreakToken}} to respect the {{LayoutConstraints}}'
+{{LayoutConstraints/blockFragmentationType}}, it resumes it layout from the previous {{BreakToken}}.
 It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken}} which is used to
 resume the layout.
 
 <pre class="lang-javascript">
 registerLayout('indent-lines', class {
-    static childDisplay = 'normal';
+    static layoutOptions = {childDisplay: 'normal'};
     static inputProperties = ['--indent', '--indent-lines'];
 
-    *layout(space, children, styleMap, edges, breakToken) {
-        // Resolve our inline size.
-        const inlineSize = resolveInlineSize(space, styleMap);
+    *layout(constraints, children, styleMap, edges, breakToken) {
 
         // Determine our (inner) available size.
-        const availableInlineSize = inlineSize - edges.all.inline;
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
         const availableBlockSize =
-            resolveBlockSize(space, styleMap) - edges.all.block;
+            (constraints.fixedBlockSize || Infinity) - edges.all.block;
 
         // Detrermine the number of lines to indent, and the indent amount.
-        const indent = resolveLength(space, styleMap.get('--indent'));
+        const indent = resolveLength(constraints, styleMap.get('--indent'));
         let lines = styleMap.get('--indent-lines').value;
 
         const childFragments = [];
@@ -689,14 +627,14 @@ registerLayout('indent-lines', class {
             const childAvailableInlineSize = shouldIndent ?
                 availableInlineSize - indent : availableInlineSize;
 
-            const childSpace = new ConstraintSpace({
-                inlineSize: childAvailableInlineSize,
-                blockSize: availableBlockSize,
+            const childConstraints = {
+                availableInlineSize: childAvailableInlineSize,
+                availableBlockSize,
                 percentageInlineSize: availableInlineSize,
-                blockFragmentationType: space.blockFragmentationType,
-            });
+                blockFragmentationType: constraints.blockFragmentationType,
+            };
 
-            const fragment = yield child.layoutNextFragment(childSpace,
+            const fragment = yield child.layoutNextFragment(childConstraints,
                                                             childBreakToken);
             childFragments.push(fragment);
 
@@ -707,8 +645,8 @@ registerLayout('indent-lines', class {
             blockOffset += fragment.blockSize;
 
             // Check if we have gone over the block fragmentation limit.
-            if (constraintSpace.blockFragmentationType != 'none' &&
-                blockOffset > constraintSpace.blockSize) {
+            if (constraints.blockFragmentationType != 'none' &&
+                blockOffset > constraints.blockSize) {
                 break;
             }
 
@@ -723,14 +661,10 @@ registerLayout('indent-lines', class {
         }
 
         const autoBlockSize = blockOffset + edges.all.blockEnd;
-        const blockSize = resolveBlockSize(space,
-                                           styleMap,
-                                           autoBlockSize);
 
         // Return our fragment.
         const result = {
-            inlineSize: inlineSize,
-            blockSize: blockSize,
+            autoBlockSize,
             childFragments: childFragments,
         }
 
@@ -816,7 +750,7 @@ This example shows an node styled by CSS, and what its respective {{LayoutEdges}
 
 <pre class="lang-javascript">
 registerLayout('box-edges', class {
-    *layout(space, children, styleMap, edges, breakToken) {
+    *layout(constraints, children, styleMap, edges, breakToken) {
         edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
         edges.border.blockEnd; // 2
         edges.scrollbar.inlineEnd; // UA-dependent, may be 0 or >0 (e.g. 16).
@@ -824,39 +758,6 @@ registerLayout('box-edges', class {
     }
 }
 </pre>
-</div>
-
-Utility Functions {#utility-functions}
---------------------------------------
-
-<pre class='idl'>
-[Exposed=LayoutWorklet]
-partial interface LayoutWorkletGlobalScope {
-    double resolveInlineSize(ConstraintSpace constraintSpace,
-                             StylePropertyMapReadOnly styleMap);
-
-    double resolveBlockSize(ConstraintSpace constraintSpace,
-                            StylePropertyMapReadOnly styleMap,
-                            optional double autoBlockSize);
-
-    double resolveLength(ConstraintSpace constraintSpace, CSSStyleValue value);
-};
-</pre>
-
-<div algorithm>
-When the <dfn method for=LayoutWorkletGlobalScope>resolveBlockSize(|constraintSpace|, |styleMap|,
-|autoBlockSize|)</dfn> method is called, the user agent <em>must</em> run the following steps:
-
-    Issue: Define that this algorithm should do exactly what CSS does for block sizes.
-        |constraintSpace|, |styleMap|, |autoBlockSize|.
-</div>
-
-<div algorithm>
-When the <dfn method for=LayoutWorkletGlobalScope>resolveLength(|constraintSpace|, |value|)</dfn>
-method is called, the user agent <em>must</em> run the following steps:
-
-    Issue: Define that this algorithm should do exactly what CSS does for generic lengths. 
-        |constraintSpace|, |value|.
 </div>
 
 Interactions with other Modules {#interactions-with-other-modules}
@@ -867,24 +768,42 @@ This section describes how other CSS modules interact with the CSS Layout API.
 Sizing {#interaction-sizing}
 ----------------------------
 
-User agents must use the {{ConstraintSpace}} to communicate to the <a>current layout</a> the size
-they would like the fragment to be.
+User agents must use the {{LayoutConstraints}} object to communicate to the <a>current layout</a>
+the size they would like the fragment to be.
 
 If the user agent wishes to force a size on the box, it can use the
-{{ConstraintSpace/inlineSizeFixed}} and {{ConstraintSpace/blockSizeFixed}} attributes to do so.
+{{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}} attributes to do so.
 
-Issue: Do we want the inlineSize to always be fixed? This would remove the resolveInlineSize call,
-    and just rely on the pre-defined behaviour by the user agent.
+The <a>layout API container</a> can be passed size information in different ways depending on the
+value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} (set by
+<code>layoutOptions</code> on the class).
 
-    The downside to this is that we won't be able to things like MathML in the initial version of
-    the specifcation, which is able to "bubble" up inline sizes to its parent.
+If the value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} is
+<code>"block-like"</code>, then the {{LayoutConstraints}} passed to the <a>layout API container</a>:
+    - <em>Must</em> calculate and set {{LayoutConstraints/fixedInlineSize}} based off the rules
+        specified in [[!css-sizing-3]] and the formatting context in which it participates, e.g.
 
-    We can't do a similar thing for the blockSize due to fragmentation. E.g. the size of the
-    fragment which is undergoing fragmentation, isn't able to be automatically resolved.
+        - As a <a>block-level</a> box in a <a>block formatting context</a>, it is sized like a
+            <a>block box</a> that establishes a formatting context, with an ''width/auto'' <a>inline
+            size</a> calculated as for non-replaced block boxes.
 
-If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and has
-an ''width/auto'' inline size, the user agent <em>must</em> set the {{ConstraintSpace/inlineSize}}
-to the <a>stretch-fit inline size</a>.
+        - As an <a>inline-level</a> box in an <a>inline formatting context</a>, it is sized as an
+            atomic inline-level box (such as an inline-block).
+
+    - <em>Must</em> calculate and set {{LayoutConstraints/fixedBlockSize}} based off the rules
+        specified in [[!css-sizing-3]], and the formatting context in which it participates. If the
+        <a>layout API container</a> has an ''height/auto'' <a>block size</a>, and cannot be determined
+        ahead of time, {{LayoutConstraints/fixedBlockSize}} must be set to <code>null</code>.
+
+If the value of <a for="document layout definition">layout options</a>' {{LayoutOptions/sizing}} is
+<code>"manual"</code>, then the user-agent shouldn't pre-calculate
+{{LayoutConstraints/fixedInlineSize}} and/or {{LayoutConstraints/fixedBlockSize}} ahead of time,
+except when it is being forced to a particular size by the formatting context in which it
+participates, for example:
+
+    - If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and
+        has an ''width/auto'' inline size, the user agent <em>must</em> set the
+        {{LayoutConstraints/fixedInlineSize}} to the <a>stretch-fit inline size</a>.
 
 <div class="note">
     Note: In the example below the <a>layout API container</a> has its inline size set to 50.
@@ -912,8 +831,8 @@ to the <a>stretch-fit inline size</a>.
 
 If a <a>layout API container</a> is out-of-flow positioned the user agent <em>must</em> solve the
 positioned size equations ([[css-position-3#abs-non-replaced-width]],
-[[css-position-3#abs-non-replaced-height]]), and set the appropriate fixed
-{{ConstraintSpace/inlineSize}} and {{ConstraintSpace/blockSize}}.
+[[css-position-3#abs-non-replaced-height]]), and set the appropriate
+{{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}}.
 
 <div class="note">
     Note: In the example below the <a>layout API container</a> has its inline and block size fixed
@@ -953,8 +872,8 @@ As a result:
       href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
       containers do</a>. [[!CSS21]]
 
-  - The {{Fragment/inlineOffset}} and {{Fragment/blockOffset}} represent the position of the
-      fragment before any positioning and transforms have occured.
+  - The {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} represent the position of
+      the fragment before any positioning and transforms have occured.
 
   - The <a>static position</a> of an absolutely-positioned child of a <a>layout API container</a> is
       set to the <a>inline-start</a>, <a>block-start</a> padding edge of the <a>layout API
@@ -963,9 +882,9 @@ As a result:
 <div class="note">
     Note: In the example below:
       - "child-relative" would be the only child passed to the author's layout. If it was positioned
-          at ({{Fragment/inlineOffset}} <code>= 20</code>, {{Fragment/blockOffset}} <code> =
-          30</code>), its final position would be (<code>25</code>, <code>40</code>) as the relative
-          positioning was handled by the user agent.
+          at ({{LayoutFragment/inlineOffset}} <code>= 20</code>, {{LayoutFragment/blockOffset}}
+          <code> = 30</code>), its final position would be (<code>25</code>, <code>40</code>) as the
+          relative positioning was handled by the user agent.
 
       - "child-absolute" would not appear as a {{LayoutChild}}, and instead would be laid out and
           positioned by the user agent.
@@ -1010,26 +929,26 @@ Fragmentation {#interaction-fragmentation}
 ------------------------------------------
 
 A <a>parent layout</a> can ask the <a>current layout</a> to <a>fragment</a> by setting the
-{{ConstraintSpace/blockFragmentationType}} and {{ConstraintSpace/blockFragmentationOffset}}.
+{{LayoutConstraints/blockFragmentationType}} and {{LayoutConstraints/blockFragmentationOffset}}.
 
-E.g. [[css-multicol-1]] layout would set a {{ConstraintSpace/blockFragmentationType}} to
-<code>"column"</code> and set the {{ConstraintSpace/blockFragmentationOffset}} to where it needs the
+E.g. [[css-multicol-1]] layout would set a {{LayoutConstraints/blockFragmentationType}} to
+<code>"column"</code> and set the {{LayoutConstraints/blockFragmentationOffset}} to where it needs the
 child to fragment.
 
 Alignment {#interaction-alignment}
 ----------------------------------
 
 <div class="issue">
-Issue: We need to add the ability to request baselines on the constraint space, and have a fragment
-    returned what was asked. E.g.
+Issue: We need to add the ability to request baselines on the input layout constraints, and have a
+    fragment returned what was asked. E.g.
 
 <pre class="lang-javascript">
-const spaceOptions = {
+const constraints = {
     inlineSize: availableInlineSize,
     baselines: ['alphabetic', 'middle'],
 };
 
-const fragment = yield child.layoutNextFragment(spaceOptions);
+const fragment = yield child.layoutNextFragment(constraints);
 fragment.baselines.get('alphabetic') == /* something */;
 </pre>
 
@@ -1116,7 +1035,7 @@ A <dfn>layout definition</dfn> is a <a>struct</a> which describes the informatio
  - <dfn for="layout definition">child input properties</dfn> which is a <a>list</a> of
      <code>DOMStrings</code>.
 
- - <dfn for="layout definition">child display</dfn> a {{ChildDisplayType}}.
+ - <dfn for="layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 A <dfn>document layout definition</dfn> is a <a>struct</a> which describes the information needed by
 the <a>document</a> about the author defined layout (which can be referenced by the ''layout()''
@@ -1128,7 +1047,7 @@ function). It consists of:
  - <dfn for="document layout definition">child input properties</dfn> which is a <a>list</a> of
      <code>DOMStrings</code>.
 
- - <dfn for="document layout definition">child display</dfn> a {{ChildDisplayType}}.
+ - <dfn for="document layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 Layout Worklet {#layout-worklet}
 --------------------------------
@@ -1158,9 +1077,21 @@ Registering A Layout {#registering-layout}
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
+dictionary LayoutOptions {
+  ChildDisplayType childDisplay = "block";
+  LayoutSizingMode sizing = "block-like";
+};
+
+[Exposed=LayoutWorklet]
 enum ChildDisplayType {
     "block",
     "normal",
+};
+
+[Exposed=LayoutWorklet]
+enum LayoutSizingMode {
+    "block-like",
+    "manual",
 };
 </pre>
 
@@ -1213,40 +1144,38 @@ is called, the user agent <em>must</em> run the following steps:
         <code>sequence&lt;DOMString></code>. If an exception is <a>thrown</a>, rethrow the exception
         and abort all these steps.
 
-    10. Let |childDisplay| be a {{ChildDisplayType}} set to <code>"block"</code>.
+    10. Let |layoutOptionsValue| be the result of <a>Get</a>(|layoutCtor|, "layoutOptions").
 
-    11. Let |childDisplayValue| be the result of <a>Get</a>(|layoutCtor|, "childDisplay").
+    11. Let |layoutOptions| be the result of <a>converting</a> |layoutOptionsValue| to a
+        {{LayoutOptions}}. If an exception is <a>thrown</a>, rethrow the exception and abort all
+        these steps.
 
-    12. If |childDisplayValue| if not undefined, then then |childDisplay| to the result of
-        <a>converting</a> |childDisplayValue| to a {{ChildDisplayType}}. If an exception is
-        <a>thrown</a>, rethrow the exception and abort all these steps.
-
-    13. If the result of <a>IsConstructor</a>(|layoutCtor|) is false, <a>throw</a> a
+    12. If the result of <a>IsConstructor</a>(|layoutCtor|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    14. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, "prototype").
+    13. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, "prototype").
 
-    15. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    14. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    16. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+    15. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
 
-    17. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
+    16. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    18. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
+    17. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
         <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    19. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
+    18. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
         <code>"intrinsicSizes"</code>).
 
-    20. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
+    19. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    21. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
+    20. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
         <code>"generator"</code>, <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
-    22. Let |definition| be a new <a>layout definition</a> with:
+    21. Let |definition| be a new <a>layout definition</a> with:
 
         - <a>class constructor</a> being |layoutCtor|.
 
@@ -1260,11 +1189,11 @@ is called, the user agent <em>must</em> run the following steps:
 
         - <a for="layout definition">child input properties</a> being |childInputProperties|.
 
-        - <a for="layout definition">child display</a> being |childDisplay|.
+        - <a for="layout definition">layout options</a> being |layoutOptions|.
 
-    23. <a for=map>Set</a> |layoutDefinitionMap|[|name|] to |definition|.
+    22. <a for=map>Set</a> |layoutDefinitionMap|[|name|] to |definition|.
 
-    24. <a>Queue a task</a> to run the following steps:
+    23. <a>Queue a task</a> to run the following steps:
 
         1. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document layout
             definitions</a> <a>map</a>.
@@ -1276,7 +1205,7 @@ is called, the user agent <em>must</em> run the following steps:
             - <a for="document layout definition">child input properties</a> being
                 |childInputProperties|.
 
-            - <a for="document layout definition">child display</a> being |childDisplay|.
+            - <a for="document layout definition">layout options</a> being |layoutOptions|.
 
         3. If |documentLayoutDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
 
@@ -1288,13 +1217,13 @@ is called, the user agent <em>must</em> run the following steps:
             3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
                 <a for="document layout definition">input properties</a>, <a for="document layout
                 definition">child input properties</a>, and <a for="document layout
-                definition">child display</a> are different), then:
+                definition">layout options</a> are different), then:
 
                 <a for=map>Set</a> |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
 
                 Log an error to the debugging console stating that the same class was registered
                 with different <code>inputProperties</code>, <code>childInputProperties</code>, or
-                <code>childDisplay</code>.
+                <code>layoutOptions</code>.
 
         4. Otherwise, <a for=map>set</a> |documentLayoutDefinitionMap|[|name|] to
             |documentDefinition|.
@@ -1305,13 +1234,15 @@ is called, the user agent <em>must</em> run the following steps:
         class MyLayout {
             static get inputProperties() { return ['--foo']; }
             static get childrenInputProperties() { return ['--bar']; }
-            static get childDisplay() { return 'normal'; }
+            static get layoutOptions() {
+              return {childDisplay: 'normal', sizing: 'block-like'}
+            }
 
             *intrinsicSizes(children, styleMap) {
                 // Intrinsic sizes code goes here.
             }
 
-            *layout(space, children, styleMap, edges, breakToken) {
+            *layout(constraints, children, styleMap, edges, breakToken) {
                 // Layout code goes here.
             }
         }
@@ -1324,10 +1255,10 @@ Layout Engine {#layout-engine}
 
 <pre class="idl">
 [Exposed=LayoutWorklet]
-interface FragmentRequest {
+interface LayoutFragmentRequest {
   // Has internal slots:
   // [[layoutChild]] - The layout child to generate the fragment for.
-  // [[constraintSpace]] - The constraint space to perform layout in.
+  // [[layoutConstraints]] - The layout constraints object to perform layout in.
   // [[breakToken]] - The break token to resume the layout with.
 };
 
@@ -1343,14 +1274,14 @@ function instead of a regular javascript function. This is for user-agents to be
 asynchronous and parallel layout engines.
 
 When an author invokes the {{LayoutChild/layoutNextFragment()}} method on a {{LayoutChild}} the
-user-agent doesn't synchronously generate a {{Fragment}} to return to the author's code. Instead it
-returns a {{FragmentRequest}}. This is a completely opaque object to the author but contains
-internal slots which encapsulates the {{LayoutChild/layoutNextFragment()}} method call.
+user-agent doesn't synchronously generate a {{LayoutFragment}} to return to the author's code.
+Instead it returns a {{LayoutFragmentRequest}}. This is a completely opaque object to the author but
+contains internal slots which encapsulates the {{LayoutChild/layoutNextFragment()}} method call.
 
-When a {{FragmentRequest}}(s) are yielded from a layout generator object the user-agent's
+When a {{LayoutFragmentRequest}}(s) are yielded from a layout generator object the user-agent's
 layout engine may run the algorithm asynchronously with other work, and/or on a different thread of
-execution. When {{Fragment}}(s) have been produced by the engine, the user-agent will "tick" the
-generator object with the resulting {{Fragment}}(s).
+execution. When {{LayoutFragment}}(s) have been produced by the engine, the user-agent will "tick"
+the generator object with the resulting {{LayoutFragment}}(s).
 
 The same applies for the {{LayoutChild/intrinsicSizes()}} method.
 
@@ -1359,24 +1290,24 @@ An example layout engine written in javascript is shown below.
 
 <pre class="lang-javascript">
 class LayoutEngine {
-  // This function takes the root of the box-tree, a ConstraintSpace, and a
+  // This function takes the root of the box-tree, a LayoutConstraints object, and a
   // BreakToken to (if paginating for printing for example) and generates a
-  // Fragment.
-  layoutEntry(rootBox, rootPageConstraintSpace, breakToken) {
+  // LayoutFragment.
+  layoutEntry(rootBox, rootPageConstraints, breakToken) {
     return layoutFragment({
       box: rootBox,
-      constraintSpace: rootPageConstraintSpace,
+      layoutConstraints: rootPageConstraints,
       breakToken: breakToken,
     });
   }
 
-  // This function takes a FragmentRequest and calls the appropriate layout
-  // algorithm to generate the a Fragment.
+  // This function takes a LayoutFragmentRequest and calls the appropriate
+  // layout algorithm to generate the a LayoutFragment.
   layoutFragment(fragmentRequest) {
     const box = fragmentRequest.layoutChild;
     const algorithm = selectLayoutAlgorithmForBox(box);
     const fragmentRequestGenerator = algorithm.layout(
-        fragmentRequest.constraintSpace,
+        fragmentRequest.layoutConstraints,
         box.children,
         box.styleMap,
         fragmentRequest.breakToken);
@@ -1395,7 +1326,7 @@ class LayoutEngine {
       nextFragmentRequest = fragmentRequestGenerator.next(fragments);
     }
 
-    return nextFragmentRequest.value; // Return the final Fragment.
+    return nextFragmentRequest.value; // Return the final LayoutFragment.
   }
 }
 </pre>
@@ -1409,7 +1340,7 @@ Performing Layout {#performing-layout}
 dictionary FragmentResultOptions {
     double inlineSize = 0;
     double blockSize = 0;
-    sequence&lt;Fragment> childFragments = [];
+    sequence&lt;LayoutFragment> childFragments = [];
     any data = null;
     BreakTokenOptions breakToken = null;
 };
@@ -1556,7 +1487,7 @@ Note: The <a>generate a fragment</a> algorithm allows for user agents to cache a
 
 <div algorithm="generate a fragment">
 When the user agent wants to <dfn>generate a fragment</dfn> of a <a>layout API formatting
-context</a> for a given |box|, |childBoxes|, |internalConstraintSpace|, and an optional
+context</a> for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an optional
 |internalBreakToken| it <em>must</em> run the following steps:
 
     1. Let |layoutFunction| be the ''layout()'' for the <a>computed value</a> of <<display-inside>>
@@ -1590,7 +1521,7 @@ context</a> for a given |box|, |childBoxes|, |internalConstraintSpace|, and an o
         layout {{Worklet}}.
 
     7. Run <a>invoke a layout callback</a> given |name|, |box|, |childBoxes|,
-        |internalConstraintSpace|, |internalBreakToken|, and |workletGlobalScope| optionally <a>in
+        |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope| optionally <a>in
         parallel</a>.
 
         Note: If the user agent runs <a>invoke a intrinsic sizes callback</a> on a thread <a>in
@@ -1600,7 +1531,7 @@ context</a> for a given |box|, |childBoxes|, |internalConstraintSpace|, and an o
 
 <div algorithm="invoke a layout callback">
 When the user agent wants to <dfn>invoke a layout callback</dfn> given |name|, |box|, |childBoxes|,
-|internalConstraintSpace|, |internalBreakToken|, and |workletGlobalScope|, it <em>must</em> run the
+|internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope|, it <em>must</em> run the
 following steps:
 
     1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
@@ -1630,8 +1561,8 @@ following steps:
         {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed value</a>'s for
         properties listed in |childInputProperties|.
 
-    7. Let |constraintSpace| be a new {{ConstraintSpace}} populated with the appropriate information
-        from |internalConstraintSpace|.
+    7. Let |layoutConstraints| be a new {{LayoutConstraints}} object populated with the appropriate
+        information from |internalLayoutConstraints|.
 
     8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
         <a>box model edges</a> for |box|.
@@ -1642,13 +1573,13 @@ following steps:
         If |internalBreakToken| is null, let |breakToken| be null.
 
     10. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
-        |children|, |styleMap|, |constraintSpace|, |breakToken| are equivalent to that previous
+        |children|, |styleMap|, |layoutConstraints|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
     11. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
 
     12. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
-        |layoutInstance|, «|styleMap|, |children|, |constraintSpace|, |edges|, |breakToken|»).
+        |layoutInstance|, «|styleMap|, |children|, |layoutConstraints|, |edges|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
@@ -1673,7 +1604,7 @@ following steps:
             <a>list</a>. The ordering <em>is</em> important as this dictates their paint order
             (described in [[#layout-api-containers]]). Their position relative to the <b>border
             box</b> of the |fragment| should be based off the author specified
-            {{Fragment/inlineOffset}} and {{Fragment/blockOffset}}.
+            {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}.
 
         - The <a>fragmentation break</a> information set to |fragment|'s
             {{FragmentResultOptions/breakToken}}.
@@ -1783,39 +1714,39 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
                     - {{IntrinsicSizes/maxContentSize}} being |layoutChild|'s <a>max-content
                         size</a>.
 
-            3. If |request| is a {{FragmentRequest}} and |generatorType| is <code>"layout"</code>
-                then:
+            3. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is
+                <code>"layout"</code> then:
 
                 1. Let |layoutChild| be result of looking up the internal slot
                     <code>\[[layoutChild]]</code> on |request|.
 
-                2. Let |childConstraintSpace| be the result of looking up the internal slot
-                    <code>\[[childConstraintSpace]]</code> on |request|.
+                2. Let |childLayoutConstraints| be the result of looking up the internal slot
+                    <code>\[[childLayoutConstraints]]</code> on |request|.
 
                 3. Let |childBreakToken| be the result of looking up the internal slot
                     <code>\[[childBreakToken]]</code> on |request|.
 
                 4. Let |internalFragment| be the result of the user agent producing a
-                    <a>fragment</a> based on |layoutChild|, |childConstraintSpace|, and
+                    <a>fragment</a> based on |layoutChild|, |childLayoutConstraints|, and
                     |childBreakToken|.
 
                 5. Let |targetRealm| be |generator|'s <a>Realm</a>.
 
-                6. Let |result| be a new {{Fragment}} with:
+                6. Let |result| be a new {{LayoutFragment}} with:
 
-                    - {{Fragment/inlineSize}} being |internalFragment|'s <a>inline size</a>.
+                    - {{LayoutFragment/inlineSize}} being |internalFragment|'s <a>inline size</a>.
 
-                    - {{Fragment/blockSize}} being |internalFragment|'s <a>block size</a>.
+                    - {{LayoutFragment/blockSize}} being |internalFragment|'s <a>block size</a>.
 
-                    - {{Fragment/inlineOffset}} initially set to 0.
+                    - {{LayoutFragment/inlineOffset}} initially set to 0.
 
-                    - {{Fragment/blockOffset}} initially set to 0.
+                    - {{LayoutFragment/blockOffset}} initially set to 0.
 
-                    - {{Fragment/breakToken}} being a new {{ChildBreakToken}} representing
+                    - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
                         |layoutChild|'s internal break token.
 
                     - If |internalFragment| has a |clonedData| object stored with it, let
-                        {{Fragment/data}} being the result of
+                        {{LayoutFragment/data}} being the result of
                         <a>StructuredDeserialize</a>(|clonedData|, |targetRealm|), otherwise null.
 
             4. If |result| is null (that is neither of the above branches was taken), return
