@@ -3509,58 +3509,147 @@ regardless of what property it is for.
 ::
 
 : <a>font</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>font-family</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>font-language-override</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-max-size</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is an <<absolute-size>>, <<relative-size>> or <css>infinity</css>, 
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>font-min-size</a>
-::
+:: Same as 'font-size'
 
 : <a>font-optical-sizing</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>font-palette</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css>, <css>light</css> or <css>dark</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-presentation</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>font-size</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is an <<absolute-size>> or <<relative-size>>, 
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>font-size-adjust</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>, 
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>font-stretch</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is a <<percentage>>, 
+        [=reify a numeric value=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify an identifier=] from the value
+        and return the result.
 
 : <a>font-style</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css> or <css>italic</css>, 
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-synthesis</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css>, <css>weight</css>, <css>style</css> or <css>small-caps</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-variant</a>
-::
+:: For both specified and computed values,
+    reify as a {{CSSStyleValue}}
+    and return the result.
 
 : <a>font-variant-alternates</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>none</css> or <css>historical-forms</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-variant-emoji</a>
-::
+:: For both specified and computed values,
+    [=reify an identifier=] from the value
+    and return the result.
 
 : <a>font-variation-settings</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, reify as a {{CSSStyleValue}}
+        and return the result.
 
 : <a>font-weight</a>
-::
+:: For both specified and computed values:
+
+    1. If the value is <css>normal</css>, <css>bold</css>, <css>bolder</css> or <css>lighter</css>,
+        [=reify an identifier=] from the value
+        and return the result.
+
+    2. Otherwise, [=reify a numeric value=] from the value
+        and return the result.
 
 : <a>gap</a>
 ::
