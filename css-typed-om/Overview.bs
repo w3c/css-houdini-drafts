@@ -132,7 +132,7 @@ Previously, the only way to read or write to the underlying values
 was via strings--
 stylesheets or the CSSOM allowed authors to send strings to the UA,
 which were parsed into underlying values,
-and the CSSOM allowed authors to request 
+and the CSSOM allowed authors to request
 that the UA serialize their underlying values back into strings.
 
 This specification introduces a new way to interact with [=underlying values=],
@@ -336,14 +336,14 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
         (those whose name starts with a single dash),
         [=ASCII-lowercased=]
         and then sorted in increasing code-point order.
-    3. [=Custom properties=], 
+    3. [=Custom properties=],
         sorted in increasing code-point order.
         (These are never lower-cased;
         they are preserved exactly as written.)
 </div>
 
 <div algorithm="CSSStyleValue.iterator">
-    The [=value pairs to iterate over=] 
+    The [=value pairs to iterate over=]
     for a {{StylePropertyMapReadOnly}} object |this|
     are obtained as follows:
 
@@ -356,7 +356,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
         2. [=Reify=] each [=list/item=] of |iterations|,
             and let |objects| be the result.
         3. Append |prop|/|objects| to |value pairs|.
-    
+
     4. Return |value pairs|.
 </div>
 
@@ -525,9 +525,9 @@ probably in an appendix.
 
     4. If any of the [=list/items=] in |values| have a non-null {{[[associatedProperty]]}} internal slot,
         and that slot's value is anything other than |property|,
-        [=throw=] a {{TypeError}}.    
+        [=throw=] a {{TypeError}}.
 
-    5. If any of the [=list/items=] in |values| 
+    5. If any of the [=list/items=] in |values|
         are a {{CSSUnparsedValue}} or {{CSSVariableReferenceValue}} object,
         [=throw=] a {{TypeError}}.
 
@@ -663,7 +663,7 @@ when it is first called.
         on |this|,
         in the standard order.
 
-        The [=computed values=] in the {{[[declarations]]}} of this object 
+        The [=computed values=] in the {{[[declarations]]}} of this object
         must remain up-to-date,
         changing as style resolution changes the properties on |this|
         and how they're computed.
@@ -2858,7 +2858,7 @@ has the same behavior as in normal CSS.
 ===========================================================
 
 This section describes how Typed OM objects are constructed from [=underlying values=],
-a process called <dfn export for=CSS lt="reify | reification">reification</dfn>. 
+a process called <dfn export for=CSS lt="reify | reification">reification</dfn>.
 
 The following list defines the [=reification=] behavior for every single property in CSS,
 for both specified and computed values.
@@ -3531,7 +3531,7 @@ regardless of what property it is for.
 : <a>font-max-size</a>
 :: For both specified and computed values:
 
-    1. If the value is an <<absolute-size>>, <<relative-size>> or <css>infinity</css>, 
+    1. If the value is an <<absolute-size>>, <<relative-size>> or <css>infinity</css>,
         [=reify an identifier=] from the value
         and return the result.
 
@@ -3564,7 +3564,7 @@ regardless of what property it is for.
 : <a>font-size</a>
 :: For both specified and computed values:
 
-    1. If the value is an <<absolute-size>> or <<relative-size>>, 
+    1. If the value is an <<absolute-size>> or <<relative-size>>,
         [=reify an identifier=] from the value
         and return the result.
 
@@ -3574,7 +3574,7 @@ regardless of what property it is for.
 : <a>font-size-adjust</a>
 :: For both specified and computed values:
 
-    1. If the value is <css>none</css>, 
+    1. If the value is <css>none</css>,
         [=reify an identifier=] from the value
         and return the result.
 
@@ -3584,7 +3584,7 @@ regardless of what property it is for.
 : <a>font-stretch</a>
 :: For both specified and computed values:
 
-    1. If the value is a <<percentage>>, 
+    1. If the value is a <<percentage>>,
         [=reify a numeric value=] from the value
         and return the result.
 
