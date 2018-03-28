@@ -1094,8 +1094,6 @@ enum LayoutSizingMode {
 };
 </pre>
 
-Issue: "normal" is a bad name?
-
 The <a>document</a> has a <a>map</a> of <dfn>document layout definitions</dfn>. Initially this map
 is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
