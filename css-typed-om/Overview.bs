@@ -5450,7 +5450,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSSkewY}}</dfn> |this|:
 
-    1. Let |s| initially be "skewX(".
+    1. Let |s| initially be "skewY(".
 
     2. Serialize |this|’s {{CSSSkewY/ay}} internal slot,
         and append it to |s|.
