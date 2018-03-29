@@ -1273,6 +1273,22 @@ is called, the user agent <em>must</em> run the following steps:
 Layout Engine {#layout-engine}
 ------------------------------
 
+<div class="issue">
+  Issue: Currently the API is in an iterable generator form. Based on implementation experience, and
+  web developer experience, this may change to promise based API instead. There are both pros and
+  cons to each of these.
+
+  <em>Promises</em>
+     - Better error reporting.
+     - Potentially better developer ergonomics.
+
+  <em>Generator</em>
+     - More "strict" - can only perform layout operations. Don't have to restrict which promise APIs
+         work each call.
+     - Potentially better bindings overhead.
+</div>
+
+
 <pre class="idl">
 [Exposed=LayoutWorklet]
 interface LayoutFragmentRequest {
