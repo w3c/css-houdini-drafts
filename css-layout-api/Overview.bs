@@ -1178,22 +1178,22 @@ is called, the user agent <em>must</em> run the following steps:
     14. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    15. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
-
-    16. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
-
-    17. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
-        <a>throw</a> a <a>TypeError</a> and abort all these steps.
-
-    18. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
+    15. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
         <code>"intrinsicSizes"</code>).
 
-    19. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
+    16. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    20. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
+    17. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
         <code>"generator"</code>, <a>throw</a> a <a>TypeError</a> and abort all these steps.
+
+    18. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+
+    19. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
+
+    20. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
+        <a>throw</a> a <a>TypeError</a> and abort all these steps.
 
     21. Let |definition| be a new <a>layout definition</a> with:
 
