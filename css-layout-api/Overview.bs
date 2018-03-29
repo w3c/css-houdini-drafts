@@ -937,22 +937,40 @@ child to fragment.
 Alignment {#interaction-alignment}
 ----------------------------------
 
-<div class="issue">
-Issue: We need to add the ability to request baselines on the input layout constraints, and have a
-    fragment returned what was asked. E.g.
+The first/last baseline sets of a <a>layout API contrainer</a> is generated exactly like block
+containers do (see [[css-align-3#baseline-export]]). Except that the order of the in-flow children
+should be determined by the in which they are returned form the layout method (via
+{{FragmentResultOptions/childFragments}}) instead of the document order.
 
+
+<div class="note">
+Note: In a future level of the specification there will be the ability for the author to define the
+baselines themselves. This will be of the form:
+
+To <em>query</em> baseline information from a {{LayoutChild}}.
 <pre class="lang-javascript">
-const constraints = {
-    inlineSize: availableInlineSize,
-    baselines: ['alphabetic', 'middle'],
-};
-
-const fragment = yield child.layoutNextFragment(constraints);
-fragment.baselines.get('alphabetic') == /* something */;
+const fragment = yield child.layoutNextFragment({
+  fixedInlineSize: availableInlineSize,
+  baselineRequests: ['alphabetic', 'middle'],
+});
+fragment.baselines.get('alphabetic') === 25 /* or something */;
 </pre>
 
-Do we want this in level 1? E.g. is it better to wait for implementations of [[css-align-3]] before
-doing this?
+To <em>produce</em> baseline information for a <a>parent layout</a>:
+<pre class="lang-javascript">
+registerLayout('baseline-producing', class {
+  *layout(children, edges, constraints, styleMap) {
+    const result = {baselines: {}};
+
+    for (let baselineRequest of constraints.baselineRequests) {
+      // baselineRequest === 'alphabetic', or something else.
+      result.baselines[baselineRequest] = 25;
+    }
+
+    return result;
+  }
+});
+</pre>
 </div>
 
 Layout {#layout}
