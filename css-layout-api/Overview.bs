@@ -318,17 +318,21 @@ A {{LayoutFragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after
 on that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
 
 The {{LayoutFragment}} has {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}}
-attributes, which are set by the respective child's layout algorithm. They cannot be changed. If the
-<a>current layout</a> requires a different {{LayoutFragment/inlineSize}} or
+attributes, which are set by the respective child's layout algorithm. They represent the <b>border
+box</b> size of the CSS <a>fragment</a>, and are relative to the <a>current layout's</a> writing
+mode.
+
+The {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}} attributes cannot be changed. If
+the <a>current layout</a> requires a different {{LayoutFragment/inlineSize}} or
 {{LayoutFragment/blockSize}} the author must perform {{LayoutChild/layoutNextFragment()}} again with
 different arguments in order to get different results.
 
 The author inside the current layout can position a resulting {{LayoutFragment}} by setting its
 {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} attributes. If not set by the
 author they default to zero. The {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}
-attributes represent the position of the {{LayoutFragment}} relative to its parent's border box,
-before transform or positioning (e.g. if a fragment is <a>relatively positioned</a>) has been
-applied.
+attributes represent the position of the {{LayoutFragment}} relative to its parent's <b>border
+box</b>, before transform or positioning (e.g. if a fragment is <a>relatively positioned</a>) has
+been applied.
 
 <div class="example">
 The layout algorithm performs a block-like layout (positioning fragments sequentially in the block
@@ -342,11 +346,11 @@ registerLayout('block-like', class {
       });
 
       const maxContentSize = childrenSizes.reduce((max, childSizes) => {
-          return Math.max(max, childSizes.maxContentContribution);
+          return Math.max(max, childSizes.maxContentSize);
       }, 0) + edges.all.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
-          return Math.max(max, childSizes.minContentContribution);
+          return Math.max(max, childSizes.minContentSize);
       }, 0) + edges.all.inline;
 
       return {maxContentSize, minContentSize};
@@ -398,8 +402,70 @@ particular child. The {{LayoutFragment/breakToken}} cannot be changed.
 If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
-Note: In a future level of the specification there may be a way to query for additional baseline
-      information, for example where the alphabetic or center baseline is positioned.
+Intrinsic Sizes {#intrinsic-sizes}
+----------------------------------
+
+<pre class='idl'>
+[Exposed=LayoutWorklet]
+interface IntrinsicSizes {
+  readonly attribute double minContentSize;
+  readonly attribute double maxContentSize;
+};
+</pre>
+
+A {{IntrinsicSizes}} object represents the <a>min-content size</a> and <a>max-content size</a> of a
+CSS <a>box</a>. It has {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}}
+attributes which represent the <b>border box</b> min/max-content contribution of the {{LayoutChild}}
+for the <a>current layout</a>. The attributes are relative to the inline direction of the <a>current
+layout's</a> writing mode.
+
+The {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}} cannot be changed. They
+must not change for a {{LayoutChild}} within the current layout pass.
+
+<div class="example">
+The example below shows the border-box intrinsic sizes of two children.
+
+<pre class="lang-html">
+&lt;style>
+.child-0 {
+  width: 380px;
+  border: solid 10px;
+}
+
+.child-1 {
+  border: solid 5px;
+}
+
+.box {
+  display: layout(intrinsic-sizes-example);
+  font: 25px/1 Ahem;
+}
+&lt;/style>
+
+&lt;div class="box">
+  &lt;div class="child-0">&lt;/div>
+  &lt;div class="child-1">XXX XXXX&lt;/div>
+&lt;/div>
+</pre>
+
+<pre class="lang-javascript">
+registerLayout('intrinsic-sizes-example', class {
+    *intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = yield children.map((child) => {
+          return child.intrinsicSizes();
+      });
+
+      childrenSizes[0].minContentSize; // 400, (380+10+10) child has a fixed size.
+      childrenSizes[0].maxContentSize; // 400, (380+10+10) child has a fixed size.
+
+      childrenSizes[1].minContentSize; // 100, size of "XXXX".
+      childrenSizes[1].maxContentSize; // 200, size of "XXX XXXX".
+    }
+
+    *layout() {}
+});
+</pre>
+</div>
 
 Layout Constraints {#layout-constraints}
 ----------------------------------------
@@ -470,11 +536,11 @@ registerLayout('flex-distribution-like', class {
       });
 
       const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
-          return sum + childSizes.maxContentContribution;
+          return sum + childSizes.maxContentSize;
       }, 0) + edges.all.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
-          return sum + childSizes.minContentContribution;
+          return sum + childSizes.minContentSize;
       }, 0) + edges.all.inline;
 
       return {maxContentSize, minContentSize};
@@ -937,11 +1003,10 @@ child to fragment.
 Alignment {#interaction-alignment}
 ----------------------------------
 
-The first/last baseline sets of a <a>layout API contrainer</a> is generated exactly like block
+The first/last baseline sets of a <a>layout API container</a> is generated exactly like block
 containers do (see [[css-align-3#baseline-export]]). Except that the order of the in-flow children
 should be determined by the in which they are returned form the layout method (via
 {{FragmentResultOptions/childFragments}}) instead of the document order.
-
 
 <div class="note">
 Note: In a future level of the specification there will be the ability for the author to define the
@@ -1403,17 +1468,7 @@ dictionary IntrinsicSizesResultOptions {
     double maxContentSize;
     double minContentSize;
 };
-
-interface IntrinsicSizes {
-  readonly attribute double minContentSize;
-  readonly attribute double maxContentSize;
-};
 </pre>
-
-Issue: Should {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}} be content
-    contributions instead? E.g.  minContentContribution, maxContentContribution. Should
-    {{IntrinsicSizesResultOptions/minContentSize}} and
-    {{IntrinsicSizesResultOptions/maxContentSize}} be content contributions as well?
 
 ### Determining Intrinsic Sizes ### {#determining-intrinsic-sizes}
 
