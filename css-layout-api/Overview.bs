@@ -1422,7 +1422,8 @@ context</a> for a given |box|, |childBoxes| it <em>must</em> run the following s
 
     4. Let |name| be the first argument of the |layoutFunction|.
 
-    5. Let |documentDefinition| be the result of <a>get a document layout definition</a>.
+    5. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
+        |name|.
 
         If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
         <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
@@ -1540,7 +1541,8 @@ context</a> for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an
 
     4. Let |name| be the first argument of the |layoutFunction|.
 
-    5. Let |documentDefinition| be the result of <a>get a document layout definition</a>.
+    5. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
+        |name|.
 
         If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
         <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
