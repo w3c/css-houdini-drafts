@@ -64,6 +64,7 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
+    text: GetMethod
     text: IsArray
     text: IsCallable
     text: IsConstructor
@@ -1530,6 +1531,9 @@ interface IntrinsicSizesRequest {
 [Exposed=LayoutWorklet]
 interface LayoutFragmentRequest {
 };
+
+typedef (IntrinsicSizesRequest or LayoutFragmentRequest)
+    LayoutFragmentRequestOrIntrinsicSizesRequest;
 </pre>
 
 The {{IntrinsicSizesRequest}} has internal slot(s):
@@ -1960,57 +1964,61 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |box|,
 When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |generatorType|, it
 <em>must</em> run the following steps:
 
-    1. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>, |generator|).
+    1. Let |done| be a <a>boolean</a> initialized to <code>false</code>.
 
-        If an exception is <a>thrown</a> return failure, and abort all these steps.
+    2. Let |nextValue| be undefined.
 
-    2. Perform the following substeps until the result of <a>Get</a>(|nextResult|,
-        <code>"done"</code>) is <code>true</code>.
+    3. Perform the following substeps until |done| is <code>true</code>:
 
-        1. Let |requests| be the result of <a>Get</a>(|nextResult|, <code>"value"</code>).
+        1. Let |nextFunction| be the result of <a>Get</a>(|generator|, <code>"next"</code>).
 
-        2. Let |results| be an <a for=list>empty</a> <a>list</a>.
+        2. If the result of <a>IsCallable</a>(|nextFunction|) is false, <a>throw</a> a
+            <a>TypeError</a> and abort all these steps.
 
-        3. <a for=list>For each</a> |request| in |requests| perform the following substeps:
+        3. Let |nextResult| be the result of calling <a>Invoke</a>(|nextFunction|, |generator|,
+            «|nextValue|»).
 
-            1. Let |result| be null.
+            If an exception is <a>thrown</a> return failure, and abort all these steps.
 
-            2. If |request| is a {{IntrinsicSizesRequest}} then:
+        4. If the result of <a>Type</a>(|nextResult|) is not Object, <a>throw</a> a <a>TypeError</a>
+            and abort all these steps.
 
-                1. Let |layoutChild| be the result of looking up the internal slot
-                    <code>\[[layoutChild]]</code> on |request|.
+        5. Let |requestOrRequests| be the result of <a>Get</a>(nextResult|, <code>"value"</code>).
 
-                2. Let |internalIntrinsicSizes| be the result of the user agent calculating the
-                    <b>border box</b> min/max content contribution of |layoutChild|.
+        6. Let |done| be the result of <a>Get</a>(|nextResult|, <code>"done"</code>).
 
-                3. Let |result| be the result of <a>create an intrinsic sizes object</a> given
-                    |request|, and |internalIntrinsicSizes|.
+        7. If the result of <a>GetMethod</a>(|requestOrRequests|, <code>@@iterable</code>) exists
+            then:
 
-            3. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is
-                <code>"layout"</code> then:
+            1. Set |results| to be a new <a for=list>empty</a> <a>list</a>.
 
-                1. Let |layoutChild| be result of looking up the internal slot
-                    <code>\[[layoutChild]]</code> on |request|.
+            2. Let |requests| be the result of <a>converting</a> |requestOrRequests| to a
+                <code>sequence&lt;LayoutFragmentRequestOrIntrinsicSizesRequest></code>.
 
-                2. Let |childLayoutConstraints| be the result of looking up the internal slot
-                    <code>\[[childLayoutConstraints]]</code> on |request|.
+                If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
-                3. Let |childBreakToken| be the result of looking up the internal slot
-                    <code>\[[childBreakToken]]</code> on |request|.
+            3. <a for=list>For each</a> |request| in |requests| perform the following substeps:
 
-                4. Let |internalFragment| be the result of the user agent producing a
-                    <a>fragment</a> based on |layoutChild|, |childLayoutConstraints|, and
-                    |childBreakToken|.
+                1. Let |result| be the result of <a>produce a generator result</a> given |request|,
+                      |generator|, |generatorType|.
 
-                5. Let |targetRealm| be |generator|'s <a>Realm</a>.
+                2. <a for=list>Append</a> |result| to |results|.
 
-                6. Let |result| be the result of <a>create a layout fragment</a> given
-                    |targetRealm|, |request|, and |internalFragment|.
+            4. Set |nextValue| to be |results|.
 
-            4. If |result| is null (that is neither of the above branches was taken), return
-                failure, and abort all these steps.
+            5. Continue.
 
-            5. <a for=list>Append</a> |result| to |results|.
+        8. Let |request| be the result of <a>converting</a> |requestOrRequests| to a
+            {{LayoutFragmentRequestOrIntrinsicSizesRequest}}.
+
+            If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
+
+        9. Let |result| be the result of <a>produce a generator result</a> given |request|,
+            |generator|, |generatorType|.
+
+        10. Set |nextValue| to be |result|.
+
+        11. Continue.
 
         The user agent may perform the above loop out of order, and <a>in parallel</a>. The ordering
         for |requests| and |results| however <em>must</em> be consistent.
@@ -2021,10 +2029,42 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
             thread tasks are complete before calling the generator again. It cannot return partial
             results to the author.
 
-        4. Let |nextResult| be the result of calling <a>Invoke</a>(<code>next</code>,
-                |generator|, |results|).
-
-            If an exception is <a>thrown</a> then return failure, and abort all these steps.
-
     3. Return the result of calling <a>Get</a>(|nextResult|, <code>"value"</code>).
+</div>
+
+<div algorithm="produce a generator result">
+When the user agent wants to <dfn>produce a generator result</dfn> given |request|, |generator|, and
+|generatorType|, it <em>must</em> run the following steps:
+    1. If |request| is a {{IntrinsicSizesRequest}} then:
+
+        1. Let |layoutChild| be the result of looking up the internal slot
+            {{IntrinsicSizesRequest/[[layoutChild]]}} on |request|.
+
+        2. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
+            box</b> min/max content contribution of |layoutChild|.
+
+        3. Return the result of <a>create an intrinsic sizes object</a> given |request|, and
+            |internalIntrinsicSizes|.
+
+    2. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is <code>"layout"</code>
+        then:
+
+        1. Let |layoutChild| be result of looking up the internal slot
+            {{LayoutFragmentRequest/[[layoutChild]]}} on |request|.
+
+        2. Let |childLayoutConstraints| be the result of looking up the internal slot
+            {{LayoutFragmentRequest/[[layoutConstraints]]}} on |request|.
+
+        3. Let |childBreakToken| be the result of looking up the internal slot
+            {{LayoutFragmentRequest/[[breakToken]]}} on |request|.
+
+        4. Let |internalFragment| be the result of the user agent producing a <a>fragment</a> based
+            on |layoutChild|, |childLayoutConstraints|, and |childBreakToken|.
+
+        5. Let |targetRealm| be |generator|'s <a>Realm</a>.
+
+        6. Return the result of <a>create a layout fragment</a> given |targetRealm|, |request|, and
+            |internalFragment|.
+
+    3. Return failure (neither of the above branches was taken).
 </div>
