@@ -405,6 +405,12 @@ interface LayoutFragment {
 };
 </pre>
 
+The {{LayoutFragment}} has internal slot(s):
+    - <dfn attribute for=LayoutFragment>\[[layoutFragmentRequest]]</dfn> a
+        {{LayoutFragmentRequest}}, this is the fragment request which generated this fragment.
+
+<hr>
+
 A {{LayoutFragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred
 on that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
 
@@ -493,6 +499,34 @@ particular child. The {{LayoutFragment/breakToken}} cannot be changed.
 If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
+<div algorithm>
+When the user agent wants to <dfn>create a layout fragment</dfn> given |targetRealm|,
+ |layoutFragmentRequest|, and |internalFragment|, it <em>must</em> run the following steps:
+
+    1. Let |fragment| be a new {{LayoutFragment}} with:
+
+        - The {{[[layoutFragmentRequest]]}} internal slot being |layoutFragmentRequest|.
+
+        - {{LayoutFragment/inlineSize}} being |internalFragment|'s <a>inline size</a> relative to
+            the <a>current layout's</a> writing mode.
+
+        - {{LayoutFragment/blockSize}} being |internalFragment|'s <a>block size</a> relative to the
+            <a>current layout's</a> writing mode.
+
+        - {{LayoutFragment/inlineOffset}} initially set to 0.
+
+        - {{LayoutFragment/blockOffset}} initially set to 0.
+
+        - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
+            |internalFragment|'s internal break token, if any.
+
+        - If |internalFragment| has a |clonedData| object stored with it, let
+            {{LayoutFragment/data}} being the result of
+            <a>StructuredDeserialize</a>(|clonedData|, |targetRealm|), otherwise null.
+
+    2. Return |fragment|.
+</div>
+
 Intrinsic Sizes {#intrinsic-sizes}
 ----------------------------------
 
@@ -503,6 +537,13 @@ interface IntrinsicSizes {
   readonly attribute double maxContentSize;
 };
 </pre>
+
+The {{IntrinsicSizes}} object has internal slot(s):
+    - <dfn attribute for=IntrinsicSizes>\[[intrinsicSizesRequest]]</dfn> a
+        {{IntrinsicSizesRequest}}, this is the intrinsic sizes request which generated these
+        intrinsic sizes.
+
+<hr>
 
 A {{IntrinsicSizes}} object represents the <a>min-content size</a> and <a>max-content size</a> of a
 CSS <a>box</a>. It has {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}}
@@ -556,6 +597,23 @@ registerLayout('intrinsic-sizes-example', class {
     *layout() {}
 });
 </pre>
+</div>
+
+<div algorithm>
+When the user agent wants to <dfn>create an intrinsic sizes object</dfn> given
+|intrinsicSizesRequest|, and |internalIntrinsicSizes|, it <em>must</em> run the following steps:
+
+    1. Let |intrinsicSizes| be a new {{IntrinsicSizes}} with:
+
+        - The {{[[intrinsicSizesRequest]]}} internal slot being |intrinsicSizesRequest|.
+
+        - {{IntrinsicSizes/minContentSize}} being |internalIntrinsicSizes|' <b>border box</b>
+            min-content contribution, relative to the <a>current layout's</a> writing mode.
+
+        - {{IntrinsicSizes/maxContentSize}} being |internalIntrinsicSizes|'s <b>border box</b>
+            max-content contribution, relative to the <a>current layout's</a> writing mode.
+
+    2. Return |intrinsicSizes|.
 </div>
 
 Layout Constraints {#layout-constraints}
@@ -1921,13 +1979,11 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
                 1. Let |layoutChild| be the result of looking up the internal slot
                     <code>\[[layoutChild]]</code> on |request|.
 
-                2. Let |result| be a new {{IntrinsicSizes}} with:
+                2. Let |internalIntrinsicSizes| be the result of the user agent calculating the
+                    <b>border box</b> min/max content contribution of |layoutChild|.
 
-                    - {{IntrinsicSizes/minContentSize}} being |layoutChild|'s <a>min-content
-                        size</a>.
-
-                    - {{IntrinsicSizes/maxContentSize}} being |layoutChild|'s <a>max-content
-                        size</a>.
+                3. Let |result| be the result of <a>create an intrinsic sizes object</a> given
+                    |request|, and |internalIntrinsicSizes|.
 
             3. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is
                 <code>"layout"</code> then:
@@ -1947,22 +2003,8 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
 
                 5. Let |targetRealm| be |generator|'s <a>Realm</a>.
 
-                6. Let |result| be a new {{LayoutFragment}} with:
-
-                    - {{LayoutFragment/inlineSize}} being |internalFragment|'s <a>inline size</a>.
-
-                    - {{LayoutFragment/blockSize}} being |internalFragment|'s <a>block size</a>.
-
-                    - {{LayoutFragment/inlineOffset}} initially set to 0.
-
-                    - {{LayoutFragment/blockOffset}} initially set to 0.
-
-                    - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
-                        |layoutChild|'s internal break token.
-
-                    - If |internalFragment| has a |clonedData| object stored with it, let
-                        {{LayoutFragment/data}} being the result of
-                        <a>StructuredDeserialize</a>(|clonedData|, |targetRealm|), otherwise null.
+                6. Let |result| be the result of <a>create a layout fragment</a> given
+                    |targetRealm|, |request|, and |internalFragment|.
 
             4. If |result| is null (that is neither of the above branches was taken), return
                 failure, and abort all these steps.
