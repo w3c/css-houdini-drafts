@@ -1355,9 +1355,9 @@ is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout definitions</dfn>. Initially this
 map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
-The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout class instances</dfn>. Initially
-this map is empty; it is populated when the user agent calls either <a>determine the intrinsic
-sizes</a> or <a>generate a fragment</a> for a <a>box</a>.
+Each <a>box</a> representing a <a>layout API container</a> has a <a>map</a> of <dfn>layout class
+instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
+<a>determine the intrinsic sizes</a> or <a>generate a fragment</a> for a <a>box</a>.
 
 <div algorithm>
 When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
@@ -1692,7 +1692,7 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
         If <a>get a layout definition</a> returned failure, let the |box| fallback to the <a>flow
         layout</a> and abort all these steps.
 
-    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |name|, |box|,
+    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |box|,
         |definition|, |workletGlobalScope|.
 
         If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
@@ -1700,21 +1700,22 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
 
     3. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
 
-    4. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
-        properties</a>.
+    4. Let |children| be a new <a>list</a>.
 
-    5. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
-        represent |childBoxes|.
+    5. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
 
-        The {{LayoutChild/styleMap}} on each {{LayoutChild}} should be a new
-        {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed values</a> for
-        properties listed in |childInputProperties|.
+        1. Let |layoutChild| be the result of <a>get a layout child</a> given |workletGlobalScope|,
+            |name|, and |childBox|.
+
+        2. <a for=list>Append</a> |layoutChild| to |children|.
 
     6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
         <a>box model edges</a> for |box|.
 
     7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed values</a> for properties listed in |inputProperties| for |box|.
+
+        Issue: We may want to store |styleMap| on |box| instead, similar to |layoutInstance|.
 
     8. At this stage the user agent may re-use the <a>intrinsic sizes</a> from a previous invocation
         if |children|, |styleMap| are equivalent to that previous invocation. If so let the
@@ -1813,7 +1814,7 @@ following steps:
         If <a>get a layout definition</a> returned failure, let the |box| fallback to the <a>flow
         layout</a> and abort all these steps.
 
-    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |name|, |box|,
+    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |box|,
         |definition|, |workletGlobalScope|.
 
         If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
@@ -1821,15 +1822,14 @@ following steps:
 
     3. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
 
-    4. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
-        properties</a>.
+    4. Let |children| be a new <a>list</a>.
 
-    5. Let |children| be a new <a>list</a> populated with new {{LayoutChild}} objects which
-        represent |childBoxes|.
+    5. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
 
-        The {{LayoutChild/styleMap}} on each {{LayoutChild}} should be a new
-        {{StylePropertyMapReadOnly}} populated with <em>only</em> the <a>computed values</a> for
-        properties listed in |childInputProperties|.
+        1. Let |layoutChild| be the result of <a>get a layout child</a> given |workletGlobalScope|,
+            |name|, and |childBox|.
+
+        2. <a for=list>Append</a> |layoutChild| to |children|.
 
     6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
         <a>box model edges</a> for |box|.
@@ -1839,6 +1839,8 @@ following steps:
 
     8. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed values</a> for properties listed in |inputProperties| for |box|.
+
+        Issue: We may want to store |styleMap| on |box| instead, similar to |layoutInstance|.
 
     9. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
         |internalBreakToken|.
@@ -1930,18 +1932,17 @@ When the user agent wants to <dfn>get a layout definition</dfn> given |name|, an
 </div>
 
 <div algorithm="get a layout class instance">
-When the user agent wants to <dfn>get a layout class instance</dfn> given |name|, |box|,
-|definition|, and |workletGlobalScope|, it <em>must</em> run the following steps:
+When the user agent wants to <dfn>get a layout class instance</dfn> given |box|, |definition|, and
+|workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |layoutClassInstanceMap| be |workletGlobalScope|'s <a>layout class instances</a> map.
+    1. Let |layoutClassInstanceMap| be |box|'s <a>layout class instances</a> map.
 
-    2. Let |key| be a stable <a for=map>key</a> which is unique to |box| and |name|.
+    2. Let |layoutInstance| be the result of <a>get</a>
+        |layoutClassInstanceMap|[|workletGlobalScope|]. If |layoutInstance| is null, run the
+        following steps:
 
-    3. Let |layoutInstance| be the result of <a>get</a> |layoutClassInstanceMap|[|key|]. If
-        |layoutInstance| is null, run the following steps:
-
-        1. If the <a>constructor valid flag</a> on |definition| is false, let |box| fallback to the
-            <a>flow layout</a> and a abort all these steps.
+        1. If the <a>constructor valid flag</a> on |definition| is false, then return failure and
+            abort all these steps.
 
         2. Let |layoutCtor| be the <a>class constructor</a> on |definition|.
 
@@ -1950,7 +1951,7 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |name|
             If <a>construct</a> throws an exception, set the |definition|'s <a>constructor valid
             flag</a> to false, then return failure and abort all these steps.
 
-        4. <a for=map>Set</a> |layoutClassInstanceMap|[|key|] to |layoutInstance|.
+        4. <a for=map>Set</a> |layoutClassInstanceMap|[|workletGlobalScope|] to |layoutInstance|.
 
     4. Return |layoutInstance|.
 </div>
