@@ -763,6 +763,52 @@ The <a>current layout</a> can choose not to fragment a {{LayoutChild}} based on 
 {{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like
 ''break-inside: avoid-page;''.
 
+<div algorithm>
+When the user agent wants to <dfn>create a layout constraints object</dfn> given |sizingMode|, box|,
+and |internalLayoutConstraints|, it <em>must</em> run the following steps:
+
+    1. If |sizingMode| is <code>"block-like"</code> then:
+
+        1. Let |fixedInlineSize| be the result of calculating |box|'s <b>border-box</b>
+            <a>inline size</a> (relative to |box|'s writing mode) exactly like block containers do.
+
+        2. Let |fixedBlockSize| be null if |box|'s <a>block size</a> is ''height/auto'', otherwise
+            the result of calculating |box|'s <b>border-box</b> <a>block size</a> exactly like block
+            containers do.
+
+        3. Return a new {{LayoutConstraints}} object with:
+
+            - {{LayoutConstraints/fixedInlineSize}}, and {{LayoutConstraints/availableInlineSize}}
+                set to |fixedInlineSize|.
+
+            - {{LayoutConstraints/percentageInlineSize}} set to |internalLayoutConstraints|'
+                percentage resolution size in the inline axis (relative to |box|'s writing mode).
+
+            - {{LayoutConstraints/fixedBlockSize}} set to |fixedBlockSize|.
+
+            - {{LayoutConstraints/availableBlockSize}} set to |fixedBlockSize| if not null,
+                otherwise |internalLayoutConstraints|' <a>available space</a> in the block axis
+                (relative to |box|'s writing mode).
+
+            - {{LayoutConstraints/percentageBlockSize}} set to |internalLayoutConstraints|'
+                percentage resolution size in the block axis (relative to |box|'s writing mode).
+
+    2. If |sizingMode| is <code>"manual"</code> then:
+
+        1. Return a new {{LayoutConstraints}} object with:
+            - {{LayoutConstraints/fixedInlineSize}}/{{LayoutConstraints/fixedBlockSize}} set to
+                |internalLayoutConstraints|' fixed inline/block size (relative to |box|'s writing
+                mode) imposed by the <a>parent layout</a>. Either may be null.
+
+                Note: See [[#interaction-sizing]] for different scenarios when this can occur.
+
+            - {{LayoutConstraints/availableInlineSize}}/{{LayoutConstraints/availableBlockSize}} set
+                to |internalLayoutConstraints|' <a>available space</a>.
+
+            - {{LayoutConstraints/percentageInlineSize}}/{{LayoutConstraints/percentageBlockSize}}
+                set to |internalLayoutConstraints|' percentage resolution size.
+</div>
+
 Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
 
@@ -1016,7 +1062,7 @@ If the value of <a for="document layout definition">layout options'</a> {{Layout
         ahead of time, {{LayoutConstraints/fixedBlockSize}} must be set to <code>null</code>.
 
 If the value of <a for="document layout definition">layout options'</a> {{LayoutOptions/sizing}} is
-<code>"manual"</code>, then the user-agent shouldn't pre-calculate
+<code>"manual"</code>, then the user-agent must not pre-calculate
 {{LayoutConstraints/fixedInlineSize}} and/or {{LayoutConstraints/fixedBlockSize}} ahead of time,
 except when it is being forced to a particular size by the formatting context in which it
 participates, for example:
@@ -1829,22 +1875,25 @@ following steps:
         If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    3. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
+    3. Let |sizingMode| be |definition|'s <a for="layout definition">layout options</a>'
+        {{LayoutOptions/sizing}} property.
 
-    4. Let |children| be a new <a>list</a>.
+    4. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
 
-    5. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
+    5. Let |children| be a new <a>list</a>.
+
+    6. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
 
         1. Let |layoutChild| be the result of <a>get a layout child</a> given |workletGlobalScope|,
             |name|, and |childBox|.
 
         2. <a for=list>Append</a> |layoutChild| to |children|.
 
-    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
+    7. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
         <a>box model edges</a> for |box|.
 
-    7. Let |layoutConstraints| be a new {{LayoutConstraints}} object populated with the appropriate
-        information from |internalLayoutConstraints|.
+    8. Let |layoutConstraints| be the result of <a>create a layout constraints object</a> given
+        |internalLayoutConstraints|, |box|, and |sizingMode|.
 
     8. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed values</a> for properties listed in |inputProperties| for |box|.
