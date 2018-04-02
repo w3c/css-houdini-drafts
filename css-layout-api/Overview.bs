@@ -409,6 +409,8 @@ interface LayoutFragment {
 The {{LayoutFragment}} has internal slot(s):
     - <dfn attribute for=LayoutFragment>\[[layoutFragmentRequest]]</dfn> a
         {{LayoutFragmentRequest}}, this is the fragment request which generated this fragment.
+    - <dfn attribute for=LayoutFragment>\[[generator]]</dfn> the generator which produced this
+        fragment.
 
 <hr>
 
@@ -501,12 +503,15 @@ If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} 
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
 <div algorithm>
-When the user agent wants to <dfn>create a layout fragment</dfn> given |targetRealm|,
- |layoutFragmentRequest|, and |internalFragment|, it <em>must</em> run the following steps:
+When the user agent wants to <dfn>create a layout fragment</dfn> given |generator|,
+|layoutFragmentRequest|, and |internalFragment|, it <em>must</em> run the following steps:
+    1. Let |targetRealm| be |generator|'s <a>Realm</a>.
 
-    1. Let |fragment| be a new {{LayoutFragment}} with:
+    2. Let |fragment| be a new {{LayoutFragment}} with:
 
         - The {{[[layoutFragmentRequest]]}} internal slot being |layoutFragmentRequest|.
+
+        - The {{[[generator]]}} internal slot being |generator|.
 
         - {{LayoutFragment/inlineSize}} being |internalFragment|'s <a>inline size</a> relative to
             the <a>current layout's</a> writing mode.
@@ -525,7 +530,7 @@ When the user agent wants to <dfn>create a layout fragment</dfn> given |targetRe
             {{LayoutFragment/data}} being the result of
             <a>StructuredDeserialize</a>(|clonedData|, |targetRealm|), otherwise null.
 
-    2. Return |fragment|.
+    3. Return |fragment|.
 </div>
 
 Intrinsic Sizes {#intrinsic-sizes}
@@ -1873,7 +1878,13 @@ following steps:
         {{FragmentResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    15. Create a <a>fragment</a> for |box| with:
+    15. <a for=list>For each</a> |childFragment| in |fragment|'s
+        {{FragmentResultOptions/childFragments}}, perform the following stubsteps:
+
+        1. If |childFragment|'s {{[[generator]]}} internal slot is not equal to |layoutGenerator|,
+            then let |box| fallback to the <a>flow layout</a> and abort all these steps.
+
+    16. Create a <a>fragment</a> for |box| with:
 
         - The <a>inline size</a> set to |fragment|'s {{FragmentResultOptions/inlineSize}}.
 
@@ -2076,9 +2087,7 @@ When the user agent wants to <dfn>produce a generator result</dfn> given |reques
         5. Let |internalFragment| be the result of the user agent producing a <a>fragment</a> based
             on |layoutChild|, |childLayoutConstraints|, and |childBreakToken|.
 
-        6. Let |targetRealm| be |generator|'s <a>Realm</a>.
-
-        7. Return the result of <a>create a layout fragment</a> given |targetRealm|, |request|, and
+        6. Return the result of <a>create a layout fragment</a> given |generator|, |request|, and
             |internalFragment|.
 
     3. Return failure (neither of the above branches was taken).
