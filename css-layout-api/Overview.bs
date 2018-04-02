@@ -1673,6 +1673,7 @@ Performing Layout {#performing-layout}
 dictionary FragmentResultOptions {
     double inlineSize = 0;
     double blockSize = 0;
+    double autoBlockSize = 0;
     sequence&lt;LayoutFragment> childFragments = [];
     any data = null;
     BreakTokenOptions breakToken = null;
@@ -1895,49 +1896,67 @@ following steps:
     8. Let |layoutConstraints| be the result of <a>create a layout constraints object</a> given
         |internalLayoutConstraints|, |box|, and |sizingMode|.
 
-    8. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+    9. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
         <a>computed values</a> for properties listed in |inputProperties| for |box|.
 
         Issue: We may want to store |styleMap| on |box| instead, similar to |layoutInstance|.
 
-    9. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
+    10. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
         |internalBreakToken|.
 
         If |internalBreakToken| is null, let |breakToken| be null.
 
-    10. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
+    11. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
         |children|, |styleMap|, |layoutConstraints|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
-    11. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
+    12. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
 
-    12. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
+    13. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
         |layoutInstance|, «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
 
-    13. Let |fragmentValue| be the result of <a>run a generator</a> given |layoutGenerator|, and
+    14. Let |fragmentValue| be the result of <a>run a generator</a> given |layoutGenerator|, and
         <code>"layout"</code>.
 
         If <a>run a generator</a> returned failure, then let |box| fallback to the <a>flow
         layout</a> and abort all these steps.
 
-    14. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
+    15. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
         {{FragmentResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    15. <a for=list>For each</a> |childFragment| in |fragment|'s
+    16. <a for=list>For each</a> |childFragment| in |fragment|'s
         {{FragmentResultOptions/childFragments}}, perform the following stubsteps:
 
         1. If |childFragment|'s {{[[generator]]}} internal slot is not equal to |layoutGenerator|,
             then let |box| fallback to the <a>flow layout</a> and abort all these steps.
 
-    16. Create a <a>fragment</a> for |box| with:
+    17. If |sizingMode| is <code>"block-like"</code>:
 
-        - The <a>inline size</a> set to |fragment|'s {{FragmentResultOptions/inlineSize}}.
+        - Then:
 
-        - The <a>block size</a> set to |fragment|'s {{FragmentResultOptions/blockSize}}.
+            1. Let |inlineSize| be |layoutConstraints|' {{LayoutConstraints/fixedInlineSize}}. (This
+                value must be set if we are using <code>"block-like"</code> sizing).
+
+            2. Let |blockSize| be the result of calculating |box|'s <b>border-box</b>
+                <a>block size</a> (relative to |box|'s writing mode) exactly like block containers
+                do, given |fragment|'s {{FragmentResultOptions/autoBlockSize}} as the "intrinsic
+                height".
+
+        - Otherwise (|sizingMode| is <code>"manual"</code>):
+
+            1. Let |inlineSize| be |fragment|'s {{FragmentResultOptions/inlineSize}}.
+
+            2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
+
+    18. Return a <a>fragment</a> for |box| with:
+
+        - The <a>inline size</a> set to |inlineSize|.
+
+        - The <a>block size</a> set to |blockSize|.
 
         - The child fragments set to |fragment|'s {{FragmentResultOptions/childFragments}}
             <a>list</a>. The ordering <em>is</em> important as this dictates their paint order
