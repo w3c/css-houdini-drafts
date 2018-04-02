@@ -326,8 +326,8 @@ Note: Both {{LayoutChild/layoutNextFragment()}} and {{LayoutChild/intrinsicSizes
 
 ### LayoutChildren and the Box Tree ### {#layout-child-box-tree}
 
-Each <a>box</a> has a <dfn attribute for=box>\[[layoutChildMap]]</dfn> internal slot, which is a <a>map</a> of
-{{LayoutWorkletGlobalScope}}s to {{LayoutChild}}ren.
+Each <a>box</a> has a <dfn attribute for=box>\[[layoutChildMap]]</dfn> internal slot, which is a
+<a>map</a> of {{LayoutWorkletGlobalScope}}s to {{LayoutChild}}ren.
 
 <div algorithm="get a layout child">
 When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalScope|, |name|, and
@@ -345,6 +345,9 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
 
         1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
             |workletGlobalScope|.
+
+            Assert that <a>get a layout definition</a> succeeded, and |definition| is not
+            <code>"invalid"</code>.
 
         2. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
             properties</a>.
@@ -1303,6 +1306,9 @@ When the user agent wants to <dfn>invalidate layout functions</dfn> given |box|,
 
     3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
         |name|.
+
+        If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
+        <code>"invalid"</code>, then abort all these steps.
 
     4. Let |inputProperties| be |documentDefinition|'s <a for="document layout definition">input
         properties</a>.
