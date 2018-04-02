@@ -2016,6 +2016,9 @@ When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |
         9. Let |result| be the result of <a>produce a generator result</a> given |request|,
             |generator|, |generatorType|.
 
+            If <a>produce a generator result</a> returns failure, return failure, and abort all
+            these steps.
+
         10. Set |nextValue| to be |result|.
 
         11. Continue.
@@ -2040,10 +2043,16 @@ When the user agent wants to <dfn>produce a generator result</dfn> given |reques
         1. Let |layoutChild| be the result of looking up the internal slot
             {{IntrinsicSizesRequest/[[layoutChild]]}} on |request|.
 
-        2. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
+        2. If |layoutChild| is <em>not</em> attached to the <a>box tree</a>, return failure and
+            abort all these steps.
+
+            Note: The author may hold onto a {{LayoutChild}} from a previous invocation. It is
+                assumed that a box is only ever attached to the box-tree once, and not re-used.
+
+        3. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
             box</b> min/max content contribution of |layoutChild|.
 
-        3. Return the result of <a>create an intrinsic sizes object</a> given |request|, and
+        4. Return the result of <a>create an intrinsic sizes object</a> given |request|, and
             |internalIntrinsicSizes|.
 
     2. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is <code>"layout"</code>
@@ -2052,18 +2061,24 @@ When the user agent wants to <dfn>produce a generator result</dfn> given |reques
         1. Let |layoutChild| be result of looking up the internal slot
             {{LayoutFragmentRequest/[[layoutChild]]}} on |request|.
 
-        2. Let |childLayoutConstraints| be the result of looking up the internal slot
+        2. If |layoutChild| is <em>not</em> attached to the <a>box tree</a>, return failure and
+            abort all these steps.
+
+            Note: The author may hold onto a {{LayoutChild}} from a previous invocation. It is
+                assumed that a box is only ever attached to the box-tree once, and not re-used.
+
+        3. Let |childLayoutConstraints| be the result of looking up the internal slot
             {{LayoutFragmentRequest/[[layoutConstraints]]}} on |request|.
 
-        3. Let |childBreakToken| be the result of looking up the internal slot
+        4. Let |childBreakToken| be the result of looking up the internal slot
             {{LayoutFragmentRequest/[[breakToken]]}} on |request|.
 
-        4. Let |internalFragment| be the result of the user agent producing a <a>fragment</a> based
+        5. Let |internalFragment| be the result of the user agent producing a <a>fragment</a> based
             on |layoutChild|, |childLayoutConstraints|, and |childBreakToken|.
 
-        5. Let |targetRealm| be |generator|'s <a>Realm</a>.
+        6. Let |targetRealm| be |generator|'s <a>Realm</a>.
 
-        6. Return the result of <a>create a layout fragment</a> given |targetRealm|, |request|, and
+        7. Return the result of <a>create a layout fragment</a> given |targetRealm|, |request|, and
             |internalFragment|.
 
     3. Return failure (neither of the above branches was taken).
