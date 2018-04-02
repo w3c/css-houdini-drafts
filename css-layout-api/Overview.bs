@@ -2166,3 +2166,13 @@ When the user agent wants to <dfn>produce a generator result</dfn> given |reques
 
     3. Return failure (neither of the above branches was taken).
 </div>
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+================================================
+
+There are no known privacy issues introduced by these features.
