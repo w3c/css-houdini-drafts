@@ -5048,7 +5048,7 @@ is set to ''loading''). If data is not required and the reference is valid then
 
 If {{CSSResourceValue/state}} is set to ''loading'' then the image
 reference is reevaluated once the pending data becomes available, according to the
-same rules referenced above.
+same rules referenced above. When the {{CSSResourceValue/state}} changes it'll automatically trigger a repaint.
 
 Reification can not fail for {{CSSResourceValue}} objects.
 
