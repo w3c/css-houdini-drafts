@@ -451,8 +451,12 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 </div>
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>, with |concreteObjectSize|
-set to the <a>concrete object size</a> of the <a>box</a>.
+negotiation</a> algorithm which is responsible for rendering an <<image>>, with |snappedConcreteObjectSize|
+defined as follows. Let |concreteObjectSize| be the <a>concrete object size</a> of the <a>box</a>.
+The |snappedConcreteObjectSize| is usually the same as the |concreteObjectSize|. However, the
+user agent may adjust the size such that it paints to pixel boundaries. If it does, the user agent
+should adjust the |snappedConcreteObjectSize| by the proportional change from its original size
+such that the <<paint()>> function can adjust the drawing accordingly.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
@@ -463,15 +467,15 @@ Note: In a future version of the spec, the author could have the ability to spec
     dimensions</a> based on computed style and size changes.
 
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
-the <a>concrete object size</a> given by the user agent.
+the |snappedConcreteObjectSize| given by the user agent.
 
 Note: See [[css-images-3#object-sizing-examples]] for examples on how the <a>concrete object
     size</a> is calculated.
 
 The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
-with any |concreteObjectSize|. The resulting image is not displayed.
+with any |snappedConcreteObjectSize|. The resulting image is not displayed.
 
-Note: User agents may use any heuristic to speculate a possible future value for |concretObjectSize|,
+Note: User agents may use any heuristic to speculate a possible future value for |snappedConcretObjectSize|,
     for example speculating that the size remains unchanged.
 
 Note: Although the image is not displayed, it may still be cached, and subsequent invocations of
@@ -488,12 +492,12 @@ interface PaintSize {
 <div algorithm>
 When the user agent wants to <dfn>draw a paint image</dfn> of a <<paint()>> function for a |box|
 into its appropriate stacking level (as defined by the property the CSS property its associated
-with), given |concreteObjectSize| it <em>must</em> run the following steps:
+with), given |snappedConcreteObjectSize| it <em>must</em> run the following steps:
     1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
     2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>, and the
-        previous invocation had the same |concreteObjectSize|, the user agent <em>may</em> use the
+        previous invocation had the same |snappedConcreteObjectSize|, the user agent <em>may</em> use the
         drawn image from the previous invocation. If so it <em>may</em> abort all these steps and
         use the previously drawn image.
 
@@ -572,7 +576,7 @@ with), given |concreteObjectSize| it <em>must</em> run the following steps:
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         paint {{Worklet}}.
 
-    13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |concreteObjectSize|,
+    13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |snappedConcreteObjectSize|,
         |workletGlobalScope| optionally <a>in parallel</a>.
 
         Note: If the user agent runs <a>invoke a paint callback</a> on a thread <a>in parallel</a>,
@@ -581,7 +585,7 @@ with), given |concreteObjectSize| it <em>must</em> run the following steps:
 
 <div algorithm>
 When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |inputArguments|,
-|concreteObjectSize|, and |workletGlobalScope|, it <em>must</em> run the following steps:
+|snappedConcreteObjectSize|, and |workletGlobalScope|, it <em>must</em> run the following steps:
 
     1. Let |paintDefinitionMap| be |workletGlobalScope|'s <a>paint definitions</a> map.
 
@@ -646,7 +650,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
             images.
 
     9. Let |paintSize| be a new {{PaintSize}} initialized to the width and height defined by
-        |concreteObjectSize|.
+        |snappedConcreteObjectSize|.
 
     10. At this stage the user agent may re-use an image from a previous invocation if |paintSize|,
         |styleMap|, |inputArguments| are equivalent to that previous invocation. If so let the image
