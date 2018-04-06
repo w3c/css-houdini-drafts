@@ -422,7 +422,7 @@ When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for
 |height|, and |paintRenderingContext2DSettings|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
     2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to the rounded values of |width| and |height|.
-    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |paintRenderingContext2DSettings.alpha|.
+    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |paintRenderingContext2DSettings|'s {{alpha}}.
     4. Return the new {{PaintRenderingContext2D}}.
 
 Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
@@ -451,12 +451,13 @@ Note: The user agent can optionally defer drawing images which are <a>paint-inva
 </div>
 
 The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>, with |snappedConcreteObjectSize|
-defined as follows. Let |concreteObjectSize| be the <a>concrete object size</a> of the <a>box</a>.
-The |snappedConcreteObjectSize| is usually the same as the |concreteObjectSize|. However, the
-user agent may adjust the size such that it paints to pixel boundaries. If it does, the user agent
-should adjust the |snappedConcreteObjectSize| by the proportional change from its original size
-such that the <<paint()>> function can adjust the drawing accordingly.
+negotiation</a> algorithm which is responsible for rendering an <<image>>, with
+|snappedConcreteObjectSize| defined as follows. Let |concreteObjectSize| be the <a>concrete object
+size</a> of the <a>box</a>.  The |snappedConcreteObjectSize| is usually the same as the
+|concreteObjectSize|. However, the user agent may adjust the size such that it paints to pixel
+boundaries. If it does, the user agent should adjust the |snappedConcreteObjectSize| by the
+proportional change from its original size such that the <<paint()>> function can adjust the drawing
+accordingly.
 
 For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
 <a>intrinsic dimensions</a>.
@@ -475,8 +476,8 @@ Note: See [[css-images-3#object-sizing-examples]] for examples on how the <a>con
 The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
 with any |snappedConcreteObjectSize|. The resulting image is not displayed.
 
-Note: User agents may use any heuristic to speculate a possible future value for |snappedConcretObjectSize|,
-    for example speculating that the size remains unchanged.
+Note: User agents may use any heuristic to speculate a possible future value for
+    |snappedConcreteObjectSize|, for example speculating that the size remains unchanged.
 
 Note: Although the image is not displayed, it may still be cached, and subsequent invocations of
     <<paint()>> may use the cached image.
@@ -1003,3 +1004,13 @@ registerPaint('overdraw', class {
     }
 });
 </pre>
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+================================================
+
+There are no known privacy issues introduced by these features.
