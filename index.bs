@@ -10,7 +10,7 @@ Abstract:
 Editor: Majid Valipour, majidvp@google.com
 Editor: Robert Flack, flackr@chromium.org
 Editor: Stephen McGruer, smcgruer@chromium.org
-
+Ignored Terms: AnimationWorklet
 </pre>
 
 <pre class="link-defaults">
@@ -187,7 +187,7 @@ partial interface Window {
 <pre class='idl'>
 callback VoidFunction = void ();
 
-[Global=Worklet]
+[ Exposed=AnimationWorklet, Global=AnimationWorklet ]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
 };
@@ -687,7 +687,7 @@ interface WorkletGroupEffect :  WorkletGroupEffectReadOnly {};
 WorkletGroupEffect implements AnimationEffectMutable;
 WorkletGroupEffect implements GroupEffectMutable;
 
-[Exposed=Worklet]
+[Exposed=AnimationWorklet]
 partial interface AnimationEffectReadOnly {
     // Intended for use inside Animation Worklet scope to drive the effect.
     attribute double localTime;
