@@ -1178,7 +1178,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 3456bb73524907a10ac567d67cde058769c35261" name="generator">
   <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
-  <meta content="c3132a0c60b188594e08fe8b54b6807c4b5b5fb6" name="document-revision">
+  <meta content="90f24a2b6a1cf802a0a8bc5a7d4c1e0ee2ade5ab" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1769,6 +1769,8 @@ of any author-defined effect, and restore it after migration.</p>
         <p>Let <var>definition</var> be the result of looking up <var>animatorName</var> on <var>sourceWorkletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map④">animator name to animator definition map</a>.</p>
         <p>If <var>definition</var> does not exist then abort the following steps.</p>
        <li data-md="">
+        <p>Let <var>animatorCtor</var> be the <a data-link-type="dfn" href="#class-constructor" id="ref-for-class-constructor②">class constructor</a> of <var>definition</var>.</p>
+       <li data-md="">
         <p>Let <var>prototype</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p②">Get</a>(<var>animatorCtor</var>, "prototype").</p>
        <li data-md="">
         <p>Let <var>onDestroyFunction</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p③">Get</a>(<var>prototype</var>, "onDestroy").</p>
@@ -1846,16 +1848,16 @@ constructing a new animator instance.</p>
    </figure>
    <h3 class="heading settled" data-level="6.2" id="creating-worklet-animation"><span class="secno">6.2. </span><span class="content">Creating a Worklet Animation</span><a class="self-link" href="#creating-worklet-animation"></a></h3>
 <pre class="idl highlight def">[Constructor (DOMString animatorName,
-              optional (AnimationEffectReadOnly or array)? effects = null,
-              AnimationTimeline? timeline,
-              optional WorkletAnimationOptions)]
+              optional (AnimationEffectReadOnly or sequence)? effects = null,
+              optional AnimationTimeline? timeline,
+              optional any options)]
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="workletanimation"><code>WorkletAnimation</code></dfn> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/web-animations/level-2/#animation" id="ref-for-animation②">Animation</a> {
         <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①"><span class="kt">DOMString</span></a> <dfn class="nv idl-code" data-dfn-for="WorkletAnimation" data-dfn-type="attribute" data-export="" data-readonly="" data-type="DOMString" id="dom-workletanimation-animatorname"><code>animatorName</code><a class="self-link" href="#dom-workletanimation-animatorname"></a></dfn>;
 };
 
 </pre>
    <div class="algorithm" data-algorithm="create-worklet-animation">
-     <dfn class="idl-code" data-dfn-for="WorkletAnimation" data-dfn-type="constructor" data-export="" id="dom-workletanimation-workletanimation"><code>WorkletAnimation(animatorName, effects, timeline, options)</code><a class="self-link" href="#dom-workletanimation-workletanimation"></a></dfn> 
+     <dfn class="idl-code" data-dfn-for="WorkletAnimation" data-dfn-type="constructor" data-export="" id="dom-workletanimation-workletanimation"><code>WorkletAnimation(<var>animatorName</var>, <var>effects</var>, <var>timeline</var>, <var>options</var>)</code><a class="self-link" href="#dom-workletanimation-workletanimation"></a></dfn> 
     <p>Creates a new <code class="idl"><a data-link-type="idl" href="#workletanimation" id="ref-for-workletanimation">WorkletAnimation</a></code> object using the following procedure.</p>
     <ol>
      <li data-md="">
@@ -1964,7 +1966,7 @@ following steps.</p>
     </ol>
    </div>
    <div class="algorithm" data-algorithm="set-animator-instance">
-    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="set-animator-instance-of-worklet-animation">set animator instance of worklet animation</dfn> given <var>workletAnimation</var>, the user age <em>must</em> run the following steps:</p>
+    <p>To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="set-animator-instance-of-worklet-animation">set animator instance of worklet animation</dfn> given <var>workletAnimation</var>, the user agent <em>must</em> run the following steps:</p>
     <ol>
      <li data-md="">
       <p><a data-link-type="dfn" href="#disassociate-animator-instance-of-worklet-animation" id="ref-for-disassociate-animator-instance-of-worklet-animation">disassociate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
@@ -1972,9 +1974,9 @@ following steps.</p>
       <p><a data-link-type="dfn" href="#associate-animator-instance-of-worklet-animation" id="ref-for-associate-animator-instance-of-worklet-animation">associate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
     </ol>
    </div>
-   <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state" id="ref-for-play-state③">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#pending" id="ref-for-pending">pending</a>, <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#running" id="ref-for-running">running</a>, or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#paused" id="ref-for-paused">paused</a>, run the procedure to <a data-link-type="dfn">associate a worklet animation with its animator instance</a> given <var>workletAnimation</var>.</p>
+   <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state" id="ref-for-play-state③">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#pending" id="ref-for-pending">pending</a>, <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#running" id="ref-for-running">running</a>, or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#paused" id="ref-for-paused">paused</a>, run the procedure to <a data-link-type="dfn" href="#associate-animator-instance-of-worklet-animation" id="ref-for-associate-animator-instance-of-worklet-animation①">associate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
    <p>When a given <var>workletAnimation</var>’s <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#play-state" id="ref-for-play-state④">play state</a> changes to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#idle" id="ref-for-idle">idle</a> or <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#finished" id="ref-for-finished">finished</a>,
-run the procedure to <a data-link-type="dfn">disassociate a worklet animation with its animator instance</a> given <var>workletAnimation</var>.</p>
+run the procedure to <a data-link-type="dfn" href="#disassociate-animator-instance-of-worklet-animation" id="ref-for-disassociate-animator-instance-of-worklet-animation①">disassociate animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
    <p>When the procedure to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#set-the-target-effect-of-an-animation" id="ref-for-set-the-target-effect-of-an-animation①">set the target effect of an animation</a> for a given <var>workletAnimation</var> is called, then <a data-link-type="dfn" href="#set-animator-instance-of-worklet-animation" id="ref-for-set-animator-instance-of-worklet-animation">set animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
    <p>When the procedure to <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#set-the-timeline-of-an-animation" id="ref-for-set-the-timeline-of-an-animation①">set the timeline of an animation</a> for a given <var>workletAnimation</var> is called, then <a data-link-type="dfn" href="#set-animator-instance-of-worklet-animation" id="ref-for-set-animator-instance-of-worklet-animation①">set animator instance of worklet animation</a> given <var>workletAnimation</var>.</p>
    <h3 class="heading settled" data-level="6.5" id="timeline-attachment"><span class="secno">6.5. </span><span class="content">Timeline Attachment</span><a class="self-link" href="#timeline-attachment"></a></h3>
@@ -2424,9 +2426,9 @@ animationWorklet<span class="p">.</span>addModule<span class="p">(</span><span c
 };
 
 [Constructor (DOMString animatorName,
-              optional (AnimationEffectReadOnly or array)? effects = null,
-              AnimationTimeline? timeline,
-              optional WorkletAnimationOptions)]
+              optional (AnimationEffectReadOnly or sequence)? effects = null,
+              optional AnimationTimeline? timeline,
+              optional any options)]
 <span class="kt">interface</span> <a class="nv" href="#workletanimation"><code>WorkletAnimation</code></a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/web-animations/level-2/#animation" id="ref-for-animation②①">Animation</a> {
         <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①①"><span class="kt">DOMString</span></a> <a class="nv" data-readonly="" data-type="DOMString" href="#dom-workletanimation-animatorname"><code>animatorName</code></a>;
 };
@@ -2515,6 +2517,7 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
    <ul>
     <li><a href="#ref-for-class-constructor">4.1. Registering an Animator Definition</a>
     <li><a href="#ref-for-class-constructor①">5.1. Creating an Animator Instance</a>
+    <li><a href="#ref-for-class-constructor②">5.4. Migrating an Animator Instance</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animate-function">
@@ -2678,13 +2681,13 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
   <aside class="dfn-panel" data-for="associate-animator-instance-of-worklet-animation">
    <b><a href="#associate-animator-instance-of-worklet-animation">#associate-animator-instance-of-worklet-animation</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-associate-animator-instance-of-worklet-animation">6.4. Interaction with Animator Instances</a>
+    <li><a href="#ref-for-associate-animator-instance-of-worklet-animation">6.4. Interaction with Animator Instances</a> <a href="#ref-for-associate-animator-instance-of-worklet-animation①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="disassociate-animator-instance-of-worklet-animation">
    <b><a href="#disassociate-animator-instance-of-worklet-animation">#disassociate-animator-instance-of-worklet-animation</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-disassociate-animator-instance-of-worklet-animation">6.4. Interaction with Animator Instances</a>
+    <li><a href="#ref-for-disassociate-animator-instance-of-worklet-animation">6.4. Interaction with Animator Instances</a> <a href="#ref-for-disassociate-animator-instance-of-worklet-animation①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="set-animator-instance-of-worklet-animation">

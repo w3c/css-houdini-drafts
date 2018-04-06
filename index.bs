@@ -417,6 +417,8 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
         If |definition| does not exist then abort the following steps.
 
+     3. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
+
      4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
 
      5. Let |onDestroyFunction| be the result of <a>Get</a>(|prototype|, "onDestroy").
@@ -504,10 +506,11 @@ Creating a Worklet Animation {#creating-worklet-animation}
 
 <pre class='idl'>
 
+
 [Constructor (DOMString animatorName,
-              optional (AnimationEffectReadOnly or array<AnimationEffectReadOnly>)? effects = null,
-              AnimationTimeline? timeline,
-              optional WorkletAnimationOptions)]
+              optional (AnimationEffectReadOnly or sequence<AnimationEffectReadOnly>)? effects = null,
+              optional AnimationTimeline? timeline,
+              optional any options)]
 interface WorkletAnimation : Animation {
         readonly attribute DOMString animatorName;
 };
@@ -516,7 +519,7 @@ interface WorkletAnimation : Animation {
 
 
 <div algorithm="create-worklet-animation">
-<dfn constructor for=WorkletAnimation>WorkletAnimation(animatorName, effects, timeline, options)</dfn>
+<dfn constructor for=WorkletAnimation>WorkletAnimation(|animatorName|, |effects|, |timeline|, |options|)</dfn>
 
 Creates a new {{WorkletAnimation}} object using the following procedure.
 
@@ -628,7 +631,7 @@ To <dfn>disassociate animator instance of worklet animation</dfn> given
 <div algorithm="set-animator-instance">
 
 To <dfn>set animator instance of worklet animation</dfn> given
-|workletAnimation|, the user age <em>must</em> run the following steps:
+|workletAnimation|, the user agent <em>must</em> run the following steps:
 
   1. <a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
   2. <a>associate animator instance of worklet animation</a> given |workletAnimation|.
@@ -637,12 +640,12 @@ To <dfn>set animator instance of worklet animation</dfn> given
 
 When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
 <a>paused</a>, run the procedure to
-<a>associate a worklet animation with its animator instance</a> given |workletAnimation|.
+<a>associate animator instance of worklet animation</a> given |workletAnimation|.
 
 
 When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>,
 run the procedure to
-<a>disassociate a worklet animation with its animator instance</a> given |workletAnimation|.
+<a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
 
 When the procedure to <a>set the target effect of an animation</a> for a given |workletAnimation|
 is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
