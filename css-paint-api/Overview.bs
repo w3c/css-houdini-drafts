@@ -565,14 +565,8 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
         </div>
 
     12. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the paint {{Worklet}}.
-
-        The user agent <em>must</em> have, and select from at least two {{PaintWorkletGlobalScope}}s
-        in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>, unless the user agent is under
-        memory constraints.
-
-        Note: This is to ensure that authors do not rely on being able to store state on the global
-            object or non-regeneratable state on the class.
+        WorkletGlobalScopes</a> from the paint {{Worklet}}, following the rules defined in
+        [[#global-scope-selection]].
 
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         paint {{Worklet}}.
@@ -715,6 +709,23 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
 Note: The contents of the resulting image are not designed to be accessible. Authors can communicate
     any useful information through the standard accessibility APIs.
 </div>
+
+Global Scope Selection {#global-scope-selection}
+------------------------------------------------
+
+When the user agent needs to select a {{PaintWorkletGlobalScope}} from the paint <a>worklet's
+WorkletGlobalScopes</a> <a>list</a> it <em>must</em>:
+
+    - Select from at <em>least</em> two {{PaintWorkletGlobalScope}}s, unless the user agent is under
+        memory constraints.
+
+    - <em>Not</em> re-use the same {{PaintWorkletGlobalScope}} more than 1000 times in a row.
+
+        Note: The 1000 limit was picked as a high upper bound, this limit may improve (downwards)
+            over time.
+
+Note: These rules exist to ensure that authors do not rely on being able to store state on the
+    global object or non-regeneratable state on the class. See [[worklets-1#code-idempotency]].
 
 Examples {#examples}
 ====================
