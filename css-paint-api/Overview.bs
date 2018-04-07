@@ -430,6 +430,19 @@ Note: The initial state of the rendering context is set inside the <a>set bitmap
     <a>output bitmap</a>.
 </div>
 
+Drawing a CSSImageValue {#drawing-a-cssimagevalue}
+--------------------------------------------------
+
+The {{CanvasImageSource}} typedef is extended to also include the {{CSSImageValue}} type to be used
+as an image source.
+
+For interfaces which use the {{CanvasDrawImage}} mixin:
+     - When a {{CanvasImageSource}} object represents an {{CSSImageValue}}, the result of invoking
+         the value's underlying image algorithm must be used as the source image for the purposes of
+         {{CanvasDrawImage/drawImage}}.
+
+Note: This should eventually be moved to the canvas section of the HTML specification.
+
 Drawing an image {#drawing-an-image}
 ====================================
 
