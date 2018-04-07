@@ -176,23 +176,19 @@ it animates fully to close or open position depending on its current position.
 </div>
 
 <script>
-animationWorklet.addModule('hidey-bar-animator.js').then( _ => {
-  const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
-  const documentTimeline = document.timeline;
+animationWorklet.addModule('hidey-bar-animator.js');
+const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
+const documentTimeline = document.timeline;
 
 
-  var workletAnim = new WorkletAnimation('hidey-bar',
-    new KeyFrameEffect($header,
-                       [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
-                       {duration: 100, iterations: 1, fill: 'both' })
-    scrollTimeline, 
-    {scrollTimeline, documentTimeline},
-  );
-});
-
-
-workletAnim.timeline == scrollTimeline; // true
-
+const animation = new WorkletAnimation('hidey-bar',
+  new KeyFrameEffect($header,
+                      [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
+                      {duration: 100, iterations: 1, fill: 'both' })
+  scrollTimeline, 
+  {scrollTimeline, documentTimeline},
+);
+animation.play();
 </script>
 ```
 
@@ -246,21 +242,17 @@ sync with scroll offset.
 </div>
 
 <script>
-animationWorklet.addModule('twitter-header-animator.js').then( _ => {
-  const workletAnim = new WorkletAnimation('twitter-header',
-    [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
-                        [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
-                        {duration: 1, iterations: 1}),
-     new KeyFrameEffect($header, /* loses transparency as we scroll up */
-                        [{opacity: 0}, {opacity: 0.8}],
-                        {duration: 1, iterations: 1})] ,
-     new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
-  );
-
-  // Same animation instance is accessible via different animation targets
-  workletAnim == $avatarEl.getAnimations()[0] == $headerEl.getAnimations()[0];
-
-});
+await animationWorklet.addModule('twitter-header-animator.js');
+const animation = new WorkletAnimation('twitter-header',
+  [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
+                      [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
+                      {duration: 1000, iterations: 1}),
+    new KeyFrameEffect($header, /* loses transparency as we scroll up */
+                      [{opacity: 0}, {opacity: 0.8}],
+                      {duration: 1000, iterations: 1})] ,
+    new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
+);
+animation.play();
 </script>
 ```
 
@@ -285,6 +277,60 @@ registerAnimator('twitter-header', class {
   }
 });
 
+```
+
+### Parallax
+```html
+<style>
+.parallax {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+}
+</style>
+<div id='scrollingContainer'>
+  <div id="slow" class="parallax"></div>
+  <div id="fast" class="parallax"></div>
+</div>
+
+<script>
+await animationWorklet.addModule('parallax-animator.js');
+const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
+
+const slowParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_slow, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
+    scrollTimeline,
+    {rate : 0.4}
+);
+slowParallax.play();
+
+const fastParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_fast, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
+    scrollTimeline,
+    {rate : 0.8}
+);
+fastParallax.play();
+</script>
+
+```
+
+parallax-animator.js:
+
+```js
+// Inside AnimationWorkletGlobalScope.
+registerAnimator('parallax', class {
+  constructor(options) {
+    this.rate_ = options.rate;
+  }
+
+  animate(currentTime, effect) {
+    effect.localTime = currentTime * this.rate_;
+  }
+});
 ```
 
 

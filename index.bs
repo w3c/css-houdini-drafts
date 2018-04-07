@@ -751,22 +751,21 @@ animates fully to close or open position depending on its current position.
 </div>
 
 <script>
-animationWorklet.addModule('hidey-bar-animator.js').then( _ => {
-  const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
-  const documentTimeline = document.timeline;
+await animationWorklet.addModule('hidey-bar-animator.js');
+const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const documentTimeline = document.timeline;
 
-  // Note we pass in two timelines in the options bag which allows the animation to read their
-  // currenTime values directly.
-  const workletAnim = new WorkletAnimation('hidey-bar',
-        new KeyFrameEffect($header,
-                          [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
-                          {duration: 100, iterations: 1, fill: 'both' }]),
-        scrollTimeline,
-        {scrollTimeline, documentTimeline});
-});
+// Note we pass in two timelines in the options bag which allows the animation to read their
+// currenTime values directly.
+const animation = new WorkletAnimation(
+    'hidey-bar',
+    new KeyFrameEffect($header,
+                        [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
+                        {duration: 1000, iterations: 1, fill: 'both' }]),
+    scrollTimeline,
+    {scrollTimeline, documentTimeline});
 
-
-workletAnim.timeline == scrollTimeline; // true
+animation.play();
 </script>
 </xmp>
 
@@ -775,7 +774,6 @@ workletAnim.timeline == scrollTimeline; // true
 // Inside AnimationWorkletGlobalScope
 
 registerAnimator('hidey-bar', class {
-
   constructor(options) {
     this.scrollTimeline_ = options.scrollTimeline;
     this.documentTimeline_ = options.documentTimeline;
@@ -800,7 +798,7 @@ registerAnimator('hidey-bar', class {
       localTime = this.direction_ * (time - this.startTime_);
     }
 
-    // Drive the output effects by setting its local time.
+    // Drive the output effect by setting its local time.
     effect.localTime = localTime;
   }
 });
@@ -820,34 +818,34 @@ sync with scroll offset.
 
 
 <xmp class='lang-markup'>
-// In document scope
+// In document scope.
 <div id='scrollingContainer'>
   <div id='header' style='height: 150px'></div>
   <div id='avatar'><img></div>
 </div>
 
 <script>
-animationWorklet.addModule('twitter-header-animator.js').then( _ => {
-  const workletAnim = new WorkletAnimation('twitter-header',
+await animationWorklet.addModule('twitter-header-animator.js');
+const animation = new WorkletAnimation(
+    'twitter-header',
     [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
-                        [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
-                        {duration: 1, iterations: 1}),
-     new KeyFrameEffect($header, /* loses transparency as we scroll up */
-                        [{opacity: 0}, {opacity: 0.8}],
-                        {duration: 1, iterations: 1})],
-     new ScrollTimeline($scrollingContainer, {timeRange: 1, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
-  );
+                    [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
+                    {duration: 1000, iterations: 1}),
+    new KeyFrameEffect($header, /* loses transparency as we scroll up */
+                    [{opacity: 0}, {opacity: 0.8}],
+                    {duration: 1000, iterations: 1})],
+    new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}));
+animation.play();
 
-  // Same animation instance is accessible via different animation targets
-  workletAnim == $avatarEl.getAnimations()[0] == $headerEl.getAnimations()[0];
+// Since this animation is using a group effect, the same animation instance 
+// is accessible via different handles: $avatarEl.getAnimations()[0], $headerEl.getAnimations()[0]
 
-});
 </script>
 
 </xmp>
 
 <xmp class='lang-javascript'>
-// Ins AnimationWorkletGlobalScope.
+// Inside AnimationWorkletGlobalScope.
 registerAnimator('twitter-header', class {
   constructor(options) {
     this.timing_ = new CubicBezier('ease-out');
@@ -858,17 +856,66 @@ registerAnimator('twitter-header', class {
   }
 
   animate(currentTime, effect) {
-    const scroll = currentTime;  // scroll is in [0, 1] range
+    const scroll = currentTime;  // scroll is in [0, 1000] range
 
     // Drive the output group effect by setting its children local times individually.
     effect.children[0].localTime = scroll;
-    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 0.5));
+    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 500));
   }
 });
 </xmp>
 
 Example 3: Parallax backgrounds. {#example-3}
 -----------------------------------------
-<!-- Big Text: TODO -->
+A simple parallax background example.
 
-TODO
+<xmp class='lang-markup'>
+<style>
+.parallax {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+}
+</style>
+<div id='scrollingContainer'>
+  <div id="slow" class="parallax"></div>
+  <div id="fast" class="parallax"></div>
+</div>
+
+<script>
+await animationWorklet.addModule('parallax-animator.js');
+const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
+
+const slowParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_slow, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    scrollTimeline,
+    {rate : 0.4}
+);
+slowParallax.play();
+
+const fastParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_fast, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    scrollTimeline,
+    {rate : 0.8}
+);
+fastParallax.play();
+</script>
+
+</xmp>
+
+<xmp class='lang-javascript'>
+// Inside AnimationWorkletGlobalScope.
+registerAnimator('parallax', class {
+  constructor(options) {
+    this.rate_ = options.rate;
+  }
+
+  animate(currentTime, effect) {
+    effect.localTime = currentTime * this.rate_;
+  }
+});
+</xmp>
