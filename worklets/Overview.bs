@@ -3,7 +3,7 @@ Title:  Worklets Level 1
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/worklets/
-TR: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
+TR: http://www.w3.org/TR/worklets-1/
 Previous Version: http://www.w3.org/TR/2016/WD-worklets-1-20160607/
 Shortname: worklets
 Level: 1
