@@ -1,6 +1,6 @@
 <pre class='metadata'>
 Title:  CSS Layout API Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-layout-api-1/
 Shortname: css-layout-api
