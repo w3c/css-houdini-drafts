@@ -123,7 +123,7 @@ the <dfn>underlying values</dfn> of CSS,
 which various specification algorithms manipulate.
 
 Underlying values can't be directly manipulated,
-as they are implemenation-dependent;
+as they are implementation-dependent;
 UAs have to agree on how to *interpret* the underlying values,
 but the values themselves are purposely left undefined
 so that UAs can store and manipulate CSS
