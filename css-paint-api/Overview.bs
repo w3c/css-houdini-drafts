@@ -78,43 +78,6 @@ response to size / computed style changes with an additional <<image>> function.
 Note: In a future version of the spec, support could be added for defining the clip, global alpha,
     filter on a portion of a box (for example on the background layers).
 
-Paint Invalidation {#paint-invalidation}
-========================================
-
-Each <<paint()>> function for a box has an associated <dfn>paint valid flag</dfn>. It may be either
-<dfn>paint-valid</dfn> or <dfn>paint-invalid</dfn>. It is initially set to <a>paint-invalid</a>.
-
-<div algorithm>
-When the user agent wants to <dfn>invalidate paint functions</dfn> given |box|, the user agent
-<em>must</em> run the following steps:
-    1. For each <<paint()>> function on the |box|, perform the following steps:
-        1. Let |paintFunction| be the current <<paint()>> function on the |box|.
-
-        2. Let |name| be the first argument of the <<paint()>> function.
-
-        3. Let |documentPaintDefinitionMap| be the associated <a>document</a>'s <a>document paint
-            definitions</a> map.
-
-        4. Let |documentDefinition| be the result of <a>get</a>
-            |documentPaintDefinitionMap|[|name|].
-
-        5. Let |inputProperties| be |documentDefinition|'s <a for="document paint definition">input
-            properties</a> list.
-
-        6. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
-            changed, set the <a>paint valid flag</a> on the |paintFunction| to <a>paint-invalid</a>.
-</div>
-
-Performing <a>draw a paint image</a> results in the <a>paint valid flag</a> for a <<paint()>>
-function on a box to be set to <a>paint-valid</a>.
-
-<a>Invalidate paint functions</a> <em>must</em> be run when the user agent recalculates the computed
-style for a box.
-
-Note: In a future version of the spec, support could be added for partial invalidation. The user
-    agent will be able to specify a region of the rendering context which needs to be re-painted by
-    the paint class.
-
 Paint Worklet {#paint-worklet}
 ==============================
 
@@ -446,11 +409,14 @@ Note: This should eventually be moved to the canvas section of the HTML specific
 Drawing an image {#drawing-an-image}
 ====================================
 
-If a <<paint()>> function for a <a>box</a> is <a>paint-invalid</a> and the <a>box</a> is inside the
-visual viewport, then user agent <em>must</em> <a>draw a paint image</a> for the current frame.
+If a <<paint()>> function image for a <a>box</a> is within the visual viewport, the user agent
+<em>must</em> display an image output from an invocation of the <a>draw a paint image</a> algorithm.
 
-Note: The user agent can optionally defer drawing images which are <a>paint-invalid</a> and outside
-    the visual viewport.
+Note: The user agent doesn't have to run <a>draw a paint image</a> each frame for a <<paint()>>
+    function within the visual viewport. It can cache results, (potentially using additional
+    invalidation steps) to display the correct image output.
+
+Note: The user agent can optionally defer drawing images which are outside the visual viewport.
 
 <div class="example">
     If an author updates a style inside a <code>requestAnimationFrame</code>, e.g.
@@ -510,38 +476,28 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
     1. Let |paintFunction| be the <<paint()>> function on the |box| which the user agent wants to
         draw.
 
-    2. If the <a>paint valid flag</a> for the |paintFunction| is <a>paint-valid</a>, and the
-        previous invocation had the same |snappedConcreteObjectSize|, the user agent <em>may</em> use the
-        drawn image from the previous invocation. If so it <em>may</em> abort all these steps and
-        use the previously drawn image.
+    2. Let |name| be the first argument of the |paintFunction|.
 
-        Note: The user agent for implementation reasons may also continue with all these steps in
-            this case. It can do this every frame, or multiple times per frame.
-
-    3. Set the <a>paint valid flag</a> for the |paintFunction| to <a>paint-valid</a>.
-
-    4. Let |name| be the first argument of the |paintFunction|.
-
-    5. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
+    3. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
         definitions</a> map.
 
-    6. If |documentPaintDefinitionMap|[|name|] does not <a for=map>exist</a>, let the image output
+    4. If |documentPaintDefinitionMap|[|name|] does not <a for=map>exist</a>, let the image output
         be an <a>invalid image</a> and abort all these steps.
 
-    7. Let |documentDefinition| be the result of <a for=map>get</a>
+    5. Let |documentDefinition| be the result of <a for=map>get</a>
         |documentPaintDefinitionMap|[|name|].
 
-    8. If |documentDefinition| is <code>"invalid"</code>, let the image output be an <a>invalid
+    6. If |documentDefinition| is <code>"invalid"</code>, let the image output be an <a>invalid
         image</a> and abort all these steps.
 
-    9. Let |inputArgumentSyntaxes| be |documentDefinition|'s <a for="document paint
+    7. Let |inputArgumentSyntaxes| be |documentDefinition|'s <a for="document paint
         definition">input argument syntaxes</a>.
 
-    10. Let |inputArguments| be the <a>list</a> of all the |paintFunction| arguments <em>after</em>
+    8. Let |inputArguments| be the <a>list</a> of all the |paintFunction| arguments <em>after</em>
         the "paint name" argument.
 
-    11. If |inputArguments| do not match the registered grammar given by |inputArgumentSyntaxes|,
-        let the image output be an <a>invalid image</a> and abort all these steps.
+    9. If |inputArguments| do not match the registered grammar given by |inputArgumentSyntaxes|, let
+        the image output be an <a>invalid image</a> and abort all these steps.
 
         <div class=example>
             This step may fail in the following cases:
@@ -577,14 +533,14 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
             arguments.
         </div>
 
-    12. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
+    10. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the paint {{Worklet}}, following the rules defined in
         [[#global-scope-selection]].
 
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         paint {{Worklet}}.
 
-    13. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |snappedConcreteObjectSize|,
+    11. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |snappedConcreteObjectSize|,
         |workletGlobalScope| optionally <a>in parallel</a>.
 
         Note: If the user agent runs <a>invoke a paint callback</a> on a thread <a>in parallel</a>,
