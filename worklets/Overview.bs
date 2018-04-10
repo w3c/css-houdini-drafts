@@ -206,7 +206,7 @@ Note:
 ### Creating a WorkletGlobalScope ### {#creating-a-workletglobalscope}
 
 <div algorithm>
-When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGlobalScopeType|,
+When a user agent is to <dfn export>create a WorkletGlobalScope</dfn>, given |workletGlobalScopeType|,
 |moduleResponsesMap|, and |outsideSettings|, it <em>must</em> run the following steps:
 
     1. Create the <a>worklet global scope execution environment</a> and run the rest of these steps
@@ -252,7 +252,7 @@ When a user agent is to <dfn>create a WorkletGlobalScope</dfn>, given |workletGl
 ### Script settings for worklets ### {#script-settings-for-worklets}
 
 <div algorithm>
-When a user agent is to <dfn>set up a worklet environment settings object</dfn>, given a
+When a user agent is to <dfn export>set up a worklet environment settings object</dfn>, given a
 |executionContext|, and |outsideSettings|, it must run the following steps:
     1. Let |inheritedResponsibleBrowsingContext| be |outsideSettings|'s <a>responsible browsing
         context</a>.
