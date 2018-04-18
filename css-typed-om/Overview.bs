@@ -9,7 +9,7 @@ Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
 Shortname: css-typed-om
 Level: 1
 Abstract: Converting CSSOM value strings into meaningfully typed JavaScript representations and back can incur a significant performance overhead. This specification exposes CSS values as typed JavaScript objects to facilitate their performant manipulation.
-Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts

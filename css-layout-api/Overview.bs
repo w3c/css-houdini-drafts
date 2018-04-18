@@ -9,7 +9,7 @@ Abstract:
 Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
-Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Editor: Robert O'Callahan, robert@ocallahan.org
 Editor: Rossen Atanassov, rossen.atanassov@microsoft.com, w3cid 49885
 Ignored Terms: LayoutWorklet
@@ -760,7 +760,7 @@ percentages should be resolved against while performing layout.
 
 The {{LayoutConstraints}} has a {{LayoutConstraints/blockFragmentationType}} attribute. The
 <a>current layout</a> should produce a {{LayoutFragment}} which fragments at the
-{{LayoutConstraints/blockFragmentationOffset}} if possible. 
+{{LayoutConstraints/blockFragmentationOffset}} if possible.
 
 The <a>current layout</a> can choose not to fragment a {{LayoutChild}} based on the
 {{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like

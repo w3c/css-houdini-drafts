@@ -10,7 +10,7 @@ Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Editor: Peter Linss, peter.linss@hp.com, w3cid 4200
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 Editor: Rossen Atanassov, rossen.atanassov@microsoft.com, w3cid 49885
-Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 </pre>
 
 <pre class='link-defaults'>

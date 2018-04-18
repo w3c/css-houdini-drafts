@@ -10,10 +10,10 @@ Shortname: css-properties-values-api
 Level: 1
 Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
-Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com, w3cid 13329
 Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
-Editor: Elliot Sprehn, esprehn@chromium.org
+Former Editor: Elliot Sprehn, esprehn@chromium.org
 Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
 Ignored Terms: boolean, Animatable, Map, Context, isolated worker, SyntaxError,
 Ignored Terms: InvalidModificationError, NotFoundError, StylePropertyMapReadOnly,

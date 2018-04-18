@@ -6,7 +6,8 @@ ED: https://drafts.css-houdini.org/css-typed-om-1/
 Shortname: css-typed-om-2
 Level: 2
 Abstract:
-Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Editor: NOBODY, OOPS!
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Repository: w3c/css-houdini-drafts
 </pre>
 
