@@ -2,6 +2,7 @@
 Title:  CSS Layout API Level 1
 Status: ED
 Group: houdini
+TR: https://www.w3.org/TR/css-layout-api-1/
 ED: https://drafts.css-houdini.org/css-layout-api-1/
 Shortname: css-layout-api
 Level: 1
