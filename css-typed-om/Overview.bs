@@ -4,6 +4,7 @@ Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 TR: https://www.w3.org/TR/css-typed-om-1/
+Previous Version: https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/
 Previous Version: https://www.w3.org/TR/2017/WD-css-typed-om-1-20170801/
 Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
 Shortname: css-typed-om
