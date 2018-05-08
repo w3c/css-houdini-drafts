@@ -329,7 +329,7 @@ interface Worklet {
 };
 
 dictionary WorkletOptions {
-    RequestCredentials credentials = "omit";
+    RequestCredentials credentials = "same-origin";
 };
 </pre>
 
