@@ -1649,10 +1649,10 @@ rather than on {{CSSNumericValue}} instances.
 
 ### Numeric Value Typing ### {#numeric-typing}
 
-Each {{CSSNumericValue}} has an associated <dfn for=CSSNumericValue>type</dfn>,
+Each {{CSSNumericValue}} has an associated <dfn export for=CSSNumericValue>type</dfn>,
 which is a [=ordered map|map=] of [=base types=] to integers,
 and an associated [=percent hint=].
-The <dfn for=CSSNumericValue lt="base type">base types</dfn> are
+The <dfn export for=CSSNumericValue lt="base type">base types</dfn> are
 "length",
 "angle",
 "time",
@@ -1661,11 +1661,11 @@ The <dfn for=CSSNumericValue lt="base type">base types</dfn> are
 "flex",
 and "percent".
 The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
-The <dfn for=CSSNumericValue>percent hint</dfn>
+The <dfn export for=CSSNumericValue>percent hint</dfn>
 is either null or a [=base type=] other than "percent".
 
 <div algorithm>
-    To <dfn lt="create a type|creating a type">create a type</dfn> from a string |unit|,
+    To <dfn export for="CSSNumericValue" lt="create a type|creating a type">create a type</dfn> from a string |unit|,
     follow the appropriate branch of the following:
 
     <dl class=switch>
@@ -1693,7 +1693,7 @@ is either null or a [=base type=] other than "percent".
 </div>
 
 <div algorithm>
-    To <dfn local-lt="add | addition">add two types</dfn> |type1| and |type2|,
+    To <dfn export for=CSSNumericValue local-lt="add | addition">add two types</dfn> |type1| and |type2|,
     perform the following steps:
 
     1. Replace |type1| with a fresh copy of |type1|,
@@ -1774,7 +1774,7 @@ is either null or a [=base type=] other than "percent".
 </div>
 
 <div algorithm>
-    To <dfn for=CSSNumericValue local-lt="multiply | multiplication">multiply two types</dfn> |type1| and |type2|,
+    To <dfn export for=CSSNumericValue local-lt="multiply | multiplication">multiply two types</dfn> |type1| and |type2|,
     perform the following steps:
 
     1. Replace |type1| with a fresh copy of |type1|,
@@ -1805,7 +1805,7 @@ is either null or a [=base type=] other than "percent".
     5. Return |finalType|.
 </div>
 
-A [=type=] is said to <dfn for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
+A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
 
 * A [=type=] matches <<length>>
     if its only non-zero [=map/entry=] is «[ "length" → 1 ]»
