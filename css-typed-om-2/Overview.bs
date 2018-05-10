@@ -3,7 +3,7 @@ Title:  CSS Typed OM Level 2
 Status: DREAM
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
-Shortname: css-typed-om-2
+Shortname: css-typed-om
 Level: 2
 Abstract:
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
