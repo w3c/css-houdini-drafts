@@ -74,7 +74,6 @@ dictionary PropertyDescriptor {
 
 partial interface CSS {
 	static void registerProperty(PropertyDescriptor descriptor);
-	static void unregisterProperty(DOMString name);
 };
 </pre>
 
@@ -100,7 +99,7 @@ following members:
 :   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
 ::  The initial value of this custom property.
 
-The {{registerProperty()}} and {{unregisterProperty()}} functions {#the-registerproperty-function}
+The {{registerProperty()}} function {#the-registerproperty-function}
 --------------------------------------------------------------------------------------------------
 
 The <dfn method for=CSS>registerProperty(PropertyDescriptor descriptor)</dfn> method
@@ -230,38 +229,7 @@ the process via which specified values for that property are turned into compute
 is defined fully by the type selected,
 as described in [[#calculation-of-computed-values]].
 
-Properties can be unregistered using
-<dfn method for=CSS>unregisterProperty(DOMString name)</dfn>.
-When it is called,
-it executes the <a>unregister a custom property</a> algorithm,
-with a <code>name</code> set to its sole argument.
-
-<div algorithm>
-	To <dfn>unregister a custom property</dfn> with the name |name|:
-
-	1. Let |property set|
-		be the value of the
-		<a>current global object's</a>
-		<a>associated <code>Document</code></a>'s
-		{{[[registeredPropertySet]]}} slot.
-
-	2. Attempt to parse |name|
-		as a <<custom-property-name>>.
-		If this fails,
-		<a>throw</a> a {{SyntaxError}}
-		and exit this algorithm.
-
-		Otherwise,
-		let |parsed name| be the parsed value.
-
-	3. If |property set|
-		contains a record with a property name matching |parsed name|
-		(compared codepoint-wise),
-		remove the record from |property set|.
-
-		Otherwise,
-		<a>throw</a> a {{NotFoundError}}.
-</div>
+	Note: A way to unregister properties may be added in the future.
 
 When the <a>current global object's</a> <a>associated <code>Document</code></a>'s {{[[registeredPropertySet]]}} changes,
 previously syntactically invalid property values can become valid and vice versa.
