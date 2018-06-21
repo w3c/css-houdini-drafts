@@ -36,12 +36,15 @@ Ignored Terms: PaintWorklet
 <pre class="link-defaults">
 spec:css-break-3; type:dfn; text:fragment
 spec:css-display-3; type:dfn; text:box
+spec:css-ui-4; type:property; text:cursor
 spec:infra; type:dfn; text:list
 </pre>
 
 <pre class="anchors">
 urlPrefix: https://heycam.github.io/webidl/; type: dfn;
     text: InvalidModificationError
+    urlPrefix: #common-;
+        text: Function
     urlPrefix: #dfn-;
         url: throw; text: thrown
     urlPrefix: #idl-;
@@ -62,7 +65,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: IsConstructor
     url: ecmascript-data-types-and-values; text: type
     url: get-o-p; text: Get
-    url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
 </pre>
@@ -140,7 +142,8 @@ A <dfn>paint definition</dfn> is a <a>struct</a> which describes the information
 
  - <dfn for="paint definition">class constructor</dfn> which is the class <a>constructor</a>.
 
- - <dfn for="paint definition">paint function</dfn> which is the paint <a>function</a> callback.
+ - <dfn for="paint definition">paint function</dfn> which is the paint <a>Function</a>
+     <a>callback function</a> type.
 
  - <dfn for="paint definition">constructor valid flag</dfn>.
 
@@ -240,10 +243,10 @@ called, the user agent <em>must</em> run the following steps:
     16. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    17. Let |paint| be the result of <a>Get</a>(|prototype|, "paint").
+    17. Let |paintValue| be the result of <a>Get</a>(|prototype|, "paint").
 
-    18. If the result of <a>IsCallable</a>(|paint|) is false, <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
+    18. Let |paint| be the result of <a>converting</a> |paintValue| to the <a>Function</a>
+        <a>callback function</a> type. Rethrow any exceptions from the conversion.
 
     19. Let |definition| be a new <a>paint definition</a> with:
 
