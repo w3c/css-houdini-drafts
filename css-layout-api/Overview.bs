@@ -125,7 +125,7 @@ For example, floats do not intrude into the layout API container, and the layout
 margins do not collapse with the margins of its contents.
 
 All inflow children of a <a>layout API container</a> are called <dfn>layout API children</dfn> and
-are laid out using the auther defined layout.
+are laid out using the author defined layout.
 
 <a>Layout API containers</a> form a containing block for their contents
 <a href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
