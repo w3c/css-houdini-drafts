@@ -198,6 +198,9 @@ called, the user agent <em>must</em> run the following steps:
         <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
         exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
+    7. Filter |inputProperties| so that it only contains <a>supported CSS properties</a> and
+        <a>custom properties</a>.
+
     Note: The list of CSS properties provided by the input properties getter can either be custom or
         native CSS properties.
 
@@ -207,17 +210,17 @@ called, the user agent <em>must</em> run the following steps:
         also contains currently invalid properties for the user agent. For example
         <code>margin-bikeshed-property</code>.
 
-    7. Let |inputArguments| be an empty <code>sequence&lt;DOMString></code>.
+    8. Let |inputArguments| be an empty <code>sequence&lt;DOMString></code>.
 
-    8. Let |inputArgumentsIterable| be the result of <a>Get</a>(|paintCtor|, "inputArguments").
+    9. Let |inputArgumentsIterable| be the result of <a>Get</a>(|paintCtor|, "inputArguments").
 
-    9. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
+    10. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
         <a>converting</a> |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
         execption is thrown, rethrow the execption and abort all these steps.
 
-    10. Let |inputArgumentSyntaxes| be an <a for=list>empty</a> <a>list</a>.
+    11. Let |inputArgumentSyntaxes| be an <a for=list>empty</a> <a>list</a>.
 
-    11. <a for=list>For each</a> |item| in |inputArguments| perform the following substeps:
+    12. <a for=list>For each</a> |item| in |inputArguments| perform the following substeps:
 
         1. Let |parsedSyntax| be the result of parsing |item| according to the rules in
             [[css-properties-values-api-1#supported-syntax-strings]]. If it fails to parse
@@ -225,9 +228,9 @@ called, the user agent <em>must</em> run the following steps:
 
         2. <a for=list>Append</a> |parsedSyntax| to |inputArgumentSyntaxes|.
 
-    12. Let |contextOptionsValue| be the result of <a>Get</a>(|paintCtor|, "contextOptions").
+    13. Let |contextOptionsValue| be the result of <a>Get</a>(|paintCtor|, "contextOptions").
 
-    13. Let |paintRenderingContext2DSettings| be the result of <a>converting</a>
+    14. Let |paintRenderingContext2DSettings| be the result of <a>converting</a>
         |contextOptionsValue| to a {{PaintRenderingContext2DSettings}}.
         If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
 
@@ -235,20 +238,20 @@ called, the user agent <em>must</em> run the following steps:
             to anti-alias text in addition to performing "visibility" optimizations, e.g. not
             painting an image behind the paint image as the paint image is opaque.
 
-    14. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    15. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    15. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    16. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
 
-    16. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    17. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
-    17. Let |paintValue| be the result of <a>Get</a>(|prototype|, "paint").
+    18. Let |paintValue| be the result of <a>Get</a>(|prototype|, "paint").
 
-    18. Let |paint| be the result of <a>converting</a> |paintValue| to the <a>Function</a>
+    19. Let |paint| be the result of <a>converting</a> |paintValue| to the <a>Function</a>
         <a>callback function</a> type. Rethrow any exceptions from the conversion.
 
-    19. Let |definition| be a new <a>paint definition</a> with:
+    20. Let |definition| be a new <a>paint definition</a> with:
 
         - <a>class constructor</a> being |paintCtor|.
 
@@ -260,9 +263,9 @@ called, the user agent <em>must</em> run the following steps:
 
         - <a for="paint definition">PaintRenderingContext2DSettings object</a> being |paintRenderingContext2DSettings|.
 
-    20. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
+    21. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
 
-    21. <a>Queue a task</a> to run the following steps:
+    22. <a>Queue a task</a> to run the following steps:
 
         1. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
             definitions</a> <a>map</a>.
