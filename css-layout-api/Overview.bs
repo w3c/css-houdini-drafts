@@ -125,7 +125,7 @@ For example, floats do not intrude into the layout API container, and the layout
 margins do not collapse with the margins of its contents.
 
 All inflow children of a <a>layout API container</a> are called <dfn>layout API children</dfn> and
-are laid out using the auther defined layout.
+are laid out using the author defined layout.
 
 <a>Layout API containers</a> form a containing block for their contents
 <a href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
@@ -138,7 +138,7 @@ The 'overflow' property applies to <a>layout API containers</a>. This is discuss
 [[#interaction-overflow]].
 
 As the layout is entirely up to the author, properties which are used in other layout modes (e.g.
-flex, block) may not apply. For example an author may not repect the 'margin' property on children.
+flex, block) may not apply. For example an author may not respect the 'margin' property on children.
 
 Layout API Container Painting {#painting}
 -----------------------------------------
