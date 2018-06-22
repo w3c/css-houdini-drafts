@@ -138,7 +138,7 @@ The 'overflow' property applies to <a>layout API containers</a>. This is discuss
 [[#interaction-overflow]].
 
 As the layout is entirely up to the author, properties which are used in other layout modes (e.g.
-flex, block) may not apply. For example an author may not repect the 'margin' property on children.
+flex, block) may not apply. For example an author may not respect the 'margin' property on children.
 
 Layout API Container Painting {#painting}
 -----------------------------------------
