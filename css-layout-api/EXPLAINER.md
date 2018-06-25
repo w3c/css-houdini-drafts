@@ -221,8 +221,8 @@ fragment.blockSize;
 fragment.alignmentBaseline;
 
 // We can set the offset relative to the current layout.
-frgment.inlineOffset = 10;
-frgment.blockOffset = 20;
+fragment.inlineOffset = 10;
+fragment.blockOffset = 20;
 ```
 
 In step (3) we do some additional book-keeping to keep track of the largest child fragment so far.
