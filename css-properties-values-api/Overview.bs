@@ -91,7 +91,7 @@ following members:
 ::  The name of the custom property being defined.
 
 :   <dfn dict-member for=PropertyDescriptor>syntax</dfn>
-::  A string representing how this custom property is parsed.
+::  A string representing how this custom property is parsed to obtain its computed value.
 
 :   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
@@ -233,7 +233,7 @@ as described in [[#calculation-of-computed-values]].
 
 When the <a>current global object's</a> <a>associated <code>Document</code></a>'s {{[[registeredPropertySet]]}} changes,
 previously syntactically invalid property values can become valid and vice versa.
-This can change the set of <a>declared values</a> which requires the <a>cascade</a> to be recomputed.
+This can change the <a>computed values</a> of registered custom properties and properties which reference them, which requires the <a>cascade</a> to be recomputed.
 
 <div class='example'>
 	By default, all custom property declarations that can be parsed as a sequence of tokens
@@ -261,15 +261,31 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	CSS.registerProperty({
 		name: "--my-color",
 		syntax: "&lt;color>",
+		inherits: false,
 		initialValue: "black"
 	});
 	</pre>
 
-	then the second '--my-color' declaration becomes syntactically invalid at parse time,
-	and is ignored.
-	The first '--my-color' is the only valid declaration left for the property,
-	so 'color' is set to the value ''green''.
+	the second '--my-color' declaration *does not* become syntactically invalid
+	at parse time, as we syntax-check only at computed-value time.
+	The specified value for '--my-color' remains ''url("not-a-color")'' as in
+	the previous example, and so its declaration is found to be
+	<a spec=css-variables>invalid at computed-value time</a> (hence the computed
+	value for '--my-color' is calculated as if the specified value were
+	''unset'').
+
+	Note that unlike in the previous example where '--my-color' was
+	not a registered custom property, ''unset'' in this case will not act the
+	same as ''inherit'', as registered custom properties can either be
+	inherited or uninherited, and '--my-color' has been registered as
+	uninherited. Instead, ''unset'' will act as ''initial'', and the computed
+	value of '--my-color' will be 'black', the initial value given in the
+	custom property registration.
+
+	The variable reference to '--my-color' in the declaration for 'color' is
+	then resolved to 'black', so 'color' is set to the value 'black'.
 </div>
+
 
 Supported syntax strings {#supported-syntax-strings}
 ----------------------------------------------------
@@ -402,6 +418,11 @@ matches to the specified value.
 
 For list values, the computed value is a list of the computed values of the
 primitives in the list.
+
+The specified value for a registered custom property is syntax-checked at
+computed-value time, not during parse time.
+If a specified value is syntactically invalid, the declaration is found to be
+<a spec=css-variables>invalid at computed-value time.</a>
 
 Behavior of Custom Properties {#behavior-of-custom-properties}
 ==============================================================
