@@ -383,9 +383,19 @@ For &lt;length-percentage> values, the computed value is one of the following:
 *   otherwise, the computed value is a calc expression containing an absolute
 	length expressed in pixels, and a percentage value.
 
-For &lt;custom-ident>, ident, &lt;color>, &lt;image>, &lt;url>, &lt;integer>,
+For &lt;custom-ident>, ident, &lt;color>, &lt;integer>,
 &lt;angle>, &lt;time>, &lt;resolution> or "*" values, the
 computed value is as specified.
+
+For &lt;url> values, the computed value is one of the following:
+
+*   if the URL is a relative URL, the computed value is the resolved absolute URL
+    as described in [[!css3-values]].
+*   otherwise, the computed value is as specified.
+
+For &lt;image> values, the computed value is as specified, except that relative
+URLs that appear in the value are resolved to absolute URLs as described in
+[[!css3-values]].
 
 For &lt;number> and &lt;percentage> values which are not calc expressions, the
 computed value is as specified. Calc expressions that are
@@ -437,6 +447,48 @@ supported by a given custom property, the type registered for the custom propert
 ignored and any value consisting of at least one token is considered valid.
 
 Issue(118): should @supports pay attention to type when considering custom properties?
+
+Relative URLs {#relative-urls}
+------------------------------
+
+Relative URL values that appear in registered custom properties are resolved
+to full URLs as described in [[!css3-values]].
+
+<div class='example'>
+	Because URLs resolve against the base URL of the stylesheet they appear in, we can
+	end up with multiple relative URLs that resolve against different base URLs, even though
+	they appear in the same property.
+
+	For example, suppose '--url-foo' and '--url-bar' are registered
+	custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
+	<code>/style/foo/foo.css</code>:
+
+	<pre class='lang-css'>
+	div {
+		--url-foo: url("foo.png");
+	}
+	</pre>
+
+	and another stylesheet at <code>/style/bar/bar.css</code>
+	<pre class='lang-css'>
+	div {
+		--url-bar: url("bar.png");
+	}
+	</pre>
+
+	and finally a document at <code>/index.html</code>:
+	<pre class='lang-html'>
+	&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
+	&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
+	&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+	&lt;/div>
+	</pre>
+
+	Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
+	<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
+	against <code>/style/bar</code>.
+
+</div>
 
 Examples {#examples}
 ====================
