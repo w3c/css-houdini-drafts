@@ -68,7 +68,7 @@ Registering custom properties {#registering-custom-properties}
 dictionary PropertyDescriptor {
 	required DOMString name;
 	         DOMString syntax       = "*";
-	         boolean   inherits     = false;
+	required boolean   inherits;
 	         DOMString initialValue;
 };
 
@@ -191,9 +191,7 @@ as arguments of the same names.
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
-	5. If |inherits| is present,
-		set |inherit flag| to its value.
-		Otherwise, set |inherit flag| to false.
+	5. Set |inherit flag| to the value of |inherits|.
 
 	6. Let |registered property| be a record
 		with a property name of |parsed name|,
