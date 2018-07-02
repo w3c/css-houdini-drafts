@@ -229,9 +229,15 @@ as described in [[#calculation-of-computed-values]].
 
 	Note: A way to unregister properties may be added in the future.
 
-When the <a>current global object's</a> <a>associated <code>Document</code></a>'s {{[[registeredPropertySet]]}} changes,
-previously syntactically invalid property values can become valid and vice versa.
-This can change the set of <a>declared values</a> which requires the <a>cascade</a> to be recomputed.
+Registering a custom property must <strong>not</strong> affect the [=cascade=] in any way.
+Regardless of what syntax is specified for a registered property,
+at parse time it is still parsed as normal for a [=custom property=],
+accepting nearly anything.
+If the [=specified value=] for a registered [=custom property=]
+violates the registered syntax,
+however,
+the property becomes [=invalid at computed-value time=]
+(and thus resets to the registered initial value).
 
 <div class='example'>
 	By default, all custom property declarations that can be parsed as a sequence of tokens
@@ -249,9 +255,11 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	The second '--my-color' declaration overrides the first at parse time (both are valid),
 	and the ''var()'' reference in the 'color' property is found to be <a spec=css-variables>invalid at computed-value time</a>
 	(because ''url("not-a-color")'' is not a color).
-	At this stage of the CSS pipeline (computation time), the only available fallback is the initial value
-	of the property, which in the case of color is ''inherit''. Although there was a valid usable value
-	(green), this was removed during parsing because it was superseded by the URL.
+	At this stage of the CSS pipeline (computation time),
+	the only available fallback is the initial value of the property,
+	which in the case of color is ''inherit''.
+	Although there was a valid usable value (green),
+	this was removed during parsing because it was superseded by the URL.
 
 	If we call:
 
@@ -259,14 +267,18 @@ This can change the set of <a>declared values</a> which requires the <a>cascade<
 	CSS.registerProperty({
 		name: "--my-color",
 		syntax: "&lt;color>",
-		initialValue: "black"
+		initialValue: "black",
+		inherits: false
 	});
 	</pre>
 
-	then the second '--my-color' declaration becomes syntactically invalid at parse time,
-	and is ignored.
-	The first '--my-color' is the only valid declaration left for the property,
-	so 'color' is set to the value ''green''.
+	the parsing doesn't significantly change,
+	regardless of whether the registration occurs before or after the stylesheet above.
+	The only difference is that it's the '--my-color' property that becomes [=invalid at computed-value time=] instead
+	and gets set to its initial value of ''black'';
+	then 'color' is validly set to ''black'',
+	rather than being [=invalid at computed-value time=]
+	and becoming ''inherit''.
 </div>
 
 Supported syntax strings {#supported-syntax-strings}
