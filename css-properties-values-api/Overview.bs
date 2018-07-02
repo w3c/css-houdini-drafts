@@ -274,54 +274,66 @@ Supported syntax strings {#supported-syntax-strings}
 
 The following syntax strings are supported:
 
-:   "&lt;length>"
-::  Any valid <<length>> value
-:   "&lt;number>"
-::  <<number>> values
-:   "&lt;percentage>"
-::  Any valid <<percentage>> value
-:   "&lt;length-percentage>"
-::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
-	expression combining <<length>> and <<percentage>> components.
-:   "&lt;color>"
-::  Any valid <<color>> value
-:   "&lt;image>"
-::  Any valid <<image>> value
-:   "&lt;url>"
-::  Any valid <<url>> value
-:   "&lt;integer>"
-::  Any valid <<integer>> value
-:   "&lt;angle>"
-::  Any valid <<angle>> value
-:   "&lt;time>"
-::  Any valid <<time>> value
-:   "&lt;resolution>"
-::  Any valid <<resolution>> value
+:   Primitive Terms
+::  The following syntax strings are primitive terms that can be 
+    combined as described below:
+
+		:   "&lt;length>"
+		::  Any valid <<length>> value
+		:   "&lt;number>"
+		::  <<number>> values
+		:   "&lt;percentage>"
+		::  Any valid <<percentage>> value
+		:   "&lt;length-percentage>"
+		::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
+			  expression combining <<length>> and <<percentage>> components.
+		:   "&lt;color>"
+		::  Any valid <<color>> value
+		:   "&lt;image>"
+		::  Any valid <<image>> value
+		:   "&lt;url>"
+		::  Any valid <<url>> value
+		:   "&lt;integer>"
+		::  Any valid <<integer>> value
+		:   "&lt;angle>"
+		::  Any valid <<angle>> value
+		:   "&lt;time>"
+		::  Any valid <<time>> value
+		:   "&lt;resolution>"
+		::  Any valid <<resolution>> value
+		:   "&lt;transform-function>"
+		::  Any valid <<transform-function>> value
+		:   "&lt;custom-ident>"
+		::  Any valid <<custom-ident>> value
+		:   Any sequence consisting of a <a>name-start code point</a>,
+			  followed by zero or more <a>name code points</a>,
+			  which matches the <<custom-ident>> production
+		::  That identifier
+
+		Note: <<custom-ident>>s are compared codepoint-wise with each other;
+		this is different than the normal behavior of UA-defined CSS
+		which limits itself to ASCII
+		and is <a>ASCII case-insensitive</a>.
+		So, specifying an ident like <code>Red</code>
+		means that the precise value ''Red'' is accepted;
+		''red'', ''RED'', and any other casing variants are not matched by this.
+		It is recommended that idents be restricted to ASCII and written in lower-case,
+		to match CSS conventions.
+
+
 :   "&lt;transform-list>"
-::  A list of valid <<transform-function>> values
-:   "&lt;custom-ident>"
-::  Any valid <<custom-ident>> value
-:   Any sequence consisting of a <a>name-start code point</a>,
-	followed by zero or more <a>name code points</a>,
-	which matches the <<custom-ident>> production
-::  That identifier
+::  A list of valid <<transform-function>> values. This is a convenience
+    production which is equivalent to "&lt;transform-function>+"
 
-	Note: <<custom-ident>>s are compared codepoint-wise with each other;
-	this is different than the normal behavior of UA-defined CSS
-	which limits itself to ASCII
-	and is <a>ASCII case-insensitive</a>.
-	So, specifying an ident like <code>Red</code>
-	means that the precise value ''Red'' is accepted;
-	''red'', ''RED'', and any other casing variants are not matched by this.
-	It is recommended that idents be restricted to ASCII and written in lower-case,
-	to match CSS conventions.
-
-:   One of the preceding strings, followed by '+'
+:   Any primitive term followed by '+'
 ::  A space-separated list of one or more repetitions of the type specified by the string.
 	Note: Since &lt;transform-list> is already a space separated list, &lt;transform-list>+
 	is invalid.
 
-:   Any combination of the preceding, separated by '|'
+:   Any primitive term followed by '#'
+::  A comma-separated list of one or more repetitions of the type specified by the string.
+
+:   Any combination of terms separated by '|'
 ::  Any value that matches one of the items in the combination, matched in specified order.
 
 	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
