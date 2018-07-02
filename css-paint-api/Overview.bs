@@ -1018,3 +1018,5 @@ do not appear in the {{StylePropertyMapReadOnly}} provided to the paint function
 			(<a href="https://github.com/w3c/css-houdini-drafts/issues/523">Issue 523</a>)
   </ul>
 
+A <a href="https://drafts.css-houdini.org/css-paint-api-1/issues-list-2018-04-10">Disposition of Comments</a> is available.
+
