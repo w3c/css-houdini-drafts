@@ -205,6 +205,18 @@ and return the result.
         Otherwise,
         let |whole value| be the parsed result.
 
+        <div class='note'>
+            The behavior of custom properties are different when modified via JavaScript 
+            than when defined in style sheets.
+
+            When a custom property is defined with an invalid syntax in a style sheet,
+            then the value is recorded as "unset", to avoid having to reparse every style sheet when a custom property is registered.
+            
+            Conversely, when a custom property is modified via the JavaScript API, 
+            any parse errors are propagated to the progamming environment via a {{TypeError}}.
+            This allows more immediate feedback of errors to developers.
+        </div>
+
     4. [=Subdivide into iterations=] |whole value|,
         according to |property|,
         and let |values| be the result.
