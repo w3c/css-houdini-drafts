@@ -1,0 +1,38 @@
+Draft:    https://www.w3.org/TR/2018/WD-css-paint-api-1-20180410/
+Title:    CSS Paint API Level 1
+
+----
+Issue 1.
+Summary:  Filter out unsupported properties from inputProperties.
+From:     Darren Shen
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/523
+Response: https://github.com/w3c/css-houdini-drafts/issues/523#issuecomment-351219067
+Changes:  https://github.com/w3c/css-houdini-drafts/commit/50fa9b8bedde46462113d756d6895701d3d743d0
+Closed:   Accepted
+Resolved: Editor discretion
+----
+Issue 2.
+Summary:  Allow inputArguments define optional arguments.
+From:     zheeeng
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/763
+Response: https://github.com/w3c/css-houdini-drafts/issues/763#issuecomment-401653404
+Closed:   Deferred
+----
+Issue 3.
+Summary:  Need to convert paint function to WebIDL Function type.
+From:     Shiino Yuki
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/743
+Response: https://github.com/w3c/css-houdini-drafts/issues/743#issuecomment-379738324
+Changes:  https://github.com/w3c/css-houdini-drafts/commit/f9f174dca09f5149c3df558d1c8e74517df19f5e
+Closed:   Accepted
+Resolved: https://lists.w3.org/Archives/Public/public-houdini/2018Apr/0002.html
+----
+Issue 4.
+Summary:  Use WebIDL callback interface inside of registerPaint.
+From:     Shiino Yuki
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/743
+Response: https://github.com/w3c/css-houdini-drafts/issues/743#issuecomment-379738324
+Closed:   Rejected
+Resolved: https://lists.w3.org/Archives/Public/public-houdini/2018Apr/0002.html
+Verified: https://github.com/w3c/css-houdini-drafts/issues/743#issuecomment-379646250
+----
