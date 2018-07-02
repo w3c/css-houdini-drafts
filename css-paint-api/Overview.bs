@@ -1001,3 +1001,20 @@ Privacy Considerations {#privacy-considerations}
 ================================================
 
 There are no known privacy issues introduced by these features.
+
+Changes {#changes}
+==================
+
+Changes since the last publication:
+	<ul>
+		<li id="change-2018-paint-function-webidl">
+			Adding converting the paint function to the WebIDL Function type, instead of just a raw
+			javascript function.
+			(<a href="https://github.com/w3c/css-houdini-drafts/issues/743">Issue 743</a>)
+
+		<li id="change-2018-filter-input-properties">
+			Added a step to {{registerPaint()}} to filter out unsupported native CSS properties. These now
+do not appear in the {{StylePropertyMapReadOnly}} provided to the paint function.
+			(<a href="https://github.com/w3c/css-houdini-drafts/issues/523">Issue 523</a>)
+  </ul>
+
