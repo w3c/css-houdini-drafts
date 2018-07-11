@@ -383,7 +383,7 @@ of the {{PropertyDescriptor}} dictionary.
 	:   <code>"big | bigger | BIGGER"</code>
 	::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
 	:   <code>"&lt;length>+"</code>
-	::  accepts a list of length values.
+	::  accepts a space-separated list of length values.
 </div>
 
 Calculation of Computed Values {#calculation-of-computed-values}
