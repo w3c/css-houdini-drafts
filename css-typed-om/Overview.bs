@@ -2905,7 +2905,16 @@ regardless of what property it is for.
     and return the result.
 
 : registered [=custom properties=] [[css-properties-values-api-1]]
-:: Issue: Should be defined by the Props & Values spec
+::
+
+    : For specified values:
+    :: The value is treated as an unregistered property:
+        [=reify a list of component values=] from the value, and return the
+        result.
+
+    : For computed values:
+    :: The value is reified according to its type, as described in
+        the subsections of [[#reify-stylevalue]].
 
 : <a>align-content</a>
 ::
