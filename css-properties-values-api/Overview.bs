@@ -424,7 +424,7 @@ computed value is as specified. Calc expressions that are
 &lt;number> and &lt;percentage> values get reduced during computation to simple
 numbers and percentages respectively.
 
-For &lt;transform-function> values contained in &lt;transform-list> values,
+For &lt;transform-function> values (including those contained in &lt;transform-list> values),
 the computed value is as specified but with all lengths resolved to their
 computed values.
 
