@@ -484,7 +484,7 @@ probably in an appendix.
     1. If |property| is not a [=custom property name string=],
         set |property| to |property| [=ASCII lowercased=].
 
-    2. If |property| is not a [[=valid CSS property=],
+    2. If |property| is not a [=valid CSS property=],
         [=throw=] a {{TypeError}}.
 
     3. If |property| is a [=single-valued property=] and |values| has more than one [=list/item=],
@@ -498,12 +498,11 @@ probably in an appendix.
         and one or more of the [=list/items=] are a {{CSSUnparsedValue}} or {{CSSVariableReferenceValue}} object,
         [=throw=] a {{TypeError}}.
 
-        Note: When a property is set via string-based APIs,
-        the presence of ''var()'' in a property
-        prevents the entire thing from being interpreted.
-        In other words,
-        everything *besides* the ''var()'' is a plain [=component value=],
-        not a meaningful type.
+        Note: Having 2+ values implies that you're setting multiple items of a list-valued property,
+        but the presence of a ''var()'' function in the string-based OM disables all syntax parsing,
+        including splitting into individual iterations
+        (because there might be more commas inside of the ''var()'' value,
+        so you can't tell how many items are actually going to show up).
         This step's restriction preserves the same semantics in the Typed OM.
 
     5. Let |props| be the value of |this|’s {{[[declarations]]}} internal slot.
