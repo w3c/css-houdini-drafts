@@ -417,7 +417,7 @@ For &lt;url> values, the computed value is one of the following:
 
 For &lt;image> values, the computed value is as specified, except that relative
 URLs that appear in the value are resolved to absolute URLs as described in
-[[!css3-values]].
+[[!css3-values]], and all lengths are resolved to their computed values.
 
 For &lt;number> and &lt;percentage> values which are not calc expressions, the
 computed value is as specified. Calc expressions that are
