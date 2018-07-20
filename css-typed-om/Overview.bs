@@ -625,7 +625,7 @@ probably in an appendix.
 <div algorithm>
     CSS properties express their valid inputs with grammars,
     which are written with the assumption of being matched against strings parsed into CSS tokens,
-    as defined in [[css-syntax-3/#tokenization]].
+    as defined in [[css-syntax-3#tokenization]].
     {{CSSStyleValue}} objects can also be matched against these grammars, however.
 
     A {{CSSStyleValue}} is said to <dfn for=CSSStyleValue>match a grammar</dfn>
@@ -2053,6 +2053,14 @@ interface CSSMathMax : CSSMathValue {
     readonly attribute CSSNumericArray values;
 };
 
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
+ Constructor(CSSNumberish min, CSSNumberish val, CSSNumberish max)]
+interface CSSMathClamp : CSSMathValue {
+    readonly attribute CSSNumericValue min;
+    readonly attribute CSSNumericValue val;
+    readonly attribute CSSNumericValue max;
+};
+
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSNumericArray {
     iterable<CSSNumericValue>;
@@ -2067,6 +2075,7 @@ enum CSSMathOperator {
     "invert",
     "min",
     "max",
+    "clamp",
 };
 </xmp>
 
@@ -2076,7 +2085,7 @@ It exists solely to host the common attributes
 of all the "math" operations.
 
 <div algorithm="CSSMathValue.operator">
-    The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathNegate, CSSMathInvert">operator</dfn> attribute
+    The <dfn attribute for="CSSMathValue, CSSMathSum, CSSMathProduct, CSSMathMin, CSSMathMax, CSSMathClamp, CSSMathNegate, CSSMathInvert">operator</dfn> attribute
     of a {{CSSMathValue}} |this| must,
     on getting,
     return the following string,
@@ -2094,6 +2103,9 @@ of all the "math" operations.
 
         : {{CSSMathMax}}
         :: <code>"max"</code>
+
+        : {{CSSMathClamp}}
+        :: <code>"clamp"</code>
 
         : {{CSSMathNegate}}
         :: <code>"negate"</code>
@@ -2138,6 +2150,23 @@ of all the "math" operations.
     it returns a {{CSSMathProduct}}.
 </div>
 
+<div algorithm="CSSMathClamp(min, val, max)">
+    The <dfn constructor for="CSSMathClamp">CSSMathClamp(|min|, |val|, |max|)</dfn> constructor must,
+    when called,
+    perform the following steps:
+
+    1. Replace |min|, |val|, and |max|
+        with the result of [=rectifying a numberish value=] for each.
+
+    2. Let |type| be the result of [=adding=] the [=types=] of |min|, |val|, and |max|.
+        If |type| is failure,
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSMathClamp}}
+        whose {{CSSMathClamp/min}}, {{CSSMathClamp/val}}, and {{CSSMathClamp/max}} internal slots
+        are set to |min|, |val|, and |max|, respectively.
+</div>
+
 <div algorithm="CSSMathNegate(arg)">
     The <dfn constructor for="CSSMathNegate">CSSMathNegate(|arg|)</dfn> constructor must,
     when called,
@@ -2146,7 +2175,7 @@ of all the "math" operations.
     1. Replace |arg|
         with the result of [=rectifying a numberish value=] for |arg|.
 
-    1. Return a new {{CSSMathNegate}}
+    2. Return a new {{CSSMathNegate}}
         whose {{CSSMathNegate/value}} internal slot
         is set to |arg|.
 
@@ -2166,6 +2195,10 @@ of all the "math" operations.
         : {{CSSMathMax}}
         :: The [=type=] is the result of [=adding=] the [=types=]
             of each of the [=list/items=] in its {{CSSMathSum/values}} internal slot.
+
+        : {{CSSMathClamp}}
+        :: The [=type=] is the result of [=adding=] the [=types=]
+            of the {{CSSMathClamp/min}}, {{CSSMathClamp/val}}, and {{CSSMathClamp/max}} internal slots.
 
         : {{CSSMathProduct}}
         :: The [=type=] is the result of [=multiplying=] the [=types=]
