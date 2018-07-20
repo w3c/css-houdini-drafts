@@ -206,13 +206,13 @@ and return the result.
         let |whole value| be the parsed result.
 
         <div class='note'>
-            The behavior of custom properties are different when modified via JavaScript 
+            The behavior of custom properties are different when modified via JavaScript
             than when defined in style sheets.
 
             When a custom property is defined with an invalid syntax in a style sheet,
             then the value is recorded as "unset", to avoid having to reparse every style sheet when a custom property is registered.
-            
-            Conversely, when a custom property is modified via the JavaScript API, 
+
+            Conversely, when a custom property is modified via the JavaScript API,
             any parse errors are propagated to the progamming environment via a {{TypeError}}.
             This allows more immediate feedback of errors to developers.
         </div>
@@ -1675,6 +1675,10 @@ and "percent".
 The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
 The <dfn export for=CSSNumericValue>percent hint</dfn>
 is either null or a [=base type=] other than "percent".
+
+Note: As new unit types are added to CSS,
+they'll be added to this list of [=base types=],
+and to the CSS [=math functions=].
 
 <div algorithm>
     To <dfn export for="CSSNumericValue" lt="create a type|creating a type">create a type</dfn> from a string |unit|,
