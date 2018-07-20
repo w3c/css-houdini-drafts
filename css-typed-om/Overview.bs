@@ -1838,14 +1838,14 @@ A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS producti
 * A [=type=] matches <<percentage>>
     if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
 * A [=type=] matches <<length-percentage>>
-    if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percentage" → 1 ]»
+    if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percent" → 1 ]»
     Same for <<angle-percentage>>, <<time-percentage>>, etc.
 * A [=type=] matches <<number>>
     if it has no non-zero [=map/entries=]
     and its [=percent hint=] is null.
 * A [=type=] matches <<number-percentage>>
     if it has no non-zero [=map/entries=],
-    or its only non-zero [=map/entry=] is «[ "percentage" → 1 ]».
+    or its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
 
 Many specifications use ''[ <<length>> | <<percentage>> ]''
 instead of ''<<length-percentage>>'' in their grammar,
@@ -5185,7 +5185,7 @@ length3.toString(); // "42px";
     3. If |unit| is "number",
         return |s|.
 
-    4. Otherwise, if |unit| is "percentage",
+    4. Otherwise, if |unit| is "percent",
         append "%" to |s|,
         then return |s|.
 
