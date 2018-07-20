@@ -2890,16 +2890,22 @@ has the same behavior as in normal CSS.
 This section describes how Typed OM objects are constructed from [=underlying values=],
 a process called <dfn export for=CSS lt="reify | reification">reification</dfn>.
 
+Some general principles apply to all [=reification=],
+and so aren't stated in each individual instance:
+
+* If an [=underlying value=] is from a [=list-valued=] property,
+    this list defines how to reify a single iteration of the property;
+    multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
+
+* If an [=underlying value=] contains a ''var()'' reference,
+    then it is reified by [=reify a list of component values|reifying a list of component values=],
+    regardless of what property it is for.
+
+Property-specific Rules {#reify-property}
+-----------------------------------------
+
 The following list defines the [=reification=] behavior for every single property in CSS,
 for both specified and computed values.
-
-If an [=underlying value=] is from a [=list-valued=] property,
-this list defines how to reify a single iteration of the property;
-multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
-
-If an [=underlying value=] contains a ''var()'' reference,
-then it is reified by [=reify a list of component values|reifying a list of component values=],
-regardless of what property it is for.
 
 <dl link-type=property>
 : unregistered [=custom properties=]
@@ -4754,7 +4760,7 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
 <div algorithm>
     To <dfn export>reify a numeric value</dfn> |num|:
 
-    1. If |num| is a ''calc()'', ''min()'', or ''max()'' expression,
+    1. If |num| is a [=math function=],
         [=reify a math expression=] from |num|
         and return the result.
 
@@ -4772,6 +4778,17 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
         set to "number" if |num| is a <<number>>,
         "percent" if |num| is a <<percentage>>,
         and |num|’s unit if |num| is a <<dimension>>.
+
+        If the value being [=reified=] is a computed value,
+        the unit used must be the appropriate [=canonical unit=] for the value's type,
+        with the numeric value scaled accordingly.
+
+        <div class=example highlight=js>
+            For example, if an element has `style="width: 1in;"`,
+            `el.attributeStyleMap.get('width')` will return `CSS.in(1)`,
+            but `el.computedStyleMap.get('width')` will return `CSS.px(96)`,
+            as ''px'' is the [=canonical unit=] for absolute lengths.
+        </div>
 </div>
 
 <div algorithm>
