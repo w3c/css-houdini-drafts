@@ -45,7 +45,7 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec
 </pre>
 
 <pre class=link-defaults>
-spec:css21; type:property;
+spec:css-sizing; type:property;
     text:max-height;
     text:max-width;
     text:min-height;
@@ -57,7 +57,9 @@ spec:cssom-1;
         text: CSS declaration block
         text: declarations; for: CSSStyleDeclaration
 spec:css-align-3; type:property; text:column-gap
-spec:css-color-3; type:property; text:color;
+spec:css-color-4;
+    type:property; text:color;
+    type:value; text:currentcolor;
 spec:css-position-3; type:value; for:left; text:auto;
 spec:css-shapes-1; type: property;
     text: shape-margin
@@ -673,7 +675,7 @@ partial interface Element {
 };
 </pre>
 
-<dfn>Computed StylePropertyMap</dfn> objects
+<dfn export>Computed StylePropertyMap</dfn> objects
 represent the [=computed values=] of an {{Element}},
 and are accessed by calling the {{Element/computedStyleMap()}} method.
 
@@ -1140,7 +1142,7 @@ The following are the arithmetic operations you can perform on dimensions:
         if |values| is « 1, 2, 3, 4 »,
         the result must be (((1 × 2) × 3) × 4).
 
-    5. Let |type| be the result of [=multiplying=] the [=types=] of every [=list/item=] in |values|.
+    5. Let |type| be the result of [=CSSNumericValue/multiplying=] the [=types=] of every [=list/item=] in |values|.
         If |type| is failure,
         [=throw=] a {{TypeError}}.
 
@@ -1623,7 +1625,7 @@ The following are the arithmetic operations you can perform on dimensions:
             2. Set |type|’s sole [=map/value=] to |power|.
             3. [=list/Append=] |type| to |types|.
 
-        3. Return the result of [=multiplying=] all the [=list/items=] of |types|.
+        3. Return the result of [=CSSNumericValue/multiplying=] all the [=list/items=] of |types|.
     </div>
 
     <div algorithm>
@@ -1939,7 +1941,7 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm>
-    The <dfn>[=type=] of a {{CSSUnitValue}}</dfn>
+    The <dfn export>[=type=] of a {{CSSUnitValue}}</dfn>
     is the result of [=creating a type=] from its {{CSSUnitValue/unit}} internal slot.
 </div>
 
@@ -2145,7 +2147,7 @@ of all the "math" operations.
 
     The <dfn constructor for="CSSMathProduct">CSSMathProduct(...|args|)</dfn> constructor
     is defined identically to the above,
-    except that in step 3 it [=multiplies=] the types instead of [=adding=],
+    except that in step 3 it [=CSSNumericValue/multiplies=] the types instead of [=adding=],
     and in the last step
     it returns a {{CSSMathProduct}}.
 </div>
@@ -2186,7 +2188,7 @@ of all the "math" operations.
 </div>
 
 <div algorithm>
-    The <dfn>[=type=] of a CSSMathValue</dfn>
+    The <dfn export>[=type=] of a CSSMathValue</dfn>
     depends on its class:
 
     <dl class=switch>
@@ -2201,7 +2203,7 @@ of all the "math" operations.
             of the {{CSSMathClamp/min}}, {{CSSMathClamp/val}}, and {{CSSMathClamp/max}} internal slots.
 
         : {{CSSMathProduct}}
-        :: The [=type=] is the result of [=multiplying=] the [=types=]
+        :: The [=type=] is the result of [=CSSNumericValue/multiplying=] the [=types=]
             of each of the [=list/items=] in its {{CSSMathProduct/values}} internal slot.
 
         : {{CSSMathNegate}}
@@ -2215,7 +2217,7 @@ of all the "math" operations.
 
 The <dfn attribute for=CSSNumericArray>length</dfn> attribute of {{CSSNumericArray}} indicates how many {{CSSNumericValue}}s are contained within the {{CSSNumericArray}}.
 
-The <dfn for=CSSNumericArray>indexed getter</dfn> of {{CSSNumericArray}} retrieves the {{CSSNumericValue}} at the provided index.
+The <dfn export for=CSSNumericArray>indexed getter</dfn> of {{CSSNumericArray}} retrieves the {{CSSNumericValue}} at the provided index.
 
 <!--
 ██    ██ ██     ██ ██     ██        ██████   ██████   ██████
