@@ -347,11 +347,11 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 
     1. Standardized properties
         (not [=custom properties=] or vendor-prefixed properties),
-        [=ASCII-lowercased=]
+        [=ASCII lowercased=]
         and then sorted in increasing code-point order.
     2. Vendor-prefixed/experimental properties
         (those whose name starts with a single dash),
-        [=ASCII-lowercased=]
+        [=ASCII lowercased=]
         and then sorted in increasing code-point order.
     3. [=Custom properties=],
         sorted in increasing code-point order.
