@@ -90,7 +90,7 @@ which are related to painting.
 The {{paintWorklet}}'s <a>worklet global scope type</a> is {{PaintWorkletGlobalScope}}.
 
 <pre class='idl'>
-partial interface CSS {
+partial namespace CSS {
     [SameObject] readonly attribute Worklet paintWorklet;
 };
 </pre>

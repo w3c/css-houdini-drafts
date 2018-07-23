@@ -72,8 +72,8 @@ dictionary PropertyDescriptor {
 	         DOMString initialValue;
 };
 
-partial interface CSS {
-	static void registerProperty(PropertyDescriptor descriptor);
+partial namespace CSS {
+	void registerProperty(PropertyDescriptor descriptor);
 };
 </pre>
 

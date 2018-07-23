@@ -1369,7 +1369,7 @@ which are related to layout.
 The {{layoutWorklet}}'s <a>worklet global scope type</a> is {{LayoutWorkletGlobalScope}}.
 
 <pre class='idl'>
-partial interface CSS {
+partial namespace CSS {
     [SameObject] readonly attribute Worklet layoutWorklet;
 };
 </pre>
