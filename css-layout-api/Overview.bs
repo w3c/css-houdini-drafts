@@ -825,7 +825,7 @@ interface ChildBreakToken {
 
 [Exposed=LayoutWorklet]
 interface BreakToken {
-    readonly attribute sequence&lt;ChildBreakToken> childBreakTokens;
+    readonly attribute FrozenArray&lt;ChildBreakToken> childBreakTokens;
     readonly attribute any data;
 };
 
