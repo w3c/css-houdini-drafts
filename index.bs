@@ -169,11 +169,10 @@ animations. The worklet can be accessed via {{animationWorklet}} attribute.
 
 The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
 
-{{AnimationWorkletGlobalScope}} represents the global execution context of
-{{animationWorklet}}.
+{{AnimationWorkletGlobalScope}} represents the global execution context of {{animationWorklet}}.
 
 <xmp class='idl'>
-partial interface Window {
+partial namespace CSS {
     [SameObject] readonly attribute Worklet animationWorklet;
 };
 </xmp>
@@ -743,7 +742,7 @@ animates fully to close or open position depending on its current position.
 </div>
 
 <script>
-await animationWorklet.addModule('hidey-bar-animator.js');
+await CSS.animationWorklet.addModule('hidey-bar-animator.js');
 const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
 const documentTimeline = document.timeline;
 
@@ -817,7 +816,7 @@ sync with scroll offset.
 </div>
 
 <script>
-await animationWorklet.addModule('twitter-header-animator.js');
+await CSS.animationWorklet.addModule('twitter-header-animator.js');
 const animation = new WorkletAnimation(
     'twitter-header',
     [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
@@ -876,7 +875,7 @@ A simple parallax background example.
 </div>
 
 <script>
-await animationWorklet.addModule('parallax-animator.js');
+await CSS.animationWorklet.addModule('parallax-animator.js');
 const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
 const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
 
