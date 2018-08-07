@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 0af8ece51a58310888d9da3e5b2ebda903d17c18" name="generator">
   <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
-  <meta content="9a1a8fb2a8e328a5a39cc6b57b0482e2935ef846" name="document-revision">
+  <meta content="9fdddcda8e8eb5e4d9027999cdeeac3f65b4e4eb" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1624,11 +1624,9 @@ animations. The worklet can be accessed via <code class="idl"><a data-link-type=
     [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#worklet" id="ref-for-worklet①"><c- n>Worklet</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="CSS" data-dfn-type="attribute" data-export data-readonly data-type="Worklet" id="dom-css-animationworklet"><code><c- g>animationWorklet</c-></code></dfn>;
 };
 </pre>
-<pre class="idl highlight def"><c- b>callback</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="callback" data-export id="callbackdef-voidfunction"><code><c- g>VoidFunction</c-></code></dfn> = <c- b>void</c-> ();
-
-[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>AnimationWorklet</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Global" id="ref-for-Global"><c- g>Global</c-></a>=<a class="n" data-link-type="idl-name"><c- n>AnimationWorklet</c-></a> ]
+<pre class="idl highlight def">[ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>AnimationWorklet</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Global" id="ref-for-Global"><c- g>Global</c-></a>=<a class="n" data-link-type="idl-name"><c- n>AnimationWorklet</c-></a> ]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="animationworkletglobalscope"><code><c- g>AnimationWorkletGlobalScope</c-></code></dfn> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope" id="ref-for-workletglobalscope"><c- n>WorkletGlobalScope</c-></a> {
-    <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator"><c- g>registerAnimator</c-></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code><c- g>name</c-></code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"></a></dfn>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction" id="ref-for-callbackdef-voidfunction"><c- n>VoidFunction</c-></a> <dfn class="idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code><c- g>animatorCtor</c-></code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"></a></dfn>);
+    <c- b>void</c-> <dfn class="dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export data-lt="registerAnimator(name, animatorCtor)" id="dom-animationworkletglobalscope-registeranimator"><code><c- g>registerAnimator</c-></code></dfn>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString"><c- b>DOMString</c-></a> <dfn class="idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code><c- g>name</c-></code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"></a></dfn>, <a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#VoidFunction" id="ref-for-VoidFunction"><c- n>VoidFunction</c-></a> <dfn class="idl-code" data-dfn-for="AnimationWorkletGlobalScope/registerAnimator(name, animatorCtor)" data-dfn-type="argument" data-export id="dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code><c- g>animatorCtor</c-></code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"></a></dfn>);
 };
 </pre>
    <div class="note" role="note">
@@ -1650,15 +1648,17 @@ animation as needed by <code class="idl"><a data-link-type="idl" href="#animatio
     <li data-md>
      <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="animator-name">animator name</dfn> <a class="production css" data-link-type="type" href="https://drafts.csswg.org/css-values-4/#typedef-ident" id="ref-for-typedef-ident">&lt;ident></a>#.</p>
     <li data-md>
-     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="class-constructor">class constructor</dfn> which is the class <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-constructor" id="ref-for-sec-constructor">constructor</a>.</p>
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="class-constructor">class constructor</dfn> which is a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#VoidFunction" id="ref-for-VoidFunction①">VoidFunction</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function">callback function</a> type.</p>
     <li data-md>
-     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="animate-function">animate function</dfn> which is the animate <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-terms-and-definitions-function" id="ref-for-sec-terms-and-definitions-function">function</a> callback.</p>
+     <p>An <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="animate-function">animate function</dfn> which is a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#Function" id="ref-for-Function">Function</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function①">callback function</a> type.</p>
+    <li data-md>
+     <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="destroy-function">destroy function</dfn> which is a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#Function" id="ref-for-Function①">Function</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function②">callback function</a> type.</p>
    </ul>
    <h3 class="heading settled" data-level="4.1" id="registering-animator-definition"><span class="secno">4.1. </span><span class="content">Registering an Animator Definition</span><a class="self-link" href="#registering-animator-definition"></a></h3>
     An <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope③">AnimationWorkletGlobalScope</a></code> has a <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="animator-name-to-animator-definition-map">animator name to animator definition map</dfn>.
-The map gets populated when <code class="idl"><a data-link-type="idl" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator①">registerAnimator(name, animatorCtor)</a></code> is called. 
+The map gets populated when <code class="idl"><a data-link-type="idl" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtorValue)</a></code> is called. 
    <div class="algorithm" data-algorithm="register-animator">
-    <p>When the <dfn class="dfn-paneled idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export id="dom-animationworkletglobalscope-registeranimator"><code>registerAnimator(<var>name</var>, <var>animatorCtor</var>)</code></dfn> method is called in a <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope④">AnimationWorkletGlobalScope</a></code>, the user agent <em>must</em> run the
+    <p>When the <dfn class="idl-code" data-dfn-for="AnimationWorkletGlobalScope" data-dfn-type="method" data-export id="dom-animationworkletglobalscope-registeranimator-name-animatorctorvalue"><code>registerAnimator(<var>name</var>, <var>animatorCtorValue</var>)</code><a class="self-link" href="#dom-animationworkletglobalscope-registeranimator-name-animatorctorvalue"></a></dfn> method is called in a <code class="idl"><a data-link-type="idl" href="#animationworkletglobalscope" id="ref-for-animationworkletglobalscope④">AnimationWorkletGlobalScope</a></code>, the user agent <em>must</em> run the
 following steps:</p>
     <ol>
      <li data-md>
@@ -1667,16 +1667,24 @@ steps.</p>
      <li data-md>
       <p>If <var>name</var> exists as a key in the <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map">animator name to animator definition map</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw①">throw</a> a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror">NotSupportedError</a> and abort all these steps.</p>
      <li data-md>
-      <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-isconstructor" id="ref-for-sec-isconstructor">IsConstructor</a>(<var>animatorCtor</var>) is false, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw②">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①">TypeError</a> and abort all these steps.</p>
+      <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-isconstructor" id="ref-for-sec-isconstructor">IsConstructor</a>(<var>animatorCtorValue</var>) is false, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw②">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①">TypeError</a> and abort all these steps.</p>
      <li data-md>
-      <p>Let <var>prototype</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p">Get</a>(<var>animatorCtor</var>, "prototype").</p>
+      <p>Let <var>animatorCtor</var> be the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-type-mapping" id="ref-for-es-type-mapping">converting</a> animatorCtorValue to the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#VoidFunction" id="ref-for-VoidFunction②">VoidFunction</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function③">callback function</a> type. If an exception is thrown, rethrow the
+exception and abort all these steps.</p>
+     <li data-md>
+      <p>Let <var>prototype</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p">Get</a>(<var>animatorCtorValue</var>, "prototype").</p>
      <li data-md>
       <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-ecmascript-data-types-and-values" id="ref-for-sec-ecmascript-data-types-and-values">Type</a>(<var>prototype</var>) is not Object, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw③">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror②">TypeError</a> and abort all these steps.</p>
      <li data-md>
-      <p>Let <var>animate</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p①">Get</a>(<var>prototype</var>, "animate").</p>
+      <p>Let <var>animateValue</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p①">Get</a>(<var>prototype</var>, "animate").</p>
      <li data-md>
-      <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-iscallable" id="ref-for-sec-iscallable">IsCallable</a>(<var>animate</var>) is false, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-throw" id="ref-for-dfn-throw④">throw</a> a <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror③">TypeError</a> and
-abort all these steps.</p>
+      <p>Let <var>animate</var> be the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-type-mapping" id="ref-for-es-type-mapping①">converting</a> <var>animateValue</var> to the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#Function" id="ref-for-Function②">Function</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function④">callback function</a> type. If an exception is thrown, rethrow the exception and abort
+all these steps.</p>
+     <li data-md>
+      <p>Let <var>destroyValue</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p②">Get</a>(<var>prototype</var>, "onDestroy").</p>
+     <li data-md>
+      <p>Let <var>destroy</var> be the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-type-mapping" id="ref-for-es-type-mapping②">converting</a> <var>destroyValue</var> to the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#Function" id="ref-for-Function③">Function</a> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-function" id="ref-for-dfn-callback-function⑤">callback function</a> type. If an exception is thrown, rethrow the exception and abort
+all these steps.</p>
      <li data-md>
       <p>Let <var>definition</var> be a new <a data-link-type="dfn" href="#animator-definition" id="ref-for-animator-definition">animator definition</a> with:</p>
       <ul>
@@ -1686,6 +1694,8 @@ abort all these steps.</p>
         <p><a data-link-type="dfn" href="#class-constructor" id="ref-for-class-constructor">class constructor</a> being <var>animatorCtor</var></p>
        <li data-md>
         <p><a data-link-type="dfn" href="#animate-function" id="ref-for-animate-function①">animate function</a> being <var>animate</var></p>
+       <li data-md>
+        <p><a data-link-type="dfn" href="#destroy-function" id="ref-for-destroy-function">destroy function</a> being <var>destroy</var></p>
       </ul>
      <li data-md>
       <p>Add the key-value pair (<var>name</var> - <var>definition</var>) to the <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map①">animator name to animator
@@ -1731,8 +1741,9 @@ when the user agent constructs a new <a data-link-type="dfn" href="#animator-ins
      <li data-md>
       <p>Let <var>state</var> be <a data-link-type="dfn" href="http://w3c.github.io/html/infrastructure.html#structureddeserialize" id="ref-for-structureddeserialize①">StructuredDeserialize</a>(<var>serializedState</var>).</p>
      <li data-md>
-      <p>Let <var>animatorInstance</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-construct" id="ref-for-sec-construct">Construct</a>(<var>animatorCtor</var>, [<var>options</var>, <var>state</var>]).</p>
-      <p>If <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-construct" id="ref-for-sec-construct①">Construct</a> throws an exception, abort the following steps.</p>
+      <p>Let <var>animatorInstance</var> be the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#construct-a-callback-function" id="ref-for-construct-a-callback-function">constructing</a> <var>animatorCtor</var> with
+[<var>options</var>, <var>state</var> as args. If an exception is thrown, rethrow the exception and abort all
+these steps.</p>
      <li data-md>
       <p>Set the following on <var>animatorInstance</var> with:</p>
       <ul>
@@ -1783,7 +1794,7 @@ instance set</a>. For each such <var>instance</var> the user agent <em>must</em>
      <li data-md>
       <p>Let <var>effect</var> be <a data-link-type="dfn" href="#animator-effect" id="ref-for-animator-effect①">animator effect</a> of <var>instance</var>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-invoking-callback-functions" id="ref-for-es-invoking-callback-functions">Invoke</a> <var>animateFunction</var> with arguments «<var>currentTime</var>, <var>effect</var>»,
+      <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#invoke-a-callback-function" id="ref-for-invoke-a-callback-function">Invoke</a> <var>animateFunction</var> with arguments «<var>currentTime</var>, <var>effect</var>»,
     and with <var>instance</var> as the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-this-value" id="ref-for-dfn-callback-this-value">callback this value</a>.</p>
     </ol>
    </div>
@@ -1816,16 +1827,11 @@ of any author-defined effect, and restore it after migration.</p>
         <p>Let <var>definition</var> be the result of looking up <var>animatorName</var> on <var>sourceWorkletGlobalScope</var>’s <a data-link-type="dfn" href="#animator-name-to-animator-definition-map" id="ref-for-animator-name-to-animator-definition-map④">animator name to animator definition map</a>.</p>
         <p>If <var>definition</var> does not exist then abort the following steps.</p>
        <li data-md>
-        <p>Let <var>animatorCtor</var> be the <a data-link-type="dfn" href="#class-constructor" id="ref-for-class-constructor②">class constructor</a> of <var>definition</var>.</p>
+        <p>Let <var>destroyFunction</var> be the <a data-link-type="dfn" href="#destroy-function" id="ref-for-destroy-function①">destroy function</a> of <var>definition</var>.</p>
        <li data-md>
-        <p>Let <var>prototype</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p②">Get</a>(<var>animatorCtor</var>, "prototype").</p>
-       <li data-md>
-        <p>Let <var>onDestroyFunction</var> be the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-get-o-p" id="ref-for-sec-get-o-p③">Get</a>(<var>prototype</var>, "onDestroy").</p>
-       <li data-md>
-        <p>If the result of <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-iscallable" id="ref-for-sec-iscallable①">IsCallable</a>(<var>onDestroyFunction</var>) is false then abort the following
-steps.</p>
-       <li data-md>
-        <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#es-invoking-callback-functions" id="ref-for-es-invoking-callback-functions①">Invoke</a> <var>onDestroyFunction</var> with <var>instance</var> as the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-this-value" id="ref-for-dfn-callback-this-value①">callback this value</a> and let <var>state</var> be the result of the invocation.</p>
+        <p><a data-link-type="dfn" href="https://heycam.github.io/webidl/#invoke-a-callback-function" id="ref-for-invoke-a-callback-function①">Invoke</a> <var>destroyFunction</var> with <var>instance</var> as the <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-callback-this-value" id="ref-for-dfn-callback-this-value①">callback this value</a> and
+let <var>state</var> be the result of the invocation. If any exception is thrown, rethrow the
+exception and abort the following steps.</p>
        <li data-md>
         <p>Set <var>serializedState</var> to be the result of <a data-link-type="dfn" href="http://w3c.github.io/html/infrastructure.html#structuredserialize" id="ref-for-structuredserialize">StructuredSerialize</a>(<var>state</var>).
 If any exception is thrown, then abort the following steps.</p>
@@ -2405,18 +2411,19 @@ registerAnimator<c- p>(</c-><c- t>'parallax'</c-><c- p>,</c-> <c- kr>class</c-> 
    <li><a href="#associate-animator-instance-of-worklet-animation">associate animator instance of worklet animation</a><span>, in §6.4</span>
    <li><a href="#class-constructor">class constructor</a><span>, in §4</span>
    <li><a href="#create-a-new-animator-instance">create a new animator instance</a><span>, in §5.1</span>
+   <li><a href="#destroy-function">destroy function</a><span>, in §4</span>
    <li><a href="#disassociate-animator-instance-of-worklet-animation">disassociate animator instance of worklet animation</a><span>, in §6.4</span>
    <li><a href="#frame-current">frame-current</a><span>, in §5.5</span>
    <li><a href="#frame-requested">frame-requested</a><span>, in §5.5</span>
    <li><a href="#dom-workletgroupeffect-getchildren">getChildren()</a><span>, in §6.7</span>
    <li><a href="#dom-animationeffect-localtime">localTime</a><span>, in §6.7</span>
    <li><a href="#migrate-an-animator-instance">migrate an animator instance</a><span>, in §5.4</span>
-   <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §4.1</span>
+   <li><a href="#dom-animationworkletglobalscope-registeranimator">registerAnimator(name, animatorCtor)</a><span>, in §3</span>
+   <li><a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctorvalue">registerAnimator(name, animatorCtorValue)</a><span>, in §4.1</span>
    <li><a href="#remove-an-animator-instance">remove an animator instance</a><span>, in §5.3</span>
    <li><a href="#run-animators">run animators</a><span>, in §5.2</span>
    <li><a href="#serialized-options">serialized options</a><span>, in §6.1</span>
    <li><a href="#set-animator-instance-of-worklet-animation">set animator instance of worklet animation</a><span>, in §6.4</span>
-   <li><a href="#callbackdef-voidfunction">VoidFunction</a><span>, in §3</span>
    <li><a href="#worklet-animation">Worklet animation</a><span>, in §6.1</span>
    <li><a href="#workletanimation">WorkletAnimation</a><span>, in §6.2</span>
    <li><a href="#dom-workletanimation-workletanimation">WorkletAnimation(animatorName, effects, timeline, options)</a><span>, in §6.2</span>
@@ -2540,6 +2547,21 @@ registerAnimator<c- p>(</c-><c- t>'parallax'</c-><c- p>,</c-> <c- kr>class</c-> 
     <li><a href="#ref-for-SameObject">3. Animation Worklet</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-VoidFunction">
+   <a href="https://heycam.github.io/webidl/#VoidFunction">https://heycam.github.io/webidl/#VoidFunction</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-VoidFunction">3. Animation Worklet</a>
+    <li><a href="#ref-for-VoidFunction①">4. Animator Definition</a>
+    <li><a href="#ref-for-VoidFunction②">4.1. Registering an Animator Definition</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-callback-function">
+   <a href="https://heycam.github.io/webidl/#dfn-callback-function">https://heycam.github.io/webidl/#dfn-callback-function</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-callback-function">4. Animator Definition</a> <a href="#ref-for-dfn-callback-function①">(2)</a> <a href="#ref-for-dfn-callback-function②">(3)</a>
+    <li><a href="#ref-for-dfn-callback-function③">4.1. Registering an Animator Definition</a> <a href="#ref-for-dfn-callback-function④">(2)</a> <a href="#ref-for-dfn-callback-function⑤">(3)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-idl-double">
    <a href="https://heycam.github.io/webidl/#idl-double">https://heycam.github.io/webidl/#idl-double</a><b>Referenced in:</b>
    <ul>
@@ -2617,6 +2639,8 @@ registerAnimator<c- p>(</c-><c- t>'parallax'</c-><c- p>,</c-> <c- kr>class</c-> 
      <li><span class="dfn-paneled" id="term-for-Exposed" style="color:initial">Exposed</span>
      <li><span class="dfn-paneled" id="term-for-Global" style="color:initial">Global</span>
      <li><span class="dfn-paneled" id="term-for-SameObject" style="color:initial">SameObject</span>
+     <li><span class="dfn-paneled" id="term-for-VoidFunction" style="color:initial">VoidFunction</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-callback-function" style="color:initial">callback function</span>
      <li><span class="dfn-paneled" id="term-for-idl-double" style="color:initial">double</span>
     </ul>
    <li>
@@ -2661,11 +2685,9 @@ registerAnimator<c- p>(</c-><c- t>'parallax'</c-><c- p>,</c-> <c- kr>class</c-> 
     [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject①"><c- g>SameObject</c-></a>] <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#worklet" id="ref-for-worklet①①"><c- n>Worklet</c-></a> <a data-readonly data-type="Worklet" href="#dom-css-animationworklet"><code><c- g>animationWorklet</c-></code></a>;
 };
 
-<c- b>callback</c-> <a href="#callbackdef-voidfunction"><code><c- g>VoidFunction</c-></code></a> = <c- b>void</c-> ();
-
 [ <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=<c- n>AnimationWorklet</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Global" id="ref-for-Global①"><c- g>Global</c-></a>=<a class="n" data-link-type="idl-name"><c- n>AnimationWorklet</c-></a> ]
 <c- b>interface</c-> <a href="#animationworkletglobalscope"><code><c- g>AnimationWorkletGlobalScope</c-></code></a> : <a class="n" data-link-type="idl-name" href="https://drafts.css-houdini.org/worklets/#workletglobalscope" id="ref-for-workletglobalscope⑤"><c- n>WorkletGlobalScope</c-></a> {
-    <c- b>void</c-> <a class="idl-code" data-link-type="method" href="#dom-animationworkletglobalscope-registeranimator" id="ref-for-dom-animationworkletglobalscope-registeranimator②"><c- g>registerAnimator</c-></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③"><c- b>DOMString</c-></a> <a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code><c- g>name</c-></code></a>, <a class="n" data-link-type="idl-name" href="#callbackdef-voidfunction" id="ref-for-callbackdef-voidfunction①"><c- n>VoidFunction</c-></a> <a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code><c- g>animatorCtor</c-></code></a>);
+    <c- b>void</c-> <a href="#dom-animationworkletglobalscope-registeranimator"><code><c- g>registerAnimator</c-></code></a>(<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString③"><c- b>DOMString</c-></a> <a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-name"><code><c- g>name</c-></code></a>, <a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#VoidFunction" id="ref-for-VoidFunction③"><c- n>VoidFunction</c-></a> <a href="#dom-animationworkletglobalscope-registeranimator-name-animatorctor-animatorctor"><code><c- g>animatorCtor</c-></code></a>);
 };
 
 [<a class="idl-code" data-link-type="constructor" href="#dom-workletanimation-workletanimation" id="ref-for-dom-workletanimation-workletanimation①"><c- g>Constructor</c-></a> (<a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString①①"><c- b>DOMString</c-></a> <a href="#dom-workletanimation-workletanimation-animatorname-effects-timeline-options-animatorname"><code><c- g>animatorName</c-></code></a>,
@@ -2720,12 +2742,6 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
     <li><a href="#ref-for-dom-css-animationworklet">3. Animation Worklet</a> <a href="#ref-for-dom-css-animationworklet①">(2)</a> <a href="#ref-for-dom-css-animationworklet②">(3)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="callbackdef-voidfunction">
-   <b><a href="#callbackdef-voidfunction">#callbackdef-voidfunction</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-callbackdef-voidfunction">3. Animation Worklet</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="animationworkletglobalscope">
    <b><a href="#animationworkletglobalscope">#animationworkletglobalscope</a></b><b>Referenced in:</b>
    <ul>
@@ -2735,6 +2751,12 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
     <li><a href="#ref-for-animationworkletglobalscope⑤">5. Animator Instance</a>
     <li><a href="#ref-for-animationworkletglobalscope⑥">5.1. Creating an Animator Instance</a> <a href="#ref-for-animationworkletglobalscope⑦">(2)</a> <a href="#ref-for-animationworkletglobalscope⑧">(3)</a>
     <li><a href="#ref-for-animationworkletglobalscope⑨">6.4. Interaction with Animator Instances</a> <a href="#ref-for-animationworkletglobalscope①⓪">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator">
+   <b><a href="#dom-animationworkletglobalscope-registeranimator">#dom-animationworkletglobalscope-registeranimator</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator">4.1. Registering an Animator Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-definition">
@@ -2760,7 +2782,6 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
    <ul>
     <li><a href="#ref-for-class-constructor">4.1. Registering an Animator Definition</a>
     <li><a href="#ref-for-class-constructor①">5.1. Creating an Animator Instance</a>
-    <li><a href="#ref-for-class-constructor②">5.4. Migrating an Animator Instance</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animate-function">
@@ -2771,6 +2792,13 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
     <li><a href="#ref-for-animate-function②">5.2. Running Animators</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="destroy-function">
+   <b><a href="#destroy-function">#destroy-function</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-destroy-function">4.1. Registering an Animator Definition</a>
+    <li><a href="#ref-for-destroy-function①">5.4. Migrating an Animator Instance</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="animator-name-to-animator-definition-map">
    <b><a href="#animator-name-to-animator-definition-map">#animator-name-to-animator-definition-map</a></b><b>Referenced in:</b>
    <ul>
@@ -2778,13 +2806,6 @@ the last few frames.<a href="#issue-8b45d7e3"> ↵ </a></div>
     <li><a href="#ref-for-animator-name-to-animator-definition-map②">5.1. Creating an Animator Instance</a>
     <li><a href="#ref-for-animator-name-to-animator-definition-map③">5.2. Running Animators</a>
     <li><a href="#ref-for-animator-name-to-animator-definition-map④">5.4. Migrating an Animator Instance</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="dom-animationworkletglobalscope-registeranimator">
-   <b><a href="#dom-animationworkletglobalscope-registeranimator">#dom-animationworkletglobalscope-registeranimator</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator">3. Animation Worklet</a>
-    <li><a href="#ref-for-dom-animationworkletglobalscope-registeranimator①">4.1. Registering an Animator Definition</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="animator-instance">

@@ -26,7 +26,12 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
         text: exception
         text: throw
         url: throw; text: thrown
-    url: es-invoking-callback-functions; text: Invoke
+    urlPrefix: #;
+        url: Function; text: Function
+        url: VoidFunction; text: VoidFunction
+    url: invoke-a-callback-function; text: Invoke
+    url: construct-a-callback-function; text: constructing
+    url: es-type-mapping; text: converting
 urlPrefix: https://html.spec.whatwg.org/#; type: dfn;
     url: run-the-animation-frame-callbacks; text: running the animation frame callbacks
 urlPrefix: http://w3c.github.io/html/infrastructure.html#; type: dfn;
@@ -62,8 +67,6 @@ urlPrefix: https://w3c.github.io/web-animations/level-2/#;
         text: group effect
         text: child effect
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
-    text: constructor
-    text: Construct
     text: IsCallable
     text: IsConstructor
     text: HasProperty
@@ -71,7 +74,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     url: map-objects; text:map object
     url: get-o-p; text: Get
     url: set-o-p-v-throw; text: Set
-    url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
 urlPrefix: https://www.w3.org/TR/hr-time-2/#dom-; type: dfn
@@ -178,8 +180,6 @@ partial namespace CSS {
 </xmp>
 
 <xmp class='idl'>
-callback VoidFunction = void ();
-
 [ Exposed=AnimationWorklet, Global=AnimationWorklet ]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
@@ -210,19 +210,21 @@ animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
 
  - An <dfn>animator name</dfn> <<ident>>#.
 
- - A <dfn>class constructor</dfn> which is the class <a>constructor</a>.
+ - A <dfn>class constructor</dfn> which is a <a>VoidFunction</a> <a>callback function</a> type.
 
- - An <dfn>animate function</dfn> which is the animate <a>function</a> callback.
+ - An <dfn>animate function</dfn> which is a <a>Function</a> <a>callback function</a> type.
+
+ - A <dfn>destroy function</dfn> which is a <a>Function</a> <a>callback function</a> type.
 
 
 Registering an Animator Definition {#registering-animator-definition}
 -------------------------------------
 An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
-The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
+The map gets populated when {{registerAnimator(name, animatorCtorValue)}} is called.
 
 <div algorithm="register-animator">
 
-When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|, |animatorCtor|)</dfn>
+When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|, |animatorCtorValue|)</dfn>
 method is called in a {{AnimationWorkletGlobalScope}}, the user agent <em>must</em> run the
 following steps:
 
@@ -232,20 +234,32 @@ following steps:
     2. If |name| exists as a key in the <a>animator name to animator definition map</a>,
         <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
 
-    3. If the result of <a>IsConstructor</a>(|animatorCtor|) is false, <a>throw</a> a
+    3. If the result of <a>IsConstructor</a>(|animatorCtorValue|) is false, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
+    4. Let |animatorCtor| be the result of <a>converting</a> animatorCtorValue to the
+        <a>VoidFunction</a> <a>callback function</a> type. If an exception is thrown, rethrow the
+        exception and abort all these steps.
+
+    4. Let |prototype| be the result of <a>Get</a>(|animatorCtorValue|, "prototype").
 
     5. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a>
         and abort all these steps.
 
-    6. Let |animate| be the result of <a>Get</a>(|prototype|, "animate").
+    6. Let |animateValue| be the result of <a>Get</a>(|prototype|, "animate").
 
-    7. If the result of <a>IsCallable</a>(|animate|) is false, <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
+    7. Let |animate| be the result of <a>converting</a> |animateValue| to the <a>Function</a>
+        <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
+        all these steps.
 
-    10. Let |definition| be a new <a>animator definition</a> with:
+    8. Let |destroyValue| be the result of <a>Get</a>(|prototype|, "onDestroy").
+
+    9. Let |destroy| be the result of <a>converting</a> |destroyValue| to the <a>Function</a>
+        <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
+        all these steps.
+
+
+    8. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
@@ -253,7 +267,10 @@ following steps:
 
         - <a>animate function</a> being |animate|
 
-    11. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
+        - <a>destroy function</a> being |destroy|
+
+
+    9. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
         definition map</a>.
 </div>
 
@@ -308,10 +325,9 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
 
     5. Let |state| be <a>StructuredDeserialize</a>(|serializedState|).
 
-    6. Let |animatorInstance| be the result of <a>Construct</a>(|animatorCtor|, [|options|, |state|]).
-
-        If <a>Construct</a> throws an exception, abort the following steps.
-
+    6. Let |animatorInstance| be the result of <a>constructing</a> |animatorCtor| with
+        [|options|, |state| as args. If an exception is thrown, rethrow the exception and abort all
+        these steps.
 
     7. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
@@ -410,22 +426,17 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
         If |definition| does not exist then abort the following steps.
 
-     3. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
+     3. Let |destroyFunction| be the <a>destroy function</a> of |definition|.
 
-     4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
 
-     5. Let |onDestroyFunction| be the result of <a>Get</a>(|prototype|, "onDestroy").
+     4. <a>Invoke</a> |destroyFunction| with |instance| as the <a>callback this value</a> and
+        let |state| be the result of the invocation. If any exception is thrown, rethrow the
+        exception and abort the following steps.
 
-     6. If the result of <a>IsCallable</a>(|onDestroyFunction|) is false then abort the following
-        steps.
-
-     7. <a>Invoke</a> |onDestroyFunction| with |instance| as the <a>callback this value</a> and let
-        |state| be the result of the invocation.
-
-     8. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
+     5. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
         If any exception is thrown, then abort the following steps.
 
-     9. Run the procedure to <a>remove an animator instance</a> given |instance|, and
+     6. Run the procedure to <a>remove an animator instance</a> given |instance|, and
         |sourceWorkletGlobalScope|.
 
   2. Wait for the above task to complete. If the task is aborted, abort the following steps.
