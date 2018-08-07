@@ -58,12 +58,6 @@ urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     text: composite operation
     text: animation class
 urlPrefix: https://w3c.github.io/web-animations/level-2/#;
-    type: interface;
-        text: GroupEffectReadOnly
-        text: AnimationEffectReadOnly
-        text: AnimationEffectMutable
-        text: GroupEffectMutable
-        text: Animation
     type: dfn;
         text: group effect
         text: child effect
@@ -175,23 +169,23 @@ animations. The worklet can be accessed via {{animationWorklet}} attribute.
 
 The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
 
-{{AnimationWorkletGlobalScope}} represents a <dfn>global execution context</dfn> of
+{{AnimationWorkletGlobalScope}} represents the global execution context of
 {{animationWorklet}}.
 
-<pre class='idl'>
+<xmp class='idl'>
 partial interface Window {
     [SameObject] readonly attribute Worklet animationWorklet;
 };
-</pre>
+</xmp>
 
-<pre class='idl'>
+<xmp class='idl'>
 callback VoidFunction = void ();
 
 [ Exposed=AnimationWorklet, Global=AnimationWorklet ]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
 };
-</pre>
+</xmp>
 
 
 <div class='note'>
@@ -504,18 +498,18 @@ animation's output.
 Creating a Worklet Animation {#creating-worklet-animation}
 -----------------------------------------------------------
 
-<pre class='idl'>
+<xmp class='idl'>
 
 
 [Constructor (DOMString animatorName,
-              optional (AnimationEffectReadOnly or sequence<AnimationEffectReadOnly>)? effects = null,
+              optional (AnimationEffect or sequence<AnimationEffect>)? effects = null,
               optional AnimationTimeline? timeline,
               optional any options)]
 interface WorkletAnimation : Animation {
         readonly attribute DOMString animatorName;
 };
 
-</pre>
+</xmp>
 
 
 <div algorithm="create-worklet-animation">
@@ -531,9 +525,9 @@ Creates a new {{WorkletAnimation}} object using the following procedure.
         {{Window}} that is the <a>current global object</a>.
 
     3. Let |effect| be the result corresponding to the first matching condition from below.
-         : If |effects| is a {{AnimationEffectReadOnly}} object,
+         : If |effects| is a {{AnimationEffect}} object,
          :: Let effect be |effects|.
-         : If |effects| is a <a>list</a> of {{AnimationEffectReadOnly}}</a> objects,
+         : If |effects| is a <a>list</a> of {{AnimationEffect}}</a> objects,
          :: Let |effect| be a new {{WorkletGroupEffect}} with its children set to |effects|.
          : Otherwise,
          :: Let |effect| be undefined.
@@ -574,7 +568,7 @@ Here are a few implications of the above semantics:
     necessarily change its output, but may change the animation <a>play state</a>.
  - Similarly, invoking {{Animation/finish()}} or updating a <a>worklet animation's</a> <a>playback
     rate</a> will only change the animation <a>play state</a> and may not change the output.
- - Querying the animation effect's local time using {{AnimationEffectReadOnly/getComputedTiming()}}
+ - Querying the animation effect's local time using {{AnimationEffect/getComputedTiming()}}
     may return stale information, in the case where the <a>animator instance</a> is running in a
     parallel execution context.
 
@@ -682,20 +676,18 @@ corresponding <a>animator instance</a> can directly control the <a>child effects
 times</a>. This allows a single worklet animation to coordinate multiple effects - see
 [[#example-2]] for an example of such a use-case.
 
-<pre class='idl'>
+<xmp class='idl'>
 
-interface WorkletGroupEffectReadOnly :  GroupEffectReadOnly {};
-
-interface WorkletGroupEffect :  WorkletGroupEffectReadOnly {};
-WorkletGroupEffect implements AnimationEffectMutable;
-WorkletGroupEffect implements GroupEffectMutable;
+interface WorkletGroupEffect {
+  sequence<AnimationEffect> getChildren();
+};
 
 [Exposed=AnimationWorklet]
-partial interface AnimationEffectReadOnly {
+partial interface AnimationEffect {
     // Intended for use inside Animation Worklet scope to drive the effect.
     attribute double localTime;
 };
-</pre>
+</xmp>
 
 <div algorithm="set-local-time">
 
@@ -713,9 +705,9 @@ action that corresponds to the first matching condition from the following:
 
 </div>
 
-Issue: The above algorithm should probably only apply to within the AnimationWorkletGlobalScope?
-
-[Issue](https://github.com/w3c/web-animations/issues/191)
+Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset
+of GroupEffect proposed as part of web-animation-2. Once that is available we
+should switch to it.
 
 
 Effect Stack and Composite Order {#effect-stack-composite-order}
@@ -837,7 +829,7 @@ const animation = new WorkletAnimation(
     new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}));
 animation.play();
 
-// Since this animation is using a group effect, the same animation instance 
+// Since this animation is using a group effect, the same animation instance
 // is accessible via different handles: $avatarEl.getAnimations()[0], $headerEl.getAnimations()[0]
 
 </script>
