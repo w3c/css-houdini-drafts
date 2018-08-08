@@ -375,8 +375,8 @@ partial interface AnimationEffectReadOnly {
 
 
 # Specification
-The [draft specification](https://wicg.github.io/animation-worklet) is updated to reflect the 
-the agreed design direction from Houdini Tokyo F2F meeting and recent changes in the same direction.
+The [draft specification](https://https://drafts.css-houdini.org/css-animationworklet) is
+the most recent version.
 
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
