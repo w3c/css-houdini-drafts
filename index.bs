@@ -102,6 +102,8 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 
 Introduction {#intro}
 =====================
+<em>This section is not normative.</em>
+
 This document introduces a new primitive for creating scroll-linked and other high performance
 procedural animations on the web. For details on the rationale and motivation see [[explainer]].
 
@@ -124,6 +126,7 @@ animations.
 
 Threading Model {#threading-model}
 ==================================
+<em>This section is not normative.</em>
 
 <a>Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
 parallel worklet execution contexts separate from the main javascript execution context, e.g., on
@@ -142,7 +145,7 @@ limit themselves to animating properties which do not require the user agent to 
 will have a much better chance of meeting the strict frame budgets required for smooth playback.
 
 If a Worklet Animation animation is executing in a parallel worklet execution context, the last
-known state of its animation effects must be periodically synced back to the main javascript
+known state of its animation effects should be periodically synced back to the main javascript
 execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
 context to the main javascript execution context <em>must</em> occur before <a>running the animation
 frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
@@ -727,15 +730,6 @@ As with other animations, <a>worklet animations</a> participate in the <a>effect
 worklet animation does not have a specific <a>animation class</a> which means it has the same
 composite order as other Javascript created web animations.
 
-Security Considerations {#security-considerations}
-==================================================
-
-Issue: Need to decide what security considerations there are for this spec.
-
-Privacy Considerations {#privacy-considerations}
-================================================
-
-Issue: Need to decide what privacy considerations there are for this spec.
 
 Examples {#examples}
 ====================

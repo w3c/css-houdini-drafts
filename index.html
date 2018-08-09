@@ -1214,7 +1214,7 @@ Possible extra rowspan handling
 </style>
   <meta content="Bikeshed version 0af8ece51a58310888d9da3e5b2ebda903d17c18" name="generator">
   <link href="https://wicg.github.io/animation-worklet/" rel="canonical">
-  <meta content="9fdddcda8e8eb5e4d9027999cdeeac3f65b4e4eb" name="document-revision">
+  <meta content="26264503e48ed9ed311680c45c18bc1e9ee56732" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1472,7 +1472,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">CSS Animation Worklet API</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-08-07">7 August 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-08-08">8 August 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1542,14 +1542,12 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li><a href="#worklet-group-effect"><span class="secno">6.7</span> <span class="content">WorkletGroupEffect</span></a>
       <li><a href="#effect-stack-composite-order"><span class="secno">6.8</span> <span class="content">Effect Stack and Composite Order</span></a>
      </ol>
-    <li><a href="#security-considerations"><span class="secno">7</span> <span class="content">Security Considerations</span></a>
-    <li><a href="#privacy-considerations"><span class="secno">8</span> <span class="content">Privacy Considerations</span></a>
     <li>
-     <a href="#examples"><span class="secno">9</span> <span class="content">Examples</span></a>
+     <a href="#examples"><span class="secno">7</span> <span class="content">Examples</span></a>
      <ol class="toc">
-      <li><a href="#example-1"><span class="secno">9.1</span> <span class="content">Example 1: Hidey Bar.</span></a>
-      <li><a href="#example-2"><span class="secno">9.2</span> <span class="content">Example 2: Twitter header.</span></a>
-      <li><a href="#example-3"><span class="secno">9.3</span> <span class="content">Example 3: Parallax backgrounds.</span></a>
+      <li><a href="#example-1"><span class="secno">7.1</span> <span class="content">Example 1: Hidey Bar.</span></a>
+      <li><a href="#example-2"><span class="secno">7.2</span> <span class="content">Example 2: Twitter header.</span></a>
+      <li><a href="#example-3"><span class="secno">7.3</span> <span class="content">Example 3: Parallax backgrounds.</span></a>
      </ol>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
     <li>
@@ -1570,8 +1568,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </nav>
   <main>
    <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
-    This document introduces a new primitive for creating scroll-linked and other high performance
-procedural animations on the web. For details on the rationale and motivation see <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a>. 
+    <em>This section is not normative.</em> 
+   <p>This document introduces a new primitive for creating scroll-linked and other high performance
+procedural animations on the web. For details on the rationale and motivation see <a data-link-type="biblio" href="#biblio-explainer">[explainer]</a>.</p>
    <p>The <a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet">Animation Worklet</a> API provides a method to create scripted animations that control a set
 of <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-effect" id="ref-for-animation-effect">animation effects</a>. The API is designed to make it possible for user agents to run such
 animations in their own dedicated thread to provide a degree of performance isolation from main
@@ -1584,6 +1583,7 @@ stateful, and runnable in a parallel worklet execution context. As such Web Anim
 or alter the input time (reverse, finish, etc.) have different semantics for Animation Worklet
 animations.</p>
    <h2 class="heading settled" data-level="2" id="threading-model"><span class="secno">2. </span><span class="content">Threading Model</span><a class="self-link" href="#threading-model"></a></h2>
+    <em>This section is not normative.</em> 
    <p><a data-link-type="dfn" href="#animation-worklet" id="ref-for-animation-worklet②">Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
 parallel worklet execution contexts separate from the main javascript execution context, e.g., on
 their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
@@ -1598,7 +1598,7 @@ unable to complete before the frame deadline.</p>
 limit themselves to animating properties which do not require the user agent to consult main thread
 will have a much better chance of meeting the strict frame budgets required for smooth playback.</p>
    <p>If a Worklet Animation animation is executing in a parallel worklet execution context, the last
-known state of its animation effects must be periodically synced back to the main javascript
+known state of its animation effects should be periodically synced back to the main javascript
 execution context. The synchronization of <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-value" id="ref-for-effect-value">effect values</a> from the parallel worklet execution
 context to the main javascript execution context <em>must</em> occur before <a data-link-type="dfn" href="https://html.spec.whatwg.org/#run-the-animation-frame-callbacks" id="ref-for-run-the-animation-frame-callbacks">running the animation
 frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
@@ -2046,7 +2046,7 @@ right abstractions and mechanisms to do this.</p>
    <p><code class="idl"><a data-link-type="idl" href="#workletgroupeffect" id="ref-for-workletgroupeffect①">WorkletGroupEffect</a></code> is a type of <a data-link-type="dfn" href="https://w3c.github.io/web-animations/level-2/#group-effect" id="ref-for-group-effect">group effect</a> that allows its <a data-link-type="dfn" href="https://w3c.github.io/web-animations/level-2/#child-effect" id="ref-for-child-effect">child effect’s</a> <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#local-time" id="ref-for-local-time④">local times</a> to be mutated individually.</p>
    <p>When a <code class="idl"><a data-link-type="idl" href="#workletgroupeffect" id="ref-for-workletgroupeffect②">WorkletGroupEffect</a></code> is set as the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-effect" id="ref-for-animation-effect⑤">animation effect</a> of a <code class="idl"><a data-link-type="idl" href="#workletanimation" id="ref-for-workletanimation②">WorkletAnimation</a></code>, the
 corresponding <a data-link-type="dfn" href="#animator-instance" id="ref-for-animator-instance②③">animator instance</a> can directly control the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/level-2/#child-effect" id="ref-for-child-effect①">child effects</a>' <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#local-time" id="ref-for-local-time⑤">local
-times</a>. This allows a single worklet animation to coordinate multiple effects - see <a href="#example-2">§9.2 Example 2: Twitter header.</a> for an example of such a use-case.</p>
+times</a>. This allows a single worklet animation to coordinate multiple effects - see <a href="#example-2">§7.2 Example 2: Twitter header.</a> for an example of such a use-case.</p>
 <pre class="idl highlight def"><c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="workletgroupeffect"><code><c- g>WorkletGroupEffect</c-></code></dfn> {
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="https://drafts.csswg.org/web-animations-1/#animationeffect" id="ref-for-animationeffect④"><c- n>AnimationEffect</c-></a>> <dfn class="idl-code" data-dfn-for="WorkletGroupEffect" data-dfn-type="method" data-export data-lt="getChildren()" id="dom-workletgroupeffect-getchildren"><code><c- g>getChildren</c-></code><a class="self-link" href="#dom-workletgroupeffect-getchildren"></a></dfn>();
 };
@@ -2080,12 +2080,8 @@ should switch to it. <a href="https://github.com/w3c/csswg-drafts/issues/2071">&
    <p>As with other animations, <a data-link-type="dfn" href="#worklet-animation" id="ref-for-worklet-animation①③">worklet animations</a> participate in the <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#effect-stack" id="ref-for-effect-stack">effect stack</a>.  A
 worklet animation does not have a specific <a data-link-type="dfn" href="https://w3c.github.io/web-animations/#animation-class" id="ref-for-animation-class">animation class</a> which means it has the same
 composite order as other Javascript created web animations.</p>
-   <h2 class="heading settled" data-level="7" id="security-considerations"><span class="secno">7. </span><span class="content">Security Considerations</span><a class="self-link" href="#security-considerations"></a></h2>
-   <p class="issue" id="issue-de770110"><a class="self-link" href="#issue-de770110"></a> Need to decide what security considerations there are for this spec.</p>
-   <h2 class="heading settled" data-level="8" id="privacy-considerations"><span class="secno">8. </span><span class="content">Privacy Considerations</span><a class="self-link" href="#privacy-considerations"></a></h2>
-   <p class="issue" id="issue-19f9ed9b"><a class="self-link" href="#issue-19f9ed9b"></a> Need to decide what privacy considerations there are for this spec.</p>
-   <h2 class="heading settled" data-level="9" id="examples"><span class="secno">9. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="9.1" id="example-1"><span class="secno">9.1. </span><span class="content">Example 1: Hidey Bar.</span><a class="self-link" href="#example-1"></a></h3>
+   <h2 class="heading settled" data-level="7" id="examples"><span class="secno">7. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
+   <h3 class="heading settled" data-level="7.1" id="example-1"><span class="secno">7.1. </span><span class="content">Example 1: Hidey Bar.</span><a class="self-link" href="#example-1"></a></h3>
     An example of header effect where a header is moved with scroll and as soon as finger is lifted it
 animates fully to close or open position depending on its current position. 
 <pre class="lang-markup highlight"><c- p>&lt;</c-><c- f>div</c-> <c- e>id</c-><c- o>=</c-><c- s>'scrollingContainer'</c-><c- p>></c->
@@ -2147,7 +2143,7 @@ registerAnimator<c- p>(</c-><c- t>'hidey-bar'</c-><c- p>,</c-> <c- kr>class</c->
 is no longer actively scrolling. This is a reasonable thing to have on scroll timeline. A simple
 fallback can emulate this by detecting when timeline time (i.e. scroll offset) has not changed in
 the last few frames.</p>
-   <h3 class="heading settled" data-level="9.2" id="example-2"><span class="secno">9.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
+   <h3 class="heading settled" data-level="7.2" id="example-2"><span class="secno">7.2. </span><span class="content">Example 2: Twitter header.</span><a class="self-link" href="#example-2"></a></h3>
     An example of twitter profile header effect where two elements (avatar, and header) are updated in
 sync with scroll offset. 
 <pre class="lang-markup highlight">// In document scope.
@@ -2193,7 +2189,7 @@ registerAnimator<c- p>(</c-><c- t>'twitter-header'</c-><c- p>,</c-> <c- kr>class
   <c- p>}</c->
 <c- p>});</c->
 </pre>
-   <h3 class="heading settled" data-level="9.3" id="example-3"><span class="secno">9.3. </span><span class="content">Example 3: Parallax backgrounds.</span><a class="self-link" href="#example-3"></a></h3>
+   <h3 class="heading settled" data-level="7.3" id="example-3"><span class="secno">7.3. </span><span class="content">Example 3: Parallax backgrounds.</span><a class="self-link" href="#example-3"></a></h3>
     A simple parallax background example. 
 <pre class="lang-markup highlight"><c- p>&lt;</c-><c- f>style</c-><c- p>></c->
 <c- p>.</c-><c- nc>parallax</c-> <c- p>{</c->
@@ -2721,8 +2717,6 @@ registerAnimator<c- p>(</c-><c- t>'parallax'</c-><c- p>,</c-> <c- kr>class</c-> 
    <div class="issue"> The above interface exposes a conservative subset
 of GroupEffect proposed as part of web-animation-2. Once that is available we
 should switch to it. <a href="https://github.com/w3c/csswg-drafts/issues/2071">&lt;https://github.com/w3c/csswg-drafts/issues/2071></a><a href="#issue-82bc9872"> ↵ </a></div>
-   <div class="issue"> Need to decide what security considerations there are for this spec.<a href="#issue-de770110"> ↵ </a></div>
-   <div class="issue"> Need to decide what privacy considerations there are for this spec.<a href="#issue-19f9ed9b"> ↵ </a></div>
    <div class="issue"> This example uses a hypothetical "phase" property on timeline as a way to detect when user
 is no longer actively scrolling. This is a reasonable thing to have on scroll timeline. A simple
 fallback can emulate this by detecting when timeline time (i.e. scroll offset) has not changed in
