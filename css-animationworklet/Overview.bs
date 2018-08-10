@@ -1,10 +1,9 @@
 <pre class='metadata'>
 Title:  CSS Animation Worklet API
-Status: CG-DRAFT
-Group: WICG
-URL: https://wicg.github.io/animation-worklet/
-Repository: wicg/animation-worklet
-Shortname: css-animation-api
+Status: ED
+Group: houdini
+ED: https://drafts.css-houdini.org/css-animationworklet-1/
+Shortname: css-workletanimation
 Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com
