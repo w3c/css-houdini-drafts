@@ -176,13 +176,14 @@ The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkle
 {{AnimationWorkletGlobalScope}} represents the global execution context of {{animationWorklet}}.
 
 <xmp class='idl'>
+[Exposed=Window]
 partial namespace CSS {
     [SameObject] readonly attribute Worklet animationWorklet;
 };
 </xmp>
 
 <xmp class='idl'>
-[ Exposed=AnimationWorklet, Global=AnimationWorklet ]
+[Exposed=AnimationWorklet, Global=AnimationWorklet]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
     void registerAnimator(DOMString name, VoidFunction animatorCtor);
 };
@@ -511,9 +512,8 @@ Creating a Worklet Animation {#creating-worklet-animation}
 -----------------------------------------------------------
 
 <xmp class='idl'>
-
-
-[Constructor (DOMString animatorName,
+[Exposed=Window,
+ Constructor (DOMString animatorName,
               optional (AnimationEffect or sequence<AnimationEffect>)? effects = null,
               optional AnimationTimeline? timeline,
               optional any options)]
@@ -689,7 +689,7 @@ times</a>. This allows a single worklet animation to coordinate multiple effects
 [[#example-2]] for an example of such a use-case.
 
 <xmp class='idl'>
-
+[Exposed=AnimationWorklet]
 interface WorkletGroupEffect {
   sequence<AnimationEffect> getChildren();
 };
