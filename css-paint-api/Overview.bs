@@ -340,9 +340,10 @@ Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderi
     Specifically it doesn't implement the {{CanvasImageData}}, {{CanvasUserInterface}},
     {{CanvasText}}, or {{CanvasTextDrawingStyles}} APIs.
 
-A {{PaintRenderingContext2D}} object has a <dfn for=PaintRenderingContext2D>output bitmap</dfn>. This is initialised when the
-object is created. The size of the [=PaintRenderingContext2D/output bitmap=] is the size of the fragment it is
-rendering.
+A {{PaintRenderingContext2D}} object has a <dfn for=PaintRenderingContext2D>output bitmap</dfn>.
+This is initialised when the object is created.
+The size of the [=PaintRenderingContext2D/output bitmap=] is the [=concrete object size=]
+of the object it is rendering to.
 
 A {{PaintRenderingContext2D}} object also has an <dfn for="PaintRenderingContext2D">alpha</dfn> flag,
 which can be set to true or false.
