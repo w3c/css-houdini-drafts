@@ -87,7 +87,7 @@ Paint Worklet {#paint-worklet}
 The {{paintWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
 which are related to painting.
 
-The {{paintWorklet}}'s <a>worklet global scope type</a> is {{PaintWorkletGlobalScope}}.
+The {{paintWorklet}}'s [=worklet global scope type=] is {{PaintWorkletGlobalScope}}.
 
 <pre class='idl'>
 partial namespace CSS {
@@ -136,30 +136,30 @@ dictionary PaintRenderingContext2DSettings {
 Concepts {#concepts}
 ====================
 
-A <dfn>paint definition</dfn> is a <a>struct</a> which describes the information needed by the
+A <dfn>paint definition</dfn> is a [=struct=] which describes the information needed by the
 {{PaintWorkletGlobalScope}} about the author defined <<image>> (which can be referenced by the
 <<paint()>> function). It consists of:
 
- - <dfn for="paint definition">class constructor</dfn> which is the class <a>constructor</a>.
+ - <dfn for="paint definition">class constructor</dfn> which is the class [=constructor=].
 
- - <dfn for="paint definition">paint function</dfn> which is the paint <a>Function</a>
-     <a>callback function</a> type.
+ - <dfn for="paint definition">paint function</dfn> which is the paint [=Function=]
+     [=callback function=] type.
 
  - <dfn for="paint definition">constructor valid flag</dfn>.
 
- - <dfn for="paint definition">input properties</dfn> which is a <a>list</a> of
+ - <dfn for="paint definition">input properties</dfn> which is a [=list=] of
     <code>DOMStrings</code>.
 
  - A <dfn for="paint definition">PaintRenderingContext2DSettings object</dfn>.
 
-A <dfn>document paint definition</dfn> is a <a>struct</a> which describes the information
-needed by the <a>document</a> about the author defined <<image>> function (which can be referenced
+A <dfn>document paint definition</dfn> is a [=struct=] which describes the information
+needed by the [=document=] about the author defined <<image>> function (which can be referenced
 by the paint function). It consists of:
 
- - A <dfn for="document paint definition">input properties</dfn> which is a <a>list</a> of
+ - A <dfn for="document paint definition">input properties</dfn> which is a [=list=] of
     <code>DOMStrings</code>.
 
- - A <dfn for="document paint definition">input argument syntaxes</dfn> which is a <a>list</a> of
+ - A <dfn for="document paint definition">input argument syntaxes</dfn> which is a [=list=] of
     parsed [[css-properties-values-api-1#supported-syntax-strings]].
 
  - A <dfn for="document paint definition">PaintRenderingContext2DSettings object</dfn>.
@@ -167,39 +167,39 @@ by the paint function). It consists of:
 Registering Custom Paint {#registering-custom-paint}
 ====================================================
 
-The <a>document</a> has a <a>map</a> of <dfn>document paint definitions</dfn>. Initially
+The [=document=] has a [=map=] of <dfn>document paint definitions</dfn>. Initially
 this map is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint definitions</dfn>. Initially this map
+A {{PaintWorkletGlobalScope}} has a [=map=] of <dfn>paint definitions</dfn>. Initially this map
 is empty; it is populated when {{registerPaint(name, paintCtor)}} is called.
 
-A {{PaintWorkletGlobalScope}} has a <a>map</a> of <dfn>paint class instances</dfn>. Initially this
-map is empty; it is populated when <a>draw a paint image</a> is invoked by the user agent.
+A {{PaintWorkletGlobalScope}} has a [=map=] of <dfn>paint class instances</dfn>. Initially this
+map is empty; it is populated when [=draw a paint image=] is invoked by the user agent.
 
-Instances of paint classes in the <a>paint class instances</a> map may be disposed and removed from
+Instances of paint classes in the [=paint class instances=] map may be disposed and removed from
 the map by the user agent at any time. This may be done when a <<paint()>> function no longer is
 used, or the user agent needs to reclaim memory.
 
 <div algorithm>
 When the <dfn method for=PaintWorkletGlobalScope>registerPaint(|name|, |paintCtor|)</dfn> method is
 called, the user agent <em>must</em> run the following steps:
-    1. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
+    1. If the |name| is an empty string, [=throw=] a [=TypeError=] and abort all these steps.
 
-    2. Let |paintDefinitionMap| be {{PaintWorkletGlobalScope}}'s <a>paint definitions</a> map.
+    2. Let |paintDefinitionMap| be {{PaintWorkletGlobalScope}}'s [=paint definitions=] map.
 
-    3. If |paintDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
-        "<a>InvalidModificationError</a>" <a>DOMException</a> and abort all these steps.
+    3. If |paintDefinitionMap|[|name|] [=map/exists=] [=throw=] a
+        "[=InvalidModificationError=]" [=DOMException=] and abort all these steps.
 
     4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>.
 
-    5. Let |inputPropertiesIterable| be the result of <a>Get</a>(|paintCtor|, "inputProperties").
+    5. Let |inputPropertiesIterable| be the result of [=Get=](|paintCtor|, "inputProperties").
 
     6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
-        <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is <a>thrown</a>, rethrow the exception and abort all these steps.
+        [=converting=] |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
+        exception is [=thrown=], rethrow the exception and abort all these steps.
 
-    7. Filter |inputProperties| so that it only contains <a>supported CSS properties</a> and
-        <a>custom properties</a>.
+    7. Filter |inputProperties| so that it only contains [=supported CSS properties=] and
+        [=custom properties=].
 
     Note: The list of CSS properties provided by the input properties getter can either be custom or
         native CSS properties.
@@ -212,92 +212,92 @@ called, the user agent <em>must</em> run the following steps:
 
     8. Let |inputArguments| be an empty <code>sequence&lt;DOMString></code>.
 
-    9. Let |inputArgumentsIterable| be the result of <a>Get</a>(|paintCtor|, "inputArguments").
+    9. Let |inputArgumentsIterable| be the result of [=Get=](|paintCtor|, "inputArguments").
 
     10. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
-        <a>converting</a> |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
+        [=converting=] |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
         execption is thrown, rethrow the execption and abort all these steps.
 
-    11. Let |inputArgumentSyntaxes| be an <a for=list>empty</a> <a>list</a>.
+    11. Let |inputArgumentSyntaxes| be an [=list/empty=] [=list=].
 
-    12. <a for=list>For each</a> |item| in |inputArguments| perform the following substeps:
+    12. [=list/For each=] |item| in |inputArguments| perform the following substeps:
 
         1. Let |parsedSyntax| be the result of parsing |item| according to the rules in
             [[css-properties-values-api-1#supported-syntax-strings]]. If it fails to parse
-            <a>throw</a> a <a>TypeError</a> and abort all these steps.
+            [=throw=] a [=TypeError=] and abort all these steps.
 
-        2. <a for=list>Append</a> |parsedSyntax| to |inputArgumentSyntaxes|.
+        2. [=list/Append=] |parsedSyntax| to |inputArgumentSyntaxes|.
 
-    13. Let |contextOptionsValue| be the result of <a>Get</a>(|paintCtor|, "contextOptions").
+    13. Let |contextOptionsValue| be the result of [=Get=](|paintCtor|, "contextOptions").
 
-    14. Let |paintRenderingContext2DSettings| be the result of <a>converting</a>
+    14. Let |paintRenderingContext2DSettings| be the result of [=converting=]
         |contextOptionsValue| to a {{PaintRenderingContext2DSettings}}.
-        If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
+        If an exception is [=thrown=], rethrow the exception and abort all these steps.
 
         Note: Setting <code>paintRenderingContext2DSettings.alpha</code> is <code>false</code> allows user agents
             to anti-alias text in addition to performing "visibility" optimizations, e.g. not
             painting an image behind the paint image as the paint image is opaque.
 
-    15. If the result of <a>IsConstructor</a>(|paintCtor|) is false, <a>throw</a> a <a>TypeError</a>
+    15. If the result of [=IsConstructor=](|paintCtor|) is false, [=throw=] a [=TypeError=]
         and abort all these steps.
 
-    16. Let |prototype| be the result of <a>Get</a>(|paintCtor|, "prototype").
+    16. Let |prototype| be the result of [=Get=](|paintCtor|, "prototype").
 
-    17. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
+    17. If the result of [=Type=](|prototype|) is not Object, [=throw=] a [=TypeError=] and
         abort all these steps.
 
-    18. Let |paintValue| be the result of <a>Get</a>(|prototype|, "paint").
+    18. Let |paintValue| be the result of [=Get=](|prototype|, "paint").
 
-    19. Let |paint| be the result of <a>converting</a> |paintValue| to the <a>Function</a>
-        <a>callback function</a> type. Rethrow any exceptions from the conversion.
+    19. Let |paint| be the result of [=converting=] |paintValue| to the [=Function=]
+        [=callback function=] type. Rethrow any exceptions from the conversion.
 
-    20. Let |definition| be a new <a>paint definition</a> with:
+    20. Let |definition| be a new [=paint definition=] with:
 
         - [=paint definition/class constructor=] being |paintCtor|.
 
-        - <a>paint function</a> being |paint|.
+        - [=paint function=] being |paint|.
 
         - [=paint definition/constructor valid flag=] being <b>true</b>.
 
-        - <a for="paint definition">input properties</a> being |inputProperties|.
+        - [=paint definition/input properties=] being |inputProperties|.
 
-        - <a for="paint definition">PaintRenderingContext2DSettings object</a> being |paintRenderingContext2DSettings|.
+        - [=paint definition/PaintRenderingContext2DSettings object=] being |paintRenderingContext2DSettings|.
 
-    21. <a for=map>Set</a> |paintDefinitionMap|[|name|] to |definition|.
+    21. [=map/Set=] |paintDefinitionMap|[|name|] to |definition|.
 
-    22. <a>Queue a task</a> to run the following steps:
+    22. [=Queue a task=] to run the following steps:
 
-        1. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
-            definitions</a> <a>map</a>.
+        1. Let |documentPaintDefinitionMap| be the associated [=document's=] [=document paint
+            definitions=] [=map=].
 
-        2. Let |documentDefinition| be a new <a>document paint definition</a> with:
+        2. Let |documentDefinition| be a new [=document paint definition=] with:
 
-            - <a for="document paint definition">input properties</a> being |inputProperties|.
+            - [=document paint definition/input properties=] being |inputProperties|.
 
-            - <a for="document paint definition">input argument syntaxes</a> being
+            - [=document paint definition/input argument syntaxes=] being
                 |inputArgumentSyntaxes|.
 
-            - <a for="document paint definition">PaintRenderingContext2DSettings object</a> being |paintRenderingContext2DSettings|.
+            - [=document paint definition/PaintRenderingContext2DSettings object=] being |paintRenderingContext2DSettings|.
 
-        3. If |documentPaintDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
+        3. If |documentPaintDefinitionMap|[|name|] [=map/exists=], run the following steps:
 
-            1. Let |existingDocumentDefinition| be the result of <a for=map>get</a>
+            1. Let |existingDocumentDefinition| be the result of [=map/get=]
                 |documentPaintDefinitionMap|[|name|].
 
             2. If |existingDocumentDefinition| is <code>"invalid"</code>, abort all these steps.
 
             3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
-                <a for="document paint definition">input properties</a>, <a for="document paint
+                [=document paint definition/input properties=], <a for="document paint
                 definition">input argument syntaxes</a>, and <a for="document paint
                 definition">PaintRenderingContext2DSettings object</a> are different), then:
 
-                <a for=map>Set</a> |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
+                [=map/Set=] |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
 
                 Log an error to the debugging console stating that the same class was registered
                 with different <code>inputProperties</code>, <code>inputArguments</code>, or
                 <code>paintRenderingContext2DSettings</code>.
 
-        4. Otherwise, <a for=map>set</a> |documentPaintDefinitionMap|[|name|] to
+        4. Otherwise, [=map/set=] |documentPaintDefinitionMap|[|name|] to
             |documentDefinition|.
 
 Note: The list of input properties should only be looked up once, the class doesn't have the
@@ -327,12 +327,12 @@ The <<paint()>> function is an additional notation to be supported by the <<imag
     </pre>
 </div>
 
-For the 'cursor' property, the <<paint()>> function should be treated as an <a>invalid image</a> and
+For the 'cursor' property, the <<paint()>> function should be treated as an [=invalid image=] and
 fallback to the next supported <<image>>.
 
-At <a>computed value</a> time the <<paint()>> function does <em>not</em> need to match the grammar
-registered by {{registerPaint()}}. Instead this will result in an <a>invalid image</a> when the
-parsing occurs inside <a>draw a paint image</a>.
+At [=computed value=] time the <<paint()>> function does <em>not</em> need to match the grammar
+registered by {{registerPaint()}}. Instead this will result in an [=invalid image=] when the
+parsing occurs inside [=draw a paint image=].
 
 The 2D rendering context {#2d-rendering-context}
 ================================================
@@ -358,19 +358,19 @@ Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderi
     Specifically it doesn't implement the {{CanvasImageData}}, {{CanvasUserInterface}},
     {{CanvasText}}, or {{CanvasTextDrawingStyles}} APIs.
 
-A {{PaintRenderingContext2D}} object has a <a>output bitmap</a>. This is initialised when the
-object is created. The size of the <a>output bitmap</a> is the size of the fragment it is
+A {{PaintRenderingContext2D}} object has a [=output bitmap=]. This is initialised when the
+object is created. The size of the [=output bitmap=] is the size of the fragment it is
 rendering.
 
-The size of the <a>output bitmap</a> does not necessarily represent the size of the actual bitmap
+The size of the [=output bitmap=] does not necessarily represent the size of the actual bitmap
 that the user agent will use internally or during rendering. For example, if the visual viewport is
 zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
 the coordinate space, so that the resulting rendering is of high quality.
 
 Additionally the user agent may record the sequence of drawing operations which have been applied to
-the <a>output bitmap</a> such that the user agent can subsequently draw onto a device bitmap at the
-correct resolution. This also allows user agents to re-use the same output of the <a>output
-bitmap</a> repeatably while the visual viewport is being zoomed for example.
+the [=output bitmap=] such that the user agent can subsequently draw onto a device bitmap at the
+correct resolution. This also allows user agents to re-use the same output of the [=output
+bitmap=] repeatably while the visual viewport is being zoomed for example.
 
 Whenever <code>"currentColor"</code> is used as a color in the {{PaintRenderingContext2D}} API, it
 is treated as opaque black.
@@ -391,13 +391,13 @@ is treated as opaque black.
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
 |height|, and |paintRenderingContext2DSettings|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
-    2. <a>Set bitmap dimensions</a> for the context's <a>output bitmap</a> to the rounded values of |width| and |height|.
-    3. Set the {{PaintRenderingContext2D}}'s <a>alpha</a> flag to |paintRenderingContext2DSettings|'s {{alpha}}.
+    2. [=Set bitmap dimensions=] for the context's [=output bitmap=] to the rounded values of |width| and |height|.
+    3. Set the {{PaintRenderingContext2D}}'s [=alpha=] flag to |paintRenderingContext2DSettings|'s {{alpha}}.
     4. Return the new {{PaintRenderingContext2D}}.
 
-Note: The initial state of the rendering context is set inside the <a>set bitmap dimensions</a>
-    algorithm, as it invokes <a>reset the rendering context to its default state</a> and clears the
-    <a>output bitmap</a>.
+Note: The initial state of the rendering context is set inside the [=set bitmap dimensions=]
+    algorithm, as it invokes [=reset the rendering context to its default state=] and clears the
+    [=output bitmap=].
 </div>
 
 Drawing a CSSImageValue {#drawing-a-cssimagevalue}
@@ -416,10 +416,10 @@ Note: This should eventually be moved to the canvas section of the HTML specific
 Drawing an image {#drawing-an-image}
 ====================================
 
-If a <<paint()>> function image for a <a>box</a> is within the visual viewport, the user agent
-<em>must</em> display an image output from an invocation of the <a>draw a paint image</a> algorithm.
+If a <<paint()>> function image for a [=box=] is within the visual viewport, the user agent
+<em>must</em> display an image output from an invocation of the [=draw a paint image=] algorithm.
 
-Note: The user agent doesn't have to run <a>draw a paint image</a> each frame for a <<paint()>>
+Note: The user agent doesn't have to run [=draw a paint image=] each frame for a <<paint()>>
     function within the visual viewport. It can cache results, (potentially using additional
     invalidation steps) to display the correct image output.
 
@@ -433,33 +433,33 @@ Note: The user agent can optionally defer drawing images which are outside the v
         });
     </pre>
     And the <code>element</code> is inside the visual viewport, the user agent is required to
-    <a>draw a paint image</a> and display the result for the current frame.
+    [=draw a paint image=] and display the result for the current frame.
 </div>
 
-The <a>draw a paint image</a> function is invoked by the user agent during the <a>object size
-negotiation</a> algorithm which is responsible for rendering an <<image>>, with
-|snappedConcreteObjectSize| defined as follows. Let |concreteObjectSize| be the <a>concrete object
-size</a> of the <a>box</a>.  The |snappedConcreteObjectSize| is usually the same as the
+The [=draw a paint image=] function is invoked by the user agent during the [=object size
+negotiation=] algorithm which is responsible for rendering an <<image>>, with
+|snappedConcreteObjectSize| defined as follows. Let |concreteObjectSize| be the [=concrete object
+size=] of the [=box=].  The |snappedConcreteObjectSize| is usually the same as the
 |concreteObjectSize|. However, the user agent may adjust the size such that it paints to pixel
 boundaries. If it does, the user agent should adjust the |snappedConcreteObjectSize| by the
 proportional change from its original size such that the <<paint()>> function can adjust the drawing
 accordingly.
 
-For the purposes of the <a>object size negotiation</a> algorithm, the paint image has no
-<a>intrinsic dimensions</a>.
+For the purposes of the [=object size negotiation=] algorithm, the paint image has no
+[=intrinsic dimensions=].
 
-Note: In a future version of the spec, the author could have the ability to specify the <a>intrinsic
-    dimensions</a> of the paint image. This will probably be exposed as a callback allowing the
-    author to define static <a>intrinsic dimensions</a> or dynamically updating the <a>intrinsic
-    dimensions</a> based on computed style and size changes.
+Note: In a future version of the spec, the author could have the ability to specify the [=intrinsic
+    dimensions=] of the paint image. This will probably be exposed as a callback allowing the
+    author to define static [=intrinsic dimensions=] or dynamically updating the [=intrinsic
+    dimensions=] based on computed style and size changes.
 
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
 the |snappedConcreteObjectSize| given by the user agent.
 
-Note: See [[css-images-3#object-sizing-examples]] for examples on how the <a>concrete object
-    size</a> is calculated.
+Note: See [[css-images-3#object-sizing-examples]] for examples on how the [=concrete object
+    size=] is calculated.
 
-The <a>draw a paint image</a> function may be speculatively invoked by the user agent at any point,
+The [=draw a paint image=] function may be speculatively invoked by the user agent at any point,
 with any |snappedConcreteObjectSize|. The resulting image is not displayed.
 
 Note: User agents may use any heuristic to speculate a possible future value for
@@ -485,26 +485,26 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
 
     2. Let |name| be the first argument of the |paintFunction|.
 
-    3. Let |documentPaintDefinitionMap| be the associated <a>document's</a> <a>document paint
-        definitions</a> map.
+    3. Let |documentPaintDefinitionMap| be the associated [=document's=] [=document paint
+        definitions=] map.
 
-    4. If |documentPaintDefinitionMap|[|name|] does not <a for=map>exist</a>, let the image output
-        be an <a>invalid image</a> and abort all these steps.
+    4. If |documentPaintDefinitionMap|[|name|] does not [=map/exist=], let the image output
+        be an [=invalid image=] and abort all these steps.
 
-    5. Let |documentDefinition| be the result of <a for=map>get</a>
+    5. Let |documentDefinition| be the result of [=map/get=]
         |documentPaintDefinitionMap|[|name|].
 
-    6. If |documentDefinition| is <code>"invalid"</code>, let the image output be an <a>invalid
-        image</a> and abort all these steps.
+    6. If |documentDefinition| is <code>"invalid"</code>, let the image output be an [=invalid
+        image=] and abort all these steps.
 
     7. Let |inputArgumentSyntaxes| be |documentDefinition|'s <a for="document paint
         definition">input argument syntaxes</a>.
 
-    8. Let |inputArguments| be the <a>list</a> of all the |paintFunction| arguments <em>after</em>
+    8. Let |inputArguments| be the [=list=] of all the |paintFunction| arguments <em>after</em>
         the "paint name" argument.
 
     9. If |inputArguments| do not match the registered grammar given by |inputArgumentSyntaxes|, let
-        the image output be an <a>invalid image</a> and abort all these steps.
+        the image output be an [=invalid image=] and abort all these steps.
 
         <div class=example>
             This step may fail in the following cases:
@@ -533,24 +533,24 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
                 &lt;/script>
             </pre>
 
-            <code>example-1</code> produces an <a>invalid image</a> as <code>"red"</code> does not
+            <code>example-1</code> produces an [=invalid image=] as <code>"red"</code> does not
             match the registered grammar.
 
-            <code>example-2</code> produces an <a>invalid image</a> as there are too many function
+            <code>example-2</code> produces an [=invalid image=] as there are too many function
             arguments.
         </div>
 
-    10. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the paint {{Worklet}}, following the rules defined in
+    10. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of [=worklet's
+        WorkletGlobalScopes=] from the paint {{Worklet}}, following the rules defined in
         [[#global-scope-selection]].
 
-        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         paint {{Worklet}}.
 
-    11. Run <a>invoke a paint callback</a> given |name|, |inputArguments|, |snappedConcreteObjectSize|,
-        |workletGlobalScope| optionally <a>in parallel</a>.
+    11. Run [=invoke a paint callback=] given |name|, |inputArguments|, |snappedConcreteObjectSize|,
+        |workletGlobalScope| optionally [=in parallel=].
 
-        Note: If the user agent runs <a>invoke a paint callback</a> on a thread <a>in parallel</a>,
+        Note: If the user agent runs [=invoke a paint callback=] on a thread [=in parallel=],
             it should select a paint worklet global scope which can be used on that thread.
 </div>
 
@@ -558,58 +558,58 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
 When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |inputArguments|,
 |snappedConcreteObjectSize|, and |workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |paintDefinitionMap| be |workletGlobalScope|'s <a>paint definitions</a> map.
+    1. Let |paintDefinitionMap| be |workletGlobalScope|'s [=paint definitions=] map.
 
-    2. If |paintDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following steps:
+    2. If |paintDefinitionMap|[|name|] does not [=map/exist=], run the following steps:
 
-        1. <a>Queue a task</a> to run the following steps:
+        1. [=Queue a task=] to run the following steps:
 
-            1. Let |documentPaintDefinitionMap| be the associated <a>document</a>'s <a>document
-                paint definitions</a> map.
+            1. Let |documentPaintDefinitionMap| be the associated [=document=]'s [=document
+                paint definitions=] map.
 
-            2. <a for=map>Set</a> |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
+            2. [=map/Set=] |documentPaintDefinitionMap|[|name|] to <code>"invalid"</code>.
 
             3. The user agent <em>should</em> log an error to the debugging console stating that a
                 class wasn't registered in all {{PaintWorkletGlobalScope}}s.
 
-        2. Let the image output be an <a>invalid image</a> and abort all these steps.
+        2. Let the image output be an [=invalid image=] and abort all these steps.
 
         Note: This handles the case where there could be a paint worklet global scope which didn't
             receive the {{registerPaint(name, paintCtor)}} for |name| (however another global scope
             did). A paint callback which is invoked on the other global scope could succeed, but
-            wont succeed on a subsequent frame when <a>draw a paint image</a> is called.
+            wont succeed on a subsequent frame when [=draw a paint image=] is called.
 
-    3. Let |definition| be the result of <a>get</a> |paintDefinitionMap|[|name|].
+    3. Let |definition| be the result of [=get=] |paintDefinitionMap|[|name|].
 
-    4. Let |paintClassInstanceMap| be |workletGlobalScope|'s <a>paint class instances</a> map.
+    4. Let |paintClassInstanceMap| be |workletGlobalScope|'s [=paint class instances=] map.
 
-    5. Let |paintInstance| be the result of <a>get</a> |paintClassInstanceMap|[|name]|. If
+    5. Let |paintInstance| be the result of [=get=] |paintClassInstanceMap|[|name]|. If
         |paintInstance| is null, run the following steps:
 
         1. If the [=paint definition/constructor valid flag=] on |definition| is false, let the image output be an
-            <a>invalid image</a> and abort all these steps.
+            [=invalid image=] and abort all these steps.
 
         2. Let |paintCtor| be the [=paint definition/class constructor=] on |definition|.
 
-        3. Let |paintInstance| be the result of <a>Construct</a>(|paintCtor|).
+        3. Let |paintInstance| be the result of [=Construct=](|paintCtor|).
 
-            If <a>construct</a> throws an exception,
+            If [=construct=] throws an exception,
             set the |definition|'s [=paint definition/constructor valid flag=] to false,
-            let the image output be an <a>invalid image</a> and abort all these
+            let the image output be an [=invalid image=] and abort all these
             steps.
 
-        4. <a for=map>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
+        4. [=map/Set=] |paintClassInstanceMap|[|name|] to |paintInstance|.
 
-    6. Let |inputProperties| be |definition|'s <a for="paint definition">input properties</a>.
+    6. Let |inputProperties| be |definition|'s [=paint definition/input properties=].
 
     7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed value</a>'s for properties listed in |inputProperties|.
+        [=computed value=]'s for properties listed in |inputProperties|.
 
-    8. Let |renderingContext| be the result of <a>create a PaintRenderingContext2D object</a> given:
+    8. Let |renderingContext| be the result of [=create a PaintRenderingContext2D object=] given:
             - "width" - The width given by |concreteObjectSize|.
             - "height" - The height given by |concreteObjectSize|.
             - "paintRenderingContext2DSettings" - The
-                <a for="paint definition">PaintRenderingContext2DSettings object</a> given by |definition|.
+                [=paint definition/PaintRenderingContext2DSettings object=] given by |definition|.
 
         Note: The |renderingContext| is not be re-used between invocations of paint. Implicitly this
             means that there is no stored data, or state on the |renderingContext| between
@@ -666,14 +666,14 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
             </pre>
         </div>
 
-    11. Let |paintFunctionCallback| be |definition|'s <a>paint function</a>.
+    11. Let |paintFunctionCallback| be |definition|'s [=paint function=].
 
-    12. <a>Invoke</a> |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
-        |styleMap|, |inputArguments|», and with |paintInstance| as the <a>callback this value</a>.
+    12. [=Invoke=] |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
+        |styleMap|, |inputArguments|», and with |paintInstance| as the [=callback this value=].
 
         If |paintFunctionCallback| does not complete within an acceptable time (as determined by the
         user agent, i.e. it is a "long running script") the user agent <em>may</em> terminate the
-        script, let the image output be an <a>invalid image</a>, and abort all these steps.
+        script, let the image output be an [=invalid image=], and abort all these steps.
 
         Note: User agents could provide tooling within their debugging tools to show authors how
             expensive their paint classes are. User agents could also how an "unresponsive script"
@@ -681,7 +681,7 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
 
     13. The image output is to be produced from the |renderingContext| given to the method.
 
-        If an exception is <a>thrown</a> the let the image output be an <a>invalid image</a>.
+        If an exception is [=thrown=] the let the image output be an [=invalid image=].
 
 Note: The contents of the resulting image are not designed to be accessible. Authors can communicate
     any useful information through the standard accessibility APIs.
@@ -690,8 +690,8 @@ Note: The contents of the resulting image are not designed to be accessible. Aut
 Global Scope Selection {#global-scope-selection}
 ------------------------------------------------
 
-When the user agent needs to select a {{PaintWorkletGlobalScope}} from the paint <a>worklet's
-WorkletGlobalScopes</a> <a>list</a> it <em>must</em>:
+When the user agent needs to select a {{PaintWorkletGlobalScope}} from the paint [=worklet's
+WorkletGlobalScopes=] [=list=] it <em>must</em>:
 
     - Select from at <em>least</em> two {{PaintWorkletGlobalScope}}s, unless the user agent is under
         memory constraints.
