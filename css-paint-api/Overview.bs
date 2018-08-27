@@ -54,8 +54,6 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
 urlPrefix: https://html.spec.whatwg.org/multipage/; type: dfn;
     urlPrefix: scripting.html
         text: reset the rendering context to its default state
-        text: output bitmap
-        text: set bitmap dimensions
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -357,8 +355,8 @@ Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderi
     Specifically it doesn't implement the {{CanvasImageData}}, {{CanvasUserInterface}},
     {{CanvasText}}, or {{CanvasTextDrawingStyles}} APIs.
 
-A {{PaintRenderingContext2D}} object has a [=output bitmap=]. This is initialised when the
-object is created. The size of the [=output bitmap=] is the size of the fragment it is
+A {{PaintRenderingContext2D}} object has a <dfn for=PaintRenderingContext2D>output bitmap</dfn>. This is initialised when the
+object is created. The size of the [=PaintRenderingContext2D/output bitmap=] is the size of the fragment it is
 rendering.
 
 A {{PaintRenderingContext2D}} object also has an <dfn for="PaintRenderingContext2D">alpha</dfn> flag,
@@ -369,15 +367,14 @@ When a {{PaintRenderingContext2D}} object has its alpha flag set to false,
 then its alpha channel must be fixed to 1.0 (fully opaque) for all pixels,
 and attempts to change the alpha component of any pixel must be silently ignored.
 
-The size of the [=output bitmap=] does not necessarily represent the size of the actual bitmap
+The size of the [=PaintRenderingContext2D/output bitmap=] does not necessarily represent the size of the actual bitmap
 that the user agent will use internally or during rendering. For example, if the visual viewport is
 zoomed the user agent may internally use bitmaps which correspond to the number of device pixels in
 the coordinate space, so that the resulting rendering is of high quality.
 
 Additionally the user agent may record the sequence of drawing operations which have been applied to
-the [=output bitmap=] such that the user agent can subsequently draw onto a device bitmap at the
-correct resolution. This also allows user agents to re-use the same output of the [=output
-bitmap=] repeatably while the visual viewport is being zoomed for example.
+the [=PaintRenderingContext2D/output bitmap=] such that the user agent can subsequently draw onto a device bitmap at the
+correct resolution. This also allows user agents to re-use the same output of the [=PaintRenderingContext2D/output bitmap=] repeatably while the visual viewport is being zoomed for example.
 
 Whenever <code>"currentColor"</code> is used as a color in the {{PaintRenderingContext2D}} API, it
 is treated as opaque black.
@@ -398,13 +395,13 @@ is treated as opaque black.
 When the user agent is to <dfn>create a PaintRenderingContext2D object</dfn> for a given |width|,
 |height|, and |paintRenderingContext2DSettings|, it <em>must</em> run the following steps:
     1. Create a new {{PaintRenderingContext2D}}.
-    2. [=Set bitmap dimensions=] for the context's [=output bitmap=] to the rounded values of |width| and |height|.
+    2. [=Set bitmap dimensions=] for the context's [=PaintRenderingContext2D/output bitmap=] to the rounded values of |width| and |height|.
     3. Set the {{PaintRenderingContext2D}}'s [=PaintRenderingContext2D/alpha=] flag to |paintRenderingContext2DSettings|'s {{alpha}}.
     4. Return the new {{PaintRenderingContext2D}}.
 
 Note: The initial state of the rendering context is set inside the [=set bitmap dimensions=]
     algorithm, as it invokes [=reset the rendering context to its default state=] and clears the
-    [=output bitmap=].
+    [=PaintRenderingContext2D/output bitmap=].
 </div>
 
 Drawing a CSSImageValue {#drawing-a-cssimagevalue}
