@@ -253,11 +253,11 @@ called, the user agent <em>must</em> run the following steps:
 
     20. Let |definition| be a new <a>paint definition</a> with:
 
-        - <a>class constructor</a> being |paintCtor|.
+        - [=paint definition/class constructor=] being |paintCtor|.
 
         - <a>paint function</a> being |paint|.
 
-        - <a>constructor valid flag</a> being <b>true</b>.
+        - [=paint definition/constructor valid flag=] being <b>true</b>.
 
         - <a for="paint definition">input properties</a> being |inputProperties|.
 
@@ -586,15 +586,16 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     5. Let |paintInstance| be the result of <a>get</a> |paintClassInstanceMap|[|name]|. If
         |paintInstance| is null, run the following steps:
 
-        1. If the <a>constructor valid flag</a> on |definition| is false, let the image output be an
+        1. If the [=paint definition/constructor valid flag=] on |definition| is false, let the image output be an
             <a>invalid image</a> and abort all these steps.
 
-        2. Let |paintCtor| be the <a>class constructor</a> on |definition|.
+        2. Let |paintCtor| be the [=paint definition/class constructor=] on |definition|.
 
         3. Let |paintInstance| be the result of <a>Construct</a>(|paintCtor|).
 
-            If <a>construct</a> throws an exception, set the |definition|'s <a>constructor valid
-            flag</a> to false, let the image output be an <a>invalid image</a> and abort all these
+            If <a>construct</a> throws an exception,
+            set the |definition|'s [=paint definition/constructor valid flag=] to false,
+            let the image output be an <a>invalid image</a> and abort all these
             steps.
 
         4. <a for=map>Set</a> |paintClassInstanceMap|[|name|] to |paintInstance|.
