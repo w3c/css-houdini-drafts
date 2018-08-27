@@ -177,7 +177,11 @@ it animates fully to close or open position depending on its current position.
 
 <script>
 animationWorklet.addModule('hidey-bar-animator.js');
-const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: $scrollingContainer,
+  orientation: 'block',
+  timeRange: 100
+});
 const documentTimeline = document.timeline;
 
 
@@ -185,7 +189,7 @@ const animation = new WorkletAnimation('hidey-bar',
   new KeyFrameEffect($header,
                       [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
                       {duration: 100, iterations: 1, fill: 'both' })
-  scrollTimeline, 
+  scrollTimeline,
   {scrollTimeline, documentTimeline},
 );
 animation.play();
@@ -249,8 +253,13 @@ const animation = new WorkletAnimation('twitter-header',
                       {duration: 1000, iterations: 1}),
     new KeyFrameEffect($header, /* loses transparency as we scroll up */
                       [{opacity: 0}, {opacity: 0.8}],
-                      {duration: 1000, iterations: 1})] ,
-    new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
+                      {duration: 1000, iterations: 1})],
+    new ScrollTimeline({
+      scrollSource: $scrollingContainer,
+      timeRange: 1000,
+      orientation: 'block',
+      startScrollOffset: 0,
+      endScrollOffset: $header.clientHeight}),
 );
 animation.play();
 </script>
@@ -296,7 +305,11 @@ registerAnimator('twitter-header', class {
 
 <script>
 await animationWorklet.addModule('parallax-animator.js');
-const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: $scrollingContainer,
+  orientation: 'block',
+  timeRange: 1000
+});
 const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
 
 const slowParallax = new WorkletAnimation(

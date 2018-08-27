@@ -747,7 +747,11 @@ animates fully to close or open position depending on its current position.
 
 <script>
 await CSS.animationWorklet.addModule('hidey-bar-animator.js');
-const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: $scrollingContainer,
+  orientation: 'block',
+  timeRange: 1000
+});
 const documentTimeline = document.timeline;
 
 // Note we pass in two timelines in the options bag which allows the animation to read their
@@ -829,7 +833,12 @@ const animation = new WorkletAnimation(
     new KeyFrameEffect($header, /* loses transparency as we scroll up */
                     [{opacity: 0}, {opacity: 0.8}],
                     {duration: 1000, iterations: 1})],
-    new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}));
+    new ScrollTimeline({
+      scrollSource: $scrollingContainer,
+      orientation: 'block',
+      timeRange: 1000,
+      startScrollOffset: 0,
+      endScrollOffset: $header.clientHeight}));
 animation.play();
 
 // Since this animation is using a group effect, the same animation instance
@@ -880,7 +889,11 @@ A simple parallax background example.
 
 <script>
 await CSS.animationWorklet.addModule('parallax-animator.js');
-const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: $scrollingContainer,
+  orientation: 'block',
+  timeRange: 1000
+});
 const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
 
 const slowParallax = new WorkletAnimation(
