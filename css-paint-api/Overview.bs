@@ -34,26 +34,11 @@ Ignored Terms: PaintWorklet
 </style>
 
 <pre class="link-defaults">
-spec:css-break-3; type:dfn; text:fragment
-spec:css-display-3; type:dfn; text:box
-spec:css-ui-4; type:property; text:cursor
 spec:infra; type:dfn; text:list
+spec:webidl; type:dfn; text:converting
 </pre>
 
 <pre class="anchors">
-urlPrefix: https://heycam.github.io/webidl/; type: dfn;
-    text: InvalidModificationError
-    urlPrefix: #common-;
-        text: Function
-    urlPrefix: #dfn-;
-        url: throw; text: thrown
-    urlPrefix: #idl-;
-        text: boolean
-        text: DOMException
-    url: es-type-mapping; text: converting
-urlPrefix: https://html.spec.whatwg.org/multipage/; type: dfn;
-    urlPrefix: scripting.html
-        text: reset the rendering context to its default state
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -185,7 +170,7 @@ called, the user agent <em>must</em> run the following steps:
     2. Let |paintDefinitionMap| be {{PaintWorkletGlobalScope}}'s [=paint definitions=] map.
 
     3. If |paintDefinitionMap|[|name|] [=map/exists=] [=throw=] a
-        "[=InvalidModificationError=]" [=DOMException=] and abort all these steps.
+        "{{InvalidModificationError}}" {{DOMException}} and abort all these steps.
 
     4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>.
 
