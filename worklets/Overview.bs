@@ -115,7 +115,7 @@ The following techniques are used in order to encourage authors to write code in
 
  - Code is loaded as a <a>module script</a> which resulting in the code being executed in <a>strict
      mode code</a> without a shared this. This prevents two different module scripts sharing
-     state be referencing shared objects on the global scope.
+     state by referencing shared objects on the global scope.
 
  - These specifications must require user agents to always have at least two {{WorkletGlobalScope}}s
      per {{Worklet}} and randomly assign a method or set of methods on a class to a particular
