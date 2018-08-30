@@ -641,7 +641,6 @@ probably in an appendix.
         (such as ''Auto'' matching the keyword ''auto'' specified in the grammar for 'width'),
         they apply to this comparison as well.
     * A {{CSSTransformValue}} matches <<transform-list>>.
-    * A {{CSSPositionValue}} matches <<position>>.
     * A {{CSSNumericValue}} matches what its type [=CSSNumericValue/matches=].
     * A {{CSSURLImageValue}} matches <<url>>.
     * Any subclass of {{CSSImageValue}} matches <<image>>.
@@ -2302,21 +2301,6 @@ partial namespace CSS {
     to avoid defining the unit individually for all ~20 functions.
 </div>
 
-<div class=example>
-    For example, rather than creating a new {{CSSPositionValue}} with code like:
-
-    <pre class=lang-js>
-        let pos = new CSSPositionValue(
-            new CSSUnitValue(5, "px"),
-            new CSSUnitValue(10, "px"));
-    </pre>
-
-    One can instead write:
-
-    <pre class=lang-js>
-        let pos = new CSSPositionValue(CSS.px(5), CSS.px(10));
-    </pre>
-</div>
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
@@ -2787,86 +2771,6 @@ This list is the object's [=values to iterate over=].
     respectively.
 </div>
 
-<!--
-████████   ███████   ██████  ████ ████████ ████  ███████  ██    ██
-██     ██ ██     ██ ██    ██  ██     ██     ██  ██     ██ ███   ██
-██     ██ ██     ██ ██        ██     ██     ██  ██     ██ ████  ██
-████████  ██     ██  ██████   ██     ██     ██  ██     ██ ██ ██ ██
-██        ██     ██       ██  ██     ██     ██  ██     ██ ██  ████
-██        ██     ██ ██    ██  ██     ██     ██  ██     ██ ██   ███
-██         ███████   ██████  ████    ██    ████  ███████  ██    ██
--->
-
-{{CSSPositionValue}} objects {#positionvalue-objects}
---------------------------------------------------
-
-{{CSSPositionValue}} objects represent <<position>> values,
-used by properties such as 'object-position'.
-
-<pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
- Constructor(CSSNumericValue x, CSSNumericValue y)]
-interface CSSPositionValue : CSSStyleValue {
-    attribute CSSNumericValue x;
-    attribute CSSNumericValue y;
-};
-</pre>
-
-The {{CSSPositionValue/x}} attribute expresses the offset from the left edge of the container;
-{{CSSPositionValue/y}} expresses the offset from the top edge of the container.
-
-<div algorithm>
-    The <dfn constructor for=CSSPositionValue>CSSPositionValue(|x|, |y|)</dfn> constructor must,
-    when called,
-    perform the following steps:
-
-    1. If |x| or |y| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
-        [=throw=] a {{TypeError}}.
-
-    2. Otherwise, return a new {{CSSPositionValue}}
-        whose {{CSSPositionValue/x}} internal slot is set to |x|,
-        and whose {{CSSPositionValue/y}} internal slot is set to |y|.
-</div>
-
-<div algorithm="CSSPositionValue.x">
-    The <dfn attribute for=CSSPositionValue>x</dfn> and <dfn attribute for=CSSPositionValue>y</dfn> attribute of a {{CSSPositionValue}} |this| must,
-    on setting a value |value|,
-    perform the following steps:
-
-    1. If |value| doesn't [=CSSNumericValue/match=] <<length-percentage>>,
-        [=throw=] a {{TypeError}}.
-
-    2. Otherwise, set |this|’s {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
-        as appropriate,
-        to |value|.
-
-    On reading, the attributes must return the value of the {{CSSPositionValue/x}} or {{CSSPositionValue/y}} internal slot,
-        as appropriate.
-</div>
-
-<div class='example'>
-    <<position>> values accept a complicated combination of keywords and values,
-    but Typed OM always simplifies to just two offsets as per the [[#reify-position]] algorithm.
-    For example, the following style sheet:
-
-    <pre class='lang-css'>
-    .example {
-        object-position: center bottom 10px;
-    }
-    </pre>
-
-    Will produce the following behavior:
-
-    <pre class='lang-javascript'>
-    let map = document.querySelector('.example').computedStyleMap();
-
-    map.get('object-position').x;
-    // CSS.percent(50)
-
-    map.get('object-position').y;
-    // CSSMathSum(CSS.percent(100), CSS.px(-10))
-    </pre>
-</div>
 
 <!--
 ████ ██     ██    ███     ██████   ████████
@@ -5064,79 +4968,6 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
     </dl>
 </div>
 
-<<position>> Values {#reify-position}
------------------------------------------------
-
-CSS <<position>> values become {{CSSPositionValue}}s in the Typed OM, with <var>x</var> and <var>y</var>
-components determined via the following process. If this process, or any sub-process referenced by this
-process fails, then reification as a whole fails.
-
-1.  Initialize both <var>x</var> and <var>y</var> to a {{CSSNumericValue}} value representing 50%.
-1.  If the provided value is a single keyword, length, percentage, or calc expression, then follow
-        the procedure outlined in [[#from-single-keyword]] with <var>value</var> given
-        by the provided value and an auto <var>bias</var>.
-1.  Otherwise, if the provided value consists of a combination of two keywords, then:
-
-        1.  follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by the
-                first keyword and an auto <var>bias</var>.
-        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-        1.  follow the procedure again with <var>value</var> given by the second keyword, using the existing <var>bias</var>.
-
-1.  Otherwise, if the provided value consists of a combination of two keywords, lengths, percentages, and
-        calc expressions, then follow the procedure outlined in [[#from-single-keyword]] with
-        <var>value</var> given by the first part of the provided value and a horizontal <var>bias</var>, then follow the
-        procedure again with <var>value</var> given by the second part of the provided value and a vertical <var>bias</var>.
-1.  Otherwise:
-
-        1.  if the provided value starts with a keyword followed by a length, percentage, or calc expression, then follow
-                the procedure outlined in [[#from-keyword-and-length]] with <var>keyword</var> set to the
-                keyword, <var>length</var> set to the length, percentage, or calc expression, and auto <var>bias</var>.
-        1.  otherwise, follow the procedure outlined in [[#from-single-keyword]] with <var>value</var>
-                set to the first component of the provided value and an auto <var>bias</var>.
-        1.  if <var>bias</var> is horizontal, set it to vertical. Otherwise, set it to horizontal.
-        1.  if the remainder of the provided value is a single keyword, length, percentage or calc expression, follow
-                the procedure outlined in
-                [[#from-single-keyword]] with <var>value</var> set to the keyword and the existing
-                <var>bias</var>.
-        1.  otherwise, if the remainder of the provided value consists of a keyword followed by a length, percentage or
-                calc expression, follow the procedure outlined in [[#from-keyword-and-length]] with
-                <var>keyword</var> set to the keyword, <var>length</var> set to the length, percentage, or calc expression, and
-                the existing <var>bias</var>.
-        1.  Otherwise, the process fails.
-
-<h4 id='from-single-keyword'>Determining <var>x</var> or <var>y</var> from a single value</h4>
-
-The following process sets a value for either <var>x</var> or <var>y</var>, depending on an input <var>value</var>
-and <var>bias</var>. The process also updates <var>bias</var> based on the <var>value</var>.
-
-1.  If <var>value</var> is the keyword "left" and <var>bias</var> is not vertical, then set <var>x</var> to a
-        {{CSSNumericValue}} value representing 0% and <var>bias</var> to horizontal and exit this process.
-1.  If <var>value</var> is the keyword "right" and <var>bias</var> is not vertical, then set <var>x</var> to a
-        {{CSSNumericValue}} value representing 100% and <var>bias</var> to horizontal and exit this process.
-1.  If <var>value</var> is the keyword "top" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-        {{CSSNumericValue}} value representing 0% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> is the keyword "bottom" and <var>bias</var> is not horizontal, then set <var>y</var> to a
-        {{CSSNumericValue}} value representing 100% and <var>bias</var> to vertical and exit this process.
-1.  If <var>value</var> [=CSSNumericValue/matches=] the <<length-percentage>> production, then set <var>norm</var> to the result of
-        [=reify a numeric value|reifying |value| as a numeric value=]. If <var>bias</var> is vertical,
-        set <var>y</var> to <var>norm</var>, otherwise set <var>x</var> to <var>norm</var> and <var>bias</var> to
-        horizontal. Exit this process.
-1.  If <var>value</var> is not the keyword "center", then this process fails.
-
-<h4 id='from-keyword-and-length'>Determining <var>x</var> or <var>y</var> from a keyword and a length</h4>
-
-The following process sets a value for either <var>x</var> or<var>y</var>, depending on an input <var>keyword</var>,
-<var>length</var>, and <var>bias</var>. The process also updates <var>bias</var> based on the <var>keyword</var> and
-<var>length</var>.
-
-1.  Follow the procedure outlined in [[#from-single-keyword]] with <var>value</var> given by
-        <var>keyword</var>, using the provided <var>bias</var>
-1.  Let <var>adjustment</var> be the result of
-    [=reify a numeric value|reifying |length| as a numeric value=].
-1.  If the keyword is "right" or "bottom", let <var>adjustment</var> be the result of subtracting
-        <var>adjustment</var> from a zero length.
-1.  Amend <var>x</var> (if <var>bias</var> is horizontal) or <var>y</var> (if <var>bias</var> is vertical) by
-        adding <var>adjustment</var> to it.
 
 <<url>> (and subtype) Values {#reify-url}
 --------------------------------------------------------------
@@ -5579,17 +5410,6 @@ length3.toString(); // "42px";
         of |this|’s {{CSSMatrixComponent/matrix}} internal slot.
 </div>
 
-
-{{CSSPositionValue}} Serialization {#positionvalue-serialization}
------------------------------------------------------------------
-
-{{CSSPositionValue}} objects are serialized by:
-*   serializing the {{CSSPositionValue/x}} attribute according to
-    the rules for {{CSSNumericValue}} objects above.
-*   serializing the {{CSSPositionValue/y}} attribute according to
-    the rules for {{CSSNumericValue}} objects above.
-*   returning the concatenation of the two serializations (x before y), separated
-    by a space.
 
 {{CSSURLImageValue}} Serialization {#urlimagevalue-serialization}
 -----------------------------------------------------------
