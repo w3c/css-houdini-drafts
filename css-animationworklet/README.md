@@ -132,7 +132,7 @@ hooks:
 
 ```js
 // in document scope
-new WorklerAnimation('animation-with-local-state', [], [], {value: 1});
+new WorkletAnimation('animation-with-local-state', [], [], {value: 1});
 ```
 
 
@@ -176,16 +176,16 @@ it animates fully to close or open position depending on its current position.
 </div>
 
 <script>
-animationWorklet.addModule('hidey-bar-animator.js');
+await CSS.animationWorklet.addModule('hidey-bar-animator.js');
 const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 100});
 const documentTimeline = document.timeline;
 
 
 const animation = new WorkletAnimation('hidey-bar',
-  new KeyFrameEffect($header,
+  new KeyframeEffect($header,
                       [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
                       {duration: 100, iterations: 1, fill: 'both' })
-  scrollTimeline, 
+  scrollTimeline,
   {scrollTimeline, documentTimeline},
 );
 animation.play();
@@ -242,12 +242,12 @@ sync with scroll offset.
 </div>
 
 <script>
-await animationWorklet.addModule('twitter-header-animator.js');
+await CSS.animationWorklet.addModule('twitter-header-animator.js');
 const animation = new WorkletAnimation('twitter-header',
-  [new KeyFrameEffect($avatar,  /* scales down as we scroll up */
+  [new KeyframeEffect($avatar,  /* scales down as we scroll up */
                       [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
                       {duration: 1000, iterations: 1}),
-    new KeyFrameEffect($header, /* loses transparency as we scroll up */
+    new KeyframeEffect($header, /* loses transparency as we scroll up */
                       [{opacity: 0}, {opacity: 0.8}],
                       {duration: 1000, iterations: 1})] ,
     new ScrollTimeline($scrollingContainer, {timeRange: 1000, startScrollOffset: 0, endScrollOffset: $header.clientHeight}),
@@ -295,7 +295,7 @@ registerAnimator('twitter-header', class {
 </div>
 
 <script>
-await animationWorklet.addModule('parallax-animator.js');
+await CSS.animationWorklet.addModule('parallax-animator.js');
 const scrollTimeline = new ScrollTimeline($scrollingContainer, {timeRange: 1000});
 const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
 
