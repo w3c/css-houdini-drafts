@@ -73,7 +73,7 @@ if ('paintWorklet' in CSS) {
 }
 ```
 
-See the worklets explainer for a more involed explaination of worklets. In short worklets:
+See the worklets explainer for a more involved explaination of worklets. In short worklets:
  - Are similar to workers in that the script runs in a separate global script context.
  - A script inside a worklet has no DOM, Network, Database, etc access.
  - The global script context lifetime is not defined (you should expect the script context to be killed at any point).
