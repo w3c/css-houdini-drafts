@@ -7,6 +7,8 @@ ED: https://drafts.css-houdini.org/css-layout-api-1/
 Shortname: css-layout-api
 Level: 1
 Abstract:
+    An API for allowing web developers to define their own layout modes with javascript.
+    See <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-layout-api/EXPLAINER.md">EXPLAINER</a>.
 Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
