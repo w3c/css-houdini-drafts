@@ -65,65 +65,43 @@ There are a lot of things going on in the following example so we'll step throug
 below. You should read the code below with its explanatory section.
 
 ```js
-registerLayout('centering', class extends Layout {
-  static blockifyChildren = true;
+registerLayout('centering', class {
+  layout(children, edges, constraints, styleMap) {
+    // (1) Determine our (inner) available size.
+    const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+    const availableBlockSize = constraints.fixedBlockSize ?
+        constraints.fixedBlockSize - edges.all.block :
+        null;
 
-  static inputProperties = super.inputProperties;
-
-  *layout(constraintSpace, children, styleMap) {
-    // (1) Resolve our inline size (typically 'width').
-    const inlineSize = resolveInlineSize(constraintSpace, styleMap);
-
-    // (2) Determine our (inner) available size.
-    const bordersAndPadding = resolveBordersAndPadding(constraintSpace, styleMap);
-    const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-    const availableInlineSize = inlineSize -
-                                bordersAndPadding.inlineStart -
-                                bordersAndPadding.inlineEnd -
-                                scrollbarSize.inline;
-
-    const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
-                               bordersAndPadding.blockStart -
-                               bordersAndPadding.blockEnd -
-                               scrollbarSize.block;
-
-    // (3) Loop over each child and perform layout.
-    const childFragments = [];
-    const childConstraintSpace = new ConstraintSpace({
-      inlineSize: availableInlineSize,
-      blockSize: availableBlockSize
-    });
-    let maxChildInlineSize = 0;
     let maxChildBlockSize = 0;
+
+    const childFragments = [];
     for (let child of children) {
-      const childFragment = yield child.layoutNextFragment(childConstraintSpace);
+      // (2) Perform layout upon the child.
+      const fragment = await child.layoutNextFragment({
+          availableInlineSize,
+          availableBlockSize,
+      });
 
-      maxChildInlineSize = Math.max(maxChildInlineSize, childFragment.inlineSize);
-      maxChildBlockSize = Math.max(maxChildBlockSize, childFragment.blockSize);
-      childFragments.push(childFragment);
+      // Determine the max fragment size so far.
+      maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
+
+      // Position our child fragment.
+      fragment.inlineOffset = edges.all.inlineStart +
+                              (constraints.fixedInlineSize - fragment.inlineSize) / 2;
+      fragment.blockOffset = edges.all.blockStart + 
+                             Math.max(0, (constraints.fixedBlockSize - fragment.blockSize) / 2);
+
+      childFragments.push(fragment);
     }
 
-    // (4) Determine our block size.
-    const blockOverflowSize = maxChildBlockSize +
-                              bordersAndPadding.blockStart +
-                              bordersAndPadding.blockEnd;
-    const blockSize = resolveBlockSize(constraintSpace, styleMap, blockOverflowSize);
+    // (3) Determine our "auto" block size.
+    const autoBlockSize = maxChildBlockSize + edges.all.block;
 
-    // (5) Loop over each fragment to position in the center.
-    for (let fragment of childFragments) {
-      fragment.inlineOffset = bordersAndPadding.inlineStart +
-                              (inlineSize - fragment.inlineSize) / 2;
-      fragment.blockOffset = bordersAndPadding.blockStart + 
-                             Math.max(0, (blockSize - fragment.blockSize) / 2);
-    }
-
-    // (6) Return our fragment.
+    // (4) Return our fragment.
     return {
-      inlineSize: inlineSize,
-      blockSize: blockSize,
-      inlineOverflowSize: maxChildInlineSize,
-      blockOverflowSize: blockOverflowSize,
-      childFragments: childFragments,
+      autoBlockSize,
+      childFragments,
     }
   }
 });
@@ -131,12 +109,13 @@ registerLayout('centering', class extends Layout {
 
 The `layout` function is your callback into the browsers layout phase in the
 rendering engine. You are given:
- - `constraintSpace`, the space of constraints which the fragment you produce should meet.
  - `children`, the list of children boxes you should perform layout upon.
- - `styleMap`, the style for the current layout.
+ - `edges`, the size of *your* borders, scrollbar, and padding in the logical coordinate system.
+ - `constraints`, the constraints which the fragment you produce should meet.
+ - `style`, the _readonly_ style for the current layout.
 
-Layout eventually will return a dictionary will what the resulting fragment of
-that layout should be.
+Layout eventually will return a dictionary will what the resulting fragment of that layout should
+be.
 
 The above example would be used in CSS by:
 ```css
@@ -145,147 +124,128 @@ The above example would be used in CSS by:
 }
 ```
 
-### Step (1) - Resolving the Inline Size ###
+### Step (1) - Determine our (inner) available size ###
 
-The first thing that you'll want to do for most layouts is to determine your `inlineSize` (`width`
-for left-to-right modes). If you want to use the default algorithm you can simply call:
-```js
-const inlineSize = resolveInlineSize(constraintSpace, styleMap);
-```
+The first thing that you'll probably want to do for most layouts is to determine your "inner" size.
 
-This will compute the `inlineSize` using the standard CSS rules. E.g. for:
-```css
-.parent {
-  width: 100px;
-}
+The `constraints` object passed into the layout function pre-calculates your inline-size (width),
+and potentially your block-size (height) if there is enough information to do so (e.g. the element
+has `height: 100px` specified).
 
-.layout {
-  display: layout(centering);
-  writing-mode: horizontal-tb;
-  width: 80%;
-}
-```
-
-`resolveInlineSize` will resolve the `inlineSize` of `.layout` to `80px`. See
-[developer.mozilla.org](https://developer.mozilla.org)
-for an explanation of what [width](https://developer.mozilla.org/en-US/docs/Web/CSS/width) and
+See [developer.mozilla.org](https://developer.mozilla.org) for an explanation of what
+[width](https://developer.mozilla.org/en-US/docs/Web/CSS/width) and
 [height](https://developer.mozilla.org/en-US/docs/Web/CSS/height), etc will resolve to.
 
-### Step (2) - Resolving the "inner" Available Size ###
-
-CSS typically subtracts the border and padding of the current fragment from the available space
-provided to the children fragments. Step (2) does this.
-
-### Step (3) - Perform Layout on `children` ###
-
-After we have the our `inlineSize` we can now perform layout on our children.
-
-The first step is to create a constraint space for our child. E.g.
+The `edges` object represents the border, scrollbar, and padding of your element. In order to
+determine our "inner" size we subtract the `edges.all` from our calculated sizes. For example:
 
 ```js
-const childConstraintSpace = new ConstraintSpace({
-  inlineSize: availableInlineSize,
-  blockSize: availableBlockSize
+const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+const availableBlockSize = constraints.fixedBlockSize ?
+    constraints.fixedBlockSize - edges.all.block :
+    null;
+```
+
+We keep `availableBlockSize` null if `constraints.fixedBlockSize` wasn't able to be computed.
+
+### Step (2) - Perform layout upon the child ###
+
+Performing layout on a child can be done with the `layoutNextFragment` method. E.g.
+
+```js
+const fragment = await child.layoutNextFragment({
+    availableInlineSize,
+    availableBlockSize,
 });
 ```
 
-There are more options for the constraint space than used here, but for this simple example the
-child constraint space just sets the size available to the children.
+The first argument is the "constraints" which you are giving to the child. They can be:
+ - `availableInlineSize` & `availableBlockSize` - A child fragment will try and "fit" within this
+     given space.
+ - `fixedInlineSize` & `fixedBlockSize` - A child fragment will be "forced" to be this size.
+ - `percentageInlineSize` & `percentageBlockSize` - Percentages will be resolved against this size.
 
-We now loop through all of our children and perform layout. This is done by:
+As layout may be paused or run on a different thread, the API is asynchronous.
 
-```js
-const childFragment = yield child.layoutNextFragment(childConstraintSpace);
-```
-
-`child` has a very simple API. You can query the style of a child and perform layout - e.g.
-
-```js
-child instanceof LayoutChild; // true
-child.styleMap.get('--a-property');
-
-const fragment = yield child.layoutNextFragment(childConstraintSpace);
-```
-
-The result of performing layout on a child is a `Fragment`. A fragment is read-only except for
+The result of performing layout on a child is a `LayoutFragment`. A fragment is read-only except for
 setting the offset relative to the parent fragment.
 
 ```js
-fragment instanceof Fragment; // true
+fragment instanceof LayoutFragment; // true
 
 // The resolved size of the fragment.
 fragment.inlineSize;
 fragment.blockSize;
-
-// The alignment baseline of the fragment.
-fragment.alignmentBaseline;
 
 // We can set the offset relative to the current layout.
 fragment.inlineOffset = 10;
 fragment.blockOffset = 20;
 ```
 
-In step (3) we do some additional book-keeping to keep track of the largest child fragment so far.
+### Step (3) - Determine our "auto" block size ###
 
-### Step (4) - Resolving the Block Size ###
+Now that we know how large our biggest child is going to be, we can calculate our "auto" block size.
+This is the size the element will be if there are no other block-size constraints (e.g. `height:
+100px`).
 
-Now that we know how large our biggest child is going to be, we can calculate our actual
-`blockSize`.
-
-We perform a call to `resolveBlockSize` again, except this time we also pass in the size that we
-would be if the height is `auto`.
-
-`resolveBlockSize` will also apply rules like `max-height` etc. upon the result. E.g. for:
-```css
-.layout {
-  display: layout(centering);
-  writing-mode: horizontal-tb;
-  max-height: 200px;
-}
-```
-
-If we called:
- - `resolveBlockSize(constraintSpace, styleMap, 400)` the result would be `200`.
- - `resolveBlockSize(constraintSpace, styleMap, 180)` the result would be `180`.
-
-### Step (5) - Positioning our Children Fragments ###
-
-In this example layout we are centering all of our children. This step sets the offset of the child
-relative to the parent fragment. E.g.
+In this layout algorithm, we just add the `edges.all.block` size to the largest child we found:
 ```js
-fragment.inlineOffset = 20;
-fragment.blockOffset = 40;
+const autoBlockSize = maxChildBlockSize + edges.all.block;
 ```
 
-The above would place `fragment` at an offset `(20, 40)` relative to its parent.
+### Step (4) - Return our fragment ###
 
-### Step (6) - Returning our Fragment ###
-
-Finally we return a dictionary which represents the `Fragment` we wish the rendering engine to
-create for us. E.g.
+Finally we return a dictionary which represents the fragment we wish the rendering engine to create
+for us. E.g.
 ```js
 const result = {
-  inlineSize: inlineSize,
-  blockSize: blockSize,
-  inlineOverflowSize: maxChildInlineSize,
-  blockOverflowSize: blockOverflowSize,
-  childFragments: childFragments,
+  autoBlockSize,
+  childFragments,
 };
 ```
 
 The important things to note here are that you need to explicitly say which `childFragments` you
 would like to render. If you give this an empty array you won't render any of your children.
 
+Querying Style
+--------------
+
+While not present in the "centering" example, it is possible to query the style of the element you
+are performing layout for, and all children. E.g.
+
+```html
+<!DOCTYPE html>
+<style>
+.parent { display: layout(style-read); --a-number: 42; }
+.child { --a-string: hello; }
+</style>
+<div class="parent">
+  <div class="child"></div>
+</div>
+```
+
+```js
+registerLayout('style-read', class {
+  static get inputProperties() { return ['--a-number']; }
+  static get childInputProperties() { return ['--a-string']; }
+
+  layout(children, edges, constraints, styleMap) {
+    // We can read our own style:
+    styleMap.get('--a-number').value === 42;
+
+    // And our children:
+    children[0].styleMap.get('--a-string').toString() === 'hello';
+  }
+});
+```
+
+You can use this to implement properties which your layout depends on, a similar thing that native
+layouts use is `flex-grow` for flexbox, or `grid-template-areas` for grid.
+
 Text Layout
 -----------
 
-We used a little trick in the above example:
-```js
-static blockifyChildren = true;
-```
-
-This one line forces all of the children to be blockified in your layout. This means for example if
-you have:
+By default layouts force all of their children to be blockified. This means for example if you have:
 ```html
 <div class="layout">
   I am some text
@@ -293,7 +253,7 @@ you have:
 </div>
 ```
 
-The engine will force the text `I am some text` to be surrounded by a `<div>`. E.g.
+The engine will conceptually force the text `I am some text` to be surrounded by a `<div>`. E.g.
 ```html
 <div class="layout">
   <div>I am some text</div>
@@ -306,9 +266,17 @@ few native layouts use this trick to simplify their algorithms, for example grid
 
 ### Text Fragmentation ###
 
-In the above `centering` example, we forced each `LayoutChild` to produce exactly one `Fragment`.
+In the above `centering` example, we forced each `LayoutChild` to produce exactly one
+`LayoutFragment`.
 
-However each `LayoutChild` is able to produce more than one `Fragment`. For example:
+We are able to ensure children do not blockify by setting the `childDisplay` to `normal`, e.g.
+```js
+registerLayout('example', class {
+  static get layoutOptions() { return {childDisplay: 'normal'}; }
+});
+```
+
+Now a `LayoutChild` which represents some text is able to produce more than one `Fragment`. E.g.
 
 ```text
 |---- Inline Available Size ----|
@@ -318,8 +286,8 @@ The quick brown fox jumped over the lazy dog.
 ```js
 child instanceof LayoutChild;
 
-const fragment1 = yield child.layoutNextFragment(constraintSpace);
-const fragment2 = yield child.layoutNextFragment(constraintSpace, fragment1.breakToken);
+const fragment1 = yield child.layoutNextFragment(constraints);
+const fragment2 = yield child.layoutNextFragment(constraints, fragment1.breakToken);
 
 fragment2.breakToken == null;
 ```
@@ -336,109 +304,38 @@ We pass the `BreakToken` to add back into the `layout()` call in order to produc
 ### A Basic Text Layout ###
 
 ```js
-registerLayout('basic-inline', class extends Layout {
-  static inputProperties = super.inputProperties;
+registerLayout('basic-inline', class {
+  static get layoutOptions() { return {childDisplay: 'normal'}; }
 
-  *layout(constraintSpace, children, styleMap, breakToken) {
-    // Resolve our inline size.
-    const inlineSize = resolveInlineSize(constraintSpace, styleMap);
-
+  layout(children, edges, constraints, styleMap) {
     // Determine our (inner) available size.
-    const bordersAndPadding = resolveBordersAndPadding(constraintSpace, styleMap);
-    const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-    const availableInlineSize = inlineSize -
-                                bordersAndPadding.inlineStart -
-                                bordersAndPadding.inlineEnd -
-                                scrollbarSize.inline;
+    const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+    const availableBlockSize = constraints.fixedBlockSize !== null ?
+        constraints.fixedBlockSize - edges.all.block : null;
 
-    const availableBlockSize = resolveBlockSize(constraintSpace, styleMap) -
-                               bordersAndPadding.blockStart -
-                               bordersAndPadding.blockEnd -
-                               scrollbarSize.block;
+    const constraints = {
+      availableInlineSize,
+      availableBlockSize,
+    };
 
     const childFragments = [];
-    let maxInlineSize = 0;
 
-    let currentLine = [];
-    let usedInlineSize = 0;
-    let maxBaseline = 0;
-
-    let lineOffset = 0;
-    let maxLineBlockSize = 0;
-
-    // Just a small little function which will update the above variables.
-    const nextLine = function() {
-      if (usedInlineSize > maxInlineSize) {
-        maxInlineSize = usedInlineSize;
-      }
-
-      currentLine = [];
-      usedInlineSize = 0;
-      maxBaseline = 0;
-
-      lineOffset += maxLineBlockSize;
-      maxLineBlockSize = 0;
-    }
-
-    let childBreakToken = null;
-    if (breakToken) {
-      childBreakToken = breakToken.childBreakTokens[0];
-
-      // Remove all the children we have already produced fragments for.
-      children.splice(0, children.indexOf(childBreakToken.child));
-    }
-
+    let blockOffset = edges.all.blockStart;
     let child = children.shift();
+    let childBreakToken = null;
     while (child) {
-      // Make sure we actually have space on the current line.
-      if (usedInlineSize > availableInlineSize) {
-        nextLine();
-      }
-
-      // The constraint space here will have the inline size of the remaining
-      // space on the line.
-      const remainingInlineSize = availableInlineSize - usedInlineSize;
-      const constraintSpace = new ConstraintSpace({
-        inlineSize: availableInlineSize - usedInlineSize,
-        blockSize: availableBlockSize,
-        percentageInlineSize: availableInlineSize,
-        inlineShrinkToFit: true,
-      });
-
-      const fragment = yield child.layoutNextFragment(constraintSpace, childBreakToken);
+      // Layout the next line, the produced line will try and respect the
+      // availableInlineSize given, you could use this to achieve a column
+      // effect or similar.
+      const fragment = await child.layoutNextFragment(constraints, childBreakToken);
       childFragments.push(fragment);
 
-      // Check if there is still space on the current line.
-      if (fragment.inlineSize > remainingInlineSize) {
-        nextLine();
+      // Position the fragment, note we coulld do something special here, like
+      // placing all the lines on a "rythimic grid", or similar.
+      fragment.inlineOffset = edges.all.inlineStart;
+      fragment.blockOffset = blockOffset;
 
-        // Check if we have gone over the block fragmentation limit.
-        if (constraintSpace.blockFragmentationType != 'none' &&
-            lineOffset > constraintSpace.blockSize) {
-          break;
-        }
-      }
-
-      // Insert fragment on the current line.
-      currentLine.push(fragment);
-      fragment.inlineOffset = usedInlineSize;
-
-      if (fragment.alignmentBaseline > maxBaseline) {
-        maxBaseline = fragment.alignmentBaseline;
-      }
-
-      // Go through each of the fragments on the line and update their block
-      // offsets.
-      for (let fragmentOnLine of currentLine) {
-        fragmentOnLine.blockOffset =
-          lineOffset + maxBaseline - fragmentOnLine.alignmentBaseline;
-
-        const lineBlockSize =
-          fragmentOnLine.blockOffset + fragmentOnLine.blockSize;
-        if (maxLineBlockSize < lineBlockSize) {
-          maxLineBlockSize = lineBlockSize;
-        }
-      }
+      blockOffset += fragment.blockSize;
 
       if (fragment.breakToken) {
         childBreakToken = fragment.breakToken;
@@ -450,43 +347,26 @@ registerLayout('basic-inline', class extends Layout {
       }
     }
 
-    // Determine our block size.
-    nextLine();
-    const blockOverflowSize = lineOffset +
-                              bordersAndPadding.blockStart +
-                              bordersAndPadding.blockEnd;
-    const blockSize = resolveBlockSize(constraintSpace, styleMap, blockOverflowSize);
+    // Determine our "auto" block size.
+    const autoBlockSize = blockOffset + edges.all.blockEnd;
 
     // Return our fragment.
-    const result = {
-      inlineSize: inlineSize,
-      blockSize: blockSize,
-      inlineOverflowSize: maxInlineSize,
-      blockOverflowSize: blockOverflowSize,
-      childFragments: childFragments,
-    }
-
-    if (childBreakToken) {
-      result.breakToken = {
-        childBreakTokens: [childBreakToken],
-      };
-    }
-
-    return result;
+    return {
+      autoBlockSize,
+      childFragments,
+    };
   }
 });
 ```
 
-The above example is more complex than the previous centering layout because of the ability for text
-children to fragment. This example positions all of its children on a line if there is space, if not
-it moves to the next.
+The above example is slightly more complex than the previous centering layout because of the ability
+for text children to fragment.
 
 That said it has all the same steps as before:
- 1. Resolving the `inlineSize`.
- 2. Resolving the (inner) available size.
- 3. Performing layout and positioning children fragments.
- 4. Resolving the final block size.
- 5. Returning the fragment.
+ 1. Resolving the (inner) available size.
+ 2. Performing layout and positioning children fragments.
+ 3. Resolving the "auto" block size.
+ 4. Returning the fragment.
 
 Scrolling
 ---------
@@ -494,39 +374,17 @@ Scrolling
 We have been handling scrolling in the above example but we haven't talked about it yet.
 
 ```js
-const scrollbarSize = resolveScrollbarSize(constraintSpace, styleMap);
-scrollbarSize.inline;
-scrollbarSize.block;
+const scrollbarEdgeSizes = edges.scrollbar;
+scrollbarEdgeSizes.inline;
+scrollbarEdgeSizes.block;
 ```
 
-The above code snippet queries the size of the scrollbar. `resolveScrollbarSize` handles the CSS
-`overflow` property. For example if we are `overflow: hidden`, `resolveScrollbarSize` will
-report 0 for both directions.
+The above code snippet queries the size of the scrollbar, and respects the `overflow` property.
+For example if we are `overflow: hidden`, `edges.scrollbar` will report 0 for all directions.
 
-The overflow size is reported when returning the new fragment, e.g.
-```js
-return {
-  inlineSize: 200,
-  blockSize: 300,
-  inlineOverflowSize: 400,
-  blockOverflowSize: 600
-};
-```
-In the above example the scrollable area is double the actual fragments size.
-
-### `overflow: auto` Behaviour ###
-
-One of the complexities with scrollable fragments is `auto`. In the CSS Layout
-API your layout may get called multiple times. E.g.
- - If the layout produced a fragment which caused a parent to overflow.
- - If the layout produced a fragment with inlineOverflowSize greater than
-   inlineSize and has `overflow: auto`. In this particular case
-   `resolveScrollbarSize` will return a different value as scrollbars are now
-   present.
- - Same as above but for the block direction.
-
-In a future extension of the CSS Layout API there may be the capability to more
-efficiently deal with these situations.
+For `overflow: auto` the engine will typically perform a layout without a scrollbar, then if it
+detects overflow, with a scrollbar. As long as you respect the layout "edges" your layout algorithm
+should work as expected.
 
 Block Fragmentation
 -------------------
@@ -556,19 +414,18 @@ In the above example the `multicol` div may produce three (3) fragments.
 We can make our children fragment by passing them a constraint space with a fragmentation line. E.g.
 
 ```js
-registerLayout('multi-col', class extends Layout {
-  static inputProperties = super.inputProperties;
-
-  *layout(constraintSpace, children, styleMap, breakToken) {
+registerLayout('special-multi-col', class {
+  layout(children, edges, constraints, styleMap, breakToken) {
     for (let child of children) {
       // Create a constraint space with a fragmentation line.
-      const childConstraintSpace = new ConstraintSpace({
-        inlineSize: availableInlineSize,
-        blockSize: availableBlockSize,
+      const childConstraints = {
+        availableInlineSize,
+        availableBlockSize,
+        blockFragmentationOffset: availableBlockSize,
         blockFragmentationType: 'column',
       });
 
-      const fragment = yield child.layoutNextFragment(childConstraintSpace);
+      const fragment = await child.layoutNextFragment(childConstraints);
     }
 
     // ... 
@@ -577,19 +434,17 @@ registerLayout('multi-col', class extends Layout {
 ```
 
 In the above example each of the children will attempt to fragment in the block direction when they
-exceed `availableBlockSize`. The type is a `'column'` which will mean it works in conjunction with
-rules like `break-inside: avoid-column`.
+exceed `blockFragmentationOffset`. The type is a `'column'` which will mean it works in conjunction
+with rules like `break-inside: avoid-column`.
 
 We can also allow our own layout to be fragmented by respecting the fragmentation line. E.g.
 
 ```js
-registerLayout('basic-inline', class extends Layout {
-  static inputProperties = super.inputProperties;
-
-  *layout(constraintSpace, children, styleMap, breakToken) {
+registerLayout('basic-inline', class {
+  layout(children, edges, constraints, styleMap, breakToken) {
 
     // We can check if we need to fragment in the block direction.
-    if (constraintSpace.blockFragmentationType != 'none') {
+    if (constraints.blockFragmentationType != 'none') {
       // We need to fragment!
     }
 
@@ -602,14 +457,14 @@ registerLayout('basic-inline', class extends Layout {
                                               // we'll just use one.
       child = childToken.child;
     } else {
-      child = children;
+      child = children[0];
     }
 
     // SNIP!
 
     return {
-      inlineSize: inlineSize,
-      blockSize: blockSize,
+      autoBlockSize,
+      childFragments,
       breakToken: {
         data: /* you can place arbitary data here */,
         childTokens: [childToken]
