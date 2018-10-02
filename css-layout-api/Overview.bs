@@ -142,6 +142,18 @@ The 'overflow' property applies to <a>layout API containers</a>. This is discuss
 As the layout is entirely up to the author, properties which are used in other layout modes (e.g.
 flex, block) may not apply. For example an author may not respect the 'margin' property on children.
 
+<div class="example">
+The HTML below shows an example of setting the ''display'' to a ''layout()'' function.
+
+<pre class="lang-html">
+&lt;!DOCTYPE html>
+&lt;style>
+.centering-layout { display: layout(centering); }
+&lt;/style>
+&lt;div class="centering-layout">&lt;/div>
+</pre>
+</div>
+
 Layout API Container Painting {#painting}
 -----------------------------------------
 
