@@ -446,10 +446,10 @@ direction), while centering its children in the inline direction.
 
 <pre class="lang-javascript">
 registerLayout('block-like', class {
-    *intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = yield children.map((child) => {
+    async intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = await Promise.all(children.map((child) => {
           return child.intrinsicSizes();
-      });
+      }));
 
       const maxContentSize = childrenSizes.reduce((max, childSizes) => {
           return Math.max(max, childSizes.maxContentSize);
@@ -462,16 +462,18 @@ registerLayout('block-like', class {
       return {maxContentSize, minContentSize};
     }
 
-    *layout(children, edges, constraints, styleMap) {
+    async layout(children, edges, constraints, styleMap) {
+        // Determine our (inner) available size.
         const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize = (constraints.fixedBlockSize || Infinity) - edges.all.block;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
 
         const childFragments = [];
         const childConstraints = { availableInlineSize, availableBlockSize };
 
-        const childFragments = yield children.map((child) => {
+        const childFragments = await Promise.all(children.map((child) => {
             return child.layoutNextFragment(childConstraints);
-        });
+        }));
 
         let blockOffset = edges.all.blockStart;
         for (let fragment of childFragments) {
@@ -594,10 +596,10 @@ The example below shows the border-box intrinsic sizes of two children.
 
 <pre class="lang-javascript">
 registerLayout('intrinsic-sizes-example', class {
-    *intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = yield children.map((child) => {
+    async intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = await Promise.all(children.map((child) => {
           return child.intrinsicSizes();
-      });
+      }));
 
       childrenSizes[0].minContentSize; // 400, (380+10+10) child has a fixed size.
       childrenSizes[0].maxContentSize; // 400, (380+10+10) child has a fixed size.
@@ -606,7 +608,7 @@ registerLayout('intrinsic-sizes-example', class {
       childrenSizes[1].maxContentSize; // 200, size of "XXX XXXX".
     }
 
-    *layout() {}
+    layout() {}
 });
 </pre>
 </div>
@@ -691,8 +693,8 @@ creates child layout constraints which specify that a child should be a fixed in
 
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
-    *intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = yield children.map((child) => {
+    async intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = children.map((child) => {
           return child.intrinsicSizes();
       });
 
@@ -707,18 +709,18 @@ registerLayout('flex-distribution-like', class {
       return {maxContentSize, minContentSize};
     }
 
-    *layout(children, edges, constraints, styleMap) {
-
+    async layout(children, edges, constraints, styleMap) {
+        // Determine our (inner) available size.
         const availableInlineSize =
             constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize =
-            (constraints.fixedInlineSize || Infinity) - edges.all.block;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
 
         const childConstraints = { availableInlineSize, availableBlockSize };
 
-        const unconstrainedChildFragments = yield children.map((child) => {
+        const unconstrainedChildFragments = await Promise.all(children.map((child) => {
             return child.layoutNextFragment(childConstraints);
-        });
+        }));
 
         const unconstrainedSizes = [];
         const totalSize = unconstrainedChildFragments.reduce((sum, fragment, i) => {
@@ -730,12 +732,12 @@ registerLayout('flex-distribution-like', class {
         const remainingSpace = Math.max(0, inlineSize - totalSize);
         const extraSpace = remainingSpace / children.length;
 
-        const childFragments = yield children.map((child, i) => {
+        const childFragments = await Promise.all(children.map((child, i) => {
             return child.layoutNextFragment({
                 fixedInlineSize: unconstrainedSizes[i] + extraSpace,
                 availableBlockSize
             });
-        });
+        }));
 
         // Position the fragments.
         let inlineOffset = 0;
@@ -866,13 +868,12 @@ registerLayout('indent-lines', class {
     static layoutOptions = {childDisplay: 'normal'};
     static inputProperties = ['--indent', '--indent-lines'];
 
-    *layout(children, edges, constraints, styleMap, breakToken) {
-
+    async layout(children, edges, constraints, styleMap, breakToken) {
         // Determine our (inner) available size.
         const availableInlineSize =
             constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize =
-            (constraints.fixedBlockSize || Infinity) - edges.all.block;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
 
         // Detrermine the number of lines to indent, and the indent amount.
         const indent = resolveLength(constraints, styleMap.get('--indent'));
@@ -904,7 +905,7 @@ registerLayout('indent-lines', class {
                 blockFragmentationType: constraints.blockFragmentationType,
             };
 
-            const fragment = yield child.layoutNextFragment(childConstraints,
+            const fragment = await child.layoutNextFragment(childConstraints,
                                                             childBreakToken);
             childFragments.push(fragment);
 
@@ -1020,7 +1021,7 @@ This example shows an node styled by CSS, and what its respective {{LayoutEdges}
 
 <pre class="lang-javascript">
 registerLayout('box-edges', class {
-    *layout(children, edges, constraints, styleMap, breakToken) {
+    async layout(children, edges, constraints, styleMap, breakToken) {
         edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
         edges.border.blockEnd; // 2
         edges.scrollbar.inlineEnd; // UA-dependent, may be 0 or >0 (e.g. 16).
@@ -1219,7 +1220,7 @@ baselines themselves. This will be of the form:
 
 To <em>query</em> baseline information from a {{LayoutChild}}.
 <pre class="lang-javascript">
-const fragment = yield child.layoutNextFragment({
+const fragment = await child.layoutNextFragment({
   fixedInlineSize: availableInlineSize,
   baselineRequests: ['alphabetic', 'middle'],
 });
@@ -1229,7 +1230,7 @@ fragment.baselines.get('alphabetic') === 25 /* or something */;
 To <em>produce</em> baseline information for a <a>parent layout</a>:
 <pre class="lang-javascript">
 registerLayout('baseline-producing', class {
-  *layout(children, edges, constraints, styleMap) {
+  async layout(children, edges, constraints, styleMap) {
     const result = {baselines: {}};
 
     for (let baselineRequest of constraints.baselineRequests) {
@@ -1549,11 +1550,11 @@ is called, the user agent <em>must</em> run the following steps:
               return {childDisplay: 'normal', sizing: 'block-like'}
             }
 
-            *intrinsicSizes(children, edges, styleMap) {
+            async intrinsicSizes(children, edges, styleMap) {
                 // Intrinsic sizes code goes here.
             }
 
-            *layout(children, edges, constraints, styleMap, breakToken) {
+            async layout(children, edges, constraints, styleMap, breakToken) {
                 // Layout code goes here.
             }
         }

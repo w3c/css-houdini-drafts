@@ -66,7 +66,7 @@ below. You should read the code below with its explanatory section.
 
 ```js
 registerLayout('centering', class {
-  layout(children, edges, constraints, styleMap) {
+  async layout(children, edges, constraints, styleMap) {
     // (1) Determine our (inner) available size.
     const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
     const availableBlockSize = constraints.fixedBlockSize ?
@@ -229,7 +229,7 @@ registerLayout('style-read', class {
   static get inputProperties() { return ['--a-number']; }
   static get childInputProperties() { return ['--a-string']; }
 
-  layout(children, edges, constraints, styleMap) {
+  async layout(children, edges, constraints, styleMap) {
     // We can read our own style:
     styleMap.get('--a-number').value === 42;
 
@@ -307,7 +307,7 @@ We pass the `BreakToken` to add back into the `layout()` call in order to produc
 registerLayout('basic-inline', class {
   static get layoutOptions() { return {childDisplay: 'normal'}; }
 
-  layout(children, edges, constraints, styleMap) {
+  async layout(children, edges, constraints, styleMap) {
     // Determine our (inner) available size.
     const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
     const availableBlockSize = constraints.fixedBlockSize !== null ?
@@ -415,7 +415,7 @@ We can make our children fragment by passing them a constraint space with a frag
 
 ```js
 registerLayout('special-multi-col', class {
-  layout(children, edges, constraints, styleMap, breakToken) {
+  async layout(children, edges, constraints, styleMap, breakToken) {
     for (let child of children) {
       // Create a constraint space with a fragmentation line.
       const childConstraints = {
@@ -441,7 +441,7 @@ We can also allow our own layout to be fragmented by respecting the fragmentatio
 
 ```js
 registerLayout('basic-inline', class {
-  layout(children, edges, constraints, styleMap, breakToken) {
+  async layout(children, edges, constraints, styleMap, breakToken) {
 
     // We can check if we need to fragment in the block direction.
     if (constraints.blockFragmentationType != 'none') {
