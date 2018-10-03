@@ -479,7 +479,7 @@ interface LayoutChild {
     readonly attribute StylePropertyMapReadOnly styleMap;
 
     IntrinsicSizesRequest intrinsicSizes();
-    LayoutFragmentRequest layoutNextFragment(LayoutConstraints constraints, ChildBreakToken breakToken);
+    LayoutFragmentRequest layoutNextFragment(LayoutConstraintsOptions constraints, ChildBreakToken breakToken);
 };
 </pre>
 
@@ -893,7 +893,7 @@ Layout Constraints {#layout-constraints}
 ----------------------------------------
 
 <pre class='idl'>
-[Constructor(optional LayoutConstraintsOptions options),Exposed=LayoutWorklet]
+[Exposed=LayoutWorklet]
 interface LayoutConstraints {
     readonly attribute double availableInlineSize;
     readonly attribute double availableBlockSize;
