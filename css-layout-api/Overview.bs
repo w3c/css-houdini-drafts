@@ -49,9 +49,9 @@ spec:infra; type:dfn; text:list
 spec:html; type:dfn; for:global object; text:realm
 spec:css22; type:property;
     text:max-height
-    text:max-width
     text:min-height
     text:min-width
+spec:css2; type:property; text:max-width
 </pre>
 
 <pre class="anchors">
@@ -74,7 +74,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: HasProperty
     url: ecmascript-data-types-and-values; text: type
     url: get-o-p; text: Get
-    url: generatorfunction; text: generator function
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
@@ -208,6 +207,206 @@ Note: User agents would not perform any "inline splitting" or fragmenting when t
           Text
         &lt;/span>
     </pre>
+</div>
+
+Layout Worklet {#layout-worklet}
+================================
+
+The {{layoutWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
+which are related to layout.
+
+The {{layoutWorklet}}'s <a>worklet global scope type</a> is {{LayoutWorkletGlobalScope}}.
+
+<pre class='idl'>
+partial namespace CSS {
+    [SameObject] readonly attribute Worklet layoutWorklet;
+};
+</pre>
+
+The {{LayoutWorkletGlobalScope}} is the global execution context of the {{layoutWorklet}}.
+
+<pre class='idl'>
+[Global=(Worklet,LayoutWorklet),Exposed=LayoutWorklet]
+interface LayoutWorkletGlobalScope : WorkletGlobalScope {
+    void registerLayout(DOMString name, VoidFunction layoutCtor);
+};
+</pre>
+
+Registering A Layout {#registering-layout}
+------------------------------------------
+
+<pre class='idl'>
+[Exposed=LayoutWorklet]
+dictionary LayoutOptions {
+  ChildDisplayType childDisplay = "block";
+  LayoutSizingMode sizing = "block-like";
+};
+
+[Exposed=LayoutWorklet]
+enum ChildDisplayType {
+    "block",
+    "normal",
+};
+
+[Exposed=LayoutWorklet]
+enum LayoutSizingMode {
+    "block-like",
+    "manual",
+};
+</pre>
+
+The <a>document</a> has a <a>map</a> of <dfn>document layout definitions</dfn>. Initially this map
+is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+
+The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout definitions</dfn>. Initially this
+map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+
+Each <a>box</a> representing a <a>layout API container</a> has a <a>map</a> of <dfn>layout class
+instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
+<a>determine the intrinsic sizes</a> or <a>generate a fragment</a> for a <a>box</a>.
+
+<div class='note'>
+    Note: The shape of the class should be:
+    <pre class='lang-javascript'>
+        class MyLayout {
+            static get inputProperties() { return ['--foo']; }
+            static get childrenInputProperties() { return ['--bar']; }
+            static get layoutOptions() {
+              return {childDisplay: 'normal', sizing: 'block-like'}
+            }
+
+            async intrinsicSizes(children, edges, styleMap) {
+                // Intrinsic sizes code goes here.
+            }
+
+            async layout(children, edges, constraints, styleMap, breakToken) {
+                // Layout code goes here.
+            }
+        }
+    </pre>
+</div>
+</div>
+
+Registering A Layout Algorithm {#registering-a-layout-algorithm}
+----------------------------------------------------------------
+
+The algorithm below is run when the {{registerLayout(name, layoutCtor)}} is called. It notifies the
+engine about the new user defined layout.
+
+<div algorithm>
+When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
+is called, the user agent <em>must</em> run the following steps:
+    1. If the |name| is an empty string, [=throw=] a [=TypeError=] and abort all these steps.
+
+    2. Let |layoutDefinitionMap| be {{LayoutWorkletGlobalScope}}'s [=layout definitions=] map.
+
+    3. If |layoutDefinitionMap|[|name|] [=map/exists=] [=throw=] a "{{InvalidModificationError}}"
+        {{DOMException}} and abort all these steps.
+
+    4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>.
+
+    5. Let |inputPropertiesIterable| be the result of [=Get=](|layoutCtor|, "inputProperties").
+
+    6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
+        [=converting=] |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
+        exception is [=thrown=], rethrow the exception and abort all these steps.
+
+    7. Filter |inputProperties| so that it only contains [=supported CSS properties=] and [=custom
+        properties=].
+
+        Note: The list of CSS properties provided by the input properties getter can either be
+            custom or native CSS properties.
+
+        Note: The list of CSS properties may contain shorthands.
+
+        Note: In order for a layout class to be forwards compatible, the list of CSS properties can
+            also contains currently invalid properties for the user agent. For example
+            <code>margin-bikeshed-property</code>.
+
+    8. Let |childInputProperties| be an empty <code>sequence&lt;DOMString></code>.
+
+    9. Let |childInputPropertiesIterable| be the result of [=Get=](|layoutCtor|,
+        "childInputProperties").
+
+    10. If |childInputPropertiesIterable| is not undefined, then set |childInputProperties| to the
+        result of [=converting=] |childInputPropertiesIterable| to a
+        <code>sequence&lt;DOMString></code>. If an exception is [=thrown=], rethrow the exception
+        and abort all these steps.
+
+    11. Filter |inputProperties| so that it only contains [=supported CSS properties=] and [=custom
+        properties=].
+
+    12. Let |layoutOptionsValue| be the result of [=Get=](|layoutCtor|, "layoutOptions").
+
+    13. Let |layoutOptions| be the result of [=converting=] |layoutOptionsValue| to a
+        {{LayoutOptions}}. If an exception is [=thrown=], rethrow the exception and abort all these
+        steps.
+
+    14. Let |prototype| be the result of [=Get=](|layoutCtor|, "prototype").
+
+    15. If the result of [=Type=](|prototype|) is not Object, [=throw=] a [=TypeError=] and abort
+        all these steps.
+
+    16. Let |intrinsicSizesValue| be the result of [=Get=](|prototype|, "intrinsicSizes").
+
+    17. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to the
+        [=Function=] [=callback function=] type. Rethrow any exceptions from the conversion.
+
+    18. Let |layoutValue| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+
+    19. Let |layout| be the result of [=converting=] |layoutValue| to the [=Function=] [=callback
+        function=] type. Rethrow any exceptions from the conversion.
+
+    20. Let |definition| be a new [=layout definition=] with:
+
+        - [=class constructor=] being |layoutCtor|.
+
+        - [=layout function=] being |layout|.
+
+        - [=intrinsic sizes function=] being |intrinsicSizes|.
+
+        - [=constructor valid flag=] being <b>true</b>.
+
+        - [=layout definition/child input properties=] being |childInputProperties|.
+
+        - [=layout definition/input properties=] being |inputProperties|.
+
+        - [=layout defintion/layout options=] being |layoutOptions|.
+
+    21. [=map/Set=] |layoutDefinitionMap|[|name|] to |definition|.
+
+    22. [=Queue a task=] to run the following steps:
+
+        1. Let |documentLayoutDefinitionMap| be the associated [=document's=] [=document layout
+            definitions=] [=map=].
+
+        2. Let |documentDefinition| be a new [=document layout definition=] with:
+
+            - [=document layout definition/child input properties=] being |childInputProperties|.
+
+            - [=document layout definition/input properties=] being |inputProperties|.
+
+            - [=document layout definition/layout options=] being |layoutOptions|.
+
+        3. If |documentLayoutDefinitionMap|[|name|] [=map/exists=], run the following steps:
+
+            1. Let |existingDocumentDefinition| be the result of [=map/get=]
+                |documentLayoutDefinitionMap|[|name|].
+
+            2. If |existingDocumentDefinition| is <code>"invalid"</code>, abort all these steps.
+
+            3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
+                [=document layout definition/input properties=], [=document layout definition/child
+                input properties=], and [=document layout definition/layout options=] are
+                different), then:
+
+                [=map/Set=] |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
+
+                Log an error to the debugging console stating that the same class was registered
+                with different <code>inputProperties</code>, <code>childInputProperties</code>, or
+                <code>layoutOptions</code>.
+
+        4. Otherwise, [=map/set=] |documentLayoutDefinitionMap|[|name|] to |documentDefinition|.
 </div>
 
 Layout API Model and Terminology {#layout-api-model-and-terminology}
@@ -1270,11 +1469,10 @@ A <dfn>layout definition</dfn> is a <a>struct</a> which describes the informatio
 
  - <dfn for="layout definition">class constructor</dfn> which is the class <a>constructor</a>.
 
- - <dfn for="layout definition">layout generator function</dfn> which is the layout <a>generator
-     function</a> callback.
+ - <dfn for="layout definition">layout function</dfn> which is the layout <a>function</a> callback.
 
- - <dfn for="layout definition">intrinsic sizes generator function</dfn> which is the intrinsic sizes
-     <a>generator function</a> callback.
+ - <dfn for="layout definition">intrinsic sizes function</dfn> which is the intrinsic sizes
+     <a>function</a> callback.
 
  - <dfn for="layout definition">constructor valid flag</dfn>.
 
@@ -1374,205 +1572,6 @@ Note: As the {{LayoutConstraints}} object is only passed into the layout functio
 Note: This only describes layout invalidation as it relates to the CSS Layout API. All
     <a>boxes</a> conceptually have a <a>layout valid flag</a> and these changes are propagated
     through the <a>box tree</a>.
-
-Layout Worklet {#layout-worklet}
---------------------------------
-
-The {{layoutWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
-which are related to layout.
-
-The {{layoutWorklet}}'s <a>worklet global scope type</a> is {{LayoutWorkletGlobalScope}}.
-
-<pre class='idl'>
-partial namespace CSS {
-    [SameObject] readonly attribute Worklet layoutWorklet;
-};
-</pre>
-
-The {{LayoutWorkletGlobalScope}} is the global execution context of the {{layoutWorklet}}.
-
-<pre class='idl'>
-[Global=(Worklet,LayoutWorklet),Exposed=LayoutWorklet]
-interface LayoutWorkletGlobalScope : WorkletGlobalScope {
-    void registerLayout(DOMString name, VoidFunction layoutCtor);
-};
-</pre>
-
-Registering A Layout {#registering-layout}
-------------------------------------------
-
-<pre class='idl'>
-[Exposed=LayoutWorklet]
-dictionary LayoutOptions {
-  ChildDisplayType childDisplay = "block";
-  LayoutSizingMode sizing = "block-like";
-};
-
-[Exposed=LayoutWorklet]
-enum ChildDisplayType {
-    "block",
-    "normal",
-};
-
-[Exposed=LayoutWorklet]
-enum LayoutSizingMode {
-    "block-like",
-    "manual",
-};
-</pre>
-
-The <a>document</a> has a <a>map</a> of <dfn>document layout definitions</dfn>. Initially this map
-is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
-
-The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout definitions</dfn>. Initially this
-map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
-
-Each <a>box</a> representing a <a>layout API container</a> has a <a>map</a> of <dfn>layout class
-instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
-<a>determine the intrinsic sizes</a> or <a>generate a fragment</a> for a <a>box</a>.
-
-<div algorithm>
-When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
-is called, the user agent <em>must</em> run the following steps:
-    1. If the |name| is an empty string, <a>throw</a> a <a>TypeError</a> and abort all these steps.
-
-    2. Let |layoutDefinitionMap| be {{LayoutWorkletGlobalScope}}'s <a>layout definitions</a> map.
-
-    3. If |layoutDefinitionMap|[|name|] <a for=map>exists</a> <a>throw</a> a
-        "<a>InvalidModificationError</a>" <a>DOMException</a> and abort all these steps.
-
-    4. Let |inputProperties| be an empty <code>sequence&lt;DOMString></code>.
-
-    5. Let |inputPropertiesIterable| be the result of <a>Get</a>(|layoutCtor|, "inputProperties").
-
-    6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
-        <a>converting</a> |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is <a>thrown</a>, rethrow the exception and abort all these steps.
-
-        Note: The list of CSS properties provided by the input properties getter can either be
-            custom or native CSS properties.
-
-        Note: The list of CSS properties may contain shorthands.
-
-        Note: In order for a layout class to be forwards compatible, the list of CSS properties can
-            also contains currently invalid properties for the user agent. For example
-            <code>margin-bikeshed-property</code>.
-
-    7. Let |childInputProperties| be an empty <code>sequence&lt;DOMString></code>.
-
-    8. Let |childInputPropertiesIterable| be the result of <a>Get</a>(|layoutCtor|,
-        "childInputProperties").
-
-    9. If |childInputPropertiesIterable| is not undefined, then set |childInputProperties| to the
-        result of <a>converting</a> |childInputPropertiesIterable| to a
-        <code>sequence&lt;DOMString></code>. If an exception is <a>thrown</a>, rethrow the exception
-        and abort all these steps.
-
-    10. Let |layoutOptionsValue| be the result of <a>Get</a>(|layoutCtor|, "layoutOptions").
-
-    11. Let |layoutOptions| be the result of <a>converting</a> |layoutOptionsValue| to a
-        {{LayoutOptions}}. If an exception is <a>thrown</a>, rethrow the exception and abort all
-        these steps.
-
-    12. If the result of <a>IsConstructor</a>(|layoutCtor|) is false, <a>throw</a> a
-        <a>TypeError</a> and abort all these steps.
-
-    13. Let |prototype| be the result of <a>Get</a>(|layoutCtor|, "prototype").
-
-    14. If the result of <a>Type</a>(|prototype|) is not Object, <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
-
-    15. Let |intrinsicSizes| be the result of <a>Get</a>(|prototype|,
-        <code>"intrinsicSizes"</code>).
-
-    16. If the result of <a>IsCallable</a>(|intrinsicSizes|) is false, <a>throw</a> a
-        <a>TypeError</a> and abort all these steps.
-
-    17. If |intrinsicSizes|'s <code>\[[FunctionKind]]</code> internal slot is not
-        <code>"generator"</code>, <a>throw</a> a <a>TypeError</a> and abort all these steps.
-
-    18. Let |layout| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
-
-    19. If the result of <a>IsCallable</a>(|layout|) is false, <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
-
-    20. If |layout|'s <code>\[[FunctionKind]]</code> internal slot is not <code>"generator"</code>,
-        <a>throw</a> a <a>TypeError</a> and abort all these steps.
-
-    21. Let |definition| be a new <a>layout definition</a> with:
-
-        - <a>class constructor</a> being |layoutCtor|.
-
-        - <a>layout generator function</a> being |layout|.
-
-        - <a>intrinsic sizes generator function</a> being |intrinsicSizes|.
-
-        - <a>constructor valid flag</a> being <b>true</b>.
-
-        - <a for="layout definition">input properties</a> being |inputProperties|.
-
-        - <a for="layout definition">child input properties</a> being |childInputProperties|.
-
-        - <a for="layout definition">layout options</a> being |layoutOptions|.
-
-    22. <a for=map>Set</a> |layoutDefinitionMap|[|name|] to |definition|.
-
-    23. <a>Queue a task</a> to run the following steps:
-
-        1. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document layout
-            definitions</a> <a>map</a>.
-
-        2. Let |documentDefinition| be a new <a>document layout definition</a> with:
-
-            - <a for="document layout definition">input properties</a> being |inputProperties|.
-
-            - <a for="document layout definition">child input properties</a> being
-                |childInputProperties|.
-
-            - <a for="document layout definition">layout options</a> being |layoutOptions|.
-
-        3. If |documentLayoutDefinitionMap|[|name|] <a for=map>exists</a>, run the following steps:
-
-            1. Let |existingDocumentDefinition| be the result of <a for=map>get</a>
-                |documentLayoutDefinitionMap|[|name|].
-
-            2. If |existingDocumentDefinition| is <code>"invalid"</code>, abort all these steps.
-
-            3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
-                <a for="document layout definition">input properties</a>, <a for="document layout
-                definition">child input properties</a>, and <a for="document layout
-                definition">layout options</a> are different), then:
-
-                <a for=map>Set</a> |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
-
-                Log an error to the debugging console stating that the same class was registered
-                with different <code>inputProperties</code>, <code>childInputProperties</code>, or
-                <code>layoutOptions</code>.
-
-        4. Otherwise, <a for=map>set</a> |documentLayoutDefinitionMap|[|name|] to
-            |documentDefinition|.
-
-<div class='note'>
-    Note: The shape of the class should be:
-    <pre class='lang-javascript'>
-        class MyLayout {
-            static get inputProperties() { return ['--foo']; }
-            static get childrenInputProperties() { return ['--bar']; }
-            static get layoutOptions() {
-              return {childDisplay: 'normal', sizing: 'block-like'}
-            }
-
-            async intrinsicSizes(children, edges, styleMap) {
-                // Intrinsic sizes code goes here.
-            }
-
-            async layout(children, edges, constraints, styleMap, breakToken) {
-                // Layout code goes here.
-            }
-        }
-    </pre>
-</div>
-</div>
 
 Layout Engine {#layout-engine}
 ------------------------------
@@ -1797,11 +1796,10 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
         if |children|, |styleMap| are equivalent to that previous invocation. If so let the
         intrinsic sizes the cached intrinsic sizes and abort all these steps.
 
-    9. Let |intrinsicSizesGeneratorFunction| be |definition|'s <a>intrinsic sizes generator
-        function</a>.
+    9. Let |intrinsicSizesFunction| be |definition|'s <a>intrinsic sizes function</a>.
 
     10. Let |intrinsicSizesGenerator| be the result of
-        <a>Invoke</a>(|intrinsicSizesGeneratorFunction|, |layoutInstance|, «|children|, |edges|,
+        <a>Invoke</a>(|intrinsicSizesFunction|, |layoutInstance|, «|children|, |edges|,
         |styleMap|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
@@ -1930,10 +1928,10 @@ following steps:
         |children|, |styleMap|, |layoutConstraints|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
-    12. Let |layoutGeneratorFunction| be |definition|'s <a>layout generator function</a>.
+    12. Let |layoutFunction| be |definition|'s <a>layout function</a>.
 
-    13. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutGeneratorFunction|,
-        |layoutInstance|, «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
+    13. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutFunction|, |layoutInstance|,
+        «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
