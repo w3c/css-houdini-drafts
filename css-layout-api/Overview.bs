@@ -142,12 +142,15 @@ As the layout is entirely up to the author, properties which are used in other l
 flex, block) may not apply. For example an author may not respect the 'margin' property on children.
 
 <div class="example">
-The HTML below shows an example of setting the ''display'' to a ''layout()'' function.
+The HTML below shows an example of setting the ''display'' to a ''layout()'' function, if the CSS
+Layout API is supported.
 
 <pre class="lang-html">
 &lt;!DOCTYPE html>
 &lt;style>
-.centering-layout { display: layout(centering); }
+@supports (display: layout(centering)) {
+  .centering-layout { display: layout(centering); }
+}
 &lt;/style>
 &lt;div class="centering-layout">&lt;/div>
 </pre>
@@ -215,7 +218,7 @@ Layout Worklet {#layout-worklet}
 The {{layoutWorklet}} attribute allows access to the {{Worklet}} responsible for all the classes
 which are related to layout.
 
-The {{layoutWorklet}}'s <a>worklet global scope type</a> is {{LayoutWorkletGlobalScope}}.
+The {{layoutWorklet}}'s [=worklet global scope type=] is {{LayoutWorkletGlobalScope}}.
 
 <pre class='idl'>
 partial namespace CSS {
@@ -231,6 +234,54 @@ interface LayoutWorkletGlobalScope : WorkletGlobalScope {
     void registerLayout(DOMString name, VoidFunction layoutCtor);
 };
 </pre>
+
+<div class='example'>
+    Web developers can feature detect by:
+    <pre class='lang-javascript'>
+    if ('layoutWorklet' in CSS) {
+      console.log('CSS Layout API available!');
+    }
+    </pre>
+</div>
+
+Concepts {#concepts}
+--------------------
+
+This section describes internal data-structures created when {{registerLayout(name, layoutCtor)}} is
+called.
+
+A <dfn>layout definition</dfn> is a [=struct=] which describes the information needed by the
+{{LayoutWorkletGlobalScope}} about the author defined layout (which can be referenced by the
+''layout()'' function). It consists of:
+
+ - <dfn for="layout definition">class constructor</dfn> which is the class [=constructor=].
+
+ - <dfn for="layout definition">layout function</dfn> which is the layout [=function=] callback.
+
+ - <dfn for="layout definition">intrinsic sizes function</dfn> which is the intrinsic sizes
+     [=function=] callback.
+
+ - <dfn for="layout definition">constructor valid flag</dfn>.
+
+ - <dfn for="layout definition">input properties</dfn> which is a [=list=] of
+     <code>DOMStrings</code>.
+
+ - <dfn for="layout definition">child input properties</dfn> which is a [=list=] of
+     <code>DOMStrings</code>.
+
+ - <dfn for="layout definition">layout options</dfn> a {{LayoutOptions}}.
+
+A <dfn>document layout definition</dfn> is a [=struct=] which describes the information needed by
+the [=document=] about the author defined layout (which can be referenced by the ''layout()''
+function). It consists of:
+
+ - <dfn for="document layout definition">input properties</dfn> which is a [=list=] of
+     <code>DOMStrings</code>
+
+ - <dfn for="document layout definition">child input properties</dfn> which is a [=list=] of
+     <code>DOMStrings</code>.
+
+ - <dfn for="document layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 Registering A Layout {#registering-layout}
 ------------------------------------------
@@ -255,20 +306,20 @@ enum LayoutSizingMode {
 };
 </pre>
 
-The <a>document</a> has a <a>map</a> of <dfn>document layout definitions</dfn>. Initially this map
+The [=document=] has a [=map=] of <dfn>document layout definitions</dfn>. Initially this map is
+empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
+
+The {{LayoutWorkletGlobalScope}} has a [=map=] of <dfn>layout definitions</dfn>. Initially this map
 is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
-The {{LayoutWorkletGlobalScope}} has a <a>map</a> of <dfn>layout definitions</dfn>. Initially this
-map is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
-
-Each <a>box</a> representing a <a>layout API container</a> has a <a>map</a> of <dfn>layout class
+Each [=box=] representing a [=layout API container</a> has a [=map=] of <dfn>layout class
 instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
-<a>determine the intrinsic sizes</a> or <a>generate a fragment</a> for a <a>box</a>.
+[=determine the intrinsic sizes=] or [=generate a fragment=] for a [=box=].
 
 <div class='note'>
     Note: The shape of the class should be:
     <pre class='lang-javascript'>
-        class MyLayout {
+        registerLayout('example', class {
             static get inputProperties() { return ['--foo']; }
             static get childrenInputProperties() { return ['--bar']; }
             static get layoutOptions() {
@@ -282,16 +333,13 @@ instances</dfn>. Initially this map is empty; it is populated when the user agen
             async layout(children, edges, constraints, styleMap, breakToken) {
                 // Layout code goes here.
             }
-        }
+        });
     </pre>
 </div>
 </div>
 
-Registering A Layout Algorithm {#registering-a-layout-algorithm}
-----------------------------------------------------------------
-
 The algorithm below is run when the {{registerLayout(name, layoutCtor)}} is called. It notifies the
-engine about the new user defined layout.
+user agent rendering engine about the new user defined layout.
 
 <div algorithm>
 When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
@@ -352,7 +400,7 @@ is called, the user agent <em>must</em> run the following steps:
     17. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to the
         [=Function=] [=callback function=] type. Rethrow any exceptions from the conversion.
 
-    18. Let |layoutValue| be the result of <a>Get</a>(|prototype|, <code>"layout"</code>).
+    18. Let |layoutValue| be the result of [=Get=](|prototype|, <code>"layout"</code>).
 
     19. Let |layout| be the result of [=converting=] |layoutValue| to the [=Function=] [=callback
         function=] type. Rethrow any exceptions from the conversion.
@@ -1459,42 +1507,6 @@ Layout {#layout}
 ================
 
 This section describes how the CSS Layout API interacts with the user agent's layout engine.
-
-Concepts {#concepts}
---------------------
-
-A <dfn>layout definition</dfn> is a <a>struct</a> which describes the information needed by the
-{{LayoutWorkletGlobalScope}} about the author defined layout (which can be referenced by the
-''layout()'' function). It consists of:
-
- - <dfn for="layout definition">class constructor</dfn> which is the class <a>constructor</a>.
-
- - <dfn for="layout definition">layout function</dfn> which is the layout <a>function</a> callback.
-
- - <dfn for="layout definition">intrinsic sizes function</dfn> which is the intrinsic sizes
-     <a>function</a> callback.
-
- - <dfn for="layout definition">constructor valid flag</dfn>.
-
- - <dfn for="layout definition">input properties</dfn> which is a <a>list</a> of
-     <code>DOMStrings</code>
-
- - <dfn for="layout definition">child input properties</dfn> which is a <a>list</a> of
-     <code>DOMStrings</code>.
-
- - <dfn for="layout definition">layout options</dfn> a {{LayoutOptions}}.
-
-A <dfn>document layout definition</dfn> is a <a>struct</a> which describes the information needed by
-the <a>document</a> about the author defined layout (which can be referenced by the ''layout()''
-function). It consists of:
-
- - <dfn for="document layout definition">input properties</dfn> which is a <a>list</a> of
-     <code>DOMStrings</code>
-
- - <dfn for="document layout definition">child input properties</dfn> which is a <a>list</a> of
-     <code>DOMStrings</code>.
-
- - <dfn for="document layout definition">layout options</dfn> a {{LayoutOptions}}.
 
 Layout Invalidation {#layout-invalidation}
 ------------------------------------------
