@@ -333,7 +333,7 @@ is called, the user agent <em>must</em> run the following steps:
         <code>sequence&lt;DOMString></code>. If an exception is [=thrown=], rethrow the exception
         and abort all these steps.
 
-    11. Filter |inputProperties| so that it only contains [=supported CSS properties=] and [=custom
+    11. Filter |childInputProperties| so that it only contains [=supported CSS properties=] and [=custom
         properties=].
 
     12. Let |layoutOptionsValue| be the result of [=Get=](|layoutCtor|, "layoutOptions").
