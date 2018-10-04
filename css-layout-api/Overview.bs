@@ -1502,83 +1502,6 @@ Layout {#layout}
 
 This section describes how the CSS Layout API interacts with the user agent's layout engine.
 
-Layout Invalidation {#layout-invalidation}
-------------------------------------------
-
-Each <a>box</a> has an associated <dfn>layout valid flag</dfn>. It may be either
-<dfn>layout-valid</dfn> or <dfn>layout-invalid</dfn>. It is initially set to <a>layout-invalid</a>.
-
-Each <a>box</a> has an associated <dfn>intrinsic sizes valid flag</dfn>. If may be either
-<dfn>intrinsic-sizes-valid</dfn> or <dfn>intrinsic-sizes-invalid</dfn>. It is initially set to
-<a>intrinsic-sizes-invalid</a>.
-
-<div algorithm>
-When the user agent wants to <dfn>invalidate layout functions</dfn> given |box|, the user agent
-<em>must</em> run the following steps:
-
-    1. Let |layoutFunction| be the ''layout()'' function of the 'display' property on the computed
-        style for the |box| if it exists. If it is a different type of value (e.g.  ''grid'') then
-        abort all these steps.
-
-    2. Let |name| be the first argument of the |layoutFunction|.
-
-    3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
-        |name|.
-
-        If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
-        <code>"invalid"</code>, then abort all these steps.
-
-    4. Let |inputProperties| be |documentDefinition|'s <a for="document layout definition">input
-        properties</a>.
-
-    5. Let |childInputProperties| be |documentDefinition|'s <a for="document layout
-        definition">child input properties</a>.
-
-    6. For each |property| in |inputProperties|, if the |property|'s <a>computed value</a> has
-        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>, and
-        set the <a>intrinsic sizes valid flag</a> to <a>intrinsic-sizes-invalid</a>.
-
-    7. For each |property| in |childInputProperties|, if the |property|'s <a>computed value</a> has
-        changed, set the <a>layout valid flag</a> on the <a>box</a> to <a>layout-invalid</a>, and
-        set the <a>intrinsic sizes valid flag</a> to <a>intrinsic-sizes-invalid</a>.
-</div>
-
-<a>Invalidate layout functions</a> <em>must</em> be run when the user agent recalculates the computed
-style for a box, or when the children's computed style of that box is recalculated.
-
-When a child <a>box</a> represented by a {{LayoutChild}} is added or removed from the <a>box
-tree</a> or has its layout invalidated (from a computed style change, or a descendant change),
-<em>and</em> this invalidation is to be propagated up the box tree, set the <a>layout valid flag</a>
-on the current <a>box</a> to <a>layout-invalid</a> and set the <a>intrinsic sizes valid flag</a> on
-the current <a>box</a> to <a>intrinsic-sizes-invalid</a>.
-
-When the computed style of a <a>layout API container</a> changes, <em>and</em> this change effects
-the values inside the {{LayoutEdges}} object, set the <a>layout valid flag</a> of the box to
-<a>layout-invalid</a>, and set the <a>intrinsic sizes valid flag</a> of the box to
-<a>intrinsic-sizes-invalid</a>.
-
-If the computed style changes effects the values inside the {{LayoutConstraints}} object, just set
-the <a>intrinsic sizes valid flag</a> of the box to <a>intrinsic-sizes-invalid</a>.
-
-Note: As the {{LayoutConstraints}} object is only passed into the layout function there is no need
-    to invalidate the intrinsic sizes.
-
-<div class="note">
-    Note: As an example the following properties could change the {{LayoutEdges}} object:
-        - 'padding-top'
-        - 'border-left-width'
-        - 'overflow-y'
-
-    And the following properties could change the {{LayoutConstraints}} object:
-        - 'width'
-        - 'max-width'
-        - 'height'
-</div>
-
-Note: This only describes layout invalidation as it relates to the CSS Layout API. All
-    <a>boxes</a> conceptually have a <a>layout valid flag</a> and these changes are propagated
-    through the <a>box tree</a>.
-
 Performing Layout {#performing-layout}
 --------------------------------------
 
@@ -1614,24 +1537,16 @@ context</a> for a given |box|, |childBoxes| it <em>must</em> run the following s
     1. Let |layoutFunction| be the ''layout()'' for the <a>computed value</a> of <<display-inside>>
         for |box|.
 
-    2. If the <a>intrinsic sizes valid flag</a> for the |layoutFunction| is
-        <a>intrinsic-sizes-valid</a> the user agent <em>may</em> use the intrinsic sizes from the
-        previous invocation. If so it <em>may</em> abort all these steps and use the previous value
-        for the intrinsic sizes.
+    2. Let |name| be the first argument of the |layoutFunction|.
 
-    3. Set the <a>intrinsic sizes valid flag</a> for the |layoutFunction| to
-        <a>intrinsic-sizes-valid</a>.
-
-    4. Let |name| be the first argument of the |layoutFunction|.
-
-    5. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
+    3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
         |name|.
 
         If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
         <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
         these steps.
 
-    6. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
+    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the layout {{Worklet}}.
 
         The user agent <em>must</em> have, and select from at least two
@@ -1644,7 +1559,7 @@ context</a> for a given |box|, |childBoxes| it <em>must</em> run the following s
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         layout {{Worklet}}.
 
-    7. Run <a>invoke a intrinsic sizes callback</a> given |name|, |box|, |childBoxes|, and
+    5. Run <a>invoke a intrinsic sizes callback</a> given |name|, |box|, |childBoxes|, and
         |workletGlobalScope| optionally <a>in parallel</a>.
 
         Note: If the user agent runs <a>invoke a intrinsic sizes callback</a> on a thread <a>in
@@ -1735,22 +1650,16 @@ context</a> for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an
     1. Let |layoutFunction| be the ''layout()'' for the <a>computed value</a> of <<display-inside>>
         for |box|.
 
-    2. If the <a>layout valid flag</a> for the |layoutFunction| is <a>layout-valid</a> the user
-        agent <em>may</em> use the intrinsic sizes from the previous invocation. If so it
-        <em>may</em> abort all these steps and use the previous value for the intrinsic sizes.
+    2. Let |name| be the first argument of the |layoutFunction|.
 
-    3. Set the <a>layout valid flag</a> for the |layoutFunction| to <a>layout-valid</a>.
-
-    4. Let |name| be the first argument of the |layoutFunction|.
-
-    5. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
+    3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
         |name|.
 
         If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
         <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
         these steps.
 
-    6. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
+    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
         WorkletGlobalScopes</a> from the layout {{Worklet}}.
 
         The user agent <em>must</em> have, and select from at least two
@@ -1763,7 +1672,7 @@ context</a> for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an
         The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
         layout {{Worklet}}.
 
-    7. Run <a>invoke a layout callback</a> given |name|, |box|, |childBoxes|,
+    5. Run <a>invoke a layout callback</a> given |name|, |box|, |childBoxes|,
         |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope| optionally <a>in
         parallel</a>.
 
