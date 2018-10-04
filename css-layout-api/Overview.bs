@@ -758,16 +758,15 @@ interface LayoutFragment {
 };
 </pre>
 
-A {{LayoutFragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred
-on that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
+A {{LayoutFragment}} represents a CSS [=fragment=] of a {{LayoutChild}} after layout has occurred on
+that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
 
 The {{LayoutFragment}} has {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}}
 attributes, which are set by the respective child's layout algorithm. They represent the <b>border
-box</b> size of the CSS <a>fragment</a>, and are relative to the <a>current layout's</a> writing
-mode.
+box</b> size of the CSS [=fragment=], and are relative to the [=current layout's=] writing mode.
 
 The {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}} attributes cannot be changed. If
-the <a>current layout</a> requires a different {{LayoutFragment/inlineSize}} or
+the [=current layout=] requires a different {{LayoutFragment/inlineSize}} or
 {{LayoutFragment/blockSize}} the author must perform {{LayoutChild/layoutNextFragment()}} again with
 different arguments in order to get different results.
 
@@ -775,68 +774,39 @@ The author inside the current layout can position a resulting {{LayoutFragment}}
 {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} attributes. If not set by the
 author they default to zero. The {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}
 attributes represent the position of the {{LayoutFragment}} relative to its parent's <b>border
-box</b>, before transform or positioning (e.g. if a fragment is <a>relatively positioned</a>) has
+box</b>, before transform or positioning (e.g. if a fragment is [=relatively positioned=]) has
 been applied.
 
-<div class="example">
-The layout algorithm performs a block-like layout (positioning fragments sequentially in the block
-direction), while centering its children in the inline direction.
+<div class=example>
+The example below shows the basic usage of a {{LayoutFragment}}.
+<pre class='lang-javascript'>
+registerLayout('example-layout-fragment', class {
+  async layout(children, edges, constraints, styleMap) {
 
-<pre class="lang-javascript">
-registerLayout('block-like', class {
-    async intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = await Promise.all(children.map((child) => {
-          return child.intrinsicSizes();
-      }));
+    // You must perform layout to generate a fragment.
+    const fragment = await child.layoutNextFragment({});
 
-      const maxContentSize = childrenSizes.reduce((max, childSizes) => {
-          return Math.max(max, childSizes.maxContentSize);
-      }, 0) + edges.all.inline;
+    // You can query the size of the fragment produced:
+    console.log(fragment.inlineSize);
+    console.log(fragment.blockSize);
 
-      const minContentSize = childrenSizes.reduce((max, childSizes) => {
-          return Math.max(max, childSizes.minContentSize);
-      }, 0) + edges.all.inline;
+    // You can set the position of the fragment, e.g. this will set it to the
+    // top-left corner:
+    fragment.inlineOffset = edges.all.inlineStart;
+    fragment.blockOffset = edges.all.blockStart;
 
-      return {maxContentSize, minContentSize};
-    }
+    // Data may be passed from the child layout:
+    console.log(fragment.data);
 
-    async layout(children, edges, constraints, styleMap) {
-        // Determine our (inner) available size.
-        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
-
-        const childFragments = [];
-        const childConstraints = { availableInlineSize, availableBlockSize };
-
-        const childFragments = await Promise.all(children.map((child) => {
-            return child.layoutNextFragment(childConstraints);
-        }));
-
-        let blockOffset = edges.all.blockStart;
-        for (let fragment of childFragments) {
-            // Position the fragment in a block like manner, centering it in the
-            // inline direction.
-            fragment.blockOffset = blockOffset;
-            fragment.inlineOffset = Math.max(
-                edges.all.inlineStart,
-                (availableInlineSize - fragment.inlineSize) / 2);
-
-            blockOffset += fragment.blockSize;
-        }
-
-        const autoBlockSize = blockOffset + edges.all.blockEnd;
-
-        return {
-            autoBlockSize,
-            childFragments,
-        };
-    }
+    // If the child fragmented, you can use the breakToken to produce the next
+    // fragment in the chain.
+    const nextFragment = await child.layoutNextFragment({}, fragment.breakToken);
+  }
 });
 </pre>
 </div>
 
-A <a>layout API container</a> can communicate with other <a>layout API containers</a> by using the
+A [=layout API container=] can communicate with other [=layout API containers=] by using the
 {{LayoutFragment/data}} attribute. This is set by the {{FragmentResultOptions/data}} member in the
 {{FragmentResultOptions}} dictionary.
 
@@ -845,7 +815,7 @@ fragmented. If the {{LayoutFragment/breakToken}} is null the {{LayoutChild}} won
 {{LayoutFragment}}s for that token chain. The {{LayoutFragment/breakToken}} can be passed to the
 {{LayoutChild/layoutNextFragment()}} function to produce the next {{LayoutFragment}} for a
 particular child. The {{LayoutFragment/breakToken}} cannot be changed.
-If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} the author must perform
+If the [=current layout=] requires a different {{LayoutFragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
 Intrinsic Sizes {#intrinsic-sizes}
@@ -859,11 +829,11 @@ interface IntrinsicSizes {
 };
 </pre>
 
-A {{IntrinsicSizes}} object represents the <a>min-content size</a> and <a>max-content size</a> of a
-CSS <a>box</a>. It has {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}}
-attributes which represent the <b>border box</b> min/max-content contribution of the {{LayoutChild}}
-for the <a>current layout</a>. The attributes are relative to the inline direction of the <a>current
-layout's</a> writing mode.
+A {{IntrinsicSizes}} object represents the [=min-content size=] and [=max-content size=] of a CSS
+[=box=]. It has {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}} attributes
+which represent the <b>border box</b> min/max-content contribution of the {{LayoutChild}} for the
+[=current layout=]. The attributes are relative to the inline direction of the [=current layout's=]
+writing mode.
 
 The {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}} cannot be changed. They
 must not change for a {{LayoutChild}} within the current layout pass.
@@ -954,21 +924,21 @@ enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
 
 A {{LayoutConstraints}} object is passed into the layout method which represents the all the
-constraints for the <a>current layout</a> to perform layout inside. It is also used to pass
-information about the available space into a <a>child layout</a>.
+constraints for the [=current layout=] to perform layout inside. It is also used to pass information
+about the available space into a [=child layout=].
 
 The {{LayoutConstraints}} object has {{LayoutConstraints/availableInlineSize}} and
-{{LayoutConstraints/availableBlockSize}} attributes. This represents the <a>available space</a> for
-a {{LayoutFragment}} which the layout should respect.
+{{LayoutConstraints/availableBlockSize}} attributes. This represents the [=available space=] for a
+{{LayoutFragment}} which the layout should respect.
 
 Note: Some layouts may need to produce a {{LayoutFragment}} which exceed this size. For example a
-    <a>replaced element</a>. The <a>parent layout</a> should expect this to occur and deal with it
+    [=replaced element=]. The [=parent layout=] should expect this to occur and deal with it
     appropriately.
 
-A <a>parent layout</a> may require the <a>current layout</a> to be exactly a particular size. If
-the {{LayoutConstraints/fixedInlineSize}} or {{LayoutConstraints/fixedBlockSize}} are specified the
-<a>current layout</a> should produce a {{LayoutFragment}} with a the specified size in the
-appropriate direction.
+A [=parent layout=] may require the [=current layout=] to be exactly a particular size. If the
+{{LayoutConstraints/fixedInlineSize}} or {{LayoutConstraints/fixedBlockSize}} are specified the
+[=current layout=] should produce a {{LayoutFragment}} with a the specified size in the appropriate
+direction.
 
 <div class="example">
 The layout algorithm performs a flexbox-like distribution of spare space in the inline direction. It
@@ -1980,6 +1950,67 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |box|,
         4. <a for=map>Set</a> |layoutClassInstanceMap|[|workletGlobalScope|] to |layoutInstance|.
 
     4. Return |layoutInstance|.
+</div>
+
+Examples {#examples}
+====================
+
+<div class="example">
+The layout algorithm below performs a block-like layout (positioning fragments sequentially in the
+block direction), while centering its children in the inline direction.
+
+<pre class="lang-javascript">
+registerLayout('block-like', class {
+    async intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = await Promise.all(children.map((child) => {
+          return child.intrinsicSizes();
+      }));
+
+      const maxContentSize = childrenSizes.reduce((max, childSizes) => {
+          return Math.max(max, childSizes.maxContentSize);
+      }, 0) + edges.all.inline;
+
+      const minContentSize = childrenSizes.reduce((max, childSizes) => {
+          return Math.max(max, childSizes.minContentSize);
+      }, 0) + edges.all.inline;
+
+      return {maxContentSize, minContentSize};
+    }
+
+    async layout(children, edges, constraints, styleMap) {
+        // Determine our (inner) available size.
+        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
+
+        const childFragments = [];
+        const childConstraints = { availableInlineSize, availableBlockSize };
+
+        const childFragments = await Promise.all(children.map((child) => {
+            return child.layoutNextFragment(childConstraints);
+        }));
+
+        let blockOffset = edges.all.blockStart;
+        for (let fragment of childFragments) {
+            // Position the fragment in a block like manner, centering it in the
+            // inline direction.
+            fragment.blockOffset = blockOffset;
+            fragment.inlineOffset = Math.max(
+                edges.all.inlineStart,
+                (availableInlineSize - fragment.inlineSize) / 2);
+
+            blockOffset += fragment.blockSize;
+        }
+
+        const autoBlockSize = blockOffset + edges.all.blockEnd;
+
+        return {
+            autoBlockSize,
+            childFragments,
+        };
+    }
+});
+</pre>
 </div>
 
 Security Considerations {#security-considerations}
