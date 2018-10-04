@@ -337,7 +337,7 @@ instances</dfn>. Initially this map is empty; it is populated when the user agen
 </div>
 
 The algorithm below is run when the {{registerLayout(name, layoutCtor)}} is called. It notifies the
-user agent rendering engine about the new user defined layout.
+user agent layout engine about the new user defined layout.
 
 <div algorithm>
 When the <dfn method for=LayoutWorkletGlobalScope>registerLayout(|name|, |layoutCtor|)</dfn> method
@@ -494,8 +494,8 @@ children of the current box which is being laid out.
 interface LayoutChild {
     readonly attribute StylePropertyMapReadOnly styleMap;
 
-    IntrinsicSizesRequest intrinsicSizes();
-    LayoutFragmentRequest layoutNextFragment(LayoutConstraintsOptions constraints, ChildBreakToken breakToken);
+    Promise&lt;IntrinsicSizes> intrinsicSizes();
+    Promise&lt;LayoutFragment> layoutNextFragment(LayoutConstraintsOptions constraints, ChildBreakToken breakToken);
 };
 </pre>
 
@@ -594,29 +594,84 @@ user agent must perform the following steps:
 </div>
 
 <div algorithm>
-When the <dfn method for=LayoutChild>layoutNextFragment(|constraints|, |breakToken|)</dfn> method is
-called on a {{LayoutChild}} |this|, the user agent must perform the following steps:
-
-    1. Let |request| be a new {{LayoutFragmentRequest}} with internal slot(s):
-        - {{LayoutFragmentRequest/[[layoutChild]]}} set to |this|.
-        - {{[[layoutConstraints]]}} set to |constraints|.
-        - {{[[breakToken]]}} set to |breakToken|.
-
-    2. Return |request|.
-</div>
-
-<div algorithm>
 When the <dfn method for=LayoutChild>intrinsicSizes()</dfn> method is called on a {{LayoutChild}}
 |this|, the user agent must perform the following steps:
 
-    1. Let |request| be a new {{IntrinsicSizesRequest}} with internal slot(s):
-          - {{IntrinsicSizesRequest/[[layoutChild]]}} set to |this|.
+    1. Let |p| be a new promise.
 
-    2. Return |request|.
+    2. Run the following steps [=in parallel=]:
+
+        1. Let |box| be |this|' [=box=] contained in the {{[[box]]}} internal slot.
+
+        2. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
+            box</b> min/max content contribution of |box|.
+
+            This step may fail, rejecting |p| with the error, and aborting these steps.
+
+        3. Let |intrinsicSizes| be a new {{IntrinsicSizes}} with:
+
+            - {{IntrinsicSizes/minContentSize}} being |internalIntrinsicSizes|' <b>border box</b>
+                min-content contribution, relative to the [=current layout's=] writing mode.
+
+            - {{IntrinsicSizes/maxContentSize}} being |internalIntrinsicSizes|'s <b>border box</b>
+                max-content contribution, relative to the [=current layout's=] writing mode.
+
+        4. Resolve |p| with |intrinsicSizes|.
+
+    3. Return |p|.
 </div>
 
-Note: Both {{LayoutChild/layoutNextFragment()}} and {{LayoutChild/intrinsicSizes()}} don't
-    synchronously run. See [[#request-objects]] for a full description.
+<div algorithm>
+When the <dfn method for=LayoutChild>layoutNextFragment(|constraints|, |breakToken|)</dfn> method is
+called on a {{LayoutChild}} |this|, the user agent must perform the following steps:
+
+    1. Let |p| be a new promise.
+
+    2. Run the following steps [=in parallel=]:
+
+        1. Let |targetRealm| be |this|' [=Realm=].
+
+        2. Let |box| be |this|' [=box=] contained in the {{[[box]]}} internal slot.
+
+        3. Let |internalFragment| be the result of the user agent producing a [=fragment=] based on
+            |box|, |constraints|, and |breakToken|.
+
+            This step may fail, rejecting |p| with the error, and aborting these steps.
+
+        4. Let |fragment| be a new {{LayoutFragment}} with:
+
+            - {{LayoutFragment/inlineSize}} being |internalFragment|'s [=inline size=] relative to
+                the [=current layout's=] writing mode.
+
+            - {{LayoutFragment/blockSize}} being |internalFragment|'s [=block size=] relative to
+                the [=current layout's=] writing mode.
+
+            - {{LayoutFragment/inlineOffset}} initially set to 0.
+
+            - {{LayoutFragment/blockOffset}} initially set to 0.
+
+            - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
+                |internalFragment|'s internal break token, if any.
+
+            - If |internalFragment| has a |clonedData| object stored with it, let
+                {{LayoutFragment/data}} being the result of [=StructuredDeserialize=](|clonedData|,
+                |targetRealm|), otherwise null.
+
+        5. Resolve |p| with |fragment|.
+
+    3. Return |p|.
+
+</div>
+
+Issue: Add check that {{LayoutChild}} is a direct child of the current layout.
+
+Issue: Add check that {{LayoutChild}} is attached to the box tree.
+
+Issue: Add a unique id to both {{IntrinsicSizes}} and {{LayoutFragment}} which is associated with
+    the current layout.
+
+Issue: We are likely going to need a more involved processing model, with an internal queue to
+    process these requests.
 
 ### LayoutChildren and the Box Tree ### {#layout-child-box-tree}
 
@@ -628,19 +683,19 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
 |box|, it <em>must</em> run the following steps:
 
     1. Assert that:
-        - |box| is currently attached to the <a>box tree</a>.
-        - |box|'s <a>containing block</a> is a <a>layout API container</a>.
-        - The <a>containing block</a>'s ''layout()'' function's first argument is |name|.
+        - |box| is currently attached to the [=box tree=]>.
+        - |box|'s [=containing block=] is a [=layout API container=].
+        - The [=containing block's=] ''layout()'' function's first argument is |name|.
 
     2. Let |layoutChildMap| be |box|'s {{[[layoutChildMap]]}}.
 
     3. If |layoutChildMap|[|workletGlobalScope|] does not <a for=map>exist</a>, run the following
         steps:
 
-        1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
+        1. Let |definition| be the result of [=get a layout definition=] given |name|, and
             |workletGlobalScope|.
 
-            Assert that <a>get a layout definition</a> succeeded, and |definition| is not
+            Assert that [=get a layout definition=] succeeded, and |definition| is not
             <code>"invalid"</code>.
 
         2. Let |childInputProperties| be |definition|'s <a for="layout definition">child input
@@ -649,7 +704,7 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
         3. Let |layoutChild| be a new {{LayoutChild}} with internal slot(s):
             - {{[[box]]}} set to |box|.
             - {{[[styleMap]]}} set to a new {{StylePropertyMapReadOnly}} populated with
-                <em>only</em> the <a>computed values</a> for properties listed in
+                <em>only</em> the [=computed values=] for properties listed in
                 |childInputProperties|.
 
         4. <a for=map>Set</a> |layoutChildMap|[|workletGlobalScope|] to |layoutChild|.
@@ -657,10 +712,10 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
     4. Return the result of <a for=map>get</a> |layoutChildMap|[|workletGlobalScope|]
 </div>
 
-When a <a>box</a> is inserted into the <a>box tree</a> the user agent <em>may</em> pre-populate the
+When a [=box=] is inserted into the [=box tree=] the user agent <em>may</em> pre-populate the
 {{[[layoutChildMap]]}} for all {{LayoutWorkletGlobalScope}}s.
 
-When a <a>box</a> is removed from the <a>box tree</a> the user agent <em>must</em> clear the
+When a [=box=] is removed from the [=box tree=] the user agent <em>must</em> clear the
 {{[[layoutChildMap]]}}.
 
 <div algorithm="update a layout child style">
@@ -668,9 +723,9 @@ When the user agent wants to <dfn>update a layout child style</dfn> given |box|,
 run the following steps:
 
     1. Assert that:
-        - |box| is currently attached to the <a>box tree</a>.
+        - |box| is currently attached to the [=box tree=].
 
-    2. If |box|'s <a>containing block</a> is not a <a>layout API container</a>, abort all these
+    2. If |box|'s [=containing block=] is not a [=layout API container=], abort all these
         steps.
 
     3. Let |layoutChildMap| be |box|'s {{[[layoutChildMap]]}}.
@@ -679,11 +734,11 @@ run the following steps:
 
         1. Let |styleMap| be |layoutChild|'s {{[[styleMap]]}}.
 
-        2. Update |styleMap|'s <a>declarations</a> based on the |box|'s new computed style.
+        2. Update |styleMap|'s [=declarations=] based on the |box|'s new computed style.
 </div>
 
-When the computed style of a <a>box</a> changes the user agent must run the <a>update a layout child
-style</a> algorithm.
+When the computed style of a [=box=] changes the user agent must run the [=update a layout child
+style=] algorithm.
 
 Layout Fragments {#layout-fragments}
 ------------------------------------
@@ -702,14 +757,6 @@ interface LayoutFragment {
     readonly attribute ChildBreakToken? breakToken;
 };
 </pre>
-
-The {{LayoutFragment}} has internal slot(s):
-    - <dfn attribute for=LayoutFragment>\[[layoutFragmentRequest]]</dfn> a
-        {{LayoutFragmentRequest}}, this is the fragment request which generated this fragment.
-    - <dfn attribute for=LayoutFragment>\[[generator]]</dfn> the generator which produced this
-        fragment.
-
-<hr>
 
 A {{LayoutFragment}} represents a CSS <a>fragment</a> of a {{LayoutChild}} after layout has occurred
 on that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
@@ -801,37 +848,6 @@ particular child. The {{LayoutFragment/breakToken}} cannot be changed.
 If the <a>current layout</a> requires a different {{LayoutFragment/breakToken}} the author must perform
 {{LayoutChild/layoutNextFragment()}} again with different arguments.
 
-<div algorithm>
-When the user agent wants to <dfn>create a layout fragment</dfn> given |generator|,
-|layoutFragmentRequest|, and |internalFragment|, it <em>must</em> run the following steps:
-    1. Let |targetRealm| be |generator|'s <a>Realm</a>.
-
-    2. Let |fragment| be a new {{LayoutFragment}} with:
-
-        - The {{[[layoutFragmentRequest]]}} internal slot being |layoutFragmentRequest|.
-
-        - The {{[[generator]]}} internal slot being |generator|.
-
-        - {{LayoutFragment/inlineSize}} being |internalFragment|'s <a>inline size</a> relative to
-            the <a>current layout's</a> writing mode.
-
-        - {{LayoutFragment/blockSize}} being |internalFragment|'s <a>block size</a> relative to the
-            <a>current layout's</a> writing mode.
-
-        - {{LayoutFragment/inlineOffset}} initially set to 0.
-
-        - {{LayoutFragment/blockOffset}} initially set to 0.
-
-        - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
-            |internalFragment|'s internal break token, if any.
-
-        - If |internalFragment| has a |clonedData| object stored with it, let
-            {{LayoutFragment/data}} being the result of
-            <a>StructuredDeserialize</a>(|clonedData|, |targetRealm|), otherwise null.
-
-    3. Return |fragment|.
-</div>
-
 Intrinsic Sizes {#intrinsic-sizes}
 ----------------------------------
 
@@ -842,13 +858,6 @@ interface IntrinsicSizes {
   readonly attribute double maxContentSize;
 };
 </pre>
-
-The {{IntrinsicSizes}} object has internal slot(s):
-    - <dfn attribute for=IntrinsicSizes>\[[intrinsicSizesRequest]]</dfn> a
-        {{IntrinsicSizesRequest}}, this is the intrinsic sizes request which generated these
-        intrinsic sizes.
-
-<hr>
 
 A {{IntrinsicSizes}} object represents the <a>min-content size</a> and <a>max-content size</a> of a
 CSS <a>box</a>. It has {{IntrinsicSizes/minContentSize}} and {{IntrinsicSizes/maxContentSize}}
@@ -902,23 +911,6 @@ registerLayout('intrinsic-sizes-example', class {
     layout() {}
 });
 </pre>
-</div>
-
-<div algorithm>
-When the user agent wants to <dfn>create an intrinsic sizes object</dfn> given
-|intrinsicSizesRequest|, and |internalIntrinsicSizes|, it <em>must</em> run the following steps:
-
-    1. Let |intrinsicSizes| be a new {{IntrinsicSizes}} with:
-
-        - The {{[[intrinsicSizesRequest]]}} internal slot being |intrinsicSizesRequest|.
-
-        - {{IntrinsicSizes/minContentSize}} being |internalIntrinsicSizes|' <b>border box</b>
-            min-content contribution, relative to the <a>current layout's</a> writing mode.
-
-        - {{IntrinsicSizes/maxContentSize}} being |internalIntrinsicSizes|'s <b>border box</b>
-            max-content contribution, relative to the <a>current layout's</a> writing mode.
-
-    2. Return |intrinsicSizes|.
 </div>
 
 Layout Constraints {#layout-constraints}
@@ -1617,117 +1609,6 @@ Note: This only describes layout invalidation as it relates to the CSS Layout AP
     <a>boxes</a> conceptually have a <a>layout valid flag</a> and these changes are propagated
     through the <a>box tree</a>.
 
-Layout Engine {#layout-engine}
-------------------------------
-
-<div class="issue">
-  Issue: Currently the API is in an iterable generator form. Based on implementation experience, and
-  web developer experience, this may change to promise based API instead. There are both pros and
-  cons to each of these.
-
-  <em>Promises</em>
-     - Better error reporting.
-     - Potentially better developer ergonomics.
-
-  <em>Generator</em>
-     - More "strict" - can only perform layout operations. Don't have to restrict which promise APIs
-         work each call.
-     - Potentially better bindings overhead.
-</div>
-
-### Request Objects ### {#request-objects}
-
-<pre class="idl">
-[Exposed=LayoutWorklet]
-interface IntrinsicSizesRequest {
-};
-
-[Exposed=LayoutWorklet]
-interface LayoutFragmentRequest {
-};
-
-typedef (IntrinsicSizesRequest or LayoutFragmentRequest)
-    LayoutFragmentRequestOrIntrinsicSizesRequest;
-</pre>
-
-The {{IntrinsicSizesRequest}} has internal slot(s):
-    - <dfn attribute for=IntrinsicSizesRequest>\[[layoutChild]]</dfn> a {{LayoutChild}}, this is the
-        child which the intrinsic sizes must be calculated for.
-
-The {{LayoutFragmentRequest}} has internal slot(s):
-    - <dfn attribute for=LayoutFragmentRequest>\[[layoutChild]]</dfn> a {{LayoutChild}}, this is the
-        child which the fragment must be generated for.
-    - <dfn attribute for=LayoutFragmentRequest>\[[layoutConstraints]]</dfn> a
-        {{LayoutConstraintsOptions}} dictionary, these are the input constraints to the
-        {{LayoutChild}}'s layout algorithm.
-    - <dfn attribute for=LayoutFragmentRequest>\[[breakToken]]</dfn> a {{ChildBreakToken}} object,
-        which is the break token the layout must be resumed with.
-
-<hr>
-
-The layout method and intrinsic sizes method on the author supplied layout class is a generator
-function instead of a regular javascript function. This is for user-agents to be able to support
-asynchronous and parallel layout engines.
-
-When an author invokes the {{LayoutChild/layoutNextFragment()}} method on a {{LayoutChild}} the
-user-agent doesn't synchronously generate a {{LayoutFragment}} to return to the author's code.
-Instead it returns a {{LayoutFragmentRequest}}. This is a completely opaque object to the author but
-contains internal slots which encapsulates the {{LayoutChild/layoutNextFragment()}} method call.
-
-When a {{LayoutFragmentRequest}}(s) are yielded from a layout generator object the user-agent's
-layout engine may run the algorithm asynchronously with other work, and/or on a different thread of
-execution. When {{LayoutFragment}}(s) have been produced by the engine, the user-agent will "tick"
-the generator object with the resulting {{LayoutFragment}}(s).
-
-The same applies for the {{LayoutChild/intrinsicSizes()}} method.
-
-<div class="example">
-An example layout engine written in javascript is shown below.
-
-<pre class="lang-javascript">
-class LayoutEngine {
-  // This function takes the root of the box-tree, a LayoutConstraints object, and a
-  // BreakToken to (if paginating for printing for example) and generates a
-  // LayoutFragment.
-  layoutEntry(rootBox, rootPageConstraints, breakToken) {
-    return layoutFragment({
-      box: rootBox,
-      layoutConstraints: rootPageConstraints,
-      breakToken: breakToken,
-    });
-  }
-
-  // This function takes a LayoutFragmentRequest and calls the appropriate
-  // layout algorithm to generate the a LayoutFragment.
-  layoutFragment(fragmentRequest) {
-    const box = fragmentRequest.layoutChild;
-    const algorithm = selectLayoutAlgorithmForBox(box);
-    const fragmentRequestGenerator = algorithm.layout(
-        fragmentRequest.layoutConstraints,
-        box.children,
-        box.styleMap,
-        fragmentRequest.breakToken);
-
-    let nextFragmentRequest = fragmentRequestGenerator.next();
-
-    while (!nextFragmentRequest.done) {
-      // A user-agent may decide to perform layout to generate the fragments in
-      // parallel on separate threads. This example performs them synchronously
-      // in order.
-      let fragments = nextFragmentRequest.value.map(layoutFragment);
-
-      // A user-agent may decide to yield for other work (garbage collection for
-      // example) before resuming this layout work. This example just performs
-      // layout synchronously without any ability to yield.
-      nextFragmentRequest = fragmentRequestGenerator.next(fragments);
-    }
-
-    return nextFragmentRequest.value; // Return the final LayoutFragment.
-  }
-}
-</pre>
-</div>
-
 Performing Layout {#performing-layout}
 --------------------------------------
 
@@ -2099,134 +1980,6 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |box|,
         4. <a for=map>Set</a> |layoutClassInstanceMap|[|workletGlobalScope|] to |layoutInstance|.
 
     4. Return |layoutInstance|.
-</div>
-
-<div algorithm="run a generator">
-When the user agent wants to <dfn>run a generator</dfn> given |generator|, and |generatorType|, it
-<em>must</em> run the following steps:
-
-    1. Let |done| be a <a>boolean</a> initialized to <code>false</code>.
-
-    2. Let |nextValue| be undefined.
-
-    3. Perform the following substeps until |done| is <code>true</code>:
-
-        1. Let |nextFunction| be the result of <a>Get</a>(|generator|, <code>"next"</code>).
-
-        2. If the result of <a>IsCallable</a>(|nextFunction|) is false, <a>throw</a> a
-            <a>TypeError</a> and abort all these steps.
-
-        3. Let |nextResult| be the result of calling <a>Invoke</a>(|nextFunction|, |generator|,
-            «|nextValue|»).
-
-            If an exception is <a>thrown</a> return failure, and abort all these steps.
-
-        4. If the result of <a>Type</a>(|nextResult|) is not Object, <a>throw</a> a <a>TypeError</a>
-            and abort all these steps.
-
-        5. Let |requestOrRequests| be the result of <a>Get</a>(nextResult|, <code>"value"</code>).
-
-        6. Let |done| be the result of <a>Get</a>(|nextResult|, <code>"done"</code>).
-
-        7. If the result of <a>GetMethod</a>(|requestOrRequests|, <code>@@iterable</code>) exists
-            then:
-
-            1. Set |results| to be a new <a for=list>empty</a> <a>list</a>.
-
-            2. Let |requests| be the result of <a>converting</a> |requestOrRequests| to a
-                <code>sequence&lt;LayoutFragmentRequestOrIntrinsicSizesRequest></code>.
-
-                If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
-
-            3. <a for=list>For each</a> |request| in |requests| perform the following substeps:
-
-                1. Let |result| be the result of <a>produce a generator result</a> given |request|,
-                      |generator|, |generatorType|.
-
-                2. <a for=list>Append</a> |result| to |results|.
-
-            4. Set |nextValue| to be |results|.
-
-            5. Continue.
-
-        8. Let |request| be the result of <a>converting</a> |requestOrRequests| to a
-            {{LayoutFragmentRequestOrIntrinsicSizesRequest}}.
-
-            If an exception is <a>thrown</a>, rethrow the exception and abort all these steps.
-
-        9. Let |result| be the result of <a>produce a generator result</a> given |request|,
-            |generator|, |generatorType|.
-
-            If <a>produce a generator result</a> returns failure, return failure, and abort all
-            these steps.
-
-        10. Set |nextValue| to be |result|.
-
-        11. Continue.
-
-        The user agent may perform the above loop out of order, and <a>in parallel</a>. The ordering
-        for |requests| and |results| however <em>must</em> be consistent.
-
-        Note: This is to allow user agents to run the appropriate layout algorithm on a different
-            thread, or asynchronously (e.g. time slicing layout work with other work). If the user
-            agent performs the loop in parallel, the outside loop has to wait until all the cross
-            thread tasks are complete before calling the generator again. It cannot return partial
-            results to the author.
-
-    3. Return the result of calling <a>Get</a>(|nextResult|, <code>"value"</code>).
-</div>
-
-<div algorithm="produce a generator result">
-When the user agent wants to <dfn>produce a generator result</dfn> given |request|, |generator|, and
-|generatorType|, it <em>must</em> run the following steps:
-    1. If |request| is a {{IntrinsicSizesRequest}} then:
-
-        1. Let |layoutChild| be the result of looking up the internal slot
-            {{IntrinsicSizesRequest/[[layoutChild]]}} on |request|.
-
-        2. Let |box| be the result of looking up the internal slot {{LayoutChild/[[box]]}} on
-            |layoutChild|.
-
-        3. If |box| is <em>not</em> attached to the <a>box tree</a>, return failure and abort all
-            these steps.
-
-            Note: The author may hold onto a {{LayoutChild}} from a previous invocation. It is
-                assumed that a box is only ever attached to the box-tree once, and not re-used.
-
-        4. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
-            box</b> min/max content contribution of |box|.
-
-        5. Return the result of <a>create an intrinsic sizes object</a> given |request|, and
-            |internalIntrinsicSizes|.
-
-    2. If |request| is a {{LayoutFragmentRequest}} and |generatorType| is <code>"layout"</code>
-        then:
-
-        1. Let |layoutChild| be result of looking up the internal slot
-            {{LayoutFragmentRequest/[[layoutChild]]}} on |request|.
-
-        2. Let |box| be the result of looking up the internal slot {{LayoutChild/[[box]]}} on
-            |layoutChild|.
-
-        3. If |box| is <em>not</em> attached to the <a>box tree</a>, return failure and abort all
-            these steps.
-
-            Note: The author may hold onto a {{LayoutChild}} from a previous invocation. It is
-                assumed that a box is only ever attached to the box-tree once, and not re-used.
-
-        4. Let |childLayoutConstraints| be the result of looking up the internal slot
-            {{LayoutFragmentRequest/[[layoutConstraints]]}} on |request|.
-
-        5. Let |childBreakToken| be the result of looking up the internal slot
-            {{LayoutFragmentRequest/[[breakToken]]}} on |request|.
-
-        6. Let |internalFragment| be the result of the user agent producing a <a>fragment</a> based
-            on |box|, |childLayoutConstraints|, and |childBreakToken|.
-
-        7. Return the result of <a>create a layout fragment</a> given |generator|, |request|, and
-            |internalFragment|.
-
-    3. Return failure (neither of the above branches was taken).
 </div>
 
 Security Considerations {#security-considerations}
