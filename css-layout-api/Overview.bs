@@ -67,11 +67,6 @@ urlPrefix: https://heycam.github.io/webidl/; type: dfn;
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
-    text: GetMethod
-    text: IsArray
-    text: IsCallable
-    text: IsConstructor
-    text: HasProperty
     url: ecmascript-data-types-and-values; text: type
     url: get-o-p; text: Get
     url: terms-and-definitions-function; text: function
@@ -417,7 +412,7 @@ is called, the user agent <em>must</em> run the following steps:
 
         - [=layout definition/input properties=] being |inputProperties|.
 
-        - [=layout defintion/layout options=] being |layoutOptions|.
+        - [=layout definition/layout options=] being |layoutOptions|.
 
     21. [=map/Set=] |layoutDefinitionMap|[|name|] to |definition|.
 
@@ -500,10 +495,16 @@ interface LayoutChild {
 </pre>
 
 The {{LayoutChild}} has internal slot(s):
+
     - <dfn attribute for=LayoutChild>\[[box]]</dfn> a CSS [=box=].
+
     - <dfn attribute for=LayoutChild>\[[styleMap]]</dfn> a {{StylePropertyMapReadOnly}}, this is the
         computed style for the child, it is populated with only the properties listed in
         <code>childInputProperties</code>.
+
+   - <dfn attribute for=LayoutChild>[[unique id]]</dfn> the [=unique id=] of the current [=layout
+       api context=]. This slot is used so that a {{LayoutChild}} used outside the current layout
+       pass is invalid.
 
 <div class=example>
 The example below shows the basic usage of a {{LayoutChild}}.
@@ -599,26 +600,22 @@ When the <dfn method for=LayoutChild>intrinsicSizes()</dfn> method is called on 
 
     1. Let |p| be a new promise.
 
-    2. Run the following steps [=in parallel=]:
+    2. Let |context| be the [=current layout's=] [=layout API context=].
 
-        1. Let |box| be |this|' [=box=] contained in the {{[[box]]}} internal slot.
+    3. If |this|' {{LayoutChild/[[unique id]]}} is not equal to |context|'s [=unique id=], reject
+        |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
 
-        2. Let |internalIntrinsicSizes| be the result of the user agent calculating the <b>border
-            box</b> min/max content contribution of |box|.
+    4. Let |task| be a new [=layout API work task=] with:
 
-            This step may fail, rejecting |p| with the error, and aborting these steps.
+        - [=layout api work task/layout child=] being |this|.
 
-        3. Let |intrinsicSizes| be a new {{IntrinsicSizes}} with:
+        - [=layout api work task/task type=] being <code>"intrinsic-sizes"</code>.
 
-            - {{IntrinsicSizes/minContentSize}} being |internalIntrinsicSizes|' <b>border box</b>
-                min-content contribution, relative to the [=current layout's=] writing mode.
+        - [=layout api work task/promise=] being |p|.
 
-            - {{IntrinsicSizes/maxContentSize}} being |internalIntrinsicSizes|'s <b>border box</b>
-                max-content contribution, relative to the [=current layout's=] writing mode.
+    5. [=list/Append=] |task| to |context|'s [=work queue=].
 
-        4. Resolve |p| with |intrinsicSizes|.
-
-    3. Return |p|.
+    6. Return |p|.
 </div>
 
 <div algorithm>
@@ -627,51 +624,36 @@ called on a {{LayoutChild}} |this|, the user agent must perform the following st
 
     1. Let |p| be a new promise.
 
-    2. Run the following steps [=in parallel=]:
+    2. Let |context| be the [=current layout's=] [=layout API context=].
 
-        1. Let |targetRealm| be |this|' [=Realm=].
+    3. If |this|' {{LayoutChild/[[unique id]]}} is not equal to |context|'s [=unique id=], reject
+        |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
 
-        2. Let |box| be |this|' [=box=] contained in the {{[[box]]}} internal slot.
+    4. If |breakToken|'s {{ChildBreakToken/[[unique id]]} is not equal to |context|'s [=unique id=],
+        reject |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
 
-        3. Let |internalFragment| be the result of the user agent producing a [=fragment=] based on
-            |box|, |constraints|, and |breakToken|.
+    5. If |context|'s [=layout API context/mode=] is <code>"intrinsic-sizes"</code>, reject |p| with
+        a "{{NotSupportedError}}" {{DOMException}}.
 
-            This step may fail, rejecting |p| with the error, and aborting these steps.
+        Note: This is to ensure that inside a <code>intrinsicSizes</code> callback,
+            {{LayoutChild/layoutNextFragment()}} cannot be called.
 
-        4. Let |fragment| be a new {{LayoutFragment}} with:
+    6. Let |task| be a new [=layout API work task=] with:
 
-            - {{LayoutFragment/inlineSize}} being |internalFragment|'s [=inline size=] relative to
-                the [=current layout's=] writing mode.
+        - [=layout api work task/layout constraints=] being |constraints|.
 
-            - {{LayoutFragment/blockSize}} being |internalFragment|'s [=block size=] relative to
-                the [=current layout's=] writing mode.
+        - [=layout api work task/layout child=] being |this|.
 
-            - {{LayoutFragment/inlineOffset}} initially set to 0.
+        - [=layout api work task/child break token=] being |breakToken|.
 
-            - {{LayoutFragment/blockOffset}} initially set to 0.
+        - [=layout api work task/task type=] being <code>"layout"</code>.
 
-            - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
-                |internalFragment|'s internal break token, if any.
+        - [=layout api work task/promise=] being |p|.
 
-            - If |internalFragment| has a |clonedData| object stored with it, let
-                {{LayoutFragment/data}} being the result of [=StructuredDeserialize=](|clonedData|,
-                |targetRealm|), otherwise null.
+    7. [=list/Append=] |task| to |context|'s [=work queue=].
 
-        5. Resolve |p| with |fragment|.
-
-    3. Return |p|.
-
+    8. Return |p|.
 </div>
-
-Issue: Add check that {{LayoutChild}} is a direct child of the current layout.
-
-Issue: Add check that {{LayoutChild}} is attached to the box tree.
-
-Issue: Add a unique id to both {{IntrinsicSizes}} and {{LayoutFragment}} which is associated with
-    the current layout.
-
-Issue: We are likely going to need a more involved processing model, with an internal queue to
-    process these requests.
 
 ### LayoutChildren and the Box Tree ### {#layout-child-box-tree}
 
@@ -679,8 +661,8 @@ Each [=box=] has a <dfn attribute for=box>\[[layoutChildMap]]</dfn> internal slo
 [=map=] of {{LayoutWorkletGlobalScope}}s to {{LayoutChild}}ren.
 
 <div algorithm="get a layout child">
-When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalScope|, |name|, and
-|box|, it <em>must</em> run the following steps:
+When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalScope|, |name|,
+ |box|, and |uniqueId|, it <em>must</em> run the following steps:
 
     1. Assert that:
         - |box| is currently attached to the [=box tree=]>.
@@ -709,7 +691,11 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
 
         4. <a for=map>Set</a> |layoutChildMap|[|workletGlobalScope|] to |layoutChild|.
 
-    4. Return the result of <a for=map>get</a> |layoutChildMap|[|workletGlobalScope|]
+    4. Let |layoutChild| be the result of <a for=map>get</a> |layoutChildMap|[|workletGlobalScope|].
+
+    5. Set |layoutChild|'s {{LayoutChild/[[unique id]]}} internal slot to |uniqueId|.
+
+    6. Return |layoutChild|.
 </div>
 
 When a [=box=] is inserted into the [=box tree=] the user agent <em>may</em> pre-populate the
@@ -757,6 +743,13 @@ interface LayoutFragment {
     readonly attribute ChildBreakToken? breakToken;
 };
 </pre>
+
+The {{LayoutFragment}} has internal slot(s):
+   - <dfn attribute for=LayoutFragment>[[unique id]]</dfn> the [=unique id=] of the [=layout api
+       context=] which produced this child fragment. This slot is used so that a {{LayoutFragment}}
+       from a previous layout pass is invalid.
+
+<hr>
 
 A {{LayoutFragment}} represents a CSS [=fragment=] of a {{LayoutChild}} after layout has occurred on
 that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
@@ -1502,6 +1495,54 @@ Layout {#layout}
 
 This section describes how the CSS Layout API interacts with the user agent's layout engine.
 
+Processing Model {#processing-model}
+------------------------------------
+
+A <dfn>layout API work task</dfn> is a [=struct=] which describes the information needed by the user
+agent layout engine to perform layout work. It consists of:
+
+     - <dfn for="layout api work task">layout constraints</dfn> a {{LayoutConstraintsOptions}}.
+
+     - <dfn for="layout api work task">layout child</dfn> a {{LayoutChild}}.
+
+     - <dfn for="layout api work task">child break token</dfn> a {{ChildBreakToken}}.
+
+     - <dfn for="layout api work task">task type</dfn> which is either <code>"layout"</code>, or
+         <code>"intrinsic-sizes"</code>
+
+     - <dfn for="layout api work task">promise</dfn> a promise object.
+
+A <dfn>layout API context</dfn> is a [=struct=] which describes the information needed by the
+[=current layout=] to produce either a fragment or determine the intrinsic-sizes for a [=box=]. It
+consits of:
+
+    - <dfn for="layout API context">work queue</dfn> which is a [=list=] of [=layout API work
+        tasks=]. The user agent will alternate between processing these tasks, and running the
+        microtask queue.
+
+    - <dfn for="layout API context">unique id</dfn> a internal unique identifier. This is used for
+        determining that objects exposed to the web developer are only used within the correct
+        layout pass. E.g. {{LayoutFragment}}s returned in the {{FragmentResultOptions}} dictionary
+        belong to the current layout pass.
+
+    - <dfn for="layout API context">mode</dfn> which is either <code>"layout"</code>, or
+        <code>"intrinsic-sizes"</code>. This is used for determining what the user agent layout
+        engine is producing, and if a call to {{LayoutChild/layoutNextFragment()}} is valid.
+
+<div algorithm="create a layout api context">
+When the user agent wants to <dfn>create a layout API context</dfn> given |mode|, it <em>must</em>
+run the following steps:
+
+    1. Return a new [=layout API context=] with:
+
+        - [=work queue=] being a new [=list/empty=] [=list=].
+
+        - [=unique id=] being a unique id.
+
+        - [=mode=] being |mode|.
+
+</div>
+
 Performing Layout {#performing-layout}
 --------------------------------------
 
@@ -1524,46 +1565,45 @@ dictionary IntrinsicSizesResultOptions {
 
 ### Determining Intrinsic Sizes ### {#determining-intrinsic-sizes}
 
-The <a>determine the intrinsic sizes</a> algorithm defines how a user agent is to query the author
-defined layout for a <a>box's</a> <a>intrinsic sizes</a> information.
+The [=determine the intrinsic sizes=] algorithm defines how a user agent is to query the author
+defined layout for a [=box's=] [=intrinsic sizes=] information.
 
-Note: The <a>determine the intrinsic sizes</a> algorithm allows for user agents to cache an arbitary
+Note: The [=determine the intrinsic sizes=] algorithm allows for user agents to cache an arbitrary
     number of previous invocations to reuse.
 
 <div algorithm="determine the intrinsic sizes">
-When the user agent wants to <dfn>determine the intrinsic sizes</dfn> of a <a>layout API formatting
-context</a> for a given |box|, |childBoxes| it <em>must</em> run the following steps:
+When the user agent wants to <dfn>determine the intrinsic sizes</dfn> of a [=layout API formatting
+context=] for a given |box|, |childBoxes| it <em>must</em> run the following steps:
 
-    1. Let |layoutFunction| be the ''layout()'' for the <a>computed value</a> of <<display-inside>>
-        for |box|.
+    1. Let |layoutFunction| be the ''layout()'' for the [=computed value=] of <<display-inside>> for
+        |box|.
 
     2. Let |name| be the first argument of the |layoutFunction|.
 
-    3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
-        |name|.
+    3. Let |documentDefinition| be the result of [=get a document layout definition=] given |name|.
 
-        If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
-        <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
-        these steps.
+        If [=get a document layout definition=] returned failure, or if |documentDefinition| is
+        <code>"invalid"</code>, then let |box| fallback to the [=flow layout=] and abort all these
+        steps.
 
-    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the layout {{Worklet}}.
+    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of [=worklet's
+        WorkletGlobalScopes=] from the layout {{Worklet}}.
 
         The user agent <em>must</em> have, and select from at least two
-        {{LayoutWorkletGlobalScope}}s in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>,
-        unless the user agent is under memory constraints.
+        {{LayoutWorkletGlobalScope}}s in the [=worklet's WorkletGlobalScopes=] [=list=], unless the
+        user agent is under memory constraints.
 
-        Note: This is to ensure that authers do not rely on being able to store state on the global
+        Note: This is to ensure that authors do not rely on being able to store state on the global
             object or non-regeneratable state on the class.
 
-        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         layout {{Worklet}}.
 
-    5. Run <a>invoke a intrinsic sizes callback</a> given |name|, |box|, |childBoxes|, and
-        |workletGlobalScope| optionally <a>in parallel</a>.
+    5. Run [=invoke a intrinsic sizes callback=] given |name|, |box|, |childBoxes|, and
+        |workletGlobalScope| optionally [=in parallel=].
 
-        Note: If the user agent runs <a>invoke a intrinsic sizes callback</a> on a thread <a>in
-            parallel</a>, it should select a layout worklet global scope which can be used on that
+        Note: If the user agent runs [=invoke a intrinsic sizes callback=] on a thread [=in
+            parallel=], it should select a layout worklet global scope which can be used on that
             thread.
 </div>
 
@@ -1571,75 +1611,74 @@ context</a> for a given |box|, |childBoxes| it <em>must</em> run the following s
 When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given |name|, |box|,
 |childBoxes|, and |workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
+    1. Let |definition| be the result of [=get a layout definition=] given |name|, and
         |workletGlobalScope|.
 
-        If <a>get a layout definition</a> returned failure, let the |box| fallback to the <a>flow
-        layout</a> and abort all these steps.
+        If [=get a layout definition=] returned failure, let the |box| fallback to the [=flow
+        layout=] and abort all these steps.
 
-    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |box|,
+    2. Let |layoutInstance| be the result of [=get a layout class instance=] given |box|,
         |definition|, |workletGlobalScope|.
 
-        If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
-        <a>flow layout</a> and abort all these steps.
+        If [=get a layout class instance=] returned failure, let the |box| fallback to the [=flow
+        layout=] and abort all these steps.
 
-    3. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
+    3. Let |inputProperties| be |definition|'s [=layout definition/input properties=].
 
-    4. Let |children| be a new <a>list</a>.
+    4. Let |children| be a new [=list=].
 
-    5. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
+    5. [=list/For each=] |childBox| in |childBoxes| perform the following substeps:
 
-        1. Let |layoutChild| be the result of <a>get a layout child</a> given |workletGlobalScope|,
-            |name|, and |childBox|.
+        1. Let |layoutChild| be the result of [=get a layout child=] given |workletGlobalScope|,
+            |name|, |childBox|, and |context|'s [=unique id=].
 
-        2. <a for=list>Append</a> |layoutChild| to |children|.
+        2. [=list/Append=] |layoutChild| to |children|.
 
-    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
-        <a>box model edges</a> for |box|.
+    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the [=computed value=] for all the
+        [=box model edges=] for |box|.
 
-    7. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed values</a> for properties listed in |inputProperties| for |box|.
+    7. Let |styleMap| be the result of [=get a style map=] given |box|, and |inputProperties|.
 
-        Issue: We may want to store |styleMap| on |box| instead, similar to |layoutInstance|.
+    8. At this stage the user agent may re-use the [=intrinsic sizes=] from a previous invocation if
+        |children|, |edges|, and |styleMap| are equivalent to that previous invocation. If so let
+        the intrinsic sizes the cached intrinsic sizes and abort all these steps.
 
-    8. At this stage the user agent may re-use the <a>intrinsic sizes</a> from a previous invocation
-        if |children|, |styleMap| are equivalent to that previous invocation. If so let the
-        intrinsic sizes the cached intrinsic sizes and abort all these steps.
+    9. Let |context| be the result of [=create a layout API context=] given
+        <code>"intrinsic-sizes"</code>.
 
-    9. Let |intrinsicSizesFunction| be |definition|'s <a>intrinsic sizes function</a>.
+    10. Let |intrinsicSizesFunction| be |definition|'s [=intrinsic sizes function=].
 
-    10. Let |intrinsicSizesGenerator| be the result of
-        <a>Invoke</a>(|intrinsicSizesFunction|, |layoutInstance|, «|children|, |edges|,
-        |styleMap|»).
+    11. Let |promise| be the result of [=Invoke=](|intrinsicSizesFunction|, |layoutInstance|, «|children|,
+        |edges|, |styleMap|»).
 
-        If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
-        all these steps.
+        If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
+        these steps.
 
-    11. Let |intrinsicSizesValue| be the result of <a>run a generator</a> given
-        |intrinsicSizesGenerator|, and <code>"intrinsic-sizes"</code>.
+    12. Let |intrinsicSizesValue| be the result of [=run a work queue=] given |promise|, and
+        |context|'s [=work queue=].
 
-        If <a>run a generator</a> returned failure, then let |box| fallback to the <a>flow
-        layout</a> and abort all these steps.
+        If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
+        abort all these steps.
 
-    12. Let |intrinsicSizes| be the result of <a>converting</a> |intrinsicSizesValue| to a
-        {{IntrinsicSizesResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
-        <a>flow layout</a> and abort all these steps.
+    13. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to a
+        {{IntrinsicSizesResultOptions}}. If an exception is [=thrown=], let |box| fallback to the
+        [=flow layout=] and abort all these steps.
 
-    13. Set the <a>intrinsic sizes</a> of |box|:
+    14. Set the [=intrinsic sizes=] of |box|:
 
-        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/minContentSize}} be the
-            <a>min-content size</a> of |box|.
+        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/minContentSize}} be the [=min-content
+            size=] of |box|.
 
-        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/maxContentSize}} be the
-            <a>max-content size</a> of |box|.
+        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/maxContentSize}} be the [=max-content
+            size=] of |box|.
 </div>
 
 ### Generating Fragments ### {#generating-fragments}
 
-The <a>generate a fragment</a> algorithm defines how a user agent is to generate a <a>box's</a>
-<a>fragment</a> for an author defined layout.
+The [=generate a fragment=] algorithm defines how a user agent is to generate a [=box's=]
+[=fragment=] for an author defined layout.
 
-Note: The <a>generate a fragment</a> algorithm allows for user agents to cache an arbitary number of
+Note: The [=generate a fragment=] algorithm allows for user agents to cache an arbitrary number of
     previous invocations to reuse.
 
 <div algorithm="generate a fragment">
@@ -1698,65 +1737,64 @@ following steps:
         If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    3. Let |sizingMode| be |definition|'s <a for="layout definition">layout options</a>'
+    3. Let |context| be the result of [=create a layout API context=] given <code>"layout"</code>.
+
+    4. Let |sizingMode| be |definition|'s <a for="layout definition">layout options</a>'
         {{LayoutOptions/sizing}} property.
 
-    4. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
+    5. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
 
-    5. Let |children| be a new <a>list</a>.
+    6. Let |children| be a new <a>list</a>.
 
-    6. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
+    7. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
 
-        1. Let |layoutChild| be the result of <a>get a layout child</a> given |workletGlobalScope|,
-            |name|, and |childBox|.
+        1. Let |layoutChild| be the result of [=get a layout child=] given |workletGlobalScope|,
+            |name|, |childBox|, and |context|'s [=unique id=].
 
         2. <a for=list>Append</a> |layoutChild| to |children|.
 
-    7. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
+    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
         <a>box model edges</a> for |box|.
 
-    8. Let |layoutConstraints| be the result of <a>create a layout constraints object</a> given
+    9. Let |layoutConstraints| be the result of <a>create a layout constraints object</a> given
         |internalLayoutConstraints|, |box|, and |sizingMode|.
 
-    9. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed values</a> for properties listed in |inputProperties| for |box|.
+    10. Let |styleMap| be the result of [=get a style map=] given |box|, and |inputProperties|.
 
-        Issue: We may want to store |styleMap| on |box| instead, similar to |layoutInstance|.
-
-    10. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
+    11. Let |breakToken| be a new {{BreakToken}} populated with the appropriate information from
         |internalBreakToken|.
 
         If |internalBreakToken| is null, let |breakToken| be null.
 
-    11. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
+    12. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
         |children|, |styleMap|, |layoutConstraints|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
-    12. Let |layoutFunction| be |definition|'s <a>layout function</a>.
+    13. Let |layoutFunction| be |definition|'s <a>layout function</a>.
 
-    13. Let |layoutGenerator| be the result of <a>Invoke</a>(|layoutFunction|, |layoutInstance|,
+    14. Let |promise| be the result of <a>Invoke</a>(|layoutFunction|, |layoutInstance|,
         «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
         If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
         all these steps.
 
-    14. Let |fragmentValue| be the result of <a>run a generator</a> given |layoutGenerator|, and
-        <code>"layout"</code>.
+    15. Let |fragmentValue| be the result of [=run a work queue=] given |promise|.
 
-        If <a>run a generator</a> returned failure, then let |box| fallback to the <a>flow
-        layout</a> and abort all these steps.
+        If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
+        abort all these steps.
 
-    15. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
+    16. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
         {{FragmentResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
         <a>flow layout</a> and abort all these steps.
 
-    16. <a for=list>For each</a> |childFragment| in |fragment|'s
+    17. <a for=list>For each</a> |childFragment| in |fragment|'s
         {{FragmentResultOptions/childFragments}}, perform the following stubsteps:
 
-        1. If |childFragment|'s {{[[generator]]}} internal slot is not equal to |layoutGenerator|,
-            then let |box| fallback to the <a>flow layout</a> and abort all these steps.
+        1. If |childFragment|'s {{LayoutFragment/[[unique id]]}} internal slot is not equal to
+            |context|'s [=unique id=], then let |box| fallback to the <a>flow layout</a> and abort
+            all these steps.
 
-    17. If |sizingMode| is <code>"block-like"</code>:
+    18. If |sizingMode| is <code>"block-like"</code>:
 
         - Then:
 
@@ -1774,7 +1812,7 @@ following steps:
 
             2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
 
-    18. Return a <a>fragment</a> for |box| with:
+    19. Return a <a>fragment</a> for |box| with:
 
         - The <a>inline size</a> set to |inlineSize|.
 
@@ -1859,6 +1897,101 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |box|,
         4. <a for=map>Set</a> |layoutClassInstanceMap|[|workletGlobalScope|] to |layoutInstance|.
 
     4. Return |layoutInstance|.
+</div>
+
+<div algorithm="get a style map">
+When the user agent wants to <dfn>get a style map</dfn> given |box|, and |inputProperties|, it
+<em>must</em> run the following steps:
+
+    1. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+        <a>computed values</a> for properties listed in |inputProperties| for |box|.
+
+    2. Return |styleMap|.
+
+    Issue: We may want to store |styleMap| on |box| instead.
+
+</div>
+
+[=Run a work queue=] is designed to allow user agents to work in both a single threaded, and
+multi-threaded environment.
+
+<div algorithm="run a work queue">
+When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |workQueue|, it
+<em>must</em> run the following steps:
+
+    1. If |promise| is not a promise, return failure.
+
+    2. [=While=] |workQueue| is not [=list/empty=], and |promise| is pending:
+
+        1. [=list/For each=] |task| in |workQueue|:
+
+            1. Let |layoutChild| be |task|'s [=layout api work task/layout child=].
+
+            2. Let |box| be |layoutChild|'s [=box=] in the {{[[box]]}} internal slot.
+
+            3. Let |childPromise| be |task|'s [=layout api work task/=promise].
+
+            2. If |task|'s [=layout api work task/task type=] is <code>"layout"</code>,
+
+                - Then [=queue a task=], or run synchronously, the following substeps:
+
+                    1. Let |childConstraints| be |task|'s [=layout api work task/layout constraints=].
+
+                    2. Let |childBreakToken| be |task|'s [=layout api work task/=child break token].
+
+                    3. Let |targetRealm| be |layoutChild|'s [=Realm=].
+
+                    4. Let |internalFragment| be the result of the user agent producing a
+                        [=fragment=] based on |box|, |childConstraints|, and |childBreakToken|.
+
+                    5. Let |fragment| be a new {{LayoutFragment}} with:
+
+                        - {{LayoutFragment/inlineSize}} being |internalFragment|'s [=inline size=]
+                            relative to the [=current layout's=] writing mode.
+
+                        - {{LayoutFragment/blockSize}} being |internalFragment|'s [=block size=]
+                            relative to the [=current layout's=] writing mode.
+
+                        - {{LayoutFragment/inlineOffset}} initially set to 0.
+
+                        - {{LayoutFragment/blockOffset}} initially set to 0.
+
+                        - {{LayoutFragment/breakToken}} being a new {{ChildBreakToken}} representing
+                            |internalFragment|'s internal break token, if any.
+
+                        - If |internalFragment| has a |clonedData| object stored with it, let
+                            {{LayoutFragment/data}} being the result of
+                            [=StructuredDeserialize=](|clonedData|, |targetRealm|), otherwise null.
+
+                    6. Resolve |childPromise| with |fragment|.
+
+                - Otherwise [=queue a task=], or run synchronously, the following substeps:
+
+                    1. Let |internalIntrinsicSizes| be the result of the user agent calculating the
+                        <b>border box</b> min/max content contribution of |box|.
+
+                    2. Let |intrinsicSizes| be a new {{IntrinsicSizes}} with:
+
+                        - {{IntrinsicSizes/minContentSize}} being |internalIntrinsicSizes|'
+                            <b>border box</b> min-content contribution, relative to the [=current
+                            layout's=] writing mode.
+
+                        - {{IntrinsicSizes/maxContentSize}} being |internalIntrinsicSizes|'s
+                            <b>border box</b> max-content contribution, relative to the [=current
+                            layout's=] writing mode.
+
+                    3. Resolve |childPromise| with |intrinsicSizes|.
+
+        2. Wait (optionally [=in parallel=]) for all of the above tasks to complete.
+
+        3. [=list/Empty=] |workQueue|.
+
+        4. [=Perform a microtask checkpoint=].
+
+    3. If |promise| isn't fulfilled (it is pending, or got rejected), return failure.
+
+    4. Return the fulfilled value of |promise|.
+
 </div>
 
 Examples {#examples}
