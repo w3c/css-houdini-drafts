@@ -56,14 +56,8 @@ spec:css2; type:property; text:max-width
 
 <pre class="anchors">
 urlPrefix: https://heycam.github.io/webidl/; type: dfn;
-    text: InvalidModificationError
     urlPrefix: #dfn-;
         url: throw; text: thrown
-    urlPrefix: #idl-;
-        text: boolean
-        text: DOMException
-    url: es-type-mapping; text: converting
-    url: es-invoking-callback-functions; text: Invoke
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -99,6 +93,9 @@ tree=].
 This specification describes an API which allows developers to layout a [=box=] in response to
 computed style and [=box tree=] changes.
 
+For a high level overview of this API, see <a
+href="https://github.com/w3c/css-houdini-drafts/blob/master/css-layout-api/EXPLAINER.md">EXPLAINER</a>.
+
 Layout API Containers {#layout-api-containers}
 ==============================================
 
@@ -119,9 +116,6 @@ contents. This is the same as establishing a block formatting context, except th
 provided by the author is used instead of the block layout.
 For example, floats do not intrude into the layout API container, and the layout API container's
 margins do not collapse with the margins of its contents.
-
-All inflow children of a [=layout API container=] are called <dfn>layout API children</dfn> and are
-laid out using the author defined layout.
 
 [=Layout API containers=] form a containing block for their contents <a
 href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
@@ -162,9 +156,9 @@ values other than ''z-index/auto'' create a stacking context even if 'position' 
 Box Tree Transformations {#layout-api-box-tree}
 -----------------------------------------------
 
-The [=layout API children=] can act in different ways depending on the value of [=document layout
-definition/layout options'=] {{LayoutOptions/childDisplay}} (set by <code>layoutOptions</code> on
-the class).
+The inflow children of a [=layout API container=] can act in different ways depending on the value
+of [=document layout definition/layout options'=] {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code> on the class).
 
 If the value of [=document layout definition/layout options'=] {{LayoutOptions/childDisplay}} is
 <code>"block"</code> the 'display' value of that child is [=blockified=]. This is similar to
@@ -305,7 +299,7 @@ empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 The {{LayoutWorkletGlobalScope}} has a [=map=] of <dfn>layout definitions</dfn>. Initially this map
 is empty; it is populated when {{registerLayout(name, layoutCtor)}} is called.
 
-Each [=box=] representing a [=layout API container</a> has a [=map=] of <dfn>layout class
+Each [=box=] representing a [=layout API container=] has a [=map=] of <dfn>layout class
 instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
 [=determine the intrinsic sizes=] or [=generate a fragment=] for a [=box=].
 
@@ -472,8 +466,8 @@ This section gives an overview of the Layout API given to authors.
 Layout Children {#layout-children}
 ----------------------------------
 
-A {{LayoutChild}} represents either a CSS generated [=box=] before layout has occurred. (The box
-or boxes will all have a computed value of 'display' that is not ''none'').
+A {{LayoutChild}} represents a inflow CSS generated [=box=] before layout has occurred. (The box or
+boxes will all have a computed value of 'display' that is not ''none'').
 
 The {{LayoutChild}} does not contain any layout information itself (like inline or block size) but
 can be used to generate {{LayoutFragment}}s which do contain layout information.
@@ -605,6 +599,9 @@ When the <dfn method for=LayoutChild>intrinsicSizes()</dfn> method is called on 
     3. If |this|' {{LayoutChild/[[unique id]]}} is not equal to |context|'s [=unique id=], reject
         |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
 
+        Note: This is to ensure that only {{LayoutChild}}ren passed in as arguments to either the
+            layout or intrinsicSizes method are used.
+
     4. Let |task| be a new [=layout API work task=] with:
 
         - [=layout api work task/layout child=] being |this|.
@@ -628,6 +625,9 @@ called on a {{LayoutChild}} |this|, the user agent must perform the following st
 
     3. If |this|' {{LayoutChild/[[unique id]]}} is not equal to |context|'s [=unique id=], reject
         |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
+
+        Note: This is to ensure that only {{LayoutChild}}ren passed in as arguments to either the
+            layout or intrinsicSizes method are used.
 
     4. If |breakToken|'s {{ChildBreakToken/[[unique id]]} is not equal to |context|'s [=unique id=],
         reject |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
@@ -1010,10 +1010,10 @@ The {{LayoutConstraints}} object has {{LayoutConstraints/percentageInlineSize}} 
 percentages should be resolved against while performing layout.
 
 The {{LayoutConstraints}} has a {{LayoutConstraints/blockFragmentationType}} attribute. The
-<a>current layout</a> should produce a {{LayoutFragment}} which fragments at the
+[=current layout=] should produce a {{LayoutFragment}} which fragments at the
 {{LayoutConstraints/blockFragmentationOffset}} if possible.
 
-The <a>current layout</a> can choose not to fragment a {{LayoutChild}} based on the
+The [=current layout=] can choose not to fragment a {{LayoutChild}} based on the
 {{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like
 ''break-inside: avoid-page;''.
 
@@ -1024,10 +1024,10 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
     1. If |sizingMode| is <code>"block-like"</code> then:
 
         1. Let |fixedInlineSize| be the result of calculating |box|'s <b>border-box</b>
-            <a>inline size</a> (relative to |box|'s writing mode) exactly like block containers do.
+            [=inline size=] (relative to |box|'s writing mode) exactly like block containers do.
 
-        2. Let |fixedBlockSize| be null if |box|'s <a>block size</a> is ''height/auto'', otherwise
-            the result of calculating |box|'s <b>border-box</b> <a>block size</a> exactly like block
+        2. Let |fixedBlockSize| be null if |box|'s [=block size=] is ''height/auto'', otherwise
+            the result of calculating |box|'s <b>border-box</b> [=block size=] exactly like block
             containers do.
 
         3. Return a new {{LayoutConstraints}} object with:
@@ -1041,7 +1041,7 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
             - {{LayoutConstraints/fixedBlockSize}} set to |fixedBlockSize|.
 
             - {{LayoutConstraints/availableBlockSize}} set to |fixedBlockSize| if not null,
-                otherwise |internalLayoutConstraints|' <a>available space</a> in the block axis
+                otherwise |internalLayoutConstraints|' [=available space=] in the block axis
                 (relative to |box|'s writing mode).
 
             - {{LayoutConstraints/percentageBlockSize}} set to |internalLayoutConstraints|'
@@ -1052,12 +1052,12 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
         1. Return a new {{LayoutConstraints}} object with:
             - {{LayoutConstraints/fixedInlineSize}}/{{LayoutConstraints/fixedBlockSize}} set to
                 |internalLayoutConstraints|' fixed inline/block size (relative to |box|'s writing
-                mode) imposed by the <a>parent layout</a>. Either may be null.
+                mode) imposed by the [=parent layout=]. Either may be null.
 
                 Note: See [[#interaction-sizing]] for different scenarios when this can occur.
 
             - {{LayoutConstraints/availableInlineSize}}/{{LayoutConstraints/availableBlockSize}} set
-                to |internalLayoutConstraints|' <a>available space</a>.
+                to |internalLayoutConstraints|' [=available space=].
 
             - {{LayoutConstraints/percentageInlineSize}}/{{LayoutConstraints/percentageBlockSize}}
                 set to |internalLayoutConstraints|' percentage resolution size.
@@ -1087,14 +1087,21 @@ dictionary BreakTokenOptions {
 enum BreakType { "none", "line", "column", "page", "region" };
 </pre>
 
+The {{ChildBreakToken}} has internal slot(s):
+   - <dfn attribute for=ChildBreakToken>[[unique id]]</dfn> the [=unique id=] of the [=layout api
+       context=] which produced this child break token. This slot is used so that a
+       {{ChildBreakToken}} from a previous layout pass is invalid.
+
+<hr>
+
 A {{LayoutChild}} can produce multiple {{LayoutFragment}}s. A {{LayoutChild}} may fragment in the
 block direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  Additionally
-{{LayoutChild}} which represents <a>inline-level</a> content, may fragment line by line if the
+{{LayoutChild}} which represents [=inline-level=] content, may fragment line by line if the
 <a for="document layout definition">layout options'</a> {{LayoutOptions/childDisplay}} (set by
 <code>layoutOptions</code>) is <code>"normal"</code>.
 
 A subsequent {{LayoutFragment}} is produced by using the previous {{LayoutFragment}}'s
-{{LayoutFragment/breakToken}}. This tells the <a>child layout</a> to produce a {{LayoutFragment}}
+{{LayoutFragment/breakToken}}. This tells the [=child layout=] to produce a {{LayoutFragment}}
 starting at the point encoded in the {{ChildBreakToken}}.
 
 <div class="example">
@@ -1224,8 +1231,8 @@ interface LayoutEdges {
 };
 </pre>
 
-A {{LayoutEdges}} object is passed into the layout method. This represents the size of the <a>box
-model edges</a> for the current box which is being laid out.
+A {{LayoutEdges}} object is passed into the layout method. This represents the size of the [=box
+model edges=] for the current box which is being laid out.
 
 The {{LayoutEdges}} has {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, and
 {{LayoutEdges/padding}} attributes. Each of these represent the width of their respective edge.
@@ -1235,7 +1242,7 @@ represents the sum of the {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, {{L
 edges.
 
 The {{LayoutEdgeSizes}} object represents the width in CSS pixels of an edge in each of the
-<a>abstract dimensions</a> ({{LayoutEdgeSizes/inlineStart}}, {{LayoutEdgeSizes/inlineEnd}},
+[=abstract dimensions=] ({{LayoutEdgeSizes/inlineStart}}, {{LayoutEdgeSizes/inlineEnd}},
 {{LayoutEdgeSizes/blockStart}}, {{LayoutEdgeSizes/blockEnd}}).
 
 The {{LayoutEdgeSizes/inline}}, and {{LayoutEdgeSizes/block}} on the {{LayoutEdgeSizes}} object are
@@ -1285,31 +1292,31 @@ This section describes how other CSS modules interact with the CSS Layout API.
 Sizing {#interaction-sizing}
 ----------------------------
 
-User agents must use the {{LayoutConstraints}} object to communicate to the <a>current layout</a>
-the size they would like the fragment to be.
+User agents must use the {{LayoutConstraints}} object to communicate to the [=current layout=] the
+size they would like the fragment to be.
 
 If the user agent wishes to force a size on the box, it can use the
 {{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}} attributes to do so.
 
-The <a>layout API container</a> can be passed size information in different ways depending on the
-value of <a for="document layout definition">layout options'</a> {{LayoutOptions/sizing}} (set by
+The [=layout API container=] can be passed size information in different ways depending on the value
+of <a for="document layout definition">layout options'</a> {{LayoutOptions/sizing}} (set by
 <code>layoutOptions</code> on the class).
 
 If the value of <a for="document layout definition">layout options'</a> {{LayoutOptions/sizing}} is
-<code>"block-like"</code>, then the {{LayoutConstraints}} passed to the <a>layout API container</a>:
+<code>"block-like"</code>, then the {{LayoutConstraints}} passed to the [=layout API container=]:
     - <em>Must</em> calculate and set {{LayoutConstraints/fixedInlineSize}} based off the rules
         specified in [[!css-sizing-3]] and the formatting context in which it participates, e.g.
 
-        - As a <a>block-level</a> box in a <a>block formatting context</a>, it is sized like a
-            <a>block box</a> that establishes a formatting context, with an ''width/auto'' <a>inline
-            size</a> calculated as for non-replaced block boxes.
+        - As a [=block-level=] box in a [=block formatting context=], it is sized like a [=block
+            box=] that establishes a formatting context, with an ''width/auto'' [=inline size=]
+            calculated as for non-replaced block boxes.
 
-        - As an <a>inline-level</a> box in an <a>inline formatting context</a>, it is sized as an
-            atomic inline-level box (such as an inline-block).
+        - As an [=inline-level=] box in an [=inline formatting context=], it is sized as an atomic
+            inline-level box (such as an inline-block).
 
     - <em>Must</em> calculate and set {{LayoutConstraints/fixedBlockSize}} based off the rules
         specified in [[!css-sizing-3]], and the formatting context in which it participates. If the
-        <a>layout API container</a> has an ''height/auto'' <a>block size</a>, and cannot be determined
+        [=layout API container=] has an ''height/auto'' [=block size=], and cannot be determined
         ahead of time, {{LayoutConstraints/fixedBlockSize}} must be set to <code>null</code>.
 
 If the value of <a for="document layout definition">layout options'</a> {{LayoutOptions/sizing}} is
@@ -1318,12 +1325,12 @@ If the value of <a for="document layout definition">layout options'</a> {{Layout
 except when it is being forced to a particular size by the formatting context in which it
 participates, for example:
 
-    - If the <a>layout API container</a> is within a <a>block formatting context</a>, is inflow, and
-        has an ''width/auto'' inline size, the user agent <em>must</em> set the
-        {{LayoutConstraints/fixedInlineSize}} to the <a>stretch-fit inline size</a>.
+    - If the [=layout API container=] is within a [=block formatting context=], is inflow, and has
+        an ''width/auto'' inline size, the user agent <em>must</em> set the
+        {{LayoutConstraints/fixedInlineSize}} to the [=stretch-fit inline size=].
 
 <div class="note">
-    Note: In the example below the <a>layout API container</a> has its inline size set to 50.
+    Note: In the example below the [=layout API container=] has its inline size set to 50.
 
     <pre class="lang-html">
         &lt;style>
@@ -1346,14 +1353,14 @@ participates, for example:
 
 ### Positioned layout sizing ### {#interaction-sizing-positiong-layout}
 
-If a <a>layout API container</a> is out-of-flow positioned the user agent <em>must</em> solve the
+If a [=layout API container=] is out-of-flow positioned the user agent <em>must</em> solve the
 positioned size equations ([[css-position-3#abs-non-replaced-width]],
 [[css-position-3#abs-non-replaced-height]]), and set the appropriate
 {{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}}.
 
 <div class="note">
-    Note: In the example below the <a>layout API container</a> has its inline and block size fixed
-        to 80.
+    Note: In the example below the [=layout API container=] has its inline and block size fixed to
+        80.
 
     <pre class="lang-html">
         &lt;style>
@@ -1385,16 +1392,16 @@ All positioning in this level of the specification is handled by the user agent.
 As a result:
   - Out-of-flow children do not appear as {{LayoutChild}}ren.
 
-  - <a>Layout API containers</a> establish <a>containing blocks</a> <a
+  - [=Layout API containers=] establish [=containing blocks=] <a
       href="https://www.w3.org/TR/CSS2/visudet.html#containing-block-details">exactly like block
       containers do</a>. [[!CSS21]]
 
   - The {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} represent the position of
       the fragment before any positioning and transforms have occured.
 
-  - The <a>static position</a> of an absolutely-positioned child of a <a>layout API container</a> is
-      set to the <a>inline-start</a>, <a>block-start</a> padding edge of the <a>layout API
-      container</a>. Auto margins are treated as zero for the child.
+  - The [=static position=] of an absolutely-positioned child of a [=layout API container=] is set
+      to the [=inline-start=], [=block-start=] padding edge of the [=layout API container=]. Auto
+      margins are treated as zero for the child.
 
 <div class="note">
     Note: In the example below:
@@ -1432,20 +1439,20 @@ As a result:
 Overflow {#interaction-overflow}
 --------------------------------
 
-The <a>scrollable overflow</a> for a <a>layout API container</a> is handled by the user agent in
-this level of the specification.
+The [=scrollable overflow=] for a [=layout API container=] is handled by the user agent in this
+level of the specification.
 
-A <a>layout API container</a> should calculate its scrollable overflow exactly like block
-containers do.
+A [=layout API container=] should calculate its scrollable overflow exactly like block containers
+do.
 
-Even if the author's <a>layout API container</a> positions a fragment into the <a>scrollable
-overflow</a> region, relative positioning or transforms may cause the fragment to shift such that
-its <a>scrollable overflow</a> region, causing no overflow to occur.
+Even if the author's [=layout API container=] positions a fragment into the [=scrollable overflow=]
+region, relative positioning or transforms may cause the fragment to shift such that its
+[=scrollable overflow=] region, causing no overflow to occur.
 
 Fragmentation {#interaction-fragmentation}
 ------------------------------------------
 
-A <a>parent layout</a> can ask the <a>current layout</a> to <a>fragment</a> by setting the
+A [=parent layout=] can ask the [=current layout=] to [=fragment=] by setting the
 {{LayoutConstraints/blockFragmentationType}} and {{LayoutConstraints/blockFragmentationOffset}}.
 
 E.g. [[css-multicol-1]] layout would set a {{LayoutConstraints/blockFragmentationType}} to
@@ -1455,7 +1462,7 @@ child to fragment.
 Alignment {#interaction-alignment}
 ----------------------------------
 
-The first/last baseline sets of a <a>layout API container</a> is generated exactly like block
+The first/last baseline sets of a [=layout API container=] is generated exactly like block
 containers do (see [[css-align-3#baseline-export]]). Except that the order of the in-flow children
 should be determined by the in which they are returned form the layout method (via
 {{FragmentResultOptions/childFragments}}) instead of the document order.
@@ -1473,7 +1480,7 @@ const fragment = await child.layoutNextFragment({
 fragment.baselines.get('alphabetic') === 25 /* or something */;
 </pre>
 
-To <em>produce</em> baseline information for a <a>parent layout</a>:
+To <em>produce</em> baseline information for a [=parent layout=]:
 <pre class="lang-javascript">
 registerLayout('baseline-producing', class {
   async layout(children, edges, constraints, styleMap) {
@@ -1682,42 +1689,40 @@ Note: The [=generate a fragment=] algorithm allows for user agents to cache an a
     previous invocations to reuse.
 
 <div algorithm="generate a fragment">
-When the user agent wants to <dfn>generate a fragment</dfn> of a <a>layout API formatting
-context</a> for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an optional
-|internalBreakToken| it <em>must</em> run the following steps:
+When the user agent wants to <dfn>generate a fragment</dfn> of a [=layout API formatting context=]
+for a given |box|, |childBoxes|, |internalLayoutConstraints|, and an optional |internalBreakToken|
+it <em>must</em> run the following steps:
 
-    1. Let |layoutFunction| be the ''layout()'' for the <a>computed value</a> of <<display-inside>>
-        for |box|.
+    1. Let |layoutFunction| be the ''layout()'' for the [=computed value=] of <<display-inside>> for
+        |box|.
 
     2. Let |name| be the first argument of the |layoutFunction|.
 
-    3. Let |documentDefinition| be the result of <a>get a document layout definition</a> given
-        |name|.
+    3. Let |documentDefinition| be the result of [=get a document layout definition=] given |name|.
 
-        If <a>get a document layout definition</a> returned failure, or if |documentDefinition| is
-        <code>"invalid"</code>, then let |box| fallback to the <a>flow layout</a> and abort all
-        these steps.
+        If [=get a document layout definition=] returned failure, or if |documentDefinition| is
+        <code>"invalid"</code>, then let |box| fallback to the [=flow layout=] and abort all these
+        steps.
 
-    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of <a>worklet's
-        WorkletGlobalScopes</a> from the layout {{Worklet}}.
+    4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of [=worklet's
+        WorkletGlobalScopes=] from the layout {{Worklet}}.
 
         The user agent <em>must</em> have, and select from at least two
-        {{LayoutWorkletGlobalScope}}s in the <a>worklet's WorkletGlobalScopes</a> <a>list</a>,
-        unless the user agent is under memory constraints.
+        {{LayoutWorkletGlobalScope}}s in the [=worklet's WorkletGlobalScopes=] [=list=], unless the
+        user agent is under memory constraints.
 
         Note: This is to ensure that authers do not rely on being able to store state on the global
             object or non-regeneratable state on the class.
 
-        The user agent <em>may</em> also <a>create a WorkletGlobalScope</a> at this time, given the
+        The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         layout {{Worklet}}.
 
-    5. Run <a>invoke a layout callback</a> given |name|, |box|, |childBoxes|,
-        |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope| optionally <a>in
-        parallel</a>.
+    5. Run [=invoke a layout callback=] given |name|, |box|, |childBoxes|,
+        |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope| optionally [=in
+        parallel=].
 
-        Note: If the user agent runs <a>invoke a intrinsic sizes callback</a> on a thread <a>in
-            parallel</a>, it should select a layout worklet global scope which can be used on that
-            thread.
+        Note: If the user agent runs [=invoke a intrinsic sizes callback=] on a thread [=in
+        parallel=], it should select a layout worklet global scope which can be used on that thread.
 </div>
 
 <div algorithm="invoke a layout callback">
@@ -1725,17 +1730,17 @@ When the user agent wants to <dfn>invoke a layout callback</dfn> given |name|, |
 |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope|, it <em>must</em> run the
 following steps:
 
-    1. Let |definition| be the result of <a>get a layout definition</a> given |name|, and
+    1. Let |definition| be the result of [=get a layout definition=] given |name|, and
         |workletGlobalScope|.
 
-        If <a>get a layout definition</a> returned failure, let the |box| fallback to the <a>flow
-        layout</a> and abort all these steps.
+        If [=get a layout definition=] returned failure, let the |box| fallback to the [=flow
+        layout=] and abort all these steps.
 
-    2. Let |layoutInstance| be the result of <a>get a layout class instance</a> given |box|,
+    2. Let |layoutInstance| be the result of [=get a layout class instance=] given |box|,
         |definition|, |workletGlobalScope|.
 
-        If <a>get a layout class instance</a> returned failure, let the |box| fallback to the
-        <a>flow layout</a> and abort all these steps.
+        If [=get a layout class instance=] returned failure, let the |box| fallback to the [=flow
+        layout=] and abort all these steps.
 
     3. Let |context| be the result of [=create a layout API context=] given <code>"layout"</code>.
 
@@ -1744,7 +1749,7 @@ following steps:
 
     5. Let |inputProperties| be |definition|'s <a for="layout definition">input properties</a>.
 
-    6. Let |children| be a new <a>list</a>.
+    6. Let |children| be a new [=list=].
 
     7. <a for=list>For each</a> |childBox| in |childBoxes| perform the following substeps:
 
@@ -1753,10 +1758,10 @@ following steps:
 
         2. <a for=list>Append</a> |layoutChild| to |children|.
 
-    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the <a>computed value</a> for all the
-        <a>box model edges</a> for |box|.
+    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the [=computed value=] for all the
+        [=box model edges=] for |box|.
 
-    9. Let |layoutConstraints| be the result of <a>create a layout constraints object</a> given
+    9. Let |layoutConstraints| be the result of [=create a layout constraints object=] given
         |internalLayoutConstraints|, |box|, and |sizingMode|.
 
     10. Let |styleMap| be the result of [=get a style map=] given |box|, and |inputProperties|.
@@ -1766,33 +1771,33 @@ following steps:
 
         If |internalBreakToken| is null, let |breakToken| be null.
 
-    12. At this stage the user agent may re-use a <a>fragment</a> from a previous invocation if
+    12. At this stage the user agent may re-use a [=fragment=] from a previous invocation if
         |children|, |styleMap|, |layoutConstraints|, |breakToken| are equivalent to that previous
         invocation. If so let the fragment output be that cached fragment and abort all these steps.
 
-    13. Let |layoutFunction| be |definition|'s <a>layout function</a>.
+    13. Let |layoutFunction| be |definition|'s [=layout function=].
 
-    14. Let |promise| be the result of <a>Invoke</a>(|layoutFunction|, |layoutInstance|,
+    14. Let |promise| be the result of [=Invoke=](|layoutFunction|, |layoutInstance|,
         «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
-        If an exception is <a>thrown</a> the let |box| fallback to the <a>flow layout</a> and abort
-        all these steps.
+        If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
+        these steps.
 
     15. Let |fragmentValue| be the result of [=run a work queue=] given |promise|.
 
         If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
         abort all these steps.
 
-    16. Let |fragment| be the result of <a>converting</a> |fragmentValue| to a
-        {{FragmentResultOptions}}. If an exception is <a>thrown</a>, let |box| fallback to the
-        <a>flow layout</a> and abort all these steps.
+    16. Let |fragment| be the result of [=converting=] |fragmentValue| to a
+        {{FragmentResultOptions}}. If an exception is [=thrown=], let |box| fallback to the [=flow
+        layout=] and abort all these steps.
 
     17. <a for=list>For each</a> |childFragment| in |fragment|'s
         {{FragmentResultOptions/childFragments}}, perform the following stubsteps:
 
         1. If |childFragment|'s {{LayoutFragment/[[unique id]]}} internal slot is not equal to
-            |context|'s [=unique id=], then let |box| fallback to the <a>flow layout</a> and abort
-            all these steps.
+            |context|'s [=unique id=], then let |box| fallback to the [=flow layout=] and abort all
+            these steps.
 
     18. If |sizingMode| is <code>"block-like"</code>:
 
@@ -1802,8 +1807,8 @@ following steps:
                 value must be set if we are using <code>"block-like"</code> sizing).
 
             2. Let |blockSize| be the result of calculating |box|'s <b>border-box</b>
-                <a>block size</a> (relative to |box|'s writing mode) exactly like block containers
-                do, given |fragment|'s {{FragmentResultOptions/autoBlockSize}} as the "intrinsic
+                [=block size=] (relative to |box|'s writing mode) exactly like block containers do,
+                given |fragment|'s {{FragmentResultOptions/autoBlockSize}} as the "intrinsic
                 height".
 
         - Otherwise (|sizingMode| is <code>"manual"</code>):
@@ -1812,38 +1817,38 @@ following steps:
 
             2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
 
-    19. Return a <a>fragment</a> for |box| with:
+    19. Return a [=fragment=] for |box| with:
 
-        - The <a>inline size</a> set to |inlineSize|.
+        - The [=inline size=] set to |inlineSize|.
 
-        - The <a>block size</a> set to |blockSize|.
+        - The [=block size=] set to |blockSize|.
 
         - The child fragments set to |fragment|'s {{FragmentResultOptions/childFragments}}
-            <a>list</a>. The ordering <em>is</em> important as this dictates their paint order
+            [=list=]. The ordering <em>is</em> important as this dictates their paint order
             (described in [[#layout-api-containers]]). Their position relative to the <b>border
             box</b> of the |fragment| should be based off the author specified
             {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}.
 
-        - The <a>fragmentation break</a> information set to |fragment|'s
+        - The [=fragmentation break=] information set to |fragment|'s
             {{FragmentResultOptions/breakToken}}.
 
-        - Let |clonedData| be the result of invoking <a>StructuredSerializeForStorage</a> on
+        - Let |clonedData| be the result of invoking [=StructuredSerializeForStorage=] on
             |fragment|'s {{FragmentResultOptions/data}}.
 
-            The user agent must store |clonedData| with the <a>fragment</a>.
+            The user agent must store |clonedData| with the [=fragment=].
 </div>
 
 ### Utility Algorithms ### {#utility-algorithms}
 
-The section specifies algorithms common to the <a>determine the intrinsic sizes</a> and <a>generate
-a fragment</a> algorithms.
+The section specifies algorithms common to the [=determine the intrinsic sizes=] and [=generate
+a fragment=] algorithms.
 
 <div algorithm="get a document layout definition">
 When the user agent wants to <dfn>get a document layout definition</dfn> given |name|, it
 <em>must</em> run the following steps:
 
-    1. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document layout
-        definitions</a> map.
+    1. Let |documentLayoutDefinitionMap| be the associated [=document's=] [=document layout
+        definitions=] map.
 
     2. If |documentLayoutDefinitionMap|[|name|] does not <a for=map>exist</a>, return failure and
         abort all these steps.
@@ -1855,14 +1860,14 @@ When the user agent wants to <dfn>get a document layout definition</dfn> given |
 When the user agent wants to <dfn>get a layout definition</dfn> given |name|, and
 |workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |layoutDefinitionMap| be |workletGlobalScope|'s <a>layout definitions</a> map.
+    1. Let |layoutDefinitionMap| be |workletGlobalScope|'s [=layout definitions=] map.
 
     2. If |layoutDefinitionMap|[|name|] does not <a for=map>exist</a>, run the following steps:
 
-        1. <a>Queue a task</a> to run the following steps:
+        1. [=Queue a task=] to run the following steps:
 
-            1. Let |documentLayoutDefinitionMap| be the associated <a>document's</a> <a>document
-                layout definition</a> map.
+            1. Let |documentLayoutDefinitionMap| be the associated [=document's=] [=document layout
+                definition=] map.
 
             2. <a for=map>Set</a> |documentLayoutDefinitionMap|[|name|] to <code>"invalid"</code>.
 
@@ -1871,28 +1876,27 @@ When the user agent wants to <dfn>get a layout definition</dfn> given |name|, an
 
         2. Return failure, and abort all these steps.
 
-    3. Return the result of <a>get</a> |layoutDefinitionMap|[|name|].
+    3. Return the result of [=get=] |layoutDefinitionMap|[|name|].
 </div>
 
 <div algorithm="get a layout class instance">
 When the user agent wants to <dfn>get a layout class instance</dfn> given |box|, |definition|, and
 |workletGlobalScope|, it <em>must</em> run the following steps:
 
-    1. Let |layoutClassInstanceMap| be |box|'s <a>layout class instances</a> map.
+    1. Let |layoutClassInstanceMap| be |box|'s [=layout class instances=] map.
 
-    2. Let |layoutInstance| be the result of <a>get</a>
-        |layoutClassInstanceMap|[|workletGlobalScope|]. If |layoutInstance| is null, run the
-        following steps:
+    2. Let |layoutInstance| be the result of [=get=] |layoutClassInstanceMap|[|workletGlobalScope|].
+        If |layoutInstance| is null, run the following steps:
 
-        1. If the <a>constructor valid flag</a> on |definition| is false, then return failure and
+        1. If the [=constructor valid flag=] on |definition| is false, then return failure and
             abort all these steps.
 
-        2. Let |layoutCtor| be the <a>class constructor</a> on |definition|.
+        2. Let |layoutCtor| be the [=class constructor=] on |definition|.
 
-        3. Let |layoutInstance| be the result of <a>Construct</a>(|layoutCtor|).
+        3. Let |layoutInstance| be the result of [=Construct=](|layoutCtor|).
 
-            If <a>construct</a> throws an exception, set the |definition|'s <a>constructor valid
-            flag</a> to false, then return failure and abort all these steps.
+            If [=construct=] throws an exception, set the |definition|'s [=constructor valid flag=]
+            to false, then return failure and abort all these steps.
 
         4. <a for=map>Set</a> |layoutClassInstanceMap|[|workletGlobalScope|] to |layoutInstance|.
 
@@ -1904,7 +1908,7 @@ When the user agent wants to <dfn>get a style map</dfn> given |box|, and |inputP
 <em>must</em> run the following steps:
 
     1. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        <a>computed values</a> for properties listed in |inputProperties| for |box|.
+        [=computed values=] for properties listed in |inputProperties| for |box|.
 
     2. Return |styleMap|.
 
