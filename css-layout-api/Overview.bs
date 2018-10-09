@@ -66,8 +66,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
-urlPrefix: https://drafts.csswg.org/css-display-3/#; type: dfn
-    text: flow layout
 urlPrefix: https://drafts.csswg.org/css-sizing/#; type: dfn
     text: intrinsic sizes
 urlPrefix: https://drafts.csswg.org/css-break/#; type: dfn
@@ -93,7 +91,7 @@ tree=].
 This specification describes an API which allows developers to layout a [=box=] in response to
 computed style and [=box tree=] changes.
 
-For a high level overview of this API, see <a
+For a high level overview of this API, see the <a
 href="https://github.com/w3c/css-houdini-drafts/blob/master/css-layout-api/EXPLAINER.md">EXPLAINER</a>.
 
 Layout API Containers {#layout-api-containers}
@@ -665,7 +663,7 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
  |box|, and |uniqueId|, it <em>must</em> run the following steps:
 
     1. Assert that:
-        - |box| is currently attached to the [=box tree=]>.
+        - |box| is currently attached to the [=box tree=].
         - |box|'s [=containing block=] is a [=layout API container=].
         - The [=containing block's=] ''layout()'' function's first argument is |name|.
 
@@ -722,6 +720,8 @@ run the following steps:
 
         2. Update |styleMap|'s [=declarations=] based on the |box|'s new computed style.
 </div>
+
+Issue: Probably change the above algorithm, and just clear the styleMap internal slot instead.
 
 When the computed style of a [=box=] changes the user agent must run the [=update a layout child
 style=] algorithm.
@@ -897,32 +897,15 @@ interface LayoutConstraints {
     readonly attribute any data;
 };
 
-dictionary LayoutConstraintsOptions {
-    double availableInlineSize = 0;
-    double availableBlockSize = 0;
-
-    double fixedInlineSize;
-    double fixedBlockSize;
-
-    double percentageInlineSize;
-    double percentageBlockSize;
-
-    double blockFragmentationOffset;
-    BlockFragmentationType blockFragmentationType = "none";
-
-    any data;
-};
-
 enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
 
 A {{LayoutConstraints}} object is passed into the layout method which represents the all the
-constraints for the [=current layout=] to perform layout inside. It is also used to pass information
-about the available space into a [=child layout=].
+constraints for the [=current layout=] to perform layout inside.
 
 The {{LayoutConstraints}} object has {{LayoutConstraints/availableInlineSize}} and
-{{LayoutConstraints/availableBlockSize}} attributes. This represents the [=available space=] for a
-{{LayoutFragment}} which the layout should respect.
+{{LayoutConstraints/availableBlockSize}} attributes. This represents the [=available space=] for the
+[=current layout=] to respect.
 
 Note: Some layouts may need to produce a {{LayoutFragment}} which exceed this size. For example a
     [=replaced element=]. The [=parent layout=] should expect this to occur and deal with it
@@ -933,81 +916,9 @@ A [=parent layout=] may require the [=current layout=] to be exactly a particula
 [=current layout=] should produce a {{LayoutFragment}} with a the specified size in the appropriate
 direction.
 
-<div class="example">
-The layout algorithm performs a flexbox-like distribution of spare space in the inline direction. It
-creates child layout constraints which specify that a child should be a fixed inline size.
-
-<pre class="lang-javascript">
-registerLayout('flex-distribution-like', class {
-    async intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = children.map((child) => {
-          return child.intrinsicSizes();
-      });
-
-      const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
-          return sum + childSizes.maxContentSize;
-      }, 0) + edges.all.inline;
-
-      const minContentSize = childrenSizes.reduce((max, childSizes) => {
-          return sum + childSizes.minContentSize;
-      }, 0) + edges.all.inline;
-
-      return {maxContentSize, minContentSize};
-    }
-
-    async layout(children, edges, constraints, styleMap) {
-        // Determine our (inner) available size.
-        const availableInlineSize =
-            constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
-
-        const childConstraints = { availableInlineSize, availableBlockSize };
-
-        const unconstrainedChildFragments = await Promise.all(children.map((child) => {
-            return child.layoutNextFragment(childConstraints);
-        }));
-
-        const unconstrainedSizes = [];
-        const totalSize = unconstrainedChildFragments.reduce((sum, fragment, i) => {
-            unconstrainedSizes[i] = fragment.inlineSize;
-            return sum + fragment.inlineSize;
-        }, 0);
-
-        // Distribute spare space between children.
-        const remainingSpace = Math.max(0, inlineSize - totalSize);
-        const extraSpace = remainingSpace / children.length;
-
-        const childFragments = await Promise.all(children.map((child, i) => {
-            return child.layoutNextFragment({
-                fixedInlineSize: unconstrainedSizes[i] + extraSpace,
-                availableBlockSize
-            });
-        }));
-
-        // Position the fragments.
-        let inlineOffset = 0;
-        let maxChildBlockSize = 0;
-        for (let fragment of childFragments) {
-            fragment.inlineOffset = inlineOffset;
-            fragment.blockOffset = edges.all.blockStart;
-
-            inlineOffset += fragment.inlineSize;
-            maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
-        }
-
-        return {
-            autoBlockSize: maxChildBlockSize + edges.all.block,
-            childFragments,
-        };
-    }
-});
-</pre>
-</div>
-
 The {{LayoutConstraints}} object has {{LayoutConstraints/percentageInlineSize}} and
-{{LayoutConstraints/percentageBlockSize}} attributes. These represent the size that a layout
-percentages should be resolved against while performing layout.
+{{LayoutConstraints/percentageBlockSize}} attributes. These represent the size that percentages
+should be resolved against while performing layout.
 
 The {{LayoutConstraints}} has a {{LayoutConstraints/blockFragmentationType}} attribute. The
 [=current layout=] should produce a {{LayoutFragment}} which fragments at the
@@ -1017,8 +928,36 @@ The [=current layout=] can choose not to fragment a {{LayoutChild}} based on the
 {{LayoutConstraints/blockFragmentationType}}, for example if the child has a property like
 ''break-inside: avoid-page;''.
 
+<div class="example">
+The example below shows the basic usage of the {{LayoutConstraints}} object.
+
+<pre class="lang-javascript">
+// The class below is registered with a "block-like" sizingMode, and can use the fixedInlineSize,
+// fixedBlockSize attributes.
+registerLayout('layout-constraints-example', class {
+    async layout(children, edges, constraints, styleMap) {
+
+        // Calculate the available size.
+        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.inline : null;
+
+        // Web developers should resolve any percentages against the percentage sizes.
+        const value = constraints.percentageInlineSize * 0.5;
+
+    }
+});
+</pre>
+</div>
+
+<hr>
+
+The [=create a layout constraints object=] algorithm is used to create the {{LayoutConstraints}}
+object. Depending on the {{LayoutOptions/sizing}} it will either pre-calculate the
+{{LayoutConstraints/fixedInlineSize}} and {{LayoutConstraints/fixedBlockSize}} upfront.
+
 <div algorithm>
-When the user agent wants to <dfn>create a layout constraints object</dfn> given |sizingMode|, box|,
+When the user agent wants to <dfn>create a layout constraints object</dfn> given |sizingMode|, |box|,
 and |internalLayoutConstraints|, it <em>must</em> run the following steps:
 
     1. If |sizingMode| is <code>"block-like"</code> then:
@@ -1026,9 +965,9 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
         1. Let |fixedInlineSize| be the result of calculating |box|'s <b>border-box</b>
             [=inline size=] (relative to |box|'s writing mode) exactly like block containers do.
 
-        2. Let |fixedBlockSize| be null if |box|'s [=block size=] is ''height/auto'', otherwise
-            the result of calculating |box|'s <b>border-box</b> [=block size=] exactly like block
-            containers do.
+        2. Let |fixedBlockSize| be null if |box|'s [=block size=] is unable to be calculated at this
+            stage, (e.g. [=block size=] is ''height/auto''), otherwise the result of calculating
+            |box|'s <b>border-box</b> [=block size=] exactly like block containers do.
 
         3. Return a new {{LayoutConstraints}} object with:
 
@@ -1062,6 +1001,51 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
             - {{LayoutConstraints/percentageInlineSize}}/{{LayoutConstraints/percentageBlockSize}}
                 set to |internalLayoutConstraints|' percentage resolution size.
 </div>
+
+### Constraints for Layout Children ### {#layout-constraints-children}
+
+<pre class='idl'>
+dictionary LayoutConstraintsOptions {
+    double availableInlineSize = 0;
+    double availableBlockSize = 0;
+
+    double fixedInlineSize;
+    double fixedBlockSize;
+
+    double percentageInlineSize;
+    double percentageBlockSize;
+
+    double blockFragmentationOffset;
+    BlockFragmentationType blockFragmentationType = "none";
+
+    any data;
+};
+</pre>
+
+The {{LayoutConstraintsOptions}} dictionary represents the set of constraints which can be passed to
+a {{LayoutChild}} to produce a {{LayoutFragment}}.
+
+<div class="example">
+The example below shows the basic usage of the {{LayoutConstraintsOptions}} dictionary.
+
+<pre class="lang-javascript">
+// The class below is registered with a "block-like" sizingMode, and can use the
+// fixedInlineSize, fixedBlockSize attributes.
+registerLayout('child-layout-constraints-example', class {
+    async layout(children, edges, constraints, styleMap) {
+
+        // A web developer can  
+        const fragment = children[0].layoutNextFragment({
+            availableInlineSize: 100,
+            availableBlockSize: 200,
+        });
+
+    }
+});
+</pre>
+</div>
+
+Issue: Finish up this section.
 
 Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
@@ -1103,106 +1087,6 @@ block direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  
 A subsequent {{LayoutFragment}} is produced by using the previous {{LayoutFragment}}'s
 {{LayoutFragment/breakToken}}. This tells the [=child layout=] to produce a {{LayoutFragment}}
 starting at the point encoded in the {{ChildBreakToken}}.
-
-<div class="example">
-This example shows a simple layout which indents child fragments for a certain number of
-lines.
-
-This example also demonstrates using the previous {{LayoutFragment/breakToken}} of a
-{{LayoutFragment}} to produce the next fragment for the {{LayoutChild}}.
-
-It also demonstrates using the {{BreakToken}} to respect the {{LayoutConstraints}}'
-{{LayoutConstraints/blockFragmentationType}}, it resumes it layout from the previous {{BreakToken}}.
-It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken}} which is used to
-resume the layout.
-
-<pre class="lang-javascript">
-registerLayout('indent-lines', class {
-    static layoutOptions = {childDisplay: 'normal'};
-    static inputProperties = ['--indent', '--indent-lines'];
-
-    async layout(children, edges, constraints, styleMap, breakToken) {
-        // Determine our (inner) available size.
-        const availableInlineSize =
-            constraints.fixedInlineSize - edges.all.inline;
-        const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
-
-        // Detrermine the number of lines to indent, and the indent amount.
-        const indent = resolveLength(constraints, styleMap.get('--indent'));
-        let lines = styleMap.get('--indent-lines').value;
-
-        const childFragments = [];
-
-        let childBreakToken = null;
-        if (breakToken) {
-            childBreakToken = breakToken.childBreakTokens[0];
-
-            // Remove all the children we have already produced fragments for.
-            children.splice(0, children.indexOf(childBreakToken.child));
-        }
-
-        let blockOffset = edges.all.blockStart;
-        let child = children.shift();
-        while (child) {
-            const shouldIndent = lines-- > 0;
-
-            // Adjust the inline size for the indent.
-            const childAvailableInlineSize = shouldIndent ?
-                availableInlineSize - indent : availableInlineSize;
-
-            const childConstraints = {
-                availableInlineSize: childAvailableInlineSize,
-                availableBlockSize,
-                percentageInlineSize: availableInlineSize,
-                blockFragmentationType: constraints.blockFragmentationType,
-            };
-
-            const fragment = await child.layoutNextFragment(childConstraints,
-                                                            childBreakToken);
-            childFragments.push(fragment);
-
-            // Position the fragment.
-            fragment.inlineOffset = shouldIndent ?
-                edges.all.inlineStart + indent : edges.all.inlineStart;
-            fragment.blockOffset = blockOffset;
-            blockOffset += fragment.blockSize;
-
-            // Check if we have gone over the block fragmentation limit.
-            if (constraints.blockFragmentationType != 'none' &&
-                blockOffset > constraints.blockSize) {
-                break;
-            }
-
-            if (fragment.breakToken) {
-                childBreakToken = fragment.breakToken;
-            } else {
-                // If a fragment doesn't have a break token, we move onto the
-                // next child.
-                child = children.shift();
-                childBreakToken = null;
-            }
-        }
-
-        const autoBlockSize = blockOffset + edges.all.blockEnd;
-
-        // Return our fragment.
-        const result = {
-            autoBlockSize,
-            childFragments: childFragments,
-        }
-
-        if (childBreakToken) {
-            result.breakToken = {
-                childBreakTokens: [childBreakToken],
-            };
-        }
-
-        return result;
-    }
-});
-</pre>
-</div>
 
 Edges {#edges}
 --------------
@@ -1283,6 +1167,8 @@ registerLayout('box-edges', class {
 }
 </pre>
 </div>
+
+Issue: Slim this down to just the "all" edges.
 
 Interactions with other Modules {#interactions-with-other-modules}
 ==================================================================
@@ -2054,6 +1940,178 @@ registerLayout('block-like', class {
             autoBlockSize,
             childFragments,
         };
+    }
+});
+</pre>
+</div>
+
+<div class="example">
+The layout algorithm performs a flexbox-like distribution of spare space in the inline direction. It
+creates child layout constraints which specify that a child should be a fixed inline size.
+
+<pre class="lang-javascript">
+registerLayout('flex-distribution-like', class {
+    async intrinsicSizes(children, edges, styleMap) {
+      const childrenSizes = children.map((child) => {
+          return child.intrinsicSizes();
+      });
+
+      const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
+          return sum + childSizes.maxContentSize;
+      }, 0) + edges.all.inline;
+
+      const minContentSize = childrenSizes.reduce((max, childSizes) => {
+          return sum + childSizes.minContentSize;
+      }, 0) + edges.all.inline;
+
+      return {maxContentSize, minContentSize};
+    }
+
+    async layout(children, edges, constraints, styleMap) {
+        // Determine our (inner) available size.
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
+
+        const childConstraints = { availableInlineSize, availableBlockSize };
+
+        const unconstrainedChildFragments = await Promise.all(children.map((child) => {
+            return child.layoutNextFragment(childConstraints);
+        }));
+
+        const unconstrainedSizes = [];
+        const totalSize = unconstrainedChildFragments.reduce((sum, fragment, i) => {
+            unconstrainedSizes[i] = fragment.inlineSize;
+            return sum + fragment.inlineSize;
+        }, 0);
+
+        // Distribute spare space between children.
+        const remainingSpace = Math.max(0, inlineSize - totalSize);
+        const extraSpace = remainingSpace / children.length;
+
+        const childFragments = await Promise.all(children.map((child, i) => {
+            return child.layoutNextFragment({
+                fixedInlineSize: unconstrainedSizes[i] + extraSpace,
+                availableBlockSize
+            });
+        }));
+
+        // Position the fragments.
+        let inlineOffset = 0;
+        let maxChildBlockSize = 0;
+        for (let fragment of childFragments) {
+            fragment.inlineOffset = inlineOffset;
+            fragment.blockOffset = edges.all.blockStart;
+
+            inlineOffset += fragment.inlineSize;
+            maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
+        }
+
+        return {
+            autoBlockSize: maxChildBlockSize + edges.all.block,
+            childFragments,
+        };
+    }
+});
+</pre>
+</div>
+
+<div class="example">
+This example shows a simple layout which indents child fragments for a certain number of
+lines.
+
+This example also demonstrates using the previous {{LayoutFragment/breakToken}} of a
+{{LayoutFragment}} to produce the next fragment for the {{LayoutChild}}.
+
+It also demonstrates using the {{BreakToken}} to respect the {{LayoutConstraints}}'
+{{LayoutConstraints/blockFragmentationType}}, it resumes it layout from the previous {{BreakToken}}.
+It returns a {{FragmentResultOptions}} with a {{FragmentResultOptions/breakToken}} which is used to
+resume the layout.
+
+<pre class="lang-javascript">
+registerLayout('indent-lines', class {
+    static layoutOptions = {childDisplay: 'normal'};
+    static inputProperties = ['--indent', '--indent-lines'];
+
+    async layout(children, edges, constraints, styleMap, breakToken) {
+        // Determine our (inner) available size.
+        const availableInlineSize =
+            constraints.fixedInlineSize - edges.all.inline;
+        const availableBlockSize = constraints.fixedBlockSize ?
+            constraints.fixedBlockSize - edges.all.block : null;
+
+        // Detrermine the number of lines to indent, and the indent amount.
+        const indent = resolveLength(constraints, styleMap.get('--indent'));
+        let lines = styleMap.get('--indent-lines').value;
+
+        const childFragments = [];
+
+        let childBreakToken = null;
+        if (breakToken) {
+            childBreakToken = breakToken.childBreakTokens[0];
+
+            // Remove all the children we have already produced fragments for.
+            children.splice(0, children.indexOf(childBreakToken.child));
+        }
+
+        let blockOffset = edges.all.blockStart;
+        let child = children.shift();
+        while (child) {
+            const shouldIndent = lines-- > 0;
+
+            // Adjust the inline size for the indent.
+            const childAvailableInlineSize = shouldIndent ?
+                availableInlineSize - indent : availableInlineSize;
+
+            const childConstraints = {
+                availableInlineSize: childAvailableInlineSize,
+                availableBlockSize,
+                percentageInlineSize: availableInlineSize,
+                blockFragmentationType: constraints.blockFragmentationType,
+            };
+
+            const fragment = await child.layoutNextFragment(childConstraints,
+                                                            childBreakToken);
+            childFragments.push(fragment);
+
+            // Position the fragment.
+            fragment.inlineOffset = shouldIndent ?
+                edges.all.inlineStart + indent : edges.all.inlineStart;
+            fragment.blockOffset = blockOffset;
+            blockOffset += fragment.blockSize;
+
+            // Check if we have gone over the block fragmentation limit.
+            if (constraints.blockFragmentationType != 'none' &&
+                blockOffset > constraints.blockSize) {
+                break;
+            }
+
+            if (fragment.breakToken) {
+                childBreakToken = fragment.breakToken;
+            } else {
+                // If a fragment doesn't have a break token, we move onto the
+                // next child.
+                child = children.shift();
+                childBreakToken = null;
+            }
+        }
+
+        const autoBlockSize = blockOffset + edges.all.blockEnd;
+
+        // Return our fragment.
+        const result = {
+            autoBlockSize,
+            childFragments: childFragments,
+        }
+
+        if (childBreakToken) {
+            result.breakToken = {
+                childBreakTokens: [childBreakToken],
+            };
+        }
+
+        return result;
     }
 });
 </pre>
