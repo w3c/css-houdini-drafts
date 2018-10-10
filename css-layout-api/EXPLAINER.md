@@ -68,9 +68,9 @@ below. You should read the code below with its explanatory section.
 registerLayout('centering', class {
   async layout(children, edges, constraints, styleMap) {
     // (1) Determine our (inner) available size.
-    const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+    const availableInlineSize = constraints.fixedInlineSize - edges.inline;
     const availableBlockSize = constraints.fixedBlockSize ?
-        constraints.fixedBlockSize - edges.all.block :
+        constraints.fixedBlockSize - edges.block :
         null;
 
     let maxChildBlockSize = 0;
@@ -87,16 +87,16 @@ registerLayout('centering', class {
       maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
 
       // Position our child fragment.
-      fragment.inlineOffset = edges.all.inlineStart +
+      fragment.inlineOffset = edges.inlineStart +
                               (constraints.fixedInlineSize - fragment.inlineSize) / 2;
-      fragment.blockOffset = edges.all.blockStart + 
+      fragment.blockOffset = edges.blockStart +
                              Math.max(0, (constraints.fixedBlockSize - fragment.blockSize) / 2);
 
       childFragments.push(fragment);
     }
 
     // (3) Determine our "auto" block size.
-    const autoBlockSize = maxChildBlockSize + edges.all.block;
+    const autoBlockSize = maxChildBlockSize + edges.block;
 
     // (4) Return our fragment.
     return {
@@ -140,9 +140,9 @@ The `edges` object represents the border, scrollbar, and padding of your element
 determine our "inner" size we subtract the `edges.all` from our calculated sizes. For example:
 
 ```js
-const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+const availableInlineSize = constraints.fixedInlineSize - edges.inline;
 const availableBlockSize = constraints.fixedBlockSize ?
-    constraints.fixedBlockSize - edges.all.block :
+    constraints.fixedBlockSize - edges.block :
     null;
 ```
 
@@ -188,9 +188,9 @@ Now that we know how large our biggest child is going to be, we can calculate ou
 This is the size the element will be if there are no other block-size constraints (e.g. `height:
 100px`).
 
-In this layout algorithm, we just add the `edges.all.block` size to the largest child we found:
+In this layout algorithm, we just add the `edges.block` size to the largest child we found:
 ```js
-const autoBlockSize = maxChildBlockSize + edges.all.block;
+const autoBlockSize = maxChildBlockSize + edges.block;
 ```
 
 ### Step (4) - Return our fragment ###
@@ -309,9 +309,9 @@ registerLayout('basic-inline', class {
 
   async layout(children, edges, constraints, styleMap) {
     // Determine our (inner) available size.
-    const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+    const availableInlineSize = constraints.fixedInlineSize - edges.inline;
     const availableBlockSize = constraints.fixedBlockSize !== null ?
-        constraints.fixedBlockSize - edges.all.block : null;
+        constraints.fixedBlockSize - edges.block : null;
 
     const constraints = {
       availableInlineSize,
@@ -320,7 +320,7 @@ registerLayout('basic-inline', class {
 
     const childFragments = [];
 
-    let blockOffset = edges.all.blockStart;
+    let blockOffset = edges.blockStart;
     let child = children.shift();
     let childBreakToken = null;
     while (child) {
@@ -332,7 +332,7 @@ registerLayout('basic-inline', class {
 
       // Position the fragment, note we coulld do something special here, like
       // placing all the lines on a "rythimic grid", or similar.
-      fragment.inlineOffset = edges.all.inlineStart;
+      fragment.inlineOffset = edges.inlineStart;
       fragment.blockOffset = blockOffset;
 
       blockOffset += fragment.blockSize;
@@ -348,7 +348,7 @@ registerLayout('basic-inline', class {
     }
 
     // Determine our "auto" block size.
-    const autoBlockSize = blockOffset + edges.all.blockEnd;
+    const autoBlockSize = blockOffset + edges.blockEnd;
 
     // Return our fragment.
     return {
@@ -373,14 +373,8 @@ Scrolling
 
 We have been handling scrolling in the above example but we haven't talked about it yet.
 
-```js
-const scrollbarEdgeSizes = edges.scrollbar;
-scrollbarEdgeSizes.inline;
-scrollbarEdgeSizes.block;
-```
-
-The above code snippet queries the size of the scrollbar, and respects the `overflow` property.
-For example if we are `overflow: hidden`, `edges.scrollbar` will report 0 for all directions.
+The `edges` object passed into `layout()` respects the `overflow` property.
+For example if we are `overflow: hidden`, `edges` object won't include the scrollbar width.
 
 For `overflow: auto` the engine will typically perform a layout without a scrollbar, then if it
 detects overflow, with a scrollbar. As long as you respect the layout "edges" your layout algorithm

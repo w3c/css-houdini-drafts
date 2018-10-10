@@ -785,8 +785,8 @@ registerLayout('example-layout-fragment', class {
 
     // You can set the position of the fragment, e.g. this will set it to the
     // top-left corner:
-    fragment.inlineOffset = edges.all.inlineStart;
-    fragment.blockOffset = edges.all.blockStart;
+    fragment.inlineOffset = edges.inlineStart;
+    fragment.blockOffset = edges.blockStart;
 
     // Data may be passed from the child layout:
     console.log(fragment.data);
@@ -938,9 +938,9 @@ registerLayout('layout-constraints-example', class {
     async layout(children, edges, constraints, styleMap) {
 
         // Calculate the available size.
-        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableInlineSize = constraints.fixedInlineSize - edges.inline;
         const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.inline : null;
+            constraints.fixedBlockSize - edges.inline : null;
 
         // Web developers should resolve any percentages against the percentage sizes.
         const value = constraints.percentageInlineSize * 0.5;
@@ -1093,7 +1093,7 @@ Edges {#edges}
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
-interface LayoutEdgeSizes {
+interface LayoutEdges {
   readonly attribute double inlineStart;
   readonly attribute double inlineEnd;
 
@@ -1104,33 +1104,17 @@ interface LayoutEdgeSizes {
   readonly attribute double inline;
   readonly attribute double block;
 };
-
-[Exposed=LayoutWorklet]
-interface LayoutEdges {
-  readonly attribute LayoutEdgeSizes border;
-  readonly attribute LayoutEdgeSizes scrollbar;
-  readonly attribute LayoutEdgeSizes padding;
-
-  readonly attribute LayoutEdgeSizes all;
-};
 </pre>
 
-A {{LayoutEdges}} object is passed into the layout method. This represents the size of the [=box
-model edges=] for the current box which is being laid out.
+A {{LayoutEdges}} object is passed into the layout method. This represents the sum of all the [=box
+model edges=] (border, scrollbar, padding), for the current box which is being laid out.
 
-The {{LayoutEdges}} has {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, and
-{{LayoutEdges/padding}} attributes. Each of these represent the width of their respective edge.
+Each of the accessors represents the width in CSS pixels of an edge in each of the [=abstract
+dimensions=] ({{LayoutEdges/inlineStart}}, {{LayoutEdges/inlineEnd}}, {{LayoutEdges/blockStart}},
+{{LayoutEdges/blockEnd}}).
 
-The {{LayoutEdges}} has the {{LayoutEdges/all}} attribute. This is a convenience attribute which
-represents the sum of the {{LayoutEdges/border}}, {{LayoutEdges/scrollbar}}, {{LayoutEdges/padding}}
-edges.
-
-The {{LayoutEdgeSizes}} object represents the width in CSS pixels of an edge in each of the
-[=abstract dimensions=] ({{LayoutEdgeSizes/inlineStart}}, {{LayoutEdgeSizes/inlineEnd}},
-{{LayoutEdgeSizes/blockStart}}, {{LayoutEdgeSizes/blockEnd}}).
-
-The {{LayoutEdgeSizes/inline}}, and {{LayoutEdgeSizes/block}} on the {{LayoutEdgeSizes}} object are
-convenience attributes which represent the sum in that direction.
+The {{LayoutEdges/inline}}, and {{LayoutEdges/block}} on the {{LayoutEdges}} object are convenience
+attributes which represent the sum in that direction.
 
 <div class="example">
 This example shows an node styled by CSS, and what its respective {{LayoutEdges}} could contain.
@@ -1159,10 +1143,11 @@ This example shows an node styled by CSS, and what its respective {{LayoutEdges}
 <pre class="lang-javascript">
 registerLayout('box-edges', class {
     async layout(children, edges, constraints, styleMap, breakToken) {
-        edges.padding.inlineStart; // 5 (as 10% * 50px = 5px).
-        edges.border.blockEnd; // 2
-        edges.scrollbar.inlineEnd; // UA-dependent, may be 0 or >0 (e.g. 16).
-        edges.all.block; // 14 (2 + 5 + 5 + 2).
+        edges.inlineStart; // 2 + 5 (as 10% * 50px = 5px).
+        edges.blockEnd; // 7 (2 + 5)
+        edges.inlineEnd; // UA-dependent, due to scrollbar.
+                         //  Could be 2 + 5 + 0 or 2 + 5 + 16 for example.
+        edges.block; // 14 (2 + 5 + 5 + 2).
     }
 }
 </pre>
@@ -1527,8 +1512,8 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
 
         2. [=list/Append=] |layoutChild| to |children|.
 
-    6. Let |edges| be a new {{LayoutEdgeSizes}} populated with the [=computed value=] for all the
-        [=box model edges=] for |box|.
+    6. Let |edges| be a new {{LayoutEdges}} populated with the [=computed value=] for all the [=box
+        model edges=] for |box|.
 
     7. Let |styleMap| be the result of [=get a style map=] given |box|, and |inputProperties|.
 
@@ -1644,8 +1629,8 @@ following steps:
 
         2. <a for=list>Append</a> |layoutChild| to |children|.
 
-    8. Let |edges| be a new {{LayoutEdgeSizes}} populated with the [=computed value=] for all the
-        [=box model edges=] for |box|.
+    8. Let |edges| be a new {{LayoutEdges}} populated with the [=computed value=] for all the [=box
+        model edges=] for |box|.
 
     9. Let |layoutConstraints| be the result of [=create a layout constraints object=] given
         |internalLayoutConstraints|, |box|, and |sizingMode|.
@@ -1900,20 +1885,20 @@ registerLayout('block-like', class {
 
       const maxContentSize = childrenSizes.reduce((max, childSizes) => {
           return Math.max(max, childSizes.maxContentSize);
-      }, 0) + edges.all.inline;
+      }, 0) + edges.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
           return Math.max(max, childSizes.minContentSize);
-      }, 0) + edges.all.inline;
+      }, 0) + edges.inline;
 
       return {maxContentSize, minContentSize};
     }
 
     async layout(children, edges, constraints, styleMap) {
         // Determine our (inner) available size.
-        const availableInlineSize = constraints.fixedInlineSize - edges.all.inline;
+        const availableInlineSize = constraints.fixedInlineSize - edges.inline;
         const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
+            constraints.fixedBlockSize - edges.block : null;
 
         const childFragments = [];
         const childConstraints = { availableInlineSize, availableBlockSize };
@@ -1922,19 +1907,19 @@ registerLayout('block-like', class {
             return child.layoutNextFragment(childConstraints);
         }));
 
-        let blockOffset = edges.all.blockStart;
+        let blockOffset = edges.blockStart;
         for (let fragment of childFragments) {
             // Position the fragment in a block like manner, centering it in the
             // inline direction.
             fragment.blockOffset = blockOffset;
             fragment.inlineOffset = Math.max(
-                edges.all.inlineStart,
+                edges.inlineStart,
                 (availableInlineSize - fragment.inlineSize) / 2);
 
             blockOffset += fragment.blockSize;
         }
 
-        const autoBlockSize = blockOffset + edges.all.blockEnd;
+        const autoBlockSize = blockOffset + edges.blockEnd;
 
         return {
             autoBlockSize,
@@ -1958,11 +1943,11 @@ registerLayout('flex-distribution-like', class {
 
       const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
           return sum + childSizes.maxContentSize;
-      }, 0) + edges.all.inline;
+      }, 0) + edges.inline;
 
       const minContentSize = childrenSizes.reduce((max, childSizes) => {
           return sum + childSizes.minContentSize;
-      }, 0) + edges.all.inline;
+      }, 0) + edges.inline;
 
       return {maxContentSize, minContentSize};
     }
@@ -1970,9 +1955,9 @@ registerLayout('flex-distribution-like', class {
     async layout(children, edges, constraints, styleMap) {
         // Determine our (inner) available size.
         const availableInlineSize =
-            constraints.fixedInlineSize - edges.all.inline;
+            constraints.fixedInlineSize - edges.inline;
         const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
+            constraints.fixedBlockSize - edges.block : null;
 
         const childConstraints = { availableInlineSize, availableBlockSize };
 
@@ -2002,14 +1987,14 @@ registerLayout('flex-distribution-like', class {
         let maxChildBlockSize = 0;
         for (let fragment of childFragments) {
             fragment.inlineOffset = inlineOffset;
-            fragment.blockOffset = edges.all.blockStart;
+            fragment.blockOffset = edges.blockStart;
 
             inlineOffset += fragment.inlineSize;
             maxChildBlockSize = Math.max(maxChildBlockSize, fragment.blockSize);
         }
 
         return {
-            autoBlockSize: maxChildBlockSize + edges.all.block,
+            autoBlockSize: maxChildBlockSize + edges.block,
             childFragments,
         };
     }
@@ -2037,9 +2022,9 @@ registerLayout('indent-lines', class {
     async layout(children, edges, constraints, styleMap, breakToken) {
         // Determine our (inner) available size.
         const availableInlineSize =
-            constraints.fixedInlineSize - edges.all.inline;
+            constraints.fixedInlineSize - edges.inline;
         const availableBlockSize = constraints.fixedBlockSize ?
-            constraints.fixedBlockSize - edges.all.block : null;
+            constraints.fixedBlockSize - edges.block : null;
 
         // Detrermine the number of lines to indent, and the indent amount.
         const indent = resolveLength(constraints, styleMap.get('--indent'));
@@ -2055,7 +2040,7 @@ registerLayout('indent-lines', class {
             children.splice(0, children.indexOf(childBreakToken.child));
         }
 
-        let blockOffset = edges.all.blockStart;
+        let blockOffset = edges.blockStart;
         let child = children.shift();
         while (child) {
             const shouldIndent = lines-- > 0;
@@ -2077,7 +2062,7 @@ registerLayout('indent-lines', class {
 
             // Position the fragment.
             fragment.inlineOffset = shouldIndent ?
-                edges.all.inlineStart + indent : edges.all.inlineStart;
+                edges.inlineStart + indent : edges.inlineStart;
             fragment.blockOffset = blockOffset;
             blockOffset += fragment.blockSize;
 
@@ -2097,7 +2082,7 @@ registerLayout('indent-lines', class {
             }
         }
 
-        const autoBlockSize = blockOffset + edges.all.blockEnd;
+        const autoBlockSize = blockOffset + edges.blockEnd;
 
         // Return our fragment.
         const result = {
