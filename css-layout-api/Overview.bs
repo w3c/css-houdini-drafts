@@ -1006,8 +1006,8 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
 
 <pre class='idl'>
 dictionary LayoutConstraintsOptions {
-    double availableInlineSize = 0;
-    double availableBlockSize = 0;
+    double availableInlineSize;
+    double availableBlockSize;
 
     double fixedInlineSize;
     double fixedBlockSize;
@@ -1034,10 +1034,18 @@ The example below shows the basic usage of the {{LayoutConstraintsOptions}} dict
 registerLayout('child-layout-constraints-example', class {
     async layout(children, edges, constraints, styleMap) {
 
-        // A web developer can  
+        // The call below gives the child an "available" space. It will try and
+        // fit within this.
         const fragment = children[0].layoutNextFragment({
             availableInlineSize: 100,
             availableBlockSize: 200,
+        });
+
+        // The call below gives the child a "fixed" size, it will be forced to
+        // this size ignoring any style set.
+        const fragment = children[0].layoutNextFragment({
+            fixedInlineSize: 20,
+            fixedBlockSize: 30,
         });
 
     }
@@ -1045,7 +1053,7 @@ registerLayout('child-layout-constraints-example', class {
 </pre>
 </div>
 
-Issue: Finish up this section.
+Issue: Specify how to convert to internal representation of these values.
 
 Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
@@ -1152,8 +1160,6 @@ registerLayout('box-edges', class {
 }
 </pre>
 </div>
-
-Issue: Slim this down to just the "all" edges.
 
 Interactions with other Modules {#interactions-with-other-modules}
 ==================================================================
