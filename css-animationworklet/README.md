@@ -24,7 +24,8 @@ environment, *worklet*. It aims to be compatible with Web Animations and uses ex
 much as possible. We believe this API hits a sweet spot in balancing among performance, richness,
 and rationality for addressing our key use cases.
 
-This design supersedes our [CompositorWorker proposal][cw-proposal].
+Key principal behind the design of AnimationWorklet can be found in this [vision](vision.md)
+document. This design supersedes our [CompositorWorker proposal][cw-proposal].
 
 # Motivating Use Cases
 
@@ -393,5 +394,20 @@ The [draft specification](https://https://drafts.css-houdini.org/css-animationwo
 the most recent version.
 
 
+# Chrome Implementation Timeline
+This is a rough sketch of how Chrome plans to deliver this feature:
+
+1.  AnimationWorklet Prototype (done): scripted custom animation, single effect, only fast
+    properties, off-thread.
+2.  AnimationWorklet [Origin Trial][ot-blogpost] (in progress, [signup][ot-signup]): good
+    performance, scroll input (ScrollTimeline), basic web-animation controls (play/cancel).
+3.  AnimationWorklet MVP (in development): animate all properties (slow path ones running in sync
+    with main thread), multiple effects (i.e., GroupEffect), full web-animation integration.
+4.  AnimationWorklet V2 (future): touch/gesture input, multiple inputs in single animation,
+    sophisticated scheduling, other outputs.
+
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
+[ot-blogpost]: https://developers.google.com/web/updates/2018/10/animation-worklet
+[ot-signup]:https://docs.google.com/forms/d/e/1FAIpQLSfO0_ptFl8r8G0UFhT0xhV17eabG-erUWBDiKSRDTqEZ_9ULQ/viewform
+
