@@ -770,6 +770,17 @@ attributes represent the position of the {{LayoutFragment}} relative to its pare
 box</b>, before transform or positioning (e.g. if a fragment is [=relatively positioned=]) has
 been applied.
 
+<figure>
+    <img src="img/layout-fragment-offsets.png" width="800"
+      alt="An example of position a fragment in different writing modes.">
+    <figcaption>
+        A simple visualization showing positioning a {{LayoutFragment}} using
+        {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}} in different writing
+        modes.
+    </figcaption>
+</figure>
+
+
 <div class=example>
 The example below shows the basic usage of a {{LayoutFragment}}.
 <pre class='lang-javascript'>
