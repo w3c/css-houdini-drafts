@@ -682,7 +682,7 @@ When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalS
             properties</a>.
 
         3. Let |layoutChild| be a new {{LayoutChild}} with internal slot(s):
-            - {{[[box]]}} set to |box|.
+            - {{LayoutChild/[[box]]}} set to |box|.
             - {{[[styleMap]]}} set to a new {{StylePropertyMapReadOnly}} populated with
                 <em>only</em> the [=computed values=] for properties listed in
                 |childInputProperties|.
@@ -1441,11 +1441,162 @@ dictionary FragmentResultOptions {
     BreakTokenOptions breakToken = null;
 };
 
+[Constructor(FragmentResultOptions)]
+interface FragmentResult {
+    readonly attribute double inlineSize;
+    readonly attribute double blockSize;
+};
+
 dictionary IntrinsicSizesResultOptions {
     double maxContentSize;
     double minContentSize;
 };
 </pre>
+
+The {{FragmentResult}} has internal slot(s):
+
+    - <dfn attribute for=FragmentResult>\[[box]]</dfn> a CSS [=box=].
+
+    - <dfn attribute for=FragmentResult>[[inline size]]</dfn> the inline size of the resulting
+        fragment.
+
+    - <dfn attribute for=FragmentResult>[[block size]]</dfn> the block size of the resulting
+        fragment.
+
+    - <dfn attribute for=FragmentResult>[[child fragments]]</dfn> the list of child fragments.
+
+    - <dfn attribute for=FragmentResult>\[[data]]</dfn> some optional serialized data.
+
+    - <dfn attribute for=FragmentResult>[[internal break token]]</dfn> an internal representation of
+        the break information for this fragment.
+
+    - <dfn attribute for=FragmentResult>[[unique id]]</dfn> the [=unique id=] of the current
+        [=layout api context=]. This slot is used so that a {{FragmentResult}} used outside the
+        current layout pass is invalid.
+
+<hr>
+
+The web developer defined layout method can return either a {{FragmentResultOptions}} or a
+{{FragmentResult}}. The {{FragmentResult}} can be used for determining the final size of the
+fragment or detecting if the provided {{FragmentResultOptions}} would result in triggering a
+fallback to [=flow layout=].
+
+<div class="example">
+This example show the web developer using the {{FragmentResult}} instead of just returning the
+{{FragmentResultOptions}} object.
+
+<pre class="lang-javascript">
+registerLayout('feature-detection', class {
+    async layout(children, edges, constraints, styleMap, breakToken) {
+
+      let result;
+      try {
+        result = new FragmentResult({
+          childFragments: [],
+          autoBlockSize: 100
+        });
+      } catch (e) {
+        // The above call may throw, if the dictionary was just returned, it
+        //  would fallback to flow layout.
+      }
+
+      // The web developer can test what size the fragment will be.
+      result.blockSize;
+
+      // Instead of returning the dictionary, we can just return this object.
+      return result;
+    }
+}
+</pre>
+</div>
+
+<div algorithm>
+The <dfn attribute for=FragmentResult>inlineSize</dfn>, on getting from a {{FragmentResult}} |this|,
+the user agent must perform the following steps:
+
+    1. Return |this|' {{FragmentResult/[[inline size]]}} internal slot.
+</div>
+
+<div algorithm>
+The <dfn attribute for=FragmentResult>blockSize</dfn>, on getting from a {{FragmentResult}} |this|,
+the user agent must perform the following steps:
+
+    1. Return |this|' {{FragmentResult/[[block size]]}} internal slot.
+</div>
+
+Note: The {{FragmentResult(options)}} constructor performs a series of validation checks (the web
+    developer isn't using an object from a previous invocation, and determines the final size of the
+    resulting fragment.
+
+<div algorithm>
+When the <dfn constructor for=FragmentResult>FragmentResult(options)</dfn> constructor is called,
+the user agent must perform the following stpes:
+
+    1. Let |context| be the [=current layout's=] [=layout API context=].
+
+    2. Let |uniqueId| be |context|'s [=unique id=].
+
+    3. Let |box| be the [=current layout's=] [=box=].
+
+    4. Let |breakTokenOptions| be |options|'s {{FragmentResultOptions/breakToken}}.
+
+    5. [=list/For each=] |childFragment| in |options|'s {{FragmentResultOptions/childFragments}},
+        perform the following stubsteps:
+
+        1. If |childFragment|'s {{LayoutFragment/[[unique id]]}} internal slot is not equal to
+            |uniqueId|, then [=throw=] a [=TypeError=], and abort all these steps.
+
+    6. [=list/For each=] |childBreakToken| in |breakTokenOptions|'s
+        {{BreakTokenOptions/childBreakTokens}}, perform the following stubsteps:
+
+        1. If |childBreakToken|'s {{ChildBreakToken/[[unique id]]}} internal slot is not equal to
+            |uniqueId|, then [=throw=] a [=TypeError=], and abort all these steps.
+
+    7. If |sizingMode| is <code>"block-like"</code>:
+
+        - Then:
+
+            1. Let |inlineSize| be the result of calculating |box|'s <b>border-box</b> [=inline
+                size=] (relative to |box|'s writing mode) exactly like block containers do.
+
+            2. Let |blockSize| be the result of calculating |box|'s <b>border-box</b>
+                [=block size=] (relative to |box|'s writing mode) exactly like block containers do,
+                given |fragment|'s {{FragmentResultOptions/autoBlockSize}} as the "intrinsic
+                block size".
+
+        - Otherwise (|sizingMode| is <code>"manual"</code>):
+
+            1. Let |inlineSize| be |fragment|'s {{FragmentResultOptions/inlineSize}}.
+
+            2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
+
+    8. Let |clonedData| be the result of invoking [=StructuredSerializeForStorage=] on |options|'s
+        {{FragmentResultOptions/data}}.
+
+    9. Let |clonedBreakTokenData| be the result of invoking [=StructuredSerializeForStorage=] on
+        |breakTokenOptions|'s {{BreakTokenOptions/data}}.
+
+    10. Let |internalBreakToken| be the internal representation of the [=fragmentation break=]
+        containing |clonedBreakTokenData|, and |breakTokenOptions|.
+
+    11. Return a new {{FragmentResult}} with:
+
+        - {{FragmentResult/[[box]]}} being |box|.
+
+        - {{FragmentResult/[[inline size]]}} being |inlineSize|.
+
+        - {{FragmentResult/[[block size]]}} being |blockSize|.
+
+        - {{FragmentResult/[[child fragments]]}} being |options|'s
+            {{FragmentResultOptions/childFragments}}.
+
+        - {{FragmentResult/[[data]]}} being |clonedData|.
+
+        - {{FragmentResult/[[internal break token]]}} being |internalBreakToken|.
+
+        - {{FragmentResult/[[unique id]]}} being |uniqueId|.
+
+</div>
 
 ### Determining Intrinsic Sizes ### {#determining-intrinsic-sizes}
 
@@ -1665,54 +1816,36 @@ following steps:
         If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
         abort all these steps.
 
-    16. Let |fragment| be the result of [=converting=] |fragmentValue| to a
+    16. Let |fragmentResultOptions| be the result of [=converting=] |fragmentValue| to a
         {{FragmentResultOptions}}. If an exception is [=thrown=], let |box| fallback to the [=flow
         layout=] and abort all these steps.
 
-    17. <a for=list>For each</a> |childFragment| in |fragment|'s
-        {{FragmentResultOptions/childFragments}}, perform the following stubsteps:
+    17. Let |fragmentResult| be the result of constructing {{FragmentResult(options)}} given
+        |fragmentResultOptions|.
 
-        1. If |childFragment|'s {{LayoutFragment/[[unique id]]}} internal slot is not equal to
-            |context|'s [=unique id=], then let |box| fallback to the [=flow layout=] and abort all
-            these steps.
+        If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
+        these steps.
 
-    18. If |sizingMode| is <code>"block-like"</code>:
+        Issue: The above two steps may not be needed as it already might be a {{FragmentResult}}.
 
-        - Then:
+    18. Return an internal representation of a [=fragment=] with:
 
-            1. Let |inlineSize| be |layoutConstraints|' {{LayoutConstraints/fixedInlineSize}}. (This
-                value must be set if we are using <code>"block-like"</code> sizing).
+        - The [=inline size=] set to |fragmentResult|'s {{FragmentResult/[[inline size]]}}.
 
-            2. Let |blockSize| be the result of calculating |box|'s <b>border-box</b>
-                [=block size=] (relative to |box|'s writing mode) exactly like block containers do,
-                given |fragment|'s {{FragmentResultOptions/autoBlockSize}} as the "intrinsic
-                height".
+        - The [=block size=] set to |fragmentResult|'s {{FragmentResult/[[inline size]]}}.
 
-        - Otherwise (|sizingMode| is <code>"manual"</code>):
+        - The child fragments set to |fragmentResult|'s {{FragmentResult/[[child fragments]]}}.
 
-            1. Let |inlineSize| be |fragment|'s {{FragmentResultOptions/inlineSize}}.
+            The ordering <em>is</em> important as this dictates their paint order (described in
+            [[#layout-api-containers]]). Their position relative to the <b>border box</b> of the
+            fragment should be based off the author specified {{LayoutFragment/inlineOffset}} and
+            {{LayoutFragment/blockOffset}}.
 
-            2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
+        - The [=fragmentation break=] information set to |fragmentResult|'s
+            {{FragmentResult/[[internal break token]]}}.
 
-    19. Return a [=fragment=] for |box| with:
+        - Store |fragmentResult|'s {{FragmentResult/[[data]]}} with the [=fragment=].
 
-        - The [=inline size=] set to |inlineSize|.
-
-        - The [=block size=] set to |blockSize|.
-
-        - The child fragments set to |fragment|'s {{FragmentResultOptions/childFragments}}
-            [=list=]. The ordering <em>is</em> important as this dictates their paint order
-            (described in [[#layout-api-containers]]). Their position relative to the <b>border
-            box</b> of the |fragment| should be based off the author specified
-            {{LayoutFragment/inlineOffset}} and {{LayoutFragment/blockOffset}}.
-
-        - The [=fragmentation break=] information set to |fragment|'s
-            {{FragmentResultOptions/breakToken}}.
-
-        - Let |clonedData| be the result of invoking [=StructuredSerializeForStorage=] on
-            |fragment|'s {{FragmentResultOptions/data}}.
-
-            The user agent must store |clonedData| with the [=fragment=].
 </div>
 
 ### Utility Algorithms ### {#utility-algorithms}
@@ -1808,7 +1941,7 @@ When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |w
 
             1. Let |layoutChild| be |task|'s [=layout api work task/layout child=].
 
-            2. Let |box| be |layoutChild|'s [=box=] in the {{[[box]]}} internal slot.
+            2. Let |box| be |layoutChild|'s [=box=] in the {{LayoutChild/[[box]]}} internal slot.
 
             3. Let |childPromise| be |task|'s [=layout api work task/=promise].
 
