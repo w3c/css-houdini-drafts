@@ -1135,6 +1135,15 @@ dimensions=] ({{LayoutEdges/inlineStart}}, {{LayoutEdges/inlineEnd}}, {{LayoutEd
 The {{LayoutEdges/inline}}, and {{LayoutEdges/block}} on the {{LayoutEdges}} object are convenience
 attributes which represent the sum in that direction.
 
+<figure>
+    <img src="img/edges.png" width="800"
+      alt="An example of layout edges.">
+    <figcaption>
+        A visualization showing the {{LayoutEdges}} object for a [=box=] with different sized
+        scrollbar, border, and padding.
+    </figcaption>
+</figure>
+
 <div class="example">
 This example shows an node styled by CSS, and what its respective {{LayoutEdges}} could contain.
 
