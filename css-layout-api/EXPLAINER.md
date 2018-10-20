@@ -226,8 +226,8 @@ are performing layout for, and all children. E.g.
 
 ```js
 registerLayout('style-read', class {
-  static get inputProperties() { return ['--a-number']; }
-  static get childInputProperties() { return ['--a-string']; }
+  static inputProperties = ['--a-number'];
+  static childInputProperties = ['--a-string'];
 
   async layout(children, edges, constraints, styleMap) {
     // We can read our own style:
@@ -272,7 +272,7 @@ In the above `centering` example, we forced each `LayoutChild` to produce exactl
 We are able to ensure children do not blockify by setting the `childDisplay` to `normal`, e.g.
 ```js
 registerLayout('example', class {
-  static get layoutOptions() { return {childDisplay: 'normal'}; }
+  static layoutOptions = {childDisplay: 'normal'};
 });
 ```
 
@@ -305,7 +305,7 @@ We pass the `BreakToken` to add back into the `layout()` call in order to produc
 
 ```js
 registerLayout('basic-inline', class {
-  static get layoutOptions() { return {childDisplay: 'normal'}; }
+  static layoutOptions = {childDisplay: 'normal'};
 
   async layout(children, edges, constraints, styleMap) {
     // Determine our (inner) available size.

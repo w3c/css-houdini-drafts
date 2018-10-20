@@ -308,11 +308,12 @@ instances</dfn>. Initially this map is empty; it is populated when the user agen
     Note: The shape of the class should be:
     <pre class='lang-javascript'>
         registerLayout('example', class {
-            static get inputProperties() { return ['--foo']; }
-            static get childrenInputProperties() { return ['--bar']; }
-            static get layoutOptions() {
-              return {childDisplay: 'normal', sizing: 'block-like'}
-            }
+            static inputProperties = ['--foo'];
+            static childrenInputProperties = ['--bar'];
+            static layoutOptions = {
+              childDisplay: 'normal',
+              sizing: 'block-like'
+            };
 
             async intrinsicSizes(children, edges, styleMap) {
                 // Intrinsic sizes code goes here.
@@ -505,7 +506,7 @@ The {{LayoutChild}} has internal slot(s):
 The example below shows the basic usage of a {{LayoutChild}}.
 <pre class='lang-javascript'>
 registerLayout('example-layout-child', class {
-  static get childInputProperties() { return ['--foo']; }
+  static childInputProperties = ['--foo'];
 
   async layout(children, edges, constraints, styleMap) {
 
