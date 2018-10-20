@@ -271,6 +271,9 @@ function). It consists of:
 Registering A Layout {#registering-layout}
 ------------------------------------------
 
+The section describes how a web developer uses {{registerLayout(name, layoutCtor)}} to register a
+layout.
+
 <pre class='idl'>
 [Exposed=LayoutWorklet]
 dictionary LayoutOptions {
@@ -280,14 +283,14 @@ dictionary LayoutOptions {
 
 [Exposed=LayoutWorklet]
 enum ChildDisplayType {
-    "block",
+    "block", // default - "blockifies" the child boxes.
     "normal",
 };
 
 [Exposed=LayoutWorklet]
 enum LayoutSizingMode {
-    "block-like",
-    "manual",
+    "block-like", // default - Sizing behaves like block containers.
+    "manual", // Sizing is specified by the web developer.
 };
 </pre>
 
@@ -459,7 +462,7 @@ A <dfn>child layout</dfn> is the layout algorithm for a {{LayoutChild}} of the [
 Layout API {#layout-api}
 ========================
 
-This section gives an overview of the Layout API given to authors.
+This section describes the objects of the Layout API provided to web developers.
 
 Layout Children {#layout-children}
 ----------------------------------
@@ -586,6 +589,9 @@ user agent must perform the following steps:
     1. Return |this|' {{StylePropertyMapReadOnly}} contained in the {{[[styleMap]]}} internal slot.
 </div>
 
+Note: The {{intrinsicSizes()}} method allows the web developer to query the intrinsic sizes of the
+    {{LayoutChild}}.
+
 <div algorithm>
 When the <dfn method for=LayoutChild>intrinsicSizes()</dfn> method is called on a {{LayoutChild}}
 |this|, the user agent must perform the following steps:
@@ -612,6 +618,9 @@ When the <dfn method for=LayoutChild>intrinsicSizes()</dfn> method is called on 
 
     6. Return |p|.
 </div>
+
+Note: The {{layoutNextFragment()}} method allows the web developer to produce a {{LayoutFragment}}
+    for a given {{LayoutChild}} (the result of performing layout).
 
 <div algorithm>
 When the <dfn method for=LayoutChild>layoutNextFragment(|constraints|, |breakToken|)</dfn> method is
@@ -657,6 +666,9 @@ called on a {{LayoutChild}} |this|, the user agent must perform the following st
 
 Each [=box=] has a <dfn attribute for=box>\[[layoutChildMap]]</dfn> internal slot, which is a
 [=map=] of {{LayoutWorkletGlobalScope}}s to {{LayoutChild}}ren.
+
+Note: [=Get a layout child=] returns a {{LayoutChild}} object for the correct
+    {{LayoutWorkletGlobalScope}} and creates one if it doesn't exist yet.
 
 <div algorithm="get a layout child">
 When the user agent wants to <dfn>get a layout child</dfn> given |workletGlobalScope|, |name|,
@@ -729,6 +741,9 @@ style=] algorithm.
 Layout Fragments {#layout-fragments}
 ------------------------------------
 
+A {{LayoutFragment}} represents a CSS [=fragment=] of a {{LayoutChild}} after layout has occurred on
+that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
+
 <pre class='idl'>
 [Exposed=LayoutWorklet]
 interface LayoutFragment {
@@ -750,9 +765,6 @@ The {{LayoutFragment}} has internal slot(s):
        from a previous layout pass is invalid.
 
 <hr>
-
-A {{LayoutFragment}} represents a CSS [=fragment=] of a {{LayoutChild}} after layout has occurred on
-that child. This is produced by the {{LayoutChild/layoutNextFragment()}} method.
 
 The {{LayoutFragment}} has {{LayoutFragment/inlineSize}} and {{LayoutFragment/blockSize}}
 attributes, which are set by the respective child's layout algorithm. They represent the <b>border
@@ -890,6 +902,9 @@ registerLayout('intrinsic-sizes-example', class {
 Layout Constraints {#layout-constraints}
 ----------------------------------------
 
+A {{LayoutConstraints}} object is passed into the layout method which represents the all the
+constraints for the [=current layout=] to perform layout within.
+
 <pre class='idl'>
 [Exposed=LayoutWorklet]
 interface LayoutConstraints {
@@ -910,9 +925,6 @@ interface LayoutConstraints {
 
 enum BlockFragmentationType { "none", "page", "column", "region" };
 </pre>
-
-A {{LayoutConstraints}} object is passed into the layout method which represents the all the
-constraints for the [=current layout=] to perform layout inside.
 
 The {{LayoutConstraints}} object has {{LayoutConstraints/availableInlineSize}} and
 {{LayoutConstraints/availableBlockSize}} attributes. This represents the [=available space=] for the
@@ -1015,6 +1027,9 @@ and |internalLayoutConstraints|, it <em>must</em> run the following steps:
 
 ### Constraints for Layout Children ### {#layout-constraints-children}
 
+The {{LayoutConstraintsOptions}} dictionary represents the set of constraints which can be passed to
+a {{LayoutChild}} to produce a {{LayoutFragment}}.
+
 <pre class='idl'>
 dictionary LayoutConstraintsOptions {
     double availableInlineSize;
@@ -1032,9 +1047,6 @@ dictionary LayoutConstraintsOptions {
     any data;
 };
 </pre>
-
-The {{LayoutConstraintsOptions}} dictionary represents the set of constraints which can be passed to
-a {{LayoutChild}} to produce a {{LayoutFragment}}.
 
 <div class="example">
 The example below shows the basic usage of the {{LayoutConstraintsOptions}} dictionary.
@@ -1069,6 +1081,12 @@ Issue: Specify how to convert to internal representation of these values.
 Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
 
+A {{LayoutChild}} can produce multiple {{LayoutFragment}}s. A {{LayoutChild}} may fragment in the
+block direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  Additionally
+{{LayoutChild}} which represents [=inline-level=] content, may fragment line by line if the
+<a for="document layout definition">layout options'</a> {{LayoutOptions/childDisplay}} (set by
+<code>layoutOptions</code>) is <code>"normal"</code>.
+
 <pre class="idl">
 [Exposed=LayoutWorklet]
 interface ChildBreakToken {
@@ -1097,18 +1115,15 @@ The {{ChildBreakToken}} has internal slot(s):
 
 <hr>
 
-A {{LayoutChild}} can produce multiple {{LayoutFragment}}s. A {{LayoutChild}} may fragment in the
-block direction if a {{LayoutConstraints/blockFragmentationType}} is not none.  Additionally
-{{LayoutChild}} which represents [=inline-level=] content, may fragment line by line if the
-<a for="document layout definition">layout options'</a> {{LayoutOptions/childDisplay}} (set by
-<code>layoutOptions</code>) is <code>"normal"</code>.
-
 A subsequent {{LayoutFragment}} is produced by using the previous {{LayoutFragment}}'s
 {{LayoutFragment/breakToken}}. This tells the [=child layout=] to produce a {{LayoutFragment}}
 starting at the point encoded in the {{ChildBreakToken}}.
 
 Edges {#edges}
 --------------
+
+A {{LayoutEdges}} object is passed into the layout method. This represents the sum of all the [=box
+model edges=] (border, scrollbar, padding), for the current box which is being laid out.
 
 <pre class='idl'>
 [Exposed=LayoutWorklet]
@@ -1124,9 +1139,6 @@ interface LayoutEdges {
   readonly attribute double block;
 };
 </pre>
-
-A {{LayoutEdges}} object is passed into the layout method. This represents the sum of all the [=box
-model edges=] (border, scrollbar, padding), for the current box which is being laid out.
 
 Each of the accessors represents the width in CSS pixels of an edge in each of the [=abstract
 dimensions=] ({{LayoutEdges/inlineStart}}, {{LayoutEdges/inlineEnd}}, {{LayoutEdges/blockStart}},
@@ -1450,6 +1462,9 @@ run the following steps:
 Performing Layout {#performing-layout}
 --------------------------------------
 
+The section describes how a user agent calls the web developer defined layout to produces intrinsic
+sizes, and fragments.
+
 <pre class='idl'>
 // This is the final return value from the author defined layout() method.
 dictionary FragmentResultOptions {
@@ -1654,16 +1669,16 @@ context=] for a given |box|, |childBoxes| it <em>must</em> run the following ste
         The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         layout {{Worklet}}.
 
-    5. Run [=invoke a intrinsic sizes callback=] given |name|, |box|, |childBoxes|, and
+    5. Run [=invoke an intrinsic sizes callback=] given |name|, |box|, |childBoxes|, and
         |workletGlobalScope| optionally [=in parallel=].
 
-        Note: If the user agent runs [=invoke a intrinsic sizes callback=] on a thread [=in
+        Note: If the user agent runs [=invoke an intrinsic sizes callback=] on a thread [=in
             parallel=], it should select a layout worklet global scope which can be used on that
             thread.
 </div>
 
-<div algorithm="invoke a intrinsic sizes callback">
-When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given |name|, |box|,
+<div algorithm="invoke an intrinsic sizes callback">
+When the user agent wants to <dfn>invoke an intrinsic sizes callback</dfn> given |name|, |box|,
 |childBoxes|, and |workletGlobalScope|, it <em>must</em> run the following steps:
 
     1. Let |definition| be the result of [=get a layout definition=] given |name|, and
@@ -1708,6 +1723,8 @@ When the user agent wants to <dfn>invoke a intrinsic sizes callback</dfn> given 
 
         If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
         these steps.
+
+        Issue: Handle non-promise case.
 
     12. Let |intrinsicSizesValue| be the result of [=run a work queue=] given |promise|, and
         |context|'s [=work queue=].
@@ -1769,8 +1786,8 @@ it <em>must</em> run the following steps:
         |internalLayoutConstraints|, |internalBreakToken|, and |workletGlobalScope| optionally [=in
         parallel=].
 
-        Note: If the user agent runs [=invoke a intrinsic sizes callback=] on a thread [=in
-        parallel=], it should select a layout worklet global scope which can be used on that thread.
+        Note: If the user agent runs [=invoke a layout callback=] on a thread [=in parallel=], it
+            should select a layout worklet global scope which can be used on that thread.
 </div>
 
 <div algorithm="invoke a layout callback">
@@ -1873,6 +1890,9 @@ following steps:
 The section specifies algorithms common to the [=determine the intrinsic sizes=] and [=generate
 a fragment=] algorithms.
 
+Note: [=Get a document layout definition=] returns a [=document layout definition=] from the
+  owning [=document=].
+
 <div algorithm="get a document layout definition">
 When the user agent wants to <dfn>get a document layout definition</dfn> given |name|, it
 <em>must</em> run the following steps:
@@ -1885,6 +1905,10 @@ When the user agent wants to <dfn>get a document layout definition</dfn> given |
 
     3. Return the result of <a for=map>get</a> |documentLayoutDefinitionMap|[|name|].
 </div>
+
+Note: [=Get a layout definition=] returns a [=layout definition=] for a given
+    {{LayoutWorkletGlobalScope}}, it the desired definition doesn't exist it will "invalidate" the
+    [=document layout definition=], (so that the layout can't be used again), and return failure.
 
 <div algorithm="get a layout definition">
 When the user agent wants to <dfn>get a layout definition</dfn> given |name|, and
@@ -1908,6 +1932,10 @@ When the user agent wants to <dfn>get a layout definition</dfn> given |name|, an
 
     3. Return the result of [=get=] |layoutDefinitionMap|[|name|].
 </div>
+
+Note: [=Get a layout class instance=] returns an instance of the web developer provided class.
+    (Registered in {{registerLayout()}}). If one isn't present yet, it will create a new one. This
+    algorithm may fail, as the constructor may throw an exception.
 
 <div algorithm="get a layout class instance">
 When the user agent wants to <dfn>get a layout class instance</dfn> given |box|, |definition|, and
@@ -1948,6 +1976,14 @@ When the user agent wants to <dfn>get a style map</dfn> given |box|, and |inputP
 
 [=Run a work queue=] is designed to allow user agents to work in both a single threaded, and
 multi-threaded environment.
+
+Note: [=Run a work queue=] processes [=layout api work task=]s enqueued with
+    {{LayoutChild/intrinsicSizes()}} and {{LayoutChild/layoutNextFragment()}}. It will continue
+    processing tasks until the promise from the web developers layout or intrinsicSizes method is
+    resolved, or the queue is empty after running the microtask queue.
+
+    The result of running the queue will either be the result of the layout or intrinsicSizes
+    method, or failure.
 
 <div algorithm="run a work queue">
 When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |workQueue|, it
@@ -2017,6 +2053,8 @@ When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |w
                     3. Resolve |childPromise| with |intrinsicSizes|.
 
         2. Wait (optionally [=in parallel=]) for all of the above tasks to complete.
+
+            Note: If the tasks were perform synchronously, then this step is a no-op.
 
         3. [=list/Empty=] |workQueue|.
 
