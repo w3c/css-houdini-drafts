@@ -1559,35 +1559,43 @@ the user agent must perform the following steps:
     1. Return |this|' {{FragmentResult/[[block size]]}} internal slot.
 </div>
 
-Note: The {{FragmentResult(options)}} constructor performs a series of validation checks (the web
-    developer isn't using an object from a previous invocation, and determines the final size of the
-    resulting fragment.
-
 <div algorithm>
-When the <dfn constructor for=FragmentResult>FragmentResult(options)</dfn> constructor is called,
-the user agent must perform the following stpes:
+When the <dfn constructor for=FragmentResult>FragmentResult(|options|)</dfn> constructor is called,
+the user agent must perform the following steps:
 
     1. Let |context| be the [=current layout's=] [=layout API context=].
 
-    2. Let |uniqueId| be |context|'s [=unique id=].
+    2. Return the result of [=construct a fragment result=] given |context|, and |options|.
 
-    3. Let |box| be the [=current layout's=] [=box=].
+</div>
 
-    4. Let |breakTokenOptions| be |options|'s {{FragmentResultOptions/breakToken}}.
+Note: The [=construct a fragment result=] algorithm performs a series of validation checks (the
+    web developer isn't using an object from a previous invocation, and determines the final size of
+    the resulting fragment.
 
-    5. [=list/For each=] |childFragment| in |options|'s {{FragmentResultOptions/childFragments}},
+<div algorithm="construct a fragment result">
+When the user agent wants to <dfn>construct a fragment result</dfn> given |context|, and |options|
+the user agent must perform the following steps:
+
+    1. Let |uniqueId| be |context|'s [=unique id=].
+
+    2. Let |box| be the [=current layout's=] [=box=].
+
+    3. Let |breakTokenOptions| be |options|'s {{FragmentResultOptions/breakToken}}.
+
+    4. [=list/For each=] |childFragment| in |options|'s {{FragmentResultOptions/childFragments}},
         perform the following stubsteps:
 
         1. If |childFragment|'s {{LayoutFragment/[[unique id]]}} internal slot is not equal to
             |uniqueId|, then [=throw=] a [=TypeError=], and abort all these steps.
 
-    6. [=list/For each=] |childBreakToken| in |breakTokenOptions|'s
+    5. [=list/For each=] |childBreakToken| in |breakTokenOptions|'s
         {{BreakTokenOptions/childBreakTokens}}, perform the following stubsteps:
 
         1. If |childBreakToken|'s {{ChildBreakToken/[[unique id]]}} internal slot is not equal to
             |uniqueId|, then [=throw=] a [=TypeError=], and abort all these steps.
 
-    7. If |sizingMode| is <code>"block-like"</code>:
+    6. If |sizingMode| is <code>"block-like"</code>:
 
         - Then:
 
@@ -1605,16 +1613,16 @@ the user agent must perform the following stpes:
 
             2. Let |blockSize| be |fragment|'s {{FragmentResultOptions/blockSize}}.
 
-    8. Let |clonedData| be the result of invoking [=StructuredSerializeForStorage=] on |options|'s
+    7. Let |clonedData| be the result of invoking [=StructuredSerializeForStorage=] on |options|'s
         {{FragmentResultOptions/data}}.
 
-    9. Let |clonedBreakTokenData| be the result of invoking [=StructuredSerializeForStorage=] on
+    8. Let |clonedBreakTokenData| be the result of invoking [=StructuredSerializeForStorage=] on
         |breakTokenOptions|'s {{BreakTokenOptions/data}}.
 
-    10. Let |internalBreakToken| be the internal representation of the [=fragmentation break=]
+    9. Let |internalBreakToken| be the internal representation of the [=fragmentation break=]
         containing |clonedBreakTokenData|, and |breakTokenOptions|.
 
-    11. Return a new {{FragmentResult}} with:
+    10. Return a new {{FragmentResult}} with:
 
         - {{FragmentResult/[[box]]}} being |box|.
 
@@ -1718,19 +1726,25 @@ When the user agent wants to <dfn>invoke an intrinsic sizes callback</dfn> given
 
     10. Let |intrinsicSizesFunction| be |definition|'s [=intrinsic sizes function=].
 
-    11. Let |promise| be the result of [=Invoke=](|intrinsicSizesFunction|, |layoutInstance|, «|children|,
-        |edges|, |styleMap|»).
+    11. Let |value| be the result of [=Invoke=](|intrinsicSizesFunction|, |layoutInstance|,
+            «|children|, |edges|, |styleMap|»).
 
         If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
         these steps.
 
-        Issue: Handle non-promise case.
+    12. If |value| is a promise:
 
-    12. Let |intrinsicSizesValue| be the result of [=run a work queue=] given |promise|, and
-        |context|'s [=work queue=].
+        - Then:
 
-        If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
-        abort all these steps.
+            1. Let |intrinsicSizesValue| be the result of [=run a work queue=] given |value|, and
+                |context|'s [=work queue=].
+
+                If [=run a work queue=] returns failure, let the |box| fallback to the [=flow
+                layout=] and abort all these steps.
+
+        - Otherwise:
+
+            1. Let |intrinsicSizesValue| be |value|.
 
     13. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to a
         {{IntrinsicSizesResultOptions}}. If an exception is [=thrown=], let |box| fallback to the
@@ -1842,30 +1856,50 @@ following steps:
 
     13. Let |layoutFunction| be |definition|'s [=layout function=].
 
-    14. Let |promise| be the result of [=Invoke=](|layoutFunction|, |layoutInstance|,
-        «|children|, |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
+    14. Let |value| be the result of [=Invoke=](|layoutFunction|, |layoutInstance|, «|children|,
+            |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
 
         If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
         these steps.
 
-    15. Let |fragmentValue| be the result of [=run a work queue=] given |promise|.
+    15. If |value| is a promise:
 
-        If [=run a work queue=] returns failure, let the |box| fallback to the [=flow layout=] and
-        abort all these steps.
+        - Then:
 
-    16. Let |fragmentResultOptions| be the result of [=converting=] |fragmentValue| to a
-        {{FragmentResultOptions}}. If an exception is [=thrown=], let |box| fallback to the [=flow
-        layout=] and abort all these steps.
+            1. Let |fragmentResultValue| be the result of [=run a work queue=] given |value|.
 
-    17. Let |fragmentResult| be the result of constructing {{FragmentResult(options)}} given
-        |fragmentResultOptions|.
+                If [=run a work queue=] returns failure, let the |box| fallback to the [=flow
+                layout=] and abort all these steps.
 
-        If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
-        these steps.
+        - Otherwise:
 
-        Issue: The above two steps may not be needed as it already might be a {{FragmentResult}}.
+            1. Let |fragmentResultValue| be |value|.
 
-    18. Return an internal representation of a [=fragment=] with:
+    16. If |fragmentResultValue| is a [=platform object=]:
+
+        - Then:
+
+            1. Let |fragmentResult| be the result [=converting=] |fragmentResultValue| to a
+                {{FragmentResult}}.
+
+                If an exception is [=thrown=], let |box| fallback to the [=flow layout=] and abort all
+                these steps.
+
+        - Otherwise:
+
+            1. Let |fragmentResultOptions| be the result of [=converting=] |fragmentResultValue| to
+                a {{FragmentResultOptions}}.
+
+                If an exception is [=thrown=], let |box| fallback to the [=flow layout=] and abort
+                all these steps.
+
+            2. Let |fragmentResult| be the result of [=construct a fragment result=] given
+                |fragmentResultOptions|.
+
+                If an exception is [=thrown=], let |box| fallback to the [=flow layout=] and abort
+                all these steps.
+
+    17. Return an internal representation of a [=fragment=] with:
 
         - The [=inline size=] set to |fragmentResult|'s {{FragmentResult/[[inline size]]}}.
 
