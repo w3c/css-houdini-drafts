@@ -3,7 +3,7 @@
 
 # Overview
 
-AnimationWorklet is a new primitive for creating scroll-linked and other high performance
+Animation Worklet is a new primitive for creating scroll-linked and other high performance
 procedural animations on the web.  It is being incubated here as part of the
 [CSS Houdini task force](https://github.com/w3c/css-houdini-drafts/wiki), and if successful will be
 transferred to that task force for full standardization.
@@ -24,8 +24,10 @@ environment, *worklet*. It aims to be compatible with Web Animations and uses ex
 much as possible. We believe this API hits a sweet spot in balancing among performance, richness,
 and rationality for addressing our key use cases.
 
-Key principal behind the design of AnimationWorklet can be found in this [vision](vision.md)
-document. This design supersedes our [CompositorWorker proposal][cw-proposal].
+See the [Animation Worklet design principles and goals](principles.md) for an overview of the
+motivations behind Animation Worklet and how the design will be evolved to support a growing set of
+rich use cases. Also see [the status document](status.md) for high level implementation status and
+timeline.
 
 # Motivating Use Cases
 
@@ -102,10 +104,10 @@ makes it possible for worklet animation to drive effects spanning multiple eleme
 
 **TODO**: At the moment, `GroupEffect` only supports just two different scheduling models (i.e.,
 parallel, sequence). These models governs how the group effect time is translated to its children
-effect times by modifying the child effect start time. AnimationWorklet allows a much more flexible
-scheduling model by making it possible to to set children effect's local time directly. In other
-words we allow arbitrary start time for child effects. This is something that needs to be added to
-level 2 spec.
+effect times by modifying the child effect start time. Animation Worklet allows a much more
+flexible scheduling model by making it possible to to set children effect's local time directly. In
+other words we allow arbitrary start time for child effects. This is something that needs to be
+added to level 2 spec.
 
 ## Multiple Timelines
 Unlike typical animations, worklet animations can be attached to multiple timelines. This is
@@ -390,24 +392,10 @@ partial interface AnimationEffectReadOnly {
 
 
 # Specification
-The [draft specification](https://https://drafts.css-houdini.org/css-animationworklet) is
+The [draft specification](https://drafts.css-houdini.org/css-animationworklet) is
 the most recent version.
 
 
-# Chrome Implementation Timeline
-This is a rough sketch of how Chrome plans to deliver this feature:
-
-1.  AnimationWorklet Prototype (done): scripted custom animation, single effect, only fast
-    properties, off-thread.
-2.  AnimationWorklet [Origin Trial][ot-blogpost] (in progress, [signup][ot-signup]): good
-    performance, scroll input (ScrollTimeline), basic web-animation controls (play/cancel).
-3.  AnimationWorklet MVP (in development): animate all properties (slow path ones running in sync
-    with main thread), multiple effects (i.e., GroupEffect), full web-animation integration.
-4.  AnimationWorklet V2 (future): touch/gesture input, multiple inputs in single animation,
-    sophisticated scheduling, other outputs.
-
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
-[ot-blogpost]: https://developers.google.com/web/updates/2018/10/animation-worklet
-[ot-signup]:https://docs.google.com/forms/d/e/1FAIpQLSfO0_ptFl8r8G0UFhT0xhV17eabG-erUWBDiKSRDTqEZ_9ULQ/viewform
 

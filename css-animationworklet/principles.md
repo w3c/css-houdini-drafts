@@ -1,4 +1,4 @@
-# Animation Worklet Vision
+# Animation Worklet Design Principles and Goals
 ***for rich interactive effects on the Web Platform***
 
 
@@ -19,22 +19,22 @@ of [RAILS model][rails]) and their rich interaction model.
 The two main methods for creating animations on the web fall short in at least one of these aspects:
 
 - CSS (Web) Animations: Aimed at supporting stateless declarative time-driven effects. The
-  expressiveness is sufficient for common time-based effects. The resulting animation can be  smooth
-  if authors limit themselves to cheap-to-update properties<sup>[1](#footnote1)</sup>. However, it
-  is awkward to use this model for other inputs beside time.
+  expressiveness is sufficient for common time-based effects. The resulting animation can be smooth
+  <sup>[1](#footnote1)</sup>. However it's unclear how this model can be scaled to handle the
+  multi-dimensional inputs, conditional values, and statefulness required by the use cases below.
 - requestAnimationFrame: Aimed at creating scripted animation effects. It can support rich
   interaction models but it is difficult to make smooth or responsive. This expressiveness of
   Javascript coupled with access to all input methods, application state and dom makes this API
   capable of building rich interactive effects. However these can only run on main thread alongside
   all other scripts<sup>[2](#footnote2)</sup> which severely hampers their responsiveness and
-  smoothness.
+  smoothness. Chrome [studies](https://tdresser.github.io/input-latency-deep-reports/) have shown that script is the main culprit to user responsiveness issues.
 
 Animation Worklet aims to help bridge the gap between these two.
 
 # Animation Worklet Vision
 
-[Animation Worklet][specification] objective is to rectify this platform shortcoming by enabling
-animations that can be:
+[Animation Worklet][specification] aims to rectify this shortcomings by enabling animations that can
+be:
 
 *   rich (imperative, stateful)
 *   fast-by-default (isolated from main thread)
@@ -122,10 +122,9 @@ calculate pointer velocity, acceleration and other computed values inside an ani
 
 ## Footnotes
 
-* <a name="footnote1">1</a>: In Chrome these are composited properties e.g., transform, opacity, filter but other engines
-may have a slightly difference subset.
-
-* <a name="footnote2">2</a>: Chrome [studies](https://tdresser.github.io/input-latency-deep-reports/) have shown that script is the main culprit to user responsiveness issues.
+* <a name="footnote1">1</a>: If authors limit themselves to cheap-to-update properties. In Chrome
+  these are composited properties e.g., transform, opacity, filter but other engines may have a
+  slightly difference subset.
 
 
 [performance]: https://paul.kinlan.me/what-news-readers-want/
