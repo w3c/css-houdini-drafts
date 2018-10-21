@@ -49,11 +49,8 @@ timeline.
   -   Efficient Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
   -   Compositing growing / shrinking box with border (using 9 patch)
 
-* Animating scroll offsets:
 
-  -   Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
-      scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
-  -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
+These usecases are enabled by the current proposed but [additional usecases](principles.md#animation-worklet-vision) are going to be addressed by extension of the API.
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`

@@ -31,7 +31,7 @@ The two main methods for creating animations on the web fall short in at least o
 
 Animation Worklet aims to help bridge the gap between these two.
 
-# Animation Worklet Vision
+## Animation Worklet Vision
 
 [Animation Worklet][specification] aims to rectify this shortcomings by enabling animations that can
 be:
@@ -64,6 +64,10 @@ Examples of rich interactive effects that are (or will be made) possible with An
     *   [Spring-Sticky effect](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/).
     *   Touch-driven physical environments.
     *   [Expando](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/): Procedural animations with multiple elements.
+*   Animated scroll offsets:
+    * Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
+      scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
+    * Custom smooth scroll animations (e.g., physic based fling curves)
 
 
 ## First Principle - Richness
