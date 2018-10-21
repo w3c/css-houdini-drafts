@@ -3,7 +3,7 @@
 
 # Overview
 
-AnimationWorklet is a new primitive for creating scroll-linked and other high performance
+Animation Worklet is a new primitive for creating scroll-linked and other high performance
 procedural animations on the web.  It is being incubated here as part of the
 [CSS Houdini task force](https://github.com/w3c/css-houdini-drafts/wiki), and if successful will be
 transferred to that task force for full standardization.
@@ -24,7 +24,10 @@ environment, *worklet*. It aims to be compatible with Web Animations and uses ex
 much as possible. We believe this API hits a sweet spot in balancing among performance, richness,
 and rationality for addressing our key use cases.
 
-This design supersedes our [CompositorWorker proposal][cw-proposal].
+See the [Animation Worklet design principles and goals](principles.md) for an overview of the
+motivations behind Animation Worklet and how the design will be evolved to support a growing set of
+rich use cases. Also see [the status document](status.md) for high level implementation status and
+timeline.
 
 # Motivating Use Cases
 
@@ -46,11 +49,8 @@ This design supersedes our [CompositorWorker proposal][cw-proposal].
   -   Efficient Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
   -   Compositing growing / shrinking box with border (using 9 patch)
 
-* Animating scroll offsets:
 
-  -   Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
-      scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
-  -   Implementing smooth scroll animations (e.g., custom physic based fling curves)
+These usecases are enabled by the current proposed but [additional usecases](principles.md#animation-worklet-vision) are going to be addressed by extension of the API.
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`
@@ -101,10 +101,10 @@ makes it possible for worklet animation to drive effects spanning multiple eleme
 
 **TODO**: At the moment, `GroupEffect` only supports just two different scheduling models (i.e.,
 parallel, sequence). These models governs how the group effect time is translated to its children
-effect times by modifying the child effect start time. AnimationWorklet allows a much more flexible
-scheduling model by making it possible to to set children effect's local time directly. In other
-words we allow arbitrary start time for child effects. This is something that needs to be added to
-level 2 spec.
+effect times by modifying the child effect start time. Animation Worklet allows a much more
+flexible scheduling model by making it possible to to set children effect's local time directly. In
+other words we allow arbitrary start time for child effects. This is something that needs to be
+added to level 2 spec.
 
 ## Multiple Timelines
 Unlike typical animations, worklet animations can be attached to multiple timelines. This is
@@ -389,9 +389,10 @@ partial interface AnimationEffectReadOnly {
 
 
 # Specification
-The [draft specification](https://https://drafts.css-houdini.org/css-animationworklet) is
+The [draft specification](https://drafts.css-houdini.org/css-animationworklet) is
 the most recent version.
 
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
+
