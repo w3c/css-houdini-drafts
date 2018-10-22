@@ -1049,6 +1049,80 @@ dictionary LayoutConstraintsOptions {
 };
 </pre>
 
+Note: The [=translate a LayoutConstraintsOptions to internal constraints=] describes how to convert
+    a {{LayoutConstraintsOptions}} object into a user agents internal representation.
+
+<div algorithm="translate a LayoutConstraintsOptions to internal constraints">
+When the user agent wants to <dfn>translate a LayoutConstraintsOptions to internal constraints</dfn>
+given |options|, it <em>must</em> run the following steps:
+
+    1. Let the [=available space=] in the inline direction (with respect to the [=current layout=],
+        be the result of:
+
+        - If |options|' {{LayoutConstraintsOptions/availableInlineSize}} is not null, and
+            {{LayoutConstraintsOptions/availableInlineSize}} is greater than zero, let the result be
+            {{LayoutConstraintsOptions/availableInlineSize}}.
+
+        - Otherwhise, let the result be zero.
+
+    2. Let the [=available space=] in the block direction (with respect to the [=current layout=]),
+        be the result of:
+
+        - If |options|' {{LayoutConstraintsOptions/availableBlockSize}} is not null, and
+            {{LayoutConstraintsOptions/availableBlockSize}} is greater than zero, let the result be
+            {{LayoutConstraintsOptions/availableBlockSize}}.
+
+        - Otherwhise, let the result be zero.
+
+    3. Let the override size in the inline direction (with respect to the [=current layout=], be the
+        result of:
+
+        - Let the result be |options|' {{LayoutConstraintsOptions/fixedInlineSize}}.
+
+        Note: If the {{LayoutConstraintsOptions/fixedInlineSize}} is null, no override size is
+            applied.
+
+    4. Let the override size in the block direction (with respect to the [=current layout=], be the
+        result of:
+
+        - Let the result be |options|' {{LayoutConstraintsOptions/fixedBlockSize}}.
+
+        Note: If the {{LayoutConstraintsOptions/fixedBlockSize}} is null, no override size is
+            applied.
+
+    5. Let the percentage resultion size in the inline direction (with respect to the [=current
+        layout=], be the result of:
+
+        - If |options|' {{LayoutConstraintsOptions/percentageInlineSize}} is not null, and
+            {{LayoutConstraintsOptions/percentageInlineSize}} is greater than zero, let the result
+            be {{LayoutConstraintsOptions/percentageInlineSize}}.
+
+        - If |options|' {{LayoutConstraintsOptions/availableInlineSize}} is not null, and
+            {{LayoutConstraintsOptions/availableInlineSize}} is greater than zero, let the result be
+            {{LayoutConstraintsOptions/availableInlineSize}}.
+
+        - Otherwhise, let the result be zero.
+
+    6. Let the percentage resultion size in the block direction (with respect to the [=current
+        layout=], be the result of:
+
+        - If |options|' {{LayoutConstraintsOptions/percentageBlockSize}} is not null, and
+            {{LayoutConstraintsOptions/percentageBlockSize}} is greater than zero, let the result
+            be {{LayoutConstraintsOptions/percentageBlockSize}}.
+
+        - If |options|' {{LayoutConstraintsOptions/availableBlockSize}} is not null, and
+            {{LayoutConstraintsOptions/availableBlockSize}} is greater than zero, let the result be
+            {{LayoutConstraintsOptions/availableBlockSize}}.
+
+        - Otherwhise, let the result be zero.
+
+    7. If the [=child layout=] is a [=layout API container=], then let the store the data (passed by
+        {{LayoutConstraints/data}}) be the result of:
+
+        - Invoking [=StructuredSerializeForStorage=] on |options|'
+            {{LayoutConstraintsOptions/data}}.
+</div>
+
 <div class="example">
 The example below shows the basic usage of the {{LayoutConstraintsOptions}} dictionary.
 
@@ -1076,8 +1150,6 @@ registerLayout('child-layout-constraints-example', class {
 });
 </pre>
 </div>
-
-Issue: Specify how to convert to internal representation of these values.
 
 Breaking and Fragmentation {#breaking-and-fragmentation}
 --------------------------------------------------------
@@ -2034,7 +2106,7 @@ When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |w
 
             2. Let |box| be |layoutChild|'s [=box=] in the {{LayoutChild/[[box]]}} internal slot.
 
-            3. Let |childPromise| be |task|'s [=layout api work task/=promise].
+            3. Let |childPromise| be |task|'s [=layout api work task/promise=].
 
             2. If |task|'s [=layout api work task/task type=] is <code>"layout"</code>,
 
@@ -2048,6 +2120,11 @@ When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |w
 
                     4. Let |internalFragment| be the result of the user agent producing a
                         [=fragment=] based on |box|, |childConstraints|, and |childBreakToken|.
+
+                        Invoking [=translate a LayoutConstraintsOptions to internal constraints=]
+                        given |childConstraints|, must be run to translate the given
+                        {{LayoutConstraintsOptions}} into the internal constraints for the user
+                        agent's layout engine.
 
                     5. Let |fragment| be a new {{LayoutFragment}} with:
 
