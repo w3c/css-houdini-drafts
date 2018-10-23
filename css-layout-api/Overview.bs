@@ -502,6 +502,9 @@ The {{LayoutChild}} has internal slot(s):
        api context=]. This slot is used so that a {{LayoutChild}} used outside the current layout
        pass is invalid.
 
+The {{LayoutChild/[[styleMap]]}} may be pre-populated when the [=computed value=] for properties
+listed in the in [=layout definition/child input properties=] for the {{LayoutChild/[[box]]}}.
+
 <div class=example>
 The example below shows the basic usage of a {{LayoutChild}}.
 <pre class='lang-javascript'>
@@ -583,11 +586,32 @@ engines to perform text shaping across element boundaries.
     </pre>
 </div>
 
+Note: When accessing the {{LayoutChild/styleMap}} the user agent can create a new
+    {{StylePropertyMapReadOnly}} if none exists yet.
+
 <div algorithm>
 The <dfn attribute for=LayoutChild>styleMap</dfn>, on getting from a {{LayoutChild}} |this|, the
 user agent must perform the following steps:
 
-    1. Return |this|' {{StylePropertyMapReadOnly}} contained in the {{[[styleMap]]}} internal slot.
+    1. If |this|' {{[[styleMap]]}} is null, then:
+
+        1. Let |box| be |this|' {{LayoutChild/[[box]]}}.
+
+        2. Let |definition| be the result of [=get a layout definition=].
+
+        3. Let |childInputProperties| be |definition|'s [=layout definition/child input
+            properties=].
+
+        4. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+            [=computed values=] for properties listed in |childInputProperties| for |box|.
+
+        5. Set |this|' {{LayoutChild/[[styleMap]]}} internal slot to |styleMap|.
+
+        Note: If the user agent always pre-populates {{LayoutChild/[[styleMap]]}} then this branch
+            of the algorithm won't be reached.
+
+    2. Return |this|' {{StylePropertyMapReadOnly}} contained in the {{LayoutChild/[[styleMap]]}}
+        internal slot.
 </div>
 
 Note: The {{intrinsicSizes()}} method allows the web developer to query the intrinsic sizes of the
@@ -715,6 +739,14 @@ When a [=box=] is inserted into the [=box tree=] the user agent <em>may</em> pre
 When a [=box=] is removed from the [=box tree=] the user agent <em>must</em> clear the
 {{[[layoutChildMap]]}}.
 
+The user agent <em>must</em> clear the {{[[layoutChildMap]]}} internal slot every 1000 layout
+passes.
+
+Note: The above rule exists to ensure that web developers do not rely on being about to store
+    non-regeneratable state on the {{LayoutChild}} object.
+
+    The 1000 limit was picked as a high upper bound, this limit may improve (downwards) over time.
+
 <div algorithm="update a layout child style">
 When the user agent wants to <dfn>update a layout child style</dfn> given |box|, it <em>must</em>
 run the following steps:
@@ -729,12 +761,8 @@ run the following steps:
 
     4. <a for=map>For each</a> |layoutChild| in |layoutChildMap|:
 
-        1. Let |styleMap| be |layoutChild|'s {{[[styleMap]]}}.
-
-        2. Update |styleMap|'s [=declarations=] based on the |box|'s new computed style.
+        1. |layoutChild|'s {{[[styleMap]]}} to null.
 </div>
-
-Issue: Probably change the above algorithm, and just clear the styleMap internal slot instead.
 
 When the computed style of a [=box=] changes the user agent must run the [=update a layout child
 style=] algorithm.
@@ -2114,7 +2142,7 @@ When the user agent wants to <dfn>run a work queue</dfn> given |promise|, and |w
 
                     1. Let |childConstraints| be |task|'s [=layout api work task/layout constraints=].
 
-                    2. Let |childBreakToken| be |task|'s [=layout api work task/=child break token].
+                    2. Let |childBreakToken| be |task|'s [=layout api work task/child break token=].
 
                     3. Let |targetRealm| be |layoutChild|'s [=Realm=].
 
