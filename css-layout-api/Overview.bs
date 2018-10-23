@@ -2246,9 +2246,9 @@ creates child layout constraints which specify that a child should be a fixed in
 <pre class="lang-javascript">
 registerLayout('flex-distribution-like', class {
     async intrinsicSizes(children, edges, styleMap) {
-      const childrenSizes = children.map((child) => {
+      const childrenSizes = await Promise.all(children.map((child) => {
           return child.intrinsicSizes();
-      });
+      }));
 
       const maxContentSize = childrenSizes.reduce((sum, childSizes) => {
           return sum + childSizes.maxContentSize;
