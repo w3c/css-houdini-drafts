@@ -1783,14 +1783,8 @@ context=] for a given |box|, |childBoxes| it <em>must</em> run the following ste
         steps.
 
     4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of [=worklet's
-        WorkletGlobalScopes=] from the layout {{Worklet}}.
-
-        The user agent <em>must</em> have, and select from at least two
-        {{LayoutWorkletGlobalScope}}s in the [=worklet's WorkletGlobalScopes=] [=list=], unless the
-        user agent is under memory constraints.
-
-        Note: This is to ensure that authors do not rely on being able to store state on the global
-            object or non-regeneratable state on the class.
+        WorkletGlobalScopes=] from the layout {{Worklet}}, following the rules defined in
+        [[#global-scope-selection]].
 
         The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         layout {{Worklet}}.
@@ -1902,14 +1896,8 @@ it <em>must</em> run the following steps:
         steps.
 
     4. Let |workletGlobalScope| be a {{LayoutWorkletGlobalScope}} from the list of [=worklet's
-        WorkletGlobalScopes=] from the layout {{Worklet}}.
-
-        The user agent <em>must</em> have, and select from at least two
-        {{LayoutWorkletGlobalScope}}s in the [=worklet's WorkletGlobalScopes=] [=list=], unless the
-        user agent is under memory constraints.
-
-        Note: This is to ensure that authers do not rely on being able to store state on the global
-            object or non-regeneratable state on the class.
+        WorkletGlobalScopes=] from the layout {{Worklet}}, following the rules defined in
+        [[#global-scope-selection]].
 
         The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
         layout {{Worklet}}.
@@ -2036,6 +2024,22 @@ following steps:
         - Store |fragmentResult|'s {{FragmentResult/[[data]]}} with the [=fragment=].
 
 </div>
+
+### Global Scope Selection ### {#global-scope-selection}
+
+When the user agent needs to select a {{LayoutWorkletGlobalScope}} from the layout [=worklet's
+WorkletGlobalScopes=] [=list=] it <em>must</em>:
+
+    - Select from at <em>least</em> two {{LayoutWorkletGlobalScope}}s, unless the user agent is
+        under memory constraints.
+
+    - <em>Not</em> re-use the same {{LayoutWorkletGlobalScope}} more than 1000 times in a row.
+
+        Note: The 1000 limit was picked as a high upper bound, this limit may improve (downwards)
+            over time.
+
+Note: These rules exist to ensure that authors do not rely on being able to store state on the
+    global object or non-regeneratable state on the class. See [[worklets-1#code-idempotency]].
 
 ### Utility Algorithms ### {#utility-algorithms}
 
