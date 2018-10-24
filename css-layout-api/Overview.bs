@@ -304,6 +304,24 @@ Each [=box=] representing a [=layout API container=] has a [=map=] of <dfn>layou
 instances</dfn>. Initially this map is empty; it is populated when the user agent calls either
 [=determine the intrinsic sizes=] or [=generate a fragment=] for a [=box=].
 
+Each [=box=] representing a [=layout API container=] has a <dfn>styleMap</dfn> internal slot.
+This is a {{StylePropertyMapReadOnly}} which contains the properties listed in
+<code>inputProperties</code>.
+
+The user agent <em>clear</em> the [=styleMap=] internal slot for a [=box=] when:
+
+  - The [=computed values=] of [=document layout definition/input properties=] for the [=box=]
+      changes.
+
+  - When the [=box=] is removed from the [=box tree=].
+
+  - Every 1000 layout passes.
+
+    Note: The above rule exists to ensure that web developers do not rely on being able to store
+        non-regeneratable state on the {{StylePropertyMapReadOnly}} object.
+        The 1000 limit was picked as a high upper bound, this limit may improve (downwards) over
+        time.
+
 <div class='note'>
     Note: The shape of the class should be:
     <pre class='lang-javascript'>
@@ -742,9 +760,8 @@ When a [=box=] is removed from the [=box tree=] the user agent <em>must</em> cle
 The user agent <em>must</em> clear the {{[[layoutChildMap]]}} internal slot every 1000 layout
 passes.
 
-Note: The above rule exists to ensure that web developers do not rely on being about to store
+Note: The above rule exists to ensure that web developers do not rely on being able to store
     non-regeneratable state on the {{LayoutChild}} object.
-
     The 1000 limit was picked as a high upper bound, this limit may improve (downwards) over time.
 
 <div algorithm="update a layout child style">
@@ -764,8 +781,8 @@ run the following steps:
         1. |layoutChild|'s {{[[styleMap]]}} to null.
 </div>
 
-When the computed style of a [=box=] changes the user agent must run the [=update a layout child
-style=] algorithm.
+When the [=computed values=] of [=document layout definition/child input properties=] for a [=box=]
+changes the user agent must run the [=update a layout child style=] algorithm.
 
 Layout Fragments {#layout-fragments}
 ------------------------------------
@@ -2100,12 +2117,14 @@ When the user agent wants to <dfn>get a layout class instance</dfn> given |box|,
 When the user agent wants to <dfn>get a style map</dfn> given |box|, and |inputProperties|, it
 <em>must</em> run the following steps:
 
-    1. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
-        [=computed values=] for properties listed in |inputProperties| for |box|.
+    1. If |box|'s [=styleMap=] is null, then:
 
-    2. Return |styleMap|.
+        1. Let |styleMap| be a new {{StylePropertyMapReadOnly}} populated with <em>only</em> the
+            [=computed values=] for properties listed in |inputProperties| for |box|.
 
-    Issue: We may want to store |styleMap| on |box| instead.
+        2. Set |box|'s [=styleMap=] internal slot to |styleMap|.
+
+    2. Return |box|'s {{StylePropertyMapReadOnly}} contained in the [=styleMap=] internal slot.
 
 </div>
 
