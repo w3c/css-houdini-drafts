@@ -73,6 +73,7 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     url: map-objects; text:map object
     url: get-o-p; text: Get
     url: set-o-p-v-throw; text: Set
+    url: samevalue; text: SameValue
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
 urlPrefix: https://www.w3.org/TR/hr-time-2/#dom-; type: dfn
@@ -187,11 +188,11 @@ partial namespace CSS {
 Animator {#animator-desc}
 ========
 
-An <dfn>Animator</dfn> represents an animation instance that is running on animation thread. Animators
-are identified by a unique name and determine how the animation progresses its keyframe effects
-given current input time. <a>Animator</a> instances live in {{AnimationWorkletGlobalScope}} and
-each one is associated with a {{WorkletAnimation}} instance. An animator can only be instantiated
-by construction of a {{WorkletAnimation}}.
+An <dfn>Animator</dfn> represents an animation instance that is running on the animation thread.
+Animators are identified by a unique name and determine how the animation progresses its keyframe
+effects given current input time. <a>Animator</a> instances live in {{AnimationWorkletGlobalScope}}
+and each one is associated with a {{WorkletAnimation}} instance. An animator can only be
+instantiated by construction of a {{WorkletAnimation}}.
 
 
 Two animators types are supported: {{StatelessAnimator}} and {{StatefulAnimator}} each
@@ -201,10 +202,10 @@ providing a different state management strategy.
 StatelessAnimator Interface {#stateless-animator-desc}
 ---------------------------
 
-This interface represnt a stateless animator. This type of animator does not depend on any local
+This interface represents a stateless animator. This type of animator does not depend on any local
 state either stored on the instance or global scope. Effectively, the animate function of an
-{{StatelessAnimator}} can be treated as a pure function with the expectation that given the
-same input, it produces the same output.
+{{StatelessAnimator}} can be treated as a pure function with the expectation that given the same
+input, it produces the same output.
 
 
 
@@ -230,33 +231,33 @@ interface StatelessAnimator {
     </pre>
 </div>
 
-Note: The statelessness allows animation worklet to perform optimization such as producing multiple
-animation frames in parallel and performing very cheap teardown and setup. Using StatelessAnimator
-is highly recommended to enable such optimizations.
+Note: The statelessness allows an animation worklet to perform optimization such as producing
+multiple animation frames in parallel and performing very cheap teardown and setup. Using
+StatelessAnimator is highly recommended to enable such optimizations.
 
 StatefulAnimator Interface {#stateful-animator-desc}
 ---------------------------
 
-This interface represent a stateful animator. This animator can have local state and animation
+This interface represents a stateful animator. This animator can have local state and animation
 worklet guarantees that it maintains this state as long as the stateful animator fulfills the
-contract required by this interface.
+contract required by this interface as described following.
 
 
 <a>Animation worklet</a> maintains a set of {{WorkletGlobalScope}}s which may exist across different
-threads or processes. Animation worklet may teardown a global scope (e.g., to preserve resources) or
-move a running <a>animator instance</a> across different global scopes (e.g., if different effects
-are only mutable in a certain thread). Animation worklet guarantees that a stateful animator
-instance's state is maintained even if the instance is respawned in a different global scope as long
-as the animator instance fulfills the required contract.
+threads or processes. Animation worklet may temporarily terminate a global scope (e.g., to preserve
+resources) or move a running <a>animator instance</a> across different global scopes (e.g., if its
+effect is mutable only in a certain thread). Animation worklet guarantees that a stateful animator
+instance's state is maintained even if the instance is respawned in a different global scope.
 
 The basic mechanism for maintaining the state is that the animation worklet snapshots the local
 state that is exposed via {{StatefulAnimator/state}} attribute and then reifies it at a later time
 to be passed into the constructor when the animator instance is respawned in a potentially different
-global scope. This processes is specied is details in <a>migrate an animator instance</a> algorithm.
+global scope. This processes is specified is details in <a>migrate an animator instance</a>
+algorithm.
 
 A user-defined stateful animator is expected to fulfill the required contract which is that its
 state attribute is an object representing its state that can be serialized using structured
-serialized algorithm and that it can also re-generatea its state given that same object passed to
+serialized algorithm and that it can also recreate its state given that same object passed to
 its constructor.
 
 <xmp class='idl'>
@@ -273,7 +274,7 @@ interface StatefulAnimator {
     <pre class='lang-javascript'>
         class BarAnimator extends StatefulAnimator {
             constructor(options, state) {
-              // Called when a new animator is instantiated (either first time of after being respawned).
+              // Called when a new animator is instantiated (either first time or after being respawned).
               this.currentVelocity  = state ? state.velocity : 0;
             }
             animate(currentTime, effect) {
@@ -340,19 +341,19 @@ following steps:
 
     4. Let |prototype| be the result of <a>Get</a>(|animatorCtorValue|, "prototype").
 
-    5. Let |type| be the the result of <a>Type</a>(|prototype|) .
 
-    6. If |type| is {{StatelessAnimator}} set |stateful| to be <a>false</a>, otherwise if |type| is
-         {{StatefulAnimator}} set |stateful| to be <b>true</b>, otherwise <a>throw</a> a
-         <a>TypeError</a> and abort all these steps.
+    5. If <a>SameValue</a>(|prototype|, {{StatelessAnimator}}) is <b>true</b> set |stateful| to be
+        <b>false</b>, otherwise if <a>SameValue</a>(|prototype|, {{StatefulAnimator}}) is 
+        <b>true</b> set |stateful| to be <b>true</b>, otherwise <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
 
-    7. Let |animateValue| be the result of <a>Get</a>(|prototype|, "animate").
+    6. Let |animateValue| be the result of <a>Get</a>(|prototype|, "animate").
 
-    8. Let |animate| be the result of <a>converting</a> |animateValue| to the <a>Function</a>
+    7. Let |animate| be the result of <a>converting</a> |animateValue| to the <a>Function</a>
         <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
         all these steps.
 
-    9. Let |definition| be a new <a>animator definition</a> with:
+    8. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
@@ -551,8 +552,8 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
 </div>
 
-Note: If an animator state getter throws the user agent will remove the animator but does not
-recreate it. This effectively removes the animator instance.
+If an animator state getter throws the user agent will remove the animator but does not recreate it.
+This effectively removes the animator instance.
 
 
 Requesting Animation Frames {#requesting-animation-frames}
@@ -870,7 +871,7 @@ animation.play();
 
 // Inside AnimationWorkletGlobalScope
 
-registerAnimator('hidey-bar', class HidebarAnimator extends StatefulAnimator {
+registerAnimator('hidey-bar', class HidybarAnimator extends StatefulAnimator {
   constructor(options, state) {
     this.scrollTimeline_ = options.scrollTimeline;
     this.documentTimeline_ = options.documentTimeline;
