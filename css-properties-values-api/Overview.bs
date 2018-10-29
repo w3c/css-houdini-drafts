@@ -410,7 +410,7 @@ For &lt;color> values, the value is computed as described in
 
 For &lt;angle>, &lt;time> and &lt;resolution> values, the computed value is the
 value expressed in its [=canonical unit=], with ''calc()'' expressions
-evaluated.
+evaluated [[css-values-4#calc-computed-value|as described in CSS Values]].
 
 For &lt;custom-ident>, ident, or "*" values, the computed value is as specified.
 
