@@ -429,7 +429,7 @@ one of the following:
 
 * if the specified value is a ''calc()'' expression, the computed value is the
 	evaluated result of that expression.
-* otheriwise, the computed value is as specified.
+* otherwise, the computed value is as specified.
 
 For &lt;transform-function> values (including those contained in &lt;transform-list> values),
 the computed value is as specified but with all lengths resolved to their
