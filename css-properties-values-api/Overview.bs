@@ -405,9 +405,14 @@ For &lt;length-percentage> values, the computed value is one of the following:
 *   otherwise, the computed value is a calc expression containing an absolute
 	length expressed in pixels, and a percentage value.
 
-For &lt;custom-ident>, ident, &lt;color>, &lt;integer>,
-&lt;angle>, &lt;time>, &lt;resolution> or "*" values, the
-computed value is as specified.
+For &lt;color> values, the value is computed as described in
+	[[css-color-4#resolving-color-values]].
+
+For &lt;angle>, &lt;time> and &lt;resolution> values, the computed value is the
+value expressed in its [=canonical unit=], with ''calc()'' expressions
+evaluated [[css-values-4#calc-computed-value|as described in CSS Values]].
+
+For &lt;custom-ident>, ident, or "*" values, the computed value is as specified.
 
 For &lt;url> values, the computed value is one of the following:
 
@@ -419,10 +424,12 @@ For &lt;image> values, the computed value is as specified, except that relative
 URLs that appear in the value are resolved to absolute URLs as described in
 [[!css3-values]], and all lengths are resolved to their computed values.
 
-For &lt;number> and &lt;percentage> values which are not calc expressions, the
-computed value is as specified. Calc expressions that are
-&lt;number> and &lt;percentage> values get reduced during computation to simple
-numbers and percentages respectively.
+For &lt;integer>, &lt;number> and &lt;percentage> values, the computed value is
+one of the following:
+
+* if the specified value is a ''calc()'' expression, the computed value is the
+	evaluated result of that expression.
+* otherwise, the computed value is as specified.
 
 For &lt;transform-function> values (including those contained in &lt;transform-list> values),
 the computed value is as specified but with all lengths resolved to their
