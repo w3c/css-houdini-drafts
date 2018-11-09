@@ -589,6 +589,18 @@ to full URLs as described in [[!css3-values]].
 
 </div>
 
+
+Fallbacks in ''var()'' references {#fallbacks-in-var-references}
+----------------------------------------------------------------
+
+References to registered custom properties using the ''var()'' function may
+provide a fallback. However, the fallback value must match the
+[[#supported-syntax-strings|registered syntax]] of the custom property being
+referenced, otherwise the declaration is
+<a spec=css-variables>invalid at computed-value time</a>.
+
+Note: This applies regardless of whether or not the fallback is being used.
+
 Examples {#examples}
 ====================
 
