@@ -22,7 +22,7 @@ We get them of `StylePropertyMaps` on elements.
 
 To get the specified height from an element we would use the following JS:
 ```
-element.attributeStyleMap.get('height'); // returns a string
+element.attributeStyleMap.get('height'); // returns a CSSUnitValue
 ```
 
 Similarly to get the computed value of a CSS property we would do the following: 
