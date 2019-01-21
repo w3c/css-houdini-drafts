@@ -729,7 +729,7 @@ partial interface CSSStyleRule {
     [SameObject] readonly attribute StylePropertyMap styleMap;
 };
 
-partial interface ElementCSSInlineStyle {
+partial interface mixin ElementCSSInlineStyle {
     [SameObject] readonly attribute StylePropertyMap attributeStyleMap;
 };
 </pre>
@@ -738,8 +738,8 @@ partial interface ElementCSSInlineStyle {
 represent style property-value pairs embedded in a style rule or inline style,
 and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> attribute of {{CSSStyleRule}} objects,
 or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute
-of objects implementing the {{ElementCSSInlineStyle}} interface
-(such as {{Element}}s).
+of objects implementing the {{ElementCSSInlineStyle}} interface mixin
+(such as {{HTMLElement}}s).
 
 When constructed, the {{[[declarations]]}} internal slot for [=declared StylePropertyMap=] objects
 is initialized to contain an entry
