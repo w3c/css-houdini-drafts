@@ -57,7 +57,7 @@ those that are passed in as a part of the styleMap. Document styles do not apply
 <pre class='idl'>
 interface FontMetrics {
   readonly attribute double width;
-  readonly attribute sequence&lt;double> advances;
+  readonly attribute FrozenArray&lt;double> advances;
 
   readonly attribute double boundingBoxLeft;
   readonly attribute double boundingBoxRight;
@@ -71,8 +71,8 @@ interface FontMetrics {
   readonly attribute double fontBoundingBoxDescent;
 
   readonly attribute Baseline dominantBaseline;
-  readonly attribute sequence&lt;Baseline> baselines;
-  readonly attribute sequence&lt;Font> fonts;
+  readonly attribute FrozenArray&lt;Baseline> baselines;
+  readonly attribute FrozenArray&lt;Font> fonts;
 };
 </pre>
 
