@@ -140,25 +140,11 @@ as arguments of the same names.
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
 
-	3. If |syntax| is not present,
-		or is equal to <code>"*"</code> (U+002A ASTERISK),
-		let |parsed syntax| be undefined,
-		and skip to the next step of this algorithm.
+	3. Attempt to parse |syntax| according to the rules in [[#parsing-the-syntax-string]].
+		If it does not parse successfully, <a>throw</a> a {{SyntaxError}}.
+		Otherwise, let |syntax descriptor| be the resulting <a>syntax descriptor</a>.
 
-		Otherwise, attempt to parse |syntax|
-		according to the rules in [[#supported-syntax-strings]].
-		If it does not parse successfully,
-		<a>throw</a> a {{SyntaxError}}.
-		Otherwise,
-		let |parsed syntax| be the parsed syntax.
-
-		Note: For example, a valid syntax string is something like <code>"&lt;length>"</code>,
-		or <code>"&lt;number>+"</code>;
-		the allowed syntax is a subset of [[css-values-3#value-defs]].
-		Future levels of this specification are expected to expand the complexity of allowed syntax strings,
-		allowing custom properties that more closely resemble the full breadth of what CSS properties allow.
-
-	4. If |parsed syntax| is undefined,
+	4. If |syntax descriptor| is the <a>universal syntax descriptor</a>,
 		and |initialValue| is not present,
 		let |parsed initial value| be empty.
 		This must be treated identically to the "default" initial value of custom properties,
@@ -166,7 +152,7 @@ as arguments of the same names.
 		Skip to the next step of this algorithm.
 
 		Otherwise,
-		if |parsed syntax| is undefined,
+		if |syntax descriptor| is the <a>universal syntax descriptor</a>,
 		parse |initialValue| as a <<declaration-value>>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
@@ -181,7 +167,7 @@ as arguments of the same names.
 
 		Otherwise,
 		parse {{PropertyDescriptor/initialValue}}
-		according to |parsed syntax|.
+		according to |syntax descriptor|.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
@@ -195,7 +181,7 @@ as arguments of the same names.
 
 	6. Let |registered property| be a record
 		with a property name of |parsed name|,
-		a syntax of |parsed syntax|,
+		a syntax of |syntax descriptor|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
 		Add |registered property|
@@ -279,111 +265,6 @@ the property becomes [=invalid at computed-value time=]
 	then 'color' is validly set to ''black'',
 	rather than being [=invalid at computed-value time=]
 	and becoming ''inherit''.
-</div>
-
-Supported syntax strings {#supported-syntax-strings}
-----------------------------------------------------
-
-The following syntax strings are supported:
-
-:   Primitive Terms
-::  The following syntax strings are primitive terms that can be 
-    combined as described below:
-
-		:   "&lt;length>"
-		::  Any valid <<length>> value
-		:   "&lt;number>"
-		::  <<number>> values
-		:   "&lt;percentage>"
-		::  Any valid <<percentage>> value
-		:   "&lt;length-percentage>"
-		::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
-			  expression combining <<length>> and <<percentage>> components.
-		:   "&lt;color>"
-		::  Any valid <<color>> value
-		:   "&lt;image>"
-		::  Any valid <<image>> value
-		:   "&lt;url>"
-		::  Any valid <<url>> value
-		:   "&lt;integer>"
-		::  Any valid <<integer>> value
-		:   "&lt;angle>"
-		::  Any valid <<angle>> value
-		:   "&lt;time>"
-		::  Any valid <<time>> value
-		:   "&lt;resolution>"
-		::  Any valid <<resolution>> value
-		:   "&lt;transform-function>"
-		::  Any valid <<transform-function>> value
-		:   "&lt;custom-ident>"
-		::  Any valid <<custom-ident>> value
-		:   Any sequence consisting of a <a>name-start code point</a>,
-			  followed by zero or more <a>name code points</a>,
-			  which matches the <<custom-ident>> production
-		::  That identifier
-
-		Note: <<custom-ident>>s are compared codepoint-wise with each other;
-		this is different than the normal behavior of UA-defined CSS
-		which limits itself to ASCII
-		and is <a>ASCII case-insensitive</a>.
-		So, specifying an ident like <code>Red</code>
-		means that the precise value ''Red'' is accepted;
-		''red'', ''RED'', and any other casing variants are not matched by this.
-		It is recommended that idents be restricted to ASCII and written in lower-case,
-		to match CSS conventions.
-
-
-:   "&lt;transform-list>"
-::  A list of valid <<transform-function>> values. This is a convenience
-    production which is equivalent to "&lt;transform-function>+"
-
-:   Any primitive term followed by '+'
-::  A space-separated list of one or more repetitions of the type specified by the string.
-	Note: Since &lt;transform-list> is already a space separated list, &lt;transform-list>+
-	is invalid.
-
-:   Any primitive term followed by '#'
-::  A comma-separated list of one or more repetitions of the type specified by the string.
-
-:   Any combination of terms separated by '|'
-::  Any value that matches one of the items in the combination, matched in specified order.
-
-	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
-	matching the value ''red'' against it will parse as an identifier,
-	while matching the value ''blue'' will parse as a <<color>>.
-:   "*"
-::  Any valid token stream
-
-Note: [[css3-values]] maintains a distinction between properties that accept
-only a length, and properties that accept both a length and a percentage,
-however the distinction doesn't currently cleanly line up with the productions.
-Accordingly, this specification introduces the length-percentage production
-for the purpose of cleanly specifying this distinction.
-
-Regardless of the syntax specified, all custom properties will accept
-<a>CSS-wide keywords</a> as well as ''revert'', and process these values
-appropriately.
-
-Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
-of the {{PropertyDescriptor}} dictionary.
-
-<div class='example'>
-	For example, the following are all valid syntax strings.
-
-	:   <code>"&lt;length>"</code>
-	::  accepts length values
-	:   <code>"&lt;length> | &lt;percentage>"</code>
-	::  accepts lengths, percentages, percentage calc expressions, and length calc
-		expressions, but not calc expressions containing a combination of length
-		and percentage values.
-	:   <code>"&lt;length-percentage>"</code>
-	::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
-		accept, as well as calc expressions containing a combination of both length
-		and percentage values.
-	:   <code>"big | bigger | BIGGER"</code>
-	::  accepts the ident "big", or the ident "bigger", or the ident "BIGGER".
-	:   <code>"&lt;length>+"</code>
-	::  accepts a space-separated list of length values.
 </div>
 
 Calculation of Computed Values {#calculation-of-computed-values}
@@ -512,6 +393,295 @@ component:
 	and ''font-size'' will behave as if the value ''unset'' was specified.
 </div>
 
+
+Syntax Strings {#syntax-strings}
+================================
+
+A <dfn>syntax string</dfn> describes the value types accepted by a registered
+custom property. Syntax strings consists of
+<a href="#supported-syntax-component-names">syntax component names</a>, that are
+optionally [[#multipliers|multiplied]] and [[#combinator|combined]].
+
+A syntax string can be parsed into a <a>syntax descriptor</a>, which is either:
+
+	1. A list of <a>syntax components</a>, each of which accept the value types
+		specified in [[#supported-names]], or
+	2. The <a>universal syntax descriptor</a> ('*'), which accepts any valid token
+		stream.
+
+Regardless of the syntax specified, all custom properties will accept
+<a>CSS-wide keywords</a> as well as ''revert'', and process these values
+appropriately.
+
+Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
+of the {{PropertyDescriptor}} dictionary.
+
+<div class='example'>
+	For example, the following are all valid syntax strings.
+
+	:   <code>"&lt;length>"</code>
+	::  accepts length values
+	:   <code>"&lt;length> | &lt;percentage>"</code>
+	::  accepts lengths, percentages, percentage calc expressions, and length calc
+		expressions, but not calc expressions containing a combination of length
+		and percentage values.
+	:   <code>"&lt;length-percentage>"</code>
+	::  accepts all values that <code>"&lt;length> | &lt;percentage>"</code> would
+		accept, as well as calc expressions containing a combination of both length
+		and percentage values.
+	:   <code>"big | bigger | BIGGER"</code>
+	::  accepts the ident <code>big</code>, or the ident <code>bigger</code>, or
+		the ident <code>BIGGER</code>.
+	:   <code>"&lt;length>+"</code>
+	::  accepts a space-separated list of length values.
+	:   "*"
+	::  accepts any valid token stream
+</div>
+
+Note: The internal grammar of syntax strings is a subset of
+	[[css-values-3#value-defs]]. Future levels of this specification are expected
+	to expand the complexity of the allowed grammar, allowing custom properties
+	that more closely resemble the full breadth of what CSS properties allow.
+
+The remainder of this chapter describes the internal grammar of the syntax
+strings.
+
+Supported names {#supported-names}
+----------------------------------
+
+This section defines a list of <dfn>supported syntax component names</dfn>, and the
+corresponding types accepted by the resulting <a>syntax component</a>.
+
+:   "&lt;length>"
+::  Any valid <<length>> value
+:   "&lt;number>"
+::  <<number>> values
+:   "&lt;percentage>"
+::  Any valid <<percentage>> value
+:   "&lt;length-percentage>"
+::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
+	  expression combining <<length>> and <<percentage>> components.
+
+		Note: [[css3-values]] maintains a distinction between properties that accept
+		only a length, and properties that accept both a length and a percentage,
+		however the distinction doesn't currently cleanly line up with the productions.
+		Accordingly, this specification introduces the length-percentage production
+		for the purpose of cleanly specifying this distinction.
+
+:   "&lt;color>"
+::  Any valid <<color>> value
+:   "&lt;image>"
+::  Any valid <<image>> value
+:   "&lt;url>"
+::  Any valid <<url>> value
+:   "&lt;integer>"
+::  Any valid <<integer>> value
+:   "&lt;angle>"
+::  Any valid <<angle>> value
+:   "&lt;time>"
+::  Any valid <<time>> value
+:   "&lt;resolution>"
+::  Any valid <<resolution>> value
+:   "&lt;transform-function>"
+::  Any valid <<transform-function>> value
+:   "&lt;custom-ident>"
+::  Any valid <<custom-ident>> value
+:   Any sequence which [[css-syntax-3#would-start-an-identifier|starts an identifier]],
+		[[css-syntax-3#consume-name|can be consumed as a name]], and matches the <<custom-ident>> production
+::  That identifier
+
+		Note: <<custom-ident>>s are compared codepoint-wise with each other;
+		this is different than the normal behavior of UA-defined CSS
+		which limits itself to ASCII
+		and is <a>ASCII case-insensitive</a>.
+		So, specifying an ident like <code>Red</code>
+		means that the precise value ''Red'' is accepted;
+		''red'', ''RED'', and any other casing variants are not matched by this.
+		It is recommended that idents be restricted to ASCII and written in lower-case,
+		to match CSS conventions.
+
+:   "&lt;transform-list>"
+::  A list of valid <<transform-function>> values. Note that
+		<code>"&lt;transform-list>"</code> is a <a>non-terminal data type name</a>
+		equivalent to <code>"&lt;transform-function>+"</code>
+
+Note: The that a syntax string of <code>"*"</code> will produce the
+	<a>universal syntax descriptor</a>, which is not a <a>syntax component</a>.
+	Therefore, <code>"*"</code> may not be [[#multipliers|multiplied]] or
+	[[#combinator|combined]] with anything else.
+
+The '+' and '#' multipliers {#multipliers}
+------------------------------------------
+
+Any <a>syntax component name</a> except
+<a>non-terminal data type names</a> may be immediately followed by a multiplier:
+
+	:   U+002B PLUS SIGN (+)
+	::  Indicates a space-separated list.
+
+	:   U+0023 NUMBER SIGN (#)
+	::  Indicates a comma-separated list.
+
+<div class='example'>
+	:   <code>"&lt;length>+"</code>
+	::  accepts a space-separated list of length values
+	:   <code>"&lt;color>#"</code>
+	::  accepts a comma-separated list of color values
+</div>
+
+Note: The multiplier must appear immediately after the <a>syntax component name</a>
+being multiplied.
+
+The '|' combinator {#combinator}
+--------------------------------
+
+<a>Syntax strings</a> may use U+007C VERTICAL LINE (|) to provide multiple
+<a>syntax component names</a>. Such syntax strings will result in a
+<a>syntax descriptor</a> with multiple <a>syntax components</a>.
+
+When a <a>syntax descriptor</a> with multiple <a>syntax components</a> is used
+to parse a CSS value, the syntax components are matched in the order specified.
+
+	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
+	matching the value ''red'' against it will parse as an identifier,
+	while matching the value ''blue'' will parse as a <<color>>.
+
+<div class='example'>
+	:   <code>"&lt;length> | auto"</code>
+	::  accepts a length, or auto
+	:   <code>"foo | &lt;color># | &lt;integer>"</code>
+	::  accepts foo, a comma-separated list of color values, or a single integer
+</div>
+
+Parsing the syntax string
+-------------------------
+
+### Definitions ### {#parsing-definitions}
+
+:   <dfn>data type name</dfn>
+::  A sequence of <a>code points</a> consisting of a U+003C LESS-THAN SIGN (&lt;), followed be zero or more <a>name code points</a>, and terminated by U+003E GREATER-THAN SIGN (&gt;).
+
+:   <dfn>non-terminal data type name</dfn>
+::  A data type which expands into some expression consisting of terminal <a>data type names</a>.
+
+:   <dfn>syntax component</dfn>
+::  An object consisting of a <a>syntax component name</a>, and an optional [[#multipliers|multiplier]].
+
+:   <dfn>syntax component name</dfn>
+::  A sequence of <a>code points</a> which is either a <a>data type name</a>,
+	or a sequence that can produce a <<custom-ident>>.
+
+:   <dfn>syntax descriptor</dfn>
+::  An object consisting of a list of <a>syntax components</a>.
+
+:   <dfn>universal syntax descriptor</dfn>
+::  A special descriptor which accepts any valid token stream.
+
+### Consume a syntax descriptor ### {#consume-syntax-descriptor}
+
+<div algorithm>
+	This section describes how to <dfn>consume a syntax descriptor</dfn> from a
+	stream of <a>code points</a>. It either produces a <a>syntax descriptor</a>
+	with a list of <a>syntax components</a>, or the <a>universal syntax descriptor</a>.
+
+	Consume the <a>next input code point</a>:
+
+	:   U+002A ASTERISK (*)
+	::  If the <a>next input code point</a> is EOF, return the
+		<a>universal syntax descriptor</a>. Otherwise return an error.
+
+	:   anything else
+	::  <a>Reconsume the current input code point</a>.
+
+	Let |descriptor| be an initially empty list of <a>syntax components</a>.
+
+	Repeatedly consume the <a>next input code point</a>:
+
+	:   <a>whitespace</a>
+	::  Do nothing.
+
+	:   U+007C VERTICAL LINE (|)
+	::  If |descriptor| is an empty list, return an error. Otherwise
+		<a>consume a syntax component</a> and append the result to |descriptor|.
+
+	:   EOF
+	::  Return |descriptor|.
+
+	:   anything else
+	::  <a>Consume a syntax component</a>, and append the result to |descriptor|.
+</div>
+
+### Consume a syntax component ### {#consume-syntax-component}
+
+<div algorithm>
+	To <dfn>consume a syntax component</dfn> from a stream of <a>code points</a>:
+
+	Consume as much <a>whitespace</a> as possible.
+
+	Let |component| be a new <a>syntax component</a> with its |name| initially
+	empty.
+
+	Consume the <a>next input code point</a>:
+
+	:   U+003C LESS-THAN SIGN (&lt;)
+	::  <a>Consume a data type name</a>, and assign the result to the |component|'s |name|.
+
+	:   <a>name-start code point</a>
+	::  <a>Reconsume the current input code point</a>.
+		[[css-syntax-3#consume-name|Consume a name]]. If the result matches the
+		<<custom-ident>> production, assign the result to the |component|'s |name|.
+		Otherwise return an error.
+
+	:   U+005C REVERSE SOLIDUS (\)
+	::  <a>Reconsume the current input code point</a>.
+		[[css-syntax-3#consume-name|Consume a name]]. If the result matches the
+		<<custom-ident>> production, assign the result to the |component|'s |name|.
+		Otherwise return an error.
+
+	:   anything else
+	::  Return an error.
+
+	Consume the <a>next input code point</a>:
+
+	:   U+002B PLUS SIGN (+)
+	::  If |component| has a <a>non-terminal data type name</a>, or if |component| is
+		already marked as a list of any kind, return an error. Otherwise, mark |component| as a
+		[[css-values-3#value-defs|space-separated list]].
+
+	:   U+0023 NUMBER SIGN (#)
+	::  If |component| has a <a>non-terminal data type name</a>, or if |component| is
+		already marked as a list of any kind, return an error. Otherwise, mark |component| as a
+		[[css-values-3#value-defs|comma-separated list]].
+
+	:   EOF
+	::  Return |component|.
+
+	:   anything else
+	::  <a>Reconsume the current input code point</a>. Return |component|.
+</div>
+
+### Consume a data type name ### {#consume-data-type-name}
+
+<div algorithm>
+	To <dfn>consume a data type name</dfn> from a stream of <a>code points</a>:
+
+	Let |name| initially be a string containing a single <a>code point</a>:
+	U+003C LESS-THAN SIGN (&lt;).
+
+	Repeatedly consume the <a>next input code point</a>:
+
+	:   U+003E GREATER-THAN SIGN (&gt;)
+	::  Append the <a>code point</a> to |name|. If |name| matches one of the
+		<a>data type names</a> listed in [[#supported-names]], return |name|.
+		Otherwise return an error.
+
+	:   <a>name code point</a>
+	::  Append the <a>code point</a> to |name|.
+
+	:   anything else
+	::  Return an error.
+</div>
+
 Behavior of Custom Properties {#behavior-of-custom-properties}
 ==============================================================
 
@@ -595,9 +765,8 @@ Fallbacks in ''var()'' references {#fallbacks-in-var-references}
 
 References to registered custom properties using the ''var()'' function may
 provide a fallback. However, the fallback value must match the
-[[#supported-syntax-strings|registered syntax]] of the custom property being
-referenced, otherwise the declaration is
-<a spec=css-variables>invalid at computed-value time</a>.
+<a>syntax descriptor</a> of the custom property being referenced, otherwise the
+declaration is <a spec=css-variables>invalid at computed-value time</a>.
 
 Note: This applies regardless of whether or not the fallback is being used.
 
