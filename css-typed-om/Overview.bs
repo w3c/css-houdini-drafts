@@ -123,7 +123,7 @@ Introduction {#intro}
 =====================
 
 CSS stylesheets are parsed into abstract UA-internal data structures,
-the <dfn>underlying values</dfn> of CSS,
+the <dfn for=CSS export>underlying values</dfn> of CSS,
 which various specification algorithms manipulate.
 
 Underlying values can't be directly manipulated,
@@ -192,7 +192,7 @@ with property |property|, cssText |cssText|, and parseMultiple set to true,
 and return the result.
 
 <div algorithm="parse a CSSStyleValue">
-    To <dfn>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|,
+    To <dfn export>parse a CSSStyleValue</dfn> given a [=string=] |property|, a [=string=] |cssText|,
     and a |parseMultiple| flag, run these steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -630,7 +630,7 @@ probably in an appendix.
     as defined in [[css-syntax-3#tokenization]].
     {{CSSStyleValue}} objects can also be matched against these grammars, however.
 
-    A {{CSSStyleValue}} is said to <dfn for=CSSStyleValue>match a grammar</dfn>
+    A {{CSSStyleValue}} is said to <dfn for=CSSStyleValue export>match a grammar</dfn>
     based on the following rules:
 
     * A {{CSSKeywordValue}} matches an [=ident=] specified in a grammar
@@ -654,14 +654,14 @@ probably in an appendix.
     this section will become more complex.
 </div>
 
-A [=string=] is a <dfn>custom property name string</dfn>
+A [=string=] is a <dfn export>custom property name string</dfn>
 if it starts with two dashes (U+002D HYPHEN-MINUS), like <code>--foo</code>.
 (This corresponds to the <<custom-property-name>> production,
 but applies to [=strings=],
 rather than [=identifiers=];
 it can be used without invoking the CSS parser.)
 
-A [=string=] is a <dfn>valid CSS property</dfn>
+A [=string=] is a <dfn export>valid CSS property</dfn>
 if it is a [=custom property name string=],
 or is a CSS property name recognized by the user agent.
 
@@ -734,7 +734,7 @@ partial interface ElementCSSInlineStyle {
 };
 </pre>
 
-<dfn>Declared StylePropertyMap</dfn> objects
+<dfn export>Declared StylePropertyMap</dfn> objects
 represent style property-value pairs embedded in a style rule or inline style,
 and are accessed via the <dfn attribute for=CSSStyleRule>styleMap</dfn> attribute of {{CSSStyleRule}} objects,
 or the <dfn attribute for="ElementCSSInlineStyle">attributeStyleMap</dfn> attribute
@@ -1084,7 +1084,7 @@ The following are the arithmetic operations you can perform on dimensions:
 </div>
 
 <div algorithm>
-    To <dfn noexport for=CSSMath>negate</dfn> a {{CSSNumericValue}} |this|:
+    To <dfn export for=CSSMath local-lt="negate">negate a {{CSSNumericValue}}</dfn> |this|:
 
     1. If |this| is a {{CSSMathNegate}} object,
         return |this|’s {{CSSMathNegate/value}} internal slot.
@@ -1164,7 +1164,7 @@ The following are the arithmetic operations you can perform on dimensions:
 </div>
 
 <div algorithm>
-    To <dfn noexport for=CSSMath>invert</dfn> a {{CSSNumericValue}} |this|:
+    To <dfn export for=CSSMath local-lt="invert">invert a {{CSSNumericValue}}</dfn> |this|:
 
     1. If |this| is a {{CSSMathInvert}} object,
         return |this|’s {{CSSMathInvert/value}} internal slot.
@@ -1439,15 +1439,15 @@ The following are the arithmetic operations you can perform on dimensions:
 </div>
 
 <div algorithm="sum value">
-    A <dfn>sum value</dfn>
+    A <dfn export for="CSSNumericValue">sum value</dfn>
     is an abstract representation of a {{CSSNumericValue}}
     as a sum of numbers with (possibly complex) units.
     Not all {{CSSNumericValue}}s can be expressed as a [=sum value=].
 
     A [=sum value=] is a [=list=].
-    Each entry in the list is a [=tuple=] of a <dfn for="sum value">value</dfn>,
+    Each entry in the list is a [=tuple=] of a <dfn export for="sum value">value</dfn>,
     which is a number,
-    and a <dfn for="sum value">unit map</dfn>,
+    and a <dfn export for="sum value">unit map</dfn>,
     which is a [=ordered map|map=] of units (strings) to powers (integers).
 
     <div class=example>
@@ -1469,7 +1469,7 @@ The following are the arithmetic operations you can perform on dimensions:
         * ''calc(1px * 2deg)'' becomes `«(2, «["deg" → 1, "px" → 1]»)»`
     </div>
 
-    To <dfn lt="create a sum value|creating a sum value">create a sum value</dfn> from a {{CSSNumericValue}} |this|,
+    To <dfn export lt="create a sum value|creating a sum value">create a sum value</dfn> from a {{CSSNumericValue}} |this|,
     the steps differ based on |this|’s class:
 
     <dl class=switch>
@@ -1614,7 +1614,7 @@ The following are the arithmetic operations you can perform on dimensions:
     </dl>
 
     <div algorithm>
-        To <dfn>create a type from a unit map</dfn> |unit map|:
+        To <dfn export>create a type from a unit map</dfn> |unit map|:
 
         1. Let |types| be an initially empty [=list=].
 
@@ -1628,7 +1628,7 @@ The following are the arithmetic operations you can perform on dimensions:
     </div>
 
     <div algorithm>
-        The <dfn>product of two unit maps</dfn> |units1| and |units2|
+        The <dfn export>product of two unit maps</dfn> |units1| and |units2|
         is the result given by the following steps:
 
         1. Let |result| be a copy of |units1|.
@@ -1800,7 +1800,7 @@ and to the CSS [=math functions=].
 </div>
 
 <div algorithm>
-    To <dfn>apply the percent hint</dfn> |hint| to a |type|,
+    To <dfn export>apply the percent hint</dfn> |hint| to a |type|,
     perform the following steps:
 
     1. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
