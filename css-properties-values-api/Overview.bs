@@ -140,9 +140,9 @@ as arguments of the same names.
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
 
-	3. Attempt to parse |syntax| according to the rules in [[#parsing-the-syntax-string]].
-		If it does not parse successfully, <a>throw</a> a {{SyntaxError}}.
-		Otherwise, let |syntax descriptor| be the resulting <a>syntax descriptor</a>.
+	3. Attempt to [=consume a syntax descriptor=] from |syntax|.
+		If it returns failure, <a>throw</a> a {{SyntaxError}}.
+		Otherwise, let |syntax descriptor| be the returned <a>syntax descriptor</a>.
 
 	4. If |syntax descriptor| is the <a>universal syntax descriptor</a>,
 		and |initialValue| is not present,
@@ -153,7 +153,7 @@ as arguments of the same names.
 
 		Otherwise,
 		if |syntax descriptor| is the <a>universal syntax descriptor</a>,
-		parse |initialValue| as a <<declaration-value>>.
+		[=CSS/parse=] |initialValue| as a <<declaration-value>>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
@@ -166,7 +166,7 @@ as arguments of the same names.
 		and exit this algorithm.
 
 		Otherwise,
-		parse {{PropertyDescriptor/initialValue}}
+		[=CSS/parse=] {{PropertyDescriptor/initialValue}}
 		according to |syntax descriptor|.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
@@ -179,12 +179,12 @@ as arguments of the same names.
 
 	5. Set |inherit flag| to the value of |inherits|.
 
-	6. Let |registered property| be a record
+	6. Let |registered property| be a [=struct=]
 		with a property name of |parsed name|,
 		a syntax of |syntax descriptor|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
-		Add |registered property|
+		[=set/Append=] |registered property|
 		to |property set|.
 </div>
 
@@ -399,7 +399,7 @@ Syntax Strings {#syntax-strings}
 
 A <dfn>syntax string</dfn> describes the value types accepted by a registered
 custom property. Syntax strings consists of
-<a href="#supported-syntax-component-names">syntax component names</a>, that are
+[=syntax component names=], that are
 optionally [[#multipliers|multiplied]] and [[#combinator|combined]].
 
 A syntax string can be parsed into a <a>syntax descriptor</a>, which is either:
@@ -409,12 +409,9 @@ A syntax string can be parsed into a <a>syntax descriptor</a>, which is either:
 	2. The <a>universal syntax descriptor</a> ('*'), which accepts any valid token
 		stream.
 
-Regardless of the syntax specified, all custom properties will accept
-<a>CSS-wide keywords</a> as well as ''revert'', and process these values
+Note: Regardless of the syntax specified, all custom properties accept
+<a>CSS-wide keywords</a>, and process these values
 appropriately.
-
-Note: This does not apply to the {{PropertyDescriptor/initialValue}} member
-of the {{PropertyDescriptor}} dictionary.
 
 <div class='example'>
 	For example, the following are all valid syntax strings.
@@ -439,9 +436,9 @@ of the {{PropertyDescriptor}} dictionary.
 </div>
 
 Note: The internal grammar of syntax strings is a subset of
-	[[css-values-3#value-defs]]. Future levels of this specification are expected
-	to expand the complexity of the allowed grammar, allowing custom properties
-	that more closely resemble the full breadth of what CSS properties allow.
+[[css-values-3#value-defs|the CSS Value Definition Syntax]]. Future levels of this specification are expected
+to expand the complexity of the allowed grammar, allowing custom properties
+that more closely resemble the full breadth of what CSS properties allow.
 
 The remainder of this chapter describes the internal grammar of the syntax
 strings.
@@ -449,7 +446,7 @@ strings.
 Supported names {#supported-names}
 ----------------------------------
 
-This section defines a list of <dfn>supported syntax component names</dfn>, and the
+This section defines the <dfn for=CSS local-lt="syntax component name" lt="supported syntax component name">supported syntax component names</dfn>, and the
 corresponding types accepted by the resulting <a>syntax component</a>.
 
 :   "&lt;length>"
@@ -460,14 +457,7 @@ corresponding types accepted by the resulting <a>syntax component</a>.
 ::  Any valid <<percentage>> value
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
-	  expression combining <<length>> and <<percentage>> components.
-
-		Note: [[css3-values]] maintains a distinction between properties that accept
-		only a length, and properties that accept both a length and a percentage,
-		however the distinction doesn't currently cleanly line up with the productions.
-		Accordingly, this specification introduces the length-percentage production
-		for the purpose of cleanly specifying this distinction.
-
+	expression combining <<length>> and <<percentage>> components.
 :   "&lt;color>"
 ::  Any valid <<color>> value
 :   "&lt;image>"
@@ -502,10 +492,10 @@ corresponding types accepted by the resulting <a>syntax component</a>.
 
 :   "&lt;transform-list>"
 ::  A list of valid <<transform-function>> values. Note that
-		<code>"&lt;transform-list>"</code> is a <a>non-terminal data type name</a>
+		<code>"&lt;transform-list>"</code> is a <a>pre-multiplied data type name</a>
 		equivalent to <code>"&lt;transform-function>+"</code>
 
-Note: The that a syntax string of <code>"*"</code> will produce the
+Note: A syntax string of <code>"*"</code> will produce the
 	<a>universal syntax descriptor</a>, which is not a <a>syntax component</a>.
 	Therefore, <code>"*"</code> may not be [[#multipliers|multiplied]] or
 	[[#combinator|combined]] with anything else.
@@ -514,13 +504,13 @@ The '+' and '#' multipliers {#multipliers}
 ------------------------------------------
 
 Any <a>syntax component name</a> except
-<a>non-terminal data type names</a> may be immediately followed by a multiplier:
+<a>pre-multiplied data type names</a> may be immediately followed by a multiplier:
 
-	:   U+002B PLUS SIGN (+)
-	::  Indicates a space-separated list.
+:   U+002B PLUS SIGN (+)
+::  Indicates a space-separated list.
 
-	:   U+0023 NUMBER SIGN (#)
-	::  Indicates a comma-separated list.
+:   U+0023 NUMBER SIGN (#)
+::  Indicates a comma-separated list.
 
 <div class='example'>
 	:   <code>"&lt;length>+"</code>
@@ -542,9 +532,9 @@ The '|' combinator {#combinator}
 When a <a>syntax descriptor</a> with multiple <a>syntax components</a> is used
 to parse a CSS value, the syntax components are matched in the order specified.
 
-	Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
-	matching the value ''red'' against it will parse as an identifier,
-	while matching the value ''blue'' will parse as a <<color>>.
+Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
+matching the value ''red'' against it will parse as an identifier,
+while matching the value ''blue'' will parse as a <<color>>.
 
 <div class='example'>
 	:   <code>"&lt;length> | auto"</code>
@@ -553,16 +543,16 @@ to parse a CSS value, the syntax components are matched in the order specified.
 	::  accepts foo, a comma-separated list of color values, or a single integer
 </div>
 
-Parsing the syntax string
--------------------------
+Parsing the syntax string {#parsing-syntax}
+-------------------------------------------
 
 ### Definitions ### {#parsing-definitions}
 
 :   <dfn>data type name</dfn>
-::  A sequence of <a>code points</a> consisting of a U+003C LESS-THAN SIGN (&lt;), followed be zero or more <a>name code points</a>, and terminated by U+003E GREATER-THAN SIGN (&gt;).
+::  A sequence of <a>code points</a> consisting of a U+003C LESS-THAN SIGN (&lt;), followed be zero or more <a>name code points</a>, and terminated by U+003E GREATER-THAN SIGN (>).
 
-:   <dfn>non-terminal data type name</dfn>
-::  A data type which expands into some expression consisting of terminal <a>data type names</a>.
+:   <dfn>pre-multiplied data type name</dfn>
+::  A [=data type name=] that represents another [=syntax component=] with a [[#multipliers|multiplier]] already included.
 
 :   <dfn>syntax component</dfn>
 ::  An object consisting of a <a>syntax component name</a>, and an optional [[#multipliers|multiplier]].
@@ -580,84 +570,88 @@ Parsing the syntax string
 ### Consume a syntax descriptor ### {#consume-syntax-descriptor}
 
 <div algorithm>
-	This section describes how to <dfn>consume a syntax descriptor</dfn> from a
-	stream of <a>code points</a>. It either produces a <a>syntax descriptor</a>
+	This section describes how to <dfn export>consume a syntax descriptor</dfn> from a [=string=] |string|.
+	It either produces a <a>syntax descriptor</a>
 	with a list of <a>syntax components</a>, or the <a>universal syntax descriptor</a>.
 
-	Consume the <a>next input code point</a>:
+	1. [=Strip leading and trailing ASCII whitespace=] from |string|.
 
-	:   U+002A ASTERISK (*)
-	::  If the <a>next input code point</a> is EOF, return the
-		<a>universal syntax descriptor</a>. Otherwise return an error.
+	2. If |string|’s [=string/length=] is 0,
+		return failure.
 
-	:   anything else
-	::  <a>Reconsume the current input code point</a>.
+	3. If |string|’s [=string/length=] is 1,
+		and the only [=code point=] in |string| is U+002A ASTERISK (*),
+		return the [=universal syntax descriptor=].
 
-	Let |descriptor| be an initially empty list of <a>syntax components</a>.
+	4. Let |stream| be an [=input stream=] created from the [=code points=] of |string|,
+		preprocessed as specified in [[css-syntax-3]].
+		Let |descriptor| be an initially empty [=list=] of <a>syntax components</a>.
 
-	Repeatedly consume the <a>next input code point</a>:
+	5. Repeatedly consume the <a>next input code point</a>:
 
-	:   <a>whitespace</a>
-	::  Do nothing.
+		:   <a>whitespace</a>
+		::  Do nothing.
 
-	:   U+007C VERTICAL LINE (|)
-	::  If |descriptor| is an empty list, return an error. Otherwise
-		<a>consume a syntax component</a> and append the result to |descriptor|.
+		:   EOF
+		:: If |descriptor|’s [=list/length=] is greater than zero,
+			return |descriptor|;
+			otherwise, return failure.
 
-	:   EOF
-	::  Return |descriptor|.
+		:   U+007C VERTICAL LINE (|)
+		:: <a>Consume a syntax component</a>.
+			If failure was returned,
+			return failure;
+			otherwise,
+			[=list/append=] the returned value to |descriptor|.
 
-	:   anything else
-	::  <a>Consume a syntax component</a>, and append the result to |descriptor|.
+		:   anything else
+		:: <a>Reconsume the current input code point</a>.
+			<a>Consume a syntax component</a>.
+			If failure was returned,
+			return failure;
+			otherwise,
+			[=list/append=] the returned value to |descriptor|.
 </div>
 
 ### Consume a syntax component ### {#consume-syntax-component}
 
 <div algorithm>
-	To <dfn>consume a syntax component</dfn> from a stream of <a>code points</a>:
+	To <dfn>consume a syntax component</dfn> from a stream of <a>code points</a> |stream|:
 
-	Consume as much <a>whitespace</a> as possible.
+	Consume as much <a>whitespace</a> as possible from |stream|.
 
-	Let |component| be a new <a>syntax component</a> with its |name| initially
+	Let |component| be a new <a>syntax component</a> with its |name| and |multiplier| initially
 	empty.
 
 	Consume the <a>next input code point</a>:
 
 	:   U+003C LESS-THAN SIGN (&lt;)
-	::  <a>Consume a data type name</a>, and assign the result to the |component|'s |name|.
+	::  <a>Consume a data type name</a>.
+		If it returned a [=string=], set |component|'s |name| to the returned value.
+		Otherwise, return failure.
 
 	:   <a>name-start code point</a>
-	::  <a>Reconsume the current input code point</a>.
-		[[css-syntax-3#consume-name|Consume a name]]. If the result matches the
-		<<custom-ident>> production, assign the result to the |component|'s |name|.
-		Otherwise return an error.
-
 	:   U+005C REVERSE SOLIDUS (\)
-	::  <a>Reconsume the current input code point</a>.
-		[[css-syntax-3#consume-name|Consume a name]]. If the result matches the
-		<<custom-ident>> production, assign the result to the |component|'s |name|.
-		Otherwise return an error.
+	::  If the stream [=starts with an identifier=],
+		<a>reconsume the current input code point</a>
+		then [=consume a name=] from the stream,
+		and set |component|’s |name| to the returned <<ident-token>>’s value.
+		Otherwise return failure.
 
 	:   anything else
-	::  Return an error.
+	::  Return failure.
 
-	Consume the <a>next input code point</a>:
+	If |component|’s |name| is a [=pre-multiplied data type name=],
+	return |component|.
 
-	:   U+002B PLUS SIGN (+)
-	::  If |component| has a <a>non-terminal data type name</a>, or if |component| is
-		already marked as a list of any kind, return an error. Otherwise, mark |component| as a
-		[[css-values-3#value-defs|space-separated list]].
+	If the [=next input code point=]
+	is U+002B PLUS SIGN (+)
+	or U+0023 NUMBER SIGN (#),
+	<a>consume the next input code point</a>,
+	and set |component|’s |multiplier| to the [=current input code point=].
 
-	:   U+0023 NUMBER SIGN (#)
-	::  If |component| has a <a>non-terminal data type name</a>, or if |component| is
-		already marked as a list of any kind, return an error. Otherwise, mark |component| as a
-		[[css-values-3#value-defs|comma-separated list]].
+	Return |component|.
 
-	:   EOF
-	::  Return |component|.
-
-	:   anything else
-	::  <a>Reconsume the current input code point</a>. Return |component|.
 </div>
 
 ### Consume a data type name ### {#consume-data-type-name}
@@ -665,21 +659,22 @@ Parsing the syntax string
 <div algorithm>
 	To <dfn>consume a data type name</dfn> from a stream of <a>code points</a>:
 
-	Let |name| initially be a string containing a single <a>code point</a>:
-	U+003C LESS-THAN SIGN (&lt;).
+	Note: This algorithm assumes that a U+003C LESS-THAN SIGN (&lt;) <a>code point</a> has already been consumed from the stream.
+
+	Let |name| initially be a [=string=] containing a single U+003C LESS-THAN SIGN (&lt;) <a>code point</a>.
 
 	Repeatedly consume the <a>next input code point</a>:
 
-	:   U+003E GREATER-THAN SIGN (&gt;)
+	:   U+003E GREATER-THAN SIGN (>)
 	::  Append the <a>code point</a> to |name|. If |name| matches one of the
 		<a>data type names</a> listed in [[#supported-names]], return |name|.
-		Otherwise return an error.
+		Otherwise return failure.
 
 	:   <a>name code point</a>
 	::  Append the <a>code point</a> to |name|.
 
 	:   anything else
-	::  Return an error.
+	::  Return failure.
 </div>
 
 Behavior of Custom Properties {#behavior-of-custom-properties}
@@ -777,16 +772,16 @@ Example 1: Using custom properties to add animation behavior {#example-1}
 -------------------------------------------------------------------------
 
 <pre class='lang-markup'>
-&lt;script&gt;
+&lt;script>
 CSS.registerProperty({
 	name: "--stop-color",
-	syntax: "&lt;color&gt;",
+	syntax: "&lt;color>",
 	inherits: false,
 	initialValue: "rgba(0,0,0,0)"
 });
-&lt;/script&gt;
+&lt;/script>
 
-&lt;style&gt;
+&lt;style>
 
 .button {
 	--stop-color: red;
@@ -798,7 +793,7 @@ CSS.registerProperty({
 	--stop-color: green;
 }
 
-&lt;/style&gt;
+&lt;/style>
 
 </pre>
 
