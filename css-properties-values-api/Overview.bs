@@ -634,7 +634,7 @@ Parsing the syntax string {#parsing-syntax}
 	::  If the stream [=starts with an identifier=],
 		<a>reconsume the current input code point</a> from |stream|
 		then [=consume a name=] from |stream|,
-		and set |component|’s |name| to the returned <<ident-token>>’s value.
+		and set |component|’s |name| to the returned value.
 		Otherwise return failure.
 
 	:   anything else
