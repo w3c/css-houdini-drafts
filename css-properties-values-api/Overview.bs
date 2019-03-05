@@ -597,11 +597,14 @@ Parsing the syntax string {#parsing-syntax}
 			otherwise, return failure.
 
 		:   U+007C VERTICAL LINE (|)
-		:: <a>Consume a syntax component</a> from |stream|.
+		:: If |descriptor|’s [=list/size=] is greater than zero,
+			<a>consume a syntax component</a> from |stream|.
 			If failure was returned,
 			return failure;
 			otherwise,
 			[=list/append=] the returned value to |descriptor|.
+
+			If |descriptor|’s [=list/size=] is zero, return failure.
 
 		:   anything else
 		:: <a>Reconsume the current input code point</a> in |stream|.
