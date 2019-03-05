@@ -782,8 +782,8 @@ the computed value, and [[css-syntax-3#tokenization|tokenizing]] the resulting
 string.
 
 <div class='example'>
-	Suppose  '--x' is registered with ''&lt;length>'' syntax, and that '--y' is
-	an unregistered custom property.
+	Suppose that '--x' is registered with ''&lt;length>'' syntax, and that '--y'
+	is an unregistered custom property.
 
 	<pre class='lang-css'>
 
