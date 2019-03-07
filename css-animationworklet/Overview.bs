@@ -255,7 +255,7 @@ instance's state is maintained even if the instance is respawned in a different 
 The basic mechanism for maintaining the state is that the animation worklet snapshots the local
 state that is exposed via {{StatefulAnimator/state}} function and then reifies it so that it can be
 passed into the constructor when the animator instance is respawned at a later time in a potentially
-different global scope. The <a>migrate an animator instance</a> algorithm specifies this provess in
+different global scope. The <a>migrate an animator instance</a> algorithm specifies this process in
 details.
 
 A user-defined stateful animator is expected to fulfill the required contract which is that its
@@ -574,7 +574,6 @@ set to <a>frame-requested</a>. These include the following:
 
 [[#running-animators]] resets the <a>animation requested flag</a> on animators to
 <a>frame-current</a>.
-
 
 
 Web Animations Integration {#web-animation-integration}
