@@ -3,7 +3,7 @@ Title:  CSS Animation Worklet API
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-animationworklet-1/
-Shortname: css-workletanimation
+Shortname: css-animationworklet
 Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com
@@ -89,12 +89,17 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 <pre class=biblio>
 {
     "explainer": {
-        "href": "https://github.com/WICG/animation-worklet/blob/gh-pages/README.md",
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/README.md",
         "title": "Animation Worklet Explainer",
-        "status": "CR",
-        "publisher": "WICG",
         "deliveredBy": [
-            "https://github.com/WICG/animation-worklet//"
+            "https://github.com/w3c/css-houdini-drafts"
+        ]
+    },
+    "principles": {
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/principles.md",
+        "title": "Animation Worklet Design Principles and Goals",
+        "deliveredBy": [
+            "https://github.com/w3c/css-houdini-drafts"
         ]
     }
 }
@@ -104,8 +109,9 @@ Introduction {#intro}
 =====================
 <em>This section is not normative.</em>
 
-This document introduces a new primitive for creating scroll-linked and other high performance
-procedural animations on the web. For details on the rationale and motivation see [[explainer]].
+This document introduces a new primitive that provides extensibility in web animations and enables
+high performance interactive procedural animations on the web. For details on the rationale and
+motivation see both [[explainer]] and [[principles]].
 
 The <a>Animation Worklet</a> API provides a method to create scripted animations that control a set
 of <a>animation effects</a>. The API is designed to make it possible for user agents to run such
@@ -114,14 +120,11 @@ thread.
 
 Relationship to the Web Animations API {#relationship-to-web-animations}
 ------------------------------------------------------------------------
+<em>This section is not normative.</em>
 
 Animations running inside an <a>Animation Worklet</a> execution context expose the {{Animation}}
 interface from the Web Animations specification on the main javascript execution context. This means
-they can be controlled and inspected from main thread using many of the Web Animation APIs. However
-Animation Worklet animations follow a different timing model that enables them to be script-driven,
-stateful, and runnable in a parallel worklet execution context. As such Web Animation APIs that seek
-or alter the input time (reverse, finish, etc.) have different semantics for Animation Worklet
-animations.
+they can be controlled and inspected from main thread using the same Web Animation APIs.
 
 
 Threading Model {#threading-model}
@@ -683,7 +686,7 @@ Here are a few implications of the above semantics:
     may return stale information, in the case where the <a>animator instance</a> is running in a
     parallel execution context.
 
-Issue(63): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
+Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately.
 
@@ -762,7 +765,7 @@ is called, then <a>set animator instance of worklet animation</a> given |worklet
 Timeline Attachment {#timeline-attachment}
 -------------------
 
-Issue(61): Define semantics of attachment and detachment.
+Issue(810): Define semantics of attachment and detachment.
 
 ScrollTimeline {#scroll-timeline}
 ---------------------------------
@@ -817,8 +820,8 @@ action that corresponds to the first matching condition from the following:
 </div>
 
 Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset
-of GroupEffect proposed as part of web-animation-2. Once that is available we
-should switch to it.
+of GroupEffect proposed as part of web-animation-2. We should instead move this
+into a delta spec against the web-animation.
 
 
 Effect Stack and Composite Order {#effect-stack-composite-order}
@@ -828,6 +831,16 @@ As with other animations, <a>worklet animations</a> participate in the <a>effect
 worklet animation does not have a specific <a>animation class</a> which means it has the same
 composite order as other Javascript created web animations.
 
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+================================================
+
+There are no known privacy issues introduced by these features.
 
 Examples {#examples}
 ====================
