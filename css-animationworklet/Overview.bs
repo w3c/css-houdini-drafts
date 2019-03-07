@@ -303,29 +303,34 @@ animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
 
  - An <dfn>animator name</dfn> <<ident>>#.
 
- - A <dfn>class constructor</dfn> which is a <a>VoidFunction</a> <a>callback function</a> type.
+ - A <dfn>class constructor</dfn> which is a {{AnimatorInstanceConstructor}} <a>callback function</a> type.
 
  - An <dfn>animate function</dfn> which is a <a>Function</a> <a>callback function</a> type.
 
  - A <dfn>stateful flag</dfn>
 
 
+
 Registering an Animator Definition {#registering-animator-definition}
 -------------------------------------
 An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
-The map gets populated when {{registerAnimator(name, animatorCtorValue)}} is called.
+The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
 
 
 <xmp class='idl'>
+
 [ Exposed=AnimationWorklet, Global=AnimationWorklet ]
 interface AnimationWorkletGlobalScope : WorkletGlobalScope {
-    void registerAnimator(DOMString name, VoidFunction animatorCtor);
+    void registerAnimator(DOMString name, AnimatorInstanceConstructor animatorCtor);
 };
+
+callback AnimatorInstanceConstructor = any (any options, optional any state);
+
 </xmp>
 
 <div algorithm="register-animator">
 
-When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|, |animatorCtorValue|)</dfn>
+When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|, |animatorCtor|)</dfn>
 method is called in a {{AnimationWorkletGlobalScope}}, the user agent <em>must</em> run the
 following steps:
 
@@ -335,14 +340,11 @@ following steps:
     2. If |name| exists as a key in the <a>animator name to animator definition map</a>,
         <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
 
-    3. If the result of <a>IsConstructor</a>(|animatorCtorValue|) is false, <a>throw</a> a
+    3. If the result of <a>IsConstructor</a>(|animatorCtor|) is <b>false</b>, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
-    4. Let |animatorCtor| be the result of <a>converting</a> animatorCtorValue to the
-        <a>VoidFunction</a> <a>callback function</a> type. If an exception is thrown, rethrow the
-        exception and abort all these steps.
 
-    4. Let |prototype| be the result of <a>Get</a>(|animatorCtorValue|, "prototype").
+    4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
 
 
     5. If <a>SameValue</a>(|prototype|, {{StatelessAnimator}}) is <b>true</b> set |stateful| to be
@@ -426,8 +428,8 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
     5. Let |state| be <a>StructuredDeserialize</a>(|serializedState|).
 
     6. Let |animatorInstance| be the result of <a>constructing</a> |animatorCtor| with
-        [|options|, |state| as args. If an exception is thrown, rethrow the exception and abort all
-        these steps.
+        «|options|, |state|» as arguments. If an exception is thrown, rethrow the exception and
+        abort all these steps.
 
     7. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
@@ -530,7 +532,7 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
      3. Let |stateful| be the <a>stateful flag</a> of |definition|.
 
-     4. If |stateful| is <a>false</a> then abort the following steps.
+     4. If |stateful| is <b>false</b> then abort the following steps.
 
      5. Let |state| be the result of <a>Get</a>(|instance|, "state"). If any exception is thrown,
         rethrow the exception and abort the following steps.
