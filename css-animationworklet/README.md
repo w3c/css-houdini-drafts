@@ -49,8 +49,13 @@ timeline.
   -   Efficient Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
   -   Compositing growing / shrinking box with border (using 9 patch)
 
+* Sophisticated effects which involves complex coordination across multiple animations.
 
-These usecases are enabled by the current proposed but [additional usecases](principles.md#animation-worklet-vision) are going to be addressed by extension of the API.
+
+
+These usecases are enabled by the current proposed but [additional usecases](principles.md
+#animation-worklet-vision) including input-driven animations are going to be addressed by extension
+of the API.
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`
@@ -78,14 +83,14 @@ Note that worklet animations expose same API surface as other web animations and
 created, played, paused, inspected, and generally controlled from main document scope. Here is how
 various methods roughly translate:
 
-  - cancel(): cancels the animation and the corresponding animator instance is removed.
-  - play(): starts the animation and the corresponding animator instance may get its `animate` function
-    called periodically as a result of changes in its timelines.
+  - `cancel()`: cancels the animation and the corresponding animator instance is removed.
+  - `play()`: starts the animation and the corresponding animator instance gets constructed and
+     may get its `animate` function called periodically as a result of changes in its timelines.
   - pause(): pauses the animation and the corresponding animator instance no longer receives
     `animate` calls.
-  - finish(): invokes `finish` on the corresponding animator instance.
-  - reverse() or mutating playbackRate: invokes `playbackRateChanged` on the corresponding
-     animator instance.
+  - finish(), reverse() or mutating playbackRate: these affect the currentTime which is seens by
+     the animator instance. (We are considering possiblity of having a `onPlaybackRateChanged`
+     callback)
 
 ## ScrollTimeline
 [ScrollTimeline](https://wicg.github.io/scroll-animations/#scrolltimeline) is a concept introduced in
@@ -106,56 +111,71 @@ flexible scheduling model by making it possible to to set children effect's loca
 other words we allow arbitrary start time for child effects. This is something that needs to be
 added to level 2 spec.
 
-## Multiple Timelines
+## ~~Multiple Timelines~~
 Unlike typical animations, worklet animations can be attached to multiple timelines. This is
 necessary to implement key usecases where the effect needs to smoothly animate across different
 timelines (e.g., scroll and wall clock).
 
-### Primary Timeline
-The first timeline is considered the *primary timeline*. The only purpose of the primary timeline is
-to make integration with existing web animation machinery easier, in particular the primary timeline
-time will be used anywhere the web animation API needs to expose a time value, for example in
-[event timeline time](https://w3c.github.io/web-animations/level-2/#event-timeline-time), or
-[event current time](https://w3c.github.io/web-animations/level-2/#event-current-time).
+**NOTE**: We have decided to drop this piece in favor of alternative ideas. Most recent
+[promising idea](https://docs.google.com/document/d/1byDy6IZqvaci-FQoiRzkeAmTSVCyMF5UuaSeGJRHpJk/edit#heading=h.dc7o68szgx2r)
+revolves around allowing worklet and workers to receive input events directly.  (here are some
+earlier alternative design: [1](https://docs.google.com/document/d/1-APjTs9fn4-E7pFeFSfiWV8tYitO84VpmKuNpE-25Qk/edit), [2](https://github.com/w3c/csswg-drafts/issues/2493), [3](https://github.com/w3c/csswg-drafts/issues/2493#issuecomment-422109535)
 
 
-**TODO**: We are considering API designs that can make it possible for an animation to observe multiple
-timelines but only gets activated on a (dynamic) subset of them. This ensures we can be more
-efficient when updating the animation.
+## Statefull and Statelss Animators
 
-## Animator Migration
+
+Sometimes animation effects require maintaining internal state (e.g., when animation needs to depend
+on velocity). Such animators have to explicitly declare their statefulness but by inheritting from
+`StatefulAnimator` superclass.
+
 The animators are not guaranteed to run in the same global scope (or underlying thread) for their
-lifetime duration. For example, a user agents is free to initially run the animator on main thread
-but later decide to migrate it off main thread to get certain performance optimizations. To allow
-worklet animators to keep their state across migrations, the API provides the following lifetime
-hooks:
+lifetime duration. For example user agents are free to initially run the animator on main thread
+but later decide to migrate it off main thread to get certain performance optimizations or to tear
+down scopes to save resources.
+
+
+Animation Worklet helps stateful animators to maintain their state across such migration events.
+This is done through a state() function which is called and animator exposes its state. Here is
+an example:
 
 ```js
 // in document scope
-new WorkletAnimation('animation-with-local-state', [], [], {value: 1});
+new WorkletAnimation('animation-with-local-state', keyframes);
 ```
 
-
 ```js
-registerAnimator('animation-with-local-state', class {
-  constructor(options, state) {
-    // |options| may be either:
-    //  - The user provided options bag passed into the WorkletAnimation constructor on first initialization i.e, {value: 1}.
-    //  - The object returned by |destroy| after each migration i.e. {value: 42}.
-    this.options_ = options;
-    this.state_ = state || {value: Math.random()};
+registerAnimator('animation-with-local-state', class FoorAnimator extends StatefulAnimator {
+  constructor(options, state = {velocity: 0, acceleration: 0}) {
+    //  state is either undefined (first time) or the state after an animator is migrated across
+    // global scope.
+    this.velocity = state.velocity;
+    this.acceleration = state.acceleration;
   }
 
-  animate(timelines, effect) {
-    this.state_.value += 0.1;
-    effect.localTime = this.state_.value;
+  animate(time, effect) {
+    if (this.lastTime) {
+      this.velocity = time - this.prevTime;
+      this.acceleration = this.velocity - this.prevVelocity;
+    }
+    this.prevTime = time;
+    this.prevVelocity = velocity;
+
+    effect.localTime = curve(velocity, acceleration, currentTime);
   }
 
-  destroy() {
-    // Invoked before each migration attempts.
-    // The returned object must be structure clonable and will be passed to constructor to help
-    // animator restore its state after migration to the new scope.
-    return this.state_;
+  state() {
+    // Invoked before any migration attempts. The returned object must be structure clonable
+    // and will be passed to constructor to help animator restore its state after migration to the
+    // new scope.
+    return {
+      this.velocity,
+      this.acceleration
+    };
+  }
+
+  curve(velocity, accerlation, t) {
+     return /* compute some physical movement curve */;
   }
 });
 ```
@@ -384,8 +404,6 @@ partial interface AnimationEffectReadOnly {
 };
 
 ```
-
-
 
 
 # Specification
