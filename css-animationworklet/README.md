@@ -3,59 +3,78 @@
 
 # Overview
 
-Animation Worklet is a new primitive for creating scroll-linked and other high performance
-procedural animations on the web.  It is being incubated here as part of the
-[CSS Houdini task force](https://github.com/w3c/css-houdini-drafts/wiki), and if successful will be
-transferred to that task force for full standardization.
+Animation Worklet is a new primitive that provides extensibility in web animations and enables high
+performance procedural animations on the web. The feature is developed as part of the  
+[CSS Houdini task force](https://github.com/w3c/css-houdini-drafts/wiki).
 
-# Introduction
+The Animation Worklet API provides a method to create scripted animations that control a set of
+animation effects. These animations are executed inside an isolated execution environment, *worklet*
+which makes it possible for user agents to run such animations  in their own dedicated thread to
+provide a degree of performance isolation from main thread. The API is compatible with Web
+Animations and uses existing constructs as much as possible.
 
-Scripted effects (written in response to `requestAnimationFrame` or async `onscroll` events) are
-rich but are subject to main thread jankiness. On the other hand, accelerated CSS transitions and
-animations can be fast (for a subset of *accelerated* properties) but are not rich enough to enable
-[many common use cases](#motivating-use-cases) and currently have no way to access scroll offset
-and other user input. This is why scripted effects are still very popular for implementing common
-effects such as hidey-bars, parallax, position:sticky, and etc. We believe (and others
-[agree][roc-thread]) that there is a need for a new primitive for creating fast and rich visual
-effects with the ability to respond to user input such as scroll.
+# Background
 
-This document proposes an API to create custom animations that execute inside an isolated execution
-environment, *worklet*. It aims to be compatible with Web Animations and uses existing constructs as
-much as possible. We believe this API hits a sweet spot in balancing among performance, richness,
-and rationality for addressing our key use cases.
+Scripted interactive effects (written in response to `requestAnimationFrame`, `pointer events` or
+async `onscroll` events) are rich but are subject to main thread jankiness. On the other hand,
+accelerated CSS transitions and animations can be fast (for a subset of *accelerated* properties)
+but are not rich enough to enable [many common use cases](#motivating-use-cases) and currently have
+no way to access key user input (pointer events, gestures, scroll). This is why scripted effects are
+still very popular for implementing common effects such as hidey-bars, parallax, pull-to-refresh,
+drag-and-drop, swipe to dismiss and etc. Animation Worklet provides is key building block for
+enabling creation of smooth rich interactive visual effects on the web while also exposing an
+extensibility hook in web animations.
 
-See the [Animation Worklet design principles and goals](principles.md) for an overview of the
-motivations behind Animation Worklet and how the design will be evolved to support a growing set of
-rich use cases. Also see [the status document](status.md) for high level implementation status and
-timeline.
+
+See the [Animation Worklet design principles and goals](principles.md) for a more extended overview
+of the motivations behind Animation Worklet and how the design will be evolved to support a growing
+set of use cases. Also see [the status document](status.md) for high level implementation status and
+timeline. [Here][roc-thread] you may find an earlier high level discussion on general approaches to
+address this problem.
+
 
 # Motivating Use Cases
 
-* Scroll-linked effects:
-  -   Parallax ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/parallax-scrolling/))
-  -   Animated scroll headers, eg. "hidey-bars" ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/twitter-header/), [twitter](https://twitter.com/LEGO_Group), [Polymer `paper-scroll-header-panel`](https://elements.polymer-project.org/elements/paper-scroll-header-panel?view=demo:demo/index.html))
-  -  Springy sticky elements ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/))
+*   Scroll driven effects:
+    *   [Hidey-bar](https://googlechromelabs.github.io/houdini-samples/animation-worklet/twitter-header/): animation depends on both time and scroll input.
+    *   [Parallax](https://googlechromelabs.github.io/houdini-samples/animation-worklet/parallax-scrolling/): Simplest scroll-drive effect.
+    *   [Custom paginated slider](http://aw-playground.glitch.me/amp-scroller.html).
+    *   Pull-to-refresh: animation depends on both touch and time inputs.
+    *   Custom scrollbars.
+    *   High-fidelity location tracking and positioning
+    *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md) of scroll-driven effects.
+    
+*   Gesture driven effects:
+    *   [Image manipulator](https://github.com/w3c/csswg-drafts/issues/2493#issuecomment-422153926) that scales, rotates etc.
+    *   Swipe to dismiss.
+    *   Drag-N-Drop.
+    *   Tiled panning e.g., Google maps.
+*   Stateful script driven effects:
+    *   [Spring timing emulations](https://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-timing/).
+    *   [Spring-Sticky effect](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/).
+    *   Touch-driven physical environments.
+    *   [Expando](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/): Procedural animations with multiple elements.
+*   Animated scroll offsets:
+    * Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
+      scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
+    * Custom smooth scroll animations (e.g., physic based fling curves)
+*   Animation Extensibility:
+    *  Custom timing functions (particularly those that are not calculable a priori)
+    *  Custom animation sequencing which involves complex coordination across multiple effects.
 
-* Animations with custom timing functions (particularly those that are not calculable a priori)
 
-  -   Spring timing function ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-timing/))
-
-* Location tracking and positioning:
-
-  -   Position: sticky
-
-* Procedural animation of multiple elements in sync:
-
-  -   Efficient Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/), [more info](https://developers.google.com/web/updates/2017/03/performant-expand-and-collapse))
-  -   Compositing growing / shrinking box with border (using 9 patch)
-
-* Sophisticated effects which involves complex coordination across multiple animations.
+Not all of these usecases are immediately enabled by the current proposed API. However Animation
+Worklet provides a powerfull primitive (off main-thread scriped animation) which when combined with
+other upcoming features (e.g., 
+[Event in Worklets](https://github.com/w3c/css-houdini-drafts/issues/834),
+[ScrollTimeline](https://wicg.github.io/scroll-animations/),
+[GroupEffect](https://github.com/w3c/csswg-drafts/issues/2071)) can address all these usecases and 
+allows many of currently main-thread rAF-based animations to move off thread with significant 
+improvement to their smoothness.
+See [Animation Worklet design principles and goals](principles.md) for a more extended discussion
+of this.
 
 
-
-These usecases are enabled by the current proposed but [additional usecases](principles.md
-#animation-worklet-vision) including input-driven animations are going to be addressed by extension
-of the API.
 
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`
