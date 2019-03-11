@@ -223,7 +223,7 @@ interface StatelessAnimator {
 <div class='note'>
     This is how the class should look.
     <pre class='lang-javascript'>
-        class FooAnimator extends StatelessAnimator{
+        class FooAnimator extends StatelessAnimator {
             constructor(options) {
                 // Called when a new animator is instantiated.
             }
@@ -253,13 +253,13 @@ effect is mutable only in a certain thread). Animation worklet guarantees that a
 instance's state is maintained even if the instance is respawned in a different global scope.
 
 The basic mechanism for maintaining the state is that the animation worklet snapshots the local
-state that is exposed via {{StatefulAnimator/state}} attribute and then reifies it at a later time
-to be passed into the constructor when the animator instance is respawned in a potentially different
-global scope. This processes is specified is details in <a>migrate an animator instance</a>
-algorithm.
+state that is exposed via the {{StatefulAnimator/state}} function and then reifies it so that it can
+be passed into the constructor when the animator instance is respawned at a later time in a
+potentially different global scope. The <a>migrate an animator instance</a> algorithm specifies this
+process in details.
 
 A user-defined stateful animator is expected to fulfill the required contract which is that its
-state attribute is an object representing its state that can be serialized using structured
+state function returns an object representing its state that can be serialized using structured
 serialized algorithm and that it can also recreate its state given that same object passed to
 its constructor.
 
@@ -267,7 +267,7 @@ its constructor.
 [Exposed=AnimationWorklet, Global=AnimationWorklet,
 Constructor (optional any options, optional any state)]
 interface StatefulAnimator {
-  attribute any state;
+  any state();
 };
 </xmp>
 
@@ -284,7 +284,7 @@ interface StatefulAnimator {
                 // Animation frame logic goes here and can rely on this.currentVelocity.
                 this.currentVelocity += 0.1;
             }
-            get state {
+            state() {
               // The returned object should be serializable using structured clonable algorithm.
               return {
                 velocity: this.currentVelocity;
@@ -348,7 +348,7 @@ following steps:
 
 
     5. If <a>SameValue</a>(|prototype|, {{StatelessAnimator}}) is <b>true</b> set |stateful| to be
-        <b>false</b>, otherwise if <a>SameValue</a>(|prototype|, {{StatefulAnimator}}) is 
+        <b>false</b>, otherwise if <a>SameValue</a>(|prototype|, {{StatefulAnimator}}) is
         <b>true</b> set |stateful| to be <b>true</b>, otherwise <a>throw</a> a <a>TypeError</a> and
         abort all these steps.
 
@@ -534,8 +534,9 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
      4. If |stateful| is <b>false</b> then abort the following steps.
 
-     5. Let |state| be the result of <a>Get</a>(|instance|, "state"). If any exception is thrown,
-        rethrow the exception and abort the following steps.
+     5. Let |state| be the result of <a>Invoke</a> |stateFunction| with |instance| as the
+        <a>callback this value</a>.  If any exception is thrown, rethrow the exception and abort
+        the following steps.
 
      6. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
         If any exception is thrown, then abort the following steps.
