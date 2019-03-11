@@ -2216,7 +2216,7 @@ of all the "math" operations.
 
 The <dfn attribute for=CSSNumericArray>length</dfn> attribute of {{CSSNumericArray}} indicates how many {{CSSNumericValue}}s are contained within the {{CSSNumericArray}}.
 
-The <dfn export for=CSSNumericArray>indexed getter</dfn> of {{CSSNumericArray}} retrieves the {{CSSNumericValue}} at the provided index.
+The <dfn export for=CSSNumericArray>[=/indexed property getter=]</dfn> of {{CSSNumericArray}} retrieves the {{CSSNumericValue}} at the provided index.
 
 <!--
 ██    ██ ██     ██ ██     ██        ██████   ██████   ██████
