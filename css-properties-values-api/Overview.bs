@@ -334,12 +334,12 @@ so long as you don't violate the (very liberal) syntax for custom properties.
 
 Registering a custom property does not change this.
 Even if a custom property is, for example,
-registered with `syntax: "<color>"`,
+registered with `syntax: "&lt;color>"`,
 a rule like `@supports (--foo: 1em) {...}`
 will still evaluate as true and apply those styles.
 
 Note: This matches the parsing behavior of registered custom properties.
-A registered custom property specified as `"<color>"`
+A registered custom property specified as `"&lt;color>"`
 but written as `--foo: 1em;` will still be accepted as valid at parse-time,
 but be automatically [=invalid at computed-value time=].
 As ''@supports'' tests parse behavior,
