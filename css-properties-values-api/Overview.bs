@@ -712,8 +712,6 @@ Note: In other words, for the purpose of determining whether a value is
 supported by a given custom property, the type registered for the custom property is
 ignored and any value consisting of at least one token is considered valid.
 
-Issue(118): should @supports pay attention to type when considering custom properties?
-
 Relative URLs {#relative-urls}
 ------------------------------
 
