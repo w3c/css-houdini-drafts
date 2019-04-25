@@ -801,6 +801,99 @@ string.
 
 </div>
 
+CSSOM {#cssom}
+==============
+
+{{CSSStyleDeclaration}} Behavior {#css-style-declaration-behavior}
+------------------------------------------------------------------
+
+The <a>set a CSS declaration</a> algorithm gains an additional constraint
+for registered custom properties:
+
+* The target declaration must have a value that matches the registered
+	[=syntax descriptor|syntax=] of the property.
+
+This means that once a property is registered, it is not possible to use
+{{setProperty()}} with a value that violates the registered syntax of the
+property.
+
+Note: Registering a property with a particular syntax
+does not invalidate already-specified values for the property
+(that is, they're not thrown out at parse-time,
+like invalid properties usually are),
+even if those would violate the registered syntax.
+The registration <em>does</em> prevent new invalid values from being set,
+and affects how the custom property calculates its [=computed value=].
+
+<div class='example'>
+	For example,
+	in the following code snippet,
+	the ''--x'' property is set to a value
+	that doesn't match the later-registered syntax:
+
+	<pre class="lang-javascript">
+		document.body.style.setProperty('--x', '10px');
+		CSS.registerProperty({
+			name: '--x',
+			syntax: '&lt;color>',
+			initialValue: 'white',
+			inherits: false
+		});
+
+		// This still outputs "10px", as existing values aren't
+		// re-evaluated after a syntax is registered.
+		console.log(document.body.style.getPropertyValue('--x'));
+
+		// This silently fails, like any other property would
+		// when one attempts to set it to an invalid value.
+		document.body.style.setProperty('--x', '20px');
+
+		// Because ''--x'' is still set to "10px", which isn't
+		// a valid <<color>>, it will be "<l>[=invalid at computed-value time=]</l>",
+		// falling back to the registered initial value of "white".
+		// 'background-color' will then receive that color and get
+		// set to "white".
+		document.body.style.backgroundColor = "var(--x)";
+	</pre>
+</div>
+
+{{CSSStyleValue}} Reification {#css-style-value-reification}
+------------------------------------------------------------
+
+<div algorithm>
+	To <dfn>reify a registered custom property value</dfn> given a
+	[=syntax descriptor=] |syntax|, run these steps:
+
+	For specified values:
+
+		1. If the value is a <<declaration-value>>, and |syntax| is not the
+			[=universal syntax descriptor=], attempt to [=CSS/parse=]
+			the value according to |syntax|. If this succeeds, [=reify=]
+			the result as if it were a computed value, and return that result.
+		2. Otherwise, [=reify a list of component values=] from the value, and
+			return the result.
+
+	For computed values:
+
+		1. If the value is a <<length>>, <<integer>>, <<number>>, <<angle>>,
+			<<time>>, <<resolution>>, <<percentage>> or <<length-percentage>>;
+			[=reify a numeric value=] from the value and return the result.
+		2. If the value is a <<transform-function>>,
+			[=reify a &lt;transform-function>=] from the value and return the
+			result.
+		3. If the value is a <<transform-list>>,
+			[=reify a &lt;transform-list>=] from the value and return the result.
+		4. If the value is an <<image>>, reify a CSSImageValue from the value and
+			return the result.
+		5. If the value is an [=identifier=], [=reify an identifier=] from the value
+			and return the result.
+		6. If the value is a <<declaration-value>>,
+			[=reify a list of component values=] from the value, and return the
+			result.
+		7. Otherwise, [=reify as a CSSStyleValue=] and return the result.
+</div>
+
+
 Examples {#examples}
 ====================
 
