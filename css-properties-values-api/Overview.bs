@@ -819,12 +819,20 @@ This means that once a property is registered, it is not possible to use
 {{setProperty()}} with a value that violates the registered syntax of the
 property.
 
-However, note that registering a property '--x' does not invalidate
-already-specified values for '--x', even if those values violate the
-registered syntax.
+Note: Registering a property with a particular syntax
+does not invalidate already-specified values for the property
+(that is, they're not thrown out at parse-time,
+like invalid properties usually are),
+even if those would violate the registered syntax.
+The registration <em>does</em> prevent new invalid values from being set,
+and affects how the custom property calculates its [=computed value=].
 
 <div class='example'>
-	The following will output '10px':
+	For example,
+	in the following code snippet,
+	the ''--x'' property is set to a value
+	that doesn't match the later-registered syntax:
+
 	<pre class="lang-javascript">
 		document.body.style.setProperty('--x', '10px');
 		CSS.registerProperty({
@@ -833,7 +841,21 @@ registered syntax.
 			initialValue: 'white',
 			inherits: false
 		});
+
+		// This still outputs "10px", as existing values aren't
+		// re-evaluated after a syntax is registered.
 		console.log(document.body.style.getPropertyValue('--x'));
+
+		// This silently fails, like any other property would
+		// when one attempts to set it to an invalid value.
+		document.body.style.setProperty('--x', '20px');
+
+		// Because ''--x'' is still set to "10px", which isn't
+		// a valid <<color>>, it will be "<l>[=invalid at computed-value time=]</l>",
+		// falling back to the registered initial value of "white".
+		// 'background-color' will then receive that color and get
+		// set to "white".
+		document.body.style.backgroundColor = "var(--x)";
 	</pre>
 </div>
 
@@ -870,7 +892,7 @@ registered syntax.
 		6. If the value is a <<declaration-value>>,
 			[=reify a list of component values=] from the value, and return the
 			result.
-		7. Otherwise, reify as a {{CSSStyleValue}} and return the result.
+		7. Otherwise, [=reify as a CSSStyleValue=] and return the result.
 </div>
 
 
