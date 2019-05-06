@@ -643,6 +643,9 @@ Parsing the syntax string {#parsing-syntax}
 	:   anything else
 	::  Return failure.
 
+	If |component|’s |name| does not match the <<custom-ident>> production,
+	return failure.
+
 	If |component|’s |name| is a [=pre-multiplied data type name=],
 	return |component|.
 
