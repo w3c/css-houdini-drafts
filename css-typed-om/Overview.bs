@@ -2871,8 +2871,8 @@ for both specified and computed values.
     [=reify a list of component values=] from the value,
     and return the result.
 
-: registered [=custom properties=] [[css-properties-values-api-1]]
-:: Issue: Should be defined by the Props & Values spec
+: registered [=custom properties=]
+:: Reified as described by [[css-properties-values-api-1#css-style-value-reification]].
 
 : <a>align-content</a>
 ::
