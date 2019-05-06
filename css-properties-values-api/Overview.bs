@@ -640,11 +640,11 @@ Parsing the syntax string {#parsing-syntax}
 		and set |component|’s |name| to the returned value.
 		Otherwise return failure.
 
+		If |component|’s |name| does not match the <<custom-ident>> production,
+		return failure.
+
 	:   anything else
 	::  Return failure.
-
-	If |component|’s |name| does not match the <<custom-ident>> production,
-	return failure.
 
 	If |component|’s |name| is a [=pre-multiplied data type name=],
 	return |component|.
