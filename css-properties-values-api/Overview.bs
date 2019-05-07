@@ -640,6 +640,9 @@ Parsing the syntax string {#parsing-syntax}
 		and set |component|’s |name| to the returned value.
 		Otherwise return failure.
 
+		If |component|’s |name| does not [=CSS/parse=] as a <<custom-ident>>,
+		return failure.
+
 	:   anything else
 	::  Return failure.
 
