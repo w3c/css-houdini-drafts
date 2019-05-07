@@ -698,10 +698,6 @@ will interpolate as specified in [[!css3-animations]].
 Otherwise, the interpolation falls back to the default 50% flip described in
 [[!css3-animations]].
 
-Issue: Intermediate interpolated results of animations on custom properties must
-be able to generate a token stream representing their value. We should ensure that
-this is standard across implementations to avoid interop issues.
-
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
