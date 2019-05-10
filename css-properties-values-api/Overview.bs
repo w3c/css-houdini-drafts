@@ -328,20 +328,20 @@ Registered Properties and @supports {#supports}
 
 Unregistered custom properties are “always valid”
 when tested via ''@supports'';
-a rule like `@supports (--foo: red) {...}`
+a rule like <code>@supports (--foo: red) {...}</code>
 is always true
 so long as you don't violate the (very liberal) syntax for custom properties.
 
 Registering a custom property does not change this.
 Even if a custom property is, for example,
-registered with `syntax: "&lt;color>"`,
-a rule like `@supports (--foo: 1em) {...}`
+registered with <code/>syntax: "&lt;color>"</code>,
+a rule like <code>@supports (--foo: 1em) {...}</code>
 will still evaluate as true and apply those styles.
 
 Note: This matches the parsing behavior of registered custom properties.
-A registered custom property specified as `"&lt;color>"`
-but written as `--foo: 1em;` will still be accepted as valid at parse-time,
-but be automatically [=invalid at computed-value time=].
+A registered custom property specified as <code>"&lt;color>"</code>
+but written as <code>--foo: 1em;</code> will still be accepted as valid at
+parse-time, but be automatically [=invalid at computed-value time=].
 As ''@supports'' tests parse behavior,
 it thus also accepts all values as valid regardless of the registered syntax.
 
