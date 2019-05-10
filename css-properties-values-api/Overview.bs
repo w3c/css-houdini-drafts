@@ -707,9 +707,13 @@ Conditional Rules {#conditional-rules}
 ''@supports'' rules and the {{CSS/supports(conditionText)}} method behave as specified
 in [[!css-variables]].
 
-Note: In other words, for the purpose of determining whether a value is
-supported by a given custom property, the type registered for the custom property is
-ignored and any value consisting of at least one token is considered valid.
+The {{CSS/supports(property, value)}} method must attempt to [=parse=] the value
+according to the registered syntax of the property, and return <code>false</code>
+if the parsing failed. Otherwise, the behavior is as specified in [[!css3-conditional]].
+
+Note: In general, methods that interact directly with a <em>value</em> validate
+the registered syntax of the property, whereas methods that parse higher level
+CSS productions don't. Future specifications must adhere to this guideline.
 
 Relative URLs {#relative-urls}
 ------------------------------
