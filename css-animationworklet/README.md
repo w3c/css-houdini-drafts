@@ -213,8 +213,12 @@ Use Animation Worklet to create animation with a custom spring timing.
 <script>
 await CSS.animationWorklet.addModule('spring-animator.js');
 
-const effect = new KeyframeEffect($target,{transform: ['translateX(0)', 'translateX(50vw)'}], {duration: 1000});
-const animation = new WorkletAnimation('spring', effect, document.timeline, {k: 2, ratio: 0.7);
+const effect = new KeyframeEffect(
+  $target,
+  {transform: ['translateX(0)', 'translateX(50vw)']},
+  {duration: 1000}
+);
+const animation = new WorkletAnimation('spring', effect, document.timeline, {k: 2, ratio: 0.7});
 animation.play();
 </script>
 ```
