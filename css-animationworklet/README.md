@@ -80,6 +80,306 @@ web platform features enabled (`--enable-experimental-web-platform-features`
 flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 
 
+# Animation Worklet
+
+Animation Worklet attempts to address the above usecases by introducing a new primitive that enables
+extensibility in the web's core animation model [WebAnimations][WA]): custom animate function!
+
+
+## How It Works
+
+Normally, an active animation takes its timeline time and according to its running state (e.g., playing,
+finished) and playback rate, computes its own **current time** which it then uses to set its
+keyframe effect **local time**. Here is a simple example of a simple animation:
+
+```js
+const effect = new KeyframeEffect(targetEl,
+  {transform: ['translateX(0)', 'translateX(50vw)']},
+  {duration: 1000}
+);
+const animation = new Animation(effect, document.timeline);
+animation.play();
+```
+
+
+Animation Worklet allows this transformation from **current time** to **local time** to be
+customized via a special Javascript function `animate`. Similar to other Houdini worklets, these
+animate functions are called inside a restricted [worklet][worklet] context (`AnimationWorkletGlobalScope`)
+which means the don't have access to main document. Another implication is that implementor can run
+these off-thread to ensure smooth animations even when main thread is busy which is a key
+performance goal for animations.
+
+To leverage this machinery, web developer creates a special Animation subclass, `WorkletAnimation`.
+The only difference is that the WorkletAnimation constructor takes a `name` argument that identifies
+the custom animate function to be used. Animation Worklet then creates a corresponding *animater*
+instance that represent this particlar animation and then on each animation frame calls its
+`animate` function to determine the local time which ultimately drives the keyframe effect.
+
+
+![Overview of the WorkletAnimation Timing Model](img/WorkletAnimation-timing-model.svg)
+
+Here the same simple example but using Animation Worklet instead.
+
+**index.html**
+```js
+// Load your custom animator in the worklet
+await CSS.animationWorklet.addModule('animator.js');
+
+const effect = new KeyframeEffect(targetEl,
+  {transform: ['translateX(0)', 'translateX(50vw)']},
+  {duration: 1000}
+);
+const animation = new WorkletAnimation('my-awesome-animator', effect);
+animation.play();
+```
+
+**animator.js**
+```
+registerAnimator('my-awesome-animator', class Passthrough extends StatelessAnimator {
+  animate(currentTime, effect) {
+    // The simplest custom animator that does exactly what regular animations do!
+    effect.localTime = currentTime;
+  }
+});
+```
+
+
+A few notable things:
+
+ - WorkletAnimation behaves the same as regular animations e.g., it can be played/paused/canceled
+ - WorkletAnimation can optionally accept an options bag to help the corresponding Animator
+   configure itself during construction.
+ - Animator controls the output of the animation by setting the AnimationEffect.localTime
+ - There is two types of Animators: Stateless and Statefull explicitly marked using superclasses.
+
+Below are a few more complex example each trying to show a different aspect of Animation Worklet.
+
+# Examples
+
+## Spring Timing
+
+Here we use Animation Worklet to create animation with a custom spring timing.
+
+
+```html
+
+<div id='target'></div>
+
+<script>
+await CSS.animationWorklet.addModule('spring-animator.js');
+targetEl = document.getElementById('target');
+
+const effect = new KeyframeEffect(
+  targetEl,
+  {transform: ['translateX(0)', 'translateX(50vw)']},
+  {duration: 1000}
+);
+const animation = new WorkletAnimation('spring', effect, document.timeline, {k: 2, ratio: 0.7});
+animation.play();
+</script>
+```
+
+spring-animator.js:
+
+```js
+registerAnimator('spring', class SpringAnimator extends StatelessAnimator {
+  constructor(options = {k: 1, ratio: 0.5}) {
+    this.timing = createSpring(options.k, options.ratio);
+  }
+
+  animate(currentTime, effect) {
+    let delta = this.timing(currentTime);
+    // scale this by target duration
+    delta = delta * (effect.getTimings().duration / 2);
+    effect.localTime = delta;
+    // TODO: Provide a method for animate to mark animation as finished once
+    // spring simulation is complete, e.g., this.finish()
+    // See issue https://github.com/w3c/css-houdini-drafts/issues/808
+  }
+});
+
+function createSpring(springConstant, ratio) {
+  // Normalize mass and distance to 1 and assume a reasonable init velocit
+  // but these can also become options to this animator.
+  const velocity = 0.2;
+  const mass = 1;
+  const distance = 1;
+
+  // Keep ratio < 1 to ensure it is under-damped.
+  ratio = Math.min(ratio, 1 - 1e-5);
+
+  const damping = ratio * 2.0 * Math.sqrt(springConstant);
+  const w = Math.sqrt(4.0 * springConstant - damping * damping) / (2.0 * mass);
+  const r = -(damping / 2.0);
+  const c1 = distance;
+  const c2 = (velocity - r * distance) / w;
+
+  // return a value in [0..distance]
+  return function springTiming(timeMs) {
+    const time = timeMs / 1000; // in seconds
+    const result = Math.pow(Math.E, r * time) *
+                  (c1 * Math.cos(w * time) + c2 * Math.sin(w * time));
+    return distance - result;
+  }
+}
+```
+
+## Twitter Header
+
+An example of twitter profile header effect where two elements (avatar, and header) are updated in
+sync with scroll offset.
+
+```html
+
+<div id='scrollingContainer'>
+  <div id='header' style='height: 150px'></div>
+  <div id='avatar'><img></div>
+</div>
+
+<script>
+const headerEl = document.getElementById('header');
+const avatarEl = document.getElementById('avatar');
+const scrollingContainerEl = document.getElementById('scrollingContainer');
+
+
+await CSS.animationWorklet.addModule('twitter-header-animator.js');
+const animation = new WorkletAnimation('twitter-header',
+  [new KeyframeEffect(avatarEl,  /* scales down as we scroll up */
+                      [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
+                      {duration: 1000, iterations: 1}),
+    new KeyframeEffect(headerEl, /* loses transparency as we scroll up */
+                      [{opacity: 0}, {opacity: 0.8}],
+                      {duration: 1000, iterations: 1})],
+    new ScrollTimeline({
+      scrollSource: scrollingContainerEl,
+      timeRange: 1000,
+      orientation: 'block',
+      startScrollOffset: 0,
+      endScrollOffset: headerEl.clientHeight}),
+);
+animation.play();
+</script>
+```
+
+twitter-header-animator.js:
+```js
+registerAnimator('twitter-header', class TwitterHeader extends StatelessAnimator {
+  constructor(options) {
+    this.timing_ = new CubicBezier('ease-out');
+  }
+
+  clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  animate(currentTime, effect) {
+    const scroll = currentTime;  // [0, 1]
+
+    // Drive the output group effect by setting its children local times.
+    effect.children[0].localTime = scroll;
+    // Can control the child effects individually
+    effect.children[1].localTime = this.timing_(this.clamp(scroll, 0, 1));
+  }
+});
+
+```
+
+## Parallax
+
+```html
+<style>
+.parallax {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+}
+</style>
+<div id='scrollingContainer'>
+  <div id="slow" class="parallax"></div>
+  <div id="fast" class="parallax"></div>
+</div>
+<script>
+await CSS.animationWorklet.addModule('parallax-animator.js');
+
+const parallaxSlowEl = document.getElementById('slow');
+const parallaxFastEl = document.getElementById('fast');
+const scrollingContainer = = document.getElementById('scrollingContainer');
+
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: scrollingContainer,
+  orientation: 'block',
+  timeRange: 1000
+});
+const scrollRange = scrollingContainerEl.scrollHeight - scrollingContainerEl.clientHeight;
+
+const slowParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect(parallaxSlowEl, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
+    scrollTimeline,
+    {rate : 0.4}
+);
+slowParallax.play();
+
+const fastParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect(parallaxFastEl, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
+    scrollTimeline,
+    {rate : 0.8}
+);
+fastParallax.play();
+</script>
+
+```
+
+parallax-animator.js:
+
+```js
+// Inside AnimationWorkletGlobalScope
+registerAnimator('parallax', class Parallax extends StatelessAnimator{
+  constructor(options) {
+    this.rate_ = options.rate;
+  }
+
+  animate(currentTime, effect) {
+    effect.localTime = currentTime * this.rate_;
+  }
+});
+```
+
+
+# Why Extend Animation?
+
+In [WebAnimation][WA], [Animation][animation] is the main controller. It handles the playback commands
+(play/pause/cancel) and is responsible for processing the progressing time (sourced from Timeline) and
+driving keyframes effect which defines how a particular target css property is animated and
+ultimately pixels moving on the screen.
+
+By allowing extensibility in Animation we can have the most flexibility in terms of what is possible
+for example animation can directly control the following:
+ - Control animation playback e.g., implement open-ended animations with non-deterministic  timings
+   (e.g., physical-based) or provide "trigger" facilities
+ - Flexibility in transforming other forms of input into "time" e.g., consume touch events and drive
+   animations
+ - Ability to handle multiple timelines e.g., animations that seamlessly transition btween being
+   touch/scroll driven to time-driven
+ - Control how time is translated e.g., new custom easing functions
+ - Drive multiple effects and control how they relate to each other e.g., new effect sequencing
+
+
+While there is benefit in extensibility in other parts of animation stack (custom timeline, custom
+effect, custom timing), custom animations provides the largest value in terms of flexibility and
+addressing key usecases so it is the one we are tackling first.
+
+Animation Worklet can be easily augmented in future to support other Houdini style extensibility
+features as well.
+
+
+TODO:  Also discuss other models that we have considered (e.g., CompositorWorker) that bypassed
+web animation altogether.
+
+
+
 # Key Concepts
 
 ## Animation Worklet Global Scope
@@ -198,190 +498,6 @@ flexible scheduling model by making it possible to to set children effect's loca
 other words we allow arbitrary start time for child effects. This is something that needs to be
 added to level 2 spec.
 
-
-# Examples
-
-## Custom Spring Timing
-
-Use Animation Worklet to create animation with a custom spring timing.
-
-
-```html
-
-<div id='target'></div>
-
-<script>
-await CSS.animationWorklet.addModule('spring-animator.js');
-
-const effect = new KeyframeEffect(
-  $target,
-  {transform: ['translateX(0)', 'translateX(50vw)']},
-  {duration: 1000}
-);
-const animation = new WorkletAnimation('spring', effect, document.timeline, {k: 2, ratio: 0.7});
-animation.play();
-</script>
-```
-
-spring-animator.js:
-
-```js
-registerAnimator('spring', class SpringAnimator extends StatelessAnimator {
-  constructor(options = {k: 1, ratio: 0.5}) {
-    this.timing = createSpring(options.k, options.ratio);
-  }
-
-  animate(currentTime, effect) {
-    let delta = this.timing(currentTime);
-    // scale this by target duration
-    delta = delta * (effect.getTimings().duration / 2);
-    effect.localTime = delta;
-    // TODO: Provide a method for animate to mark animation as finished once
-    // spring simulation is complete, e.g., this.finish()
-    // See issue https://github.com/w3c/css-houdini-drafts/issues/808
-  }
-});
-
-function createSpring(springConstant, ratio) {
-  // Normalize mass and distance to 1 and assume a reasonable init velocit
-  // but these can also become options to this animator.
-  const velocity = 0.2;
-  const mass = 1;
-  const distance = 1;
-
-  // Keep ratio < 1 to ensure it is under-damped.
-  ratio = Math.min(ratio, 1 - 1e-5);
-
-  const damping = ratio * 2.0 * Math.sqrt(springConstant);
-  const w = Math.sqrt(4.0 * springConstant - damping * damping) / (2.0 * mass);
-  const r = -(damping / 2.0);
-  const c1 = distance;
-  const c2 = (velocity - r * distance) / w;
-
-  // return a value in [0..distance]
-  return function springTiming(timeMs) {
-    const time = timeMs / 1000; // in seconds
-    const result = Math.pow(Math.E, r * time) *
-                  (c1 * Math.cos(w * time) + c2 * Math.sin(w * time));
-    return distance - result;
-  }
-}
-```
-
-## Twitter Header
-
-An example of twitter profile header effect where two elements (avatar, and header) are updated in
-sync with scroll offset.
-
-```html
-
-<div id='scrollingContainer'>
-  <div id='header' style='height: 150px'></div>
-  <div id='avatar'><img></div>
-</div>
-
-<script>
-await CSS.animationWorklet.addModule('twitter-header-animator.js');
-const animation = new WorkletAnimation('twitter-header',
-  [new KeyframeEffect($avatar,  /* scales down as we scroll up */
-                      [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
-                      {duration: 1000, iterations: 1}),
-    new KeyframeEffect($header, /* loses transparency as we scroll up */
-                      [{opacity: 0}, {opacity: 0.8}],
-                      {duration: 1000, iterations: 1})],
-    new ScrollTimeline({
-      scrollSource: $scrollingContainer,
-      timeRange: 1000,
-      orientation: 'block',
-      startScrollOffset: 0,
-      endScrollOffset: $header.clientHeight}),
-);
-animation.play();
-</script>
-```
-
-twitter-header-animator.js:
-```js
-registerAnimator('twitter-header', class TwitterHeader extends StatelessAnimator {
-  constructor(options) {
-    this.timing_ = new CubicBezier('ease-out');
-  }
-
-  clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
-
-  animate(currentTime, effect) {
-    const scroll = currentTime;  // [0, 1]
-
-    // Drive the output group effect by setting its children local times.
-    effect.children[0].localTime = scroll;
-    // Can control the child effects individually
-    effect.children[1].localTime = this.timing_(this.clamp(scroll, 0, 1));
-  }
-});
-
-```
-
-### Parallax
-
-```html
-<style>
-.parallax {
-    position: fixed;
-    top: 0;
-    left: 0;
-    opacity: 0.5;
-}
-</style>
-<div id='scrollingContainer'>
-  <div id="slow" class="parallax"></div>
-  <div id="fast" class="parallax"></div>
-</div>
-
-<script>
-await CSS.animationWorklet.addModule('parallax-animator.js');
-const scrollTimeline = new ScrollTimeline({
-  scrollSource: $scrollingContainer,
-  orientation: 'block',
-  timeRange: 1000
-});
-const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
-
-const slowParallax = new WorkletAnimation(
-    'parallax',
-    new KeyframeEffect($parallax_slow, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
-    scrollTimeline,
-    {rate : 0.4}
-);
-slowParallax.play();
-
-const fastParallax = new WorkletAnimation(
-    'parallax',
-    new KeyframeEffect($parallax_fast, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
-    scrollTimeline,
-    {rate : 0.8}
-);
-fastParallax.play();
-</script>
-
-```
-
-parallax-animator.js:
-
-```js
-// Inside AnimationWorkletGlobalScope.
-registerAnimator('parallax', class Parallax extends StatelessAnimator{
-  constructor(options) {
-    this.rate_ = options.rate;
-  }
-
-  animate(currentTime, effect) {
-    effect.localTime = currentTime * this.rate_;
-  }
-});
-```
-
 # WEBIDL
 
 `WorkletAnimation` extends `Animation` and adds a getter for its timelines.
@@ -426,4 +542,6 @@ the most recent version.
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
 [cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
-
+[WA]: https://drafts.csswg.org/web-animations/
+[animation]: https://drafts.csswg.org/web-animations/#animations
+[worklet]: https://drafts.css-houdini.org/worklets/#worklet-section
