@@ -686,7 +686,7 @@ Here are a few implications of the above semantics:
     parallel execution context.
 
 Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
-   animation curren is changing e.g., via reverse(), finish() or playbackRate change. So that
+   animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
    it can react appropriately.
 
 
