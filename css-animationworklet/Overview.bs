@@ -379,7 +379,7 @@ Animator Instance {#animator-instance-section}
 
 An <dfn>animator instance</dfn> is a <a>struct</a> which describes a fully realized custom animation
 instance in an {{AnimationWorkletGlobalScope}}. It has a reference to an <a>animator definition</a>
-and owns the instance specific state such as animation effect and timelines. It consists of:
+and owns the instance specific state such as animation effect and timeline. It consists of:
 
  - An <a>animator name</a>.
 
@@ -391,8 +391,6 @@ and owns the instance specific state such as animation effect and timelines. It 
      time.
 
  - An <dfn>animator timeline</dfn> which is a <a>timeline</a>.
-
- - An <dfn>animator attached timelines</dfn> which is <a>list</a> of attached <a>timelines</a>
 
  - An <dfn>animator serialized options</dfn> which is a serializable object.
 
@@ -421,26 +419,23 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
 
     2. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
 
-    3. Let |timelineList| be a new <a>list</a> with |timeline| added to it.
+    3. Let |options| be <a>StructuredDeserialize</a>(|serializedOptions|).
 
-    4. Let |options| be <a>StructuredDeserialize</a>(|serializedOptions|).
+    4. Let |state| be <a>StructuredDeserialize</a>(|serializedState|).
 
-    5. Let |state| be <a>StructuredDeserialize</a>(|serializedState|).
-
-    6. Let |animatorInstance| be the result of <a>constructing</a> |animatorCtor| with
+    5. Let |animatorInstance| be the result of <a>constructing</a> |animatorCtor| with
         «|options|, |state|» as arguments. If an exception is thrown, rethrow the exception and
         abort all these steps.
 
-    7. Set the following on |animatorInstance| with:
+    6. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
         - <a>animation requested flag</a> being <a>frame-current</a>
         - <a>animator current time</a> being unresolved
         - <a>animator effect</a> being |effect|
         - <a>animator timeline</a> being |timeline|
-        - <a>animator attached timelines</a> being |timelineList|
         - <a>animator serialized options</a> being |options|
 
-    8. Add |animatorInstance| to |workletGlobalScope|'s <a>animator instance set</a>.
+    7. Add |animatorInstance| to |workletGlobalScope|'s <a>animator instance set</a>.
 
 </div>
 
@@ -534,6 +529,7 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
 
      4. If |stateful| is <b>false</b> then abort the following steps.
 
+     4. |stateFunction|
      5. Let |state| be the result of <a>Invoke</a> |stateFunction| with |instance| as the
         <a>callback this value</a>.  If any exception is thrown, rethrow the exception and abort
         the following steps.
@@ -569,7 +565,7 @@ Each <a>animator instance</a> has an associated <dfn>animation requested flag</d
 either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
 <a>frame-current</a>. Different circumstances can cause the <a>animation requested flag</a> to be
 set to <a>frame-requested</a>. These include the following:
-  - Changes in the <a>current time</a> of any <a>timeline</a> in the animator's <a>animator attached timelines</a>
+  - Changes in the <a>current time</a> of the animator's <a>timeline</a>
   - Changes in the <a>current time</a> of the animator's corresponding <a>Worklet Animation</a>
 
 [[#running-animators]] resets the <a>animation requested flag</a> on animators to
@@ -765,13 +761,12 @@ When the procedure to <a>set the timeline of an animation</a> for a given |workl
 is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
 
 
-Timeline Attachment {#timeline-attachment}
--------------------
-
-Issue(810): Define semantics of attachment and detachment.
 
 ScrollTimeline {#scroll-timeline}
 ---------------------------------
+<em>This section is not normative.</em>
+
+
 {{ScrollTimeline}} is a new concept being proposed for addition to web animation API. It defines
 an animation timeline whose time value depends on the scroll position of a scroll container.
 <a>Worklet animations</a> can have a scroll timeline and thus drive their scripted effects based
@@ -848,96 +843,8 @@ There are no known privacy issues introduced by these features.
 Examples {#examples}
 ====================
 
-Example 1: Hidey Bar. {#example-1}
------------------------------------------
-An example of header effect where a header is moved with scroll and as soon as finger is lifted it
-animates fully to close or open position depending on its current position.
 
-<xmp class='lang-markup'>
-
-<div id='scrollingContainer'>
-  <div id='header'>Some header</div>
-  <div>content</div>
-</div>
-
-<script>
-await CSS.animationWorklet.addModule('hidey-bar-animator.js');
-const scrollTimeline = new ScrollTimeline({
-  scrollSource: $scrollingContainer,
-  orientation: 'block',
-  timeRange: 1000
-});
-const documentTimeline = document.timeline;
-
-// Note we pass in two timelines in the options bag which allows the animation to read their
-// currenTime values directly.
-const animation = new WorkletAnimation(
-    'hidey-bar',
-    new KeyframeEffect($header,
-                        [{transform: 'translateX(100px)'}, {transform: 'translateX(0px)'}],
-                        {duration: 1000, iterations: 1, fill: 'both' }]),
-    scrollTimeline,
-    {scrollTimeline, documentTimeline});
-
-animation.play();
-</script>
-</xmp>
-
-<xmp class='lang-javascript'>
-
-// Inside AnimationWorkletGlobalScope
-
-registerAnimator('hidey-bar', class HidybarAnimator extends StatefulAnimator {
-  constructor(options, state) {
-    this.scrollTimeline_ = options.scrollTimeline;
-    this.documentTimeline_ = options.documentTimeline;
-
-    if (state) {
-      this.startTime_ = state.startTime;
-      this.direction_ = state.direction;
-    }
-  }
-
-  animate(currentTime, effect) {
-    const scroll = this.scrollTimeline_.currentTime;  // [0, 100]
-    const time = this.documentTimeline_.currentTime;
-
-    const activelyScrolling = this.scrollTimeline_.phase == 'active';
-
-    let localTime;
-    if (activelyScrolling) {
-      this.startTime_ = undefined;
-      localTime = scroll;
-    } else {
-      this.startTime_ = this.startTime_ || time;
-      // Decide on close/open direction depending on how far we have scrolled the header
-      // This can even do more sophisticated animation curve by computing the scroll velocity and
-      // using it.
-      this.direction_ = scroll >= 50 ? +1 : -1;
-      localTime = this.direction_ * (time - this.startTime_);
-    }
-
-    // Drive the output effect by setting its local time.
-    effect.localTime = localTime;
-  }
-
-  getter state() {
-    return {
-      startTime: this.startTime_,
-      direction: this.direction_
-    }
-  }
-});
-
-</xmp>
-
-Issue: This example uses a hypothetical "phase" property on timeline as a way to detect when user
-is no longer actively scrolling. This is a reasonable thing to have on scroll timeline. A simple
-fallback can emulate this by detecting when timeline time (i.e. scroll offset) has not changed in
-the last few frames.
-
-
-Example 2: Twitter header. {#example-2}
+Example 1: Twitter header. {#example-1}
 --------------------------
 An example of twitter profile header effect where two elements (avatar, and header) are updated in
 sync with scroll offset.
@@ -997,7 +904,7 @@ function clamp(value, min, max) {
 
 </xmp>
 
-Example 3: Parallax backgrounds. {#example-3}
+Example 2: Parallax backgrounds. {#example-2}
 -----------------------------------------
 A simple parallax background example.
 
