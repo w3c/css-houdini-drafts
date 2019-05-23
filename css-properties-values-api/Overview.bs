@@ -704,12 +704,24 @@ Otherwise, the interpolation falls back to the default 50% flip described in
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
-''@supports'' rules and the {{CSS/supports(conditionText)}} method behave as specified
-in [[!css-variables]].
+=======
+<div class=note>
+	''@supports'' rules and the {{CSS/supports(conditionText)}} method
+	behave as specified in [[!css-variables]],
+	without distinguishing between registered and unregistered custom properties,
+	and paying no attention to registered properties' syntaxes.
 
-Note: In other words, for the purpose of determining whether a value is
-supported by a given custom property, the type registered for the custom property is
-ignored and any value consisting of at least one token is considered valid.
+	{{CSS/supports(property, value)}},
+	as specified in [[css-conditional-3]],
+	<em>does</em> pay attention to the syntax of registered custom properties.
+
+	The general principle in use
+	is that anything which evaluates the validity of a CSS property value on its own
+	will pay attention to the syntax of registered custom properties,
+	but anything parsing any larger construct
+	(such as declarations, or entire stylesheets)
+	will ignore the syntax.
+</div>
 
 Relative URLs {#relative-urls}
 ------------------------------
