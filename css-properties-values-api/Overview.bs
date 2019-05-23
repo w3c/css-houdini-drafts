@@ -704,7 +704,6 @@ Otherwise, the interpolation falls back to the default 50% flip described in
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
-=======
 <div class=note>
 	''@supports'' rules and the {{CSS/supports(conditionText)}} method
 	behave as specified in [[!css-variables]],
