@@ -586,33 +586,24 @@ Parsing the syntax string {#parsing-syntax}
 		preprocessed as specified in [[css-syntax-3]].
 		Let |descriptor| be an initially empty [=list=] of <a>syntax components</a>.
 
-	5. Repeatedly consume the <a>next input code point</a> from |stream|:
+	5. <a>Consume a syntax component</a> from |stream|.
+		If failure was returned,
+		return failure;
+		otherwise,
+		[=list/append=] the returned value to |descriptor|.
 
-		:   <a>whitespace</a>
-		::  Do nothing.
+		Consume as much <a>whitespace</a> as possible from |stream|.
 
+		Consume the <a>next input code point</a> in |stream|:
 		:   EOF
-		:: If |descriptor|’s [=list/size=] is greater than zero,
-			return |descriptor|;
-			otherwise, return failure.
+		:: return |descriptor|.
 
 		:   U+007C VERTICAL LINE (|)
-		:: If |descriptor|’s [=list/size=] is greater than zero,
-			<a>consume a syntax component</a> from |stream|.
-			If failure was returned,
-			return failure;
-			otherwise,
-			[=list/append=] the returned value to |descriptor|.
+		:: Repeat step 5.
 
-			If |descriptor|’s [=list/size=] is zero, return failure.
+		:   Anything else:
+		:: Return failure.
 
-		:   anything else
-		:: <a>Reconsume the current input code point</a> in |stream|.
-			<a>Consume a syntax component</a> from |stream|.
-			If failure was returned,
-			return failure;
-			otherwise,
-			[=list/append=] the returned value to |descriptor|.
 </div>
 
 ### Consume a syntax component ### {#consume-syntax-component}
@@ -625,7 +616,7 @@ Parsing the syntax string {#parsing-syntax}
 	Let |component| be a new <a>syntax component</a> with its |name| and |multiplier| initially
 	empty.
 
-	Consume the <a>next input code point</a> |stream|:
+	Consume the <a>next input code point</a> in |stream|:
 
 	:   U+003C LESS-THAN SIGN (&lt;)
 	::  <a>Consume a data type name</a> from |stream|.
