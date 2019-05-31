@@ -32,9 +32,12 @@ spec:css-syntax-3; type:dfn;
 	text:starts with an identifier
 	text:consume a name
 spec:css-transforms-1; type:type; text:<transform-function>
-spec:css-values-4; type:value;
-	text:ex
-	text:cap
+spec:css-values-4;
+	type:value;
+		text:ex
+		text:cap
+	type:dfn
+		text:identifier
 spec:cssom-1; type:interface; text:CSS
 spec:dom; type:interface; text:Document
 spec:infra; type:dfn;
@@ -702,7 +705,11 @@ Conditional Rules {#conditional-rules}
 	and paying no attention to registered properties' syntaxes.
 
 	{{CSS/supports(property, value)}},
+<<<<<<< HEAD
 	as specified in [[css3-conditional]],
+=======
+	as specified in [[css-conditional-1]],
+>>>>>>> [css-properties-values-api] Fix some linking errors.
 	<em>does</em> pay attention to the syntax of registered custom properties.
 
 	The general principle in use
@@ -798,7 +805,7 @@ string.
 
 	Because the computed value of '--x' (when serialized)  is "80px", the computed
 	value of '--y' is: <<whitespace-token>> followed by
-	<<dimension-token>> with a value of '80' and unit 'px'.
+	<<dimension-token>> with a value of "80" and unit "px".
 
 </div>
 
