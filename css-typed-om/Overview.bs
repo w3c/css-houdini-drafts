@@ -4618,7 +4618,9 @@ Unrepresentable Values {#reify-failure}
 Not all [=underlying values=] are simple enough to be [=reified=]
 with the current set of {{CSSStyleValue}} subclasses.
 When this is the case,
-the property is [=reified as a CSSStyleValue=].
+the property is [=reified as a CSSStyleValue=] for a particular property,
+ensuring that it can be used as a value for that property,
+and nothing else.
 
 <div algorithm>
     To <dfn export lt="reify as a CSSStyleValue | reified as a CSSStyleValue">reify as a CSSStyleValue</dfn>
