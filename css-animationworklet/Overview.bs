@@ -6,9 +6,9 @@ ED: https://drafts.css-houdini.org/css-animationworklet-1/
 Shortname: css-animationworklet
 Level: 1
 Abstract:
-Editor: Majid Valipour, majidvp@google.com
-Editor: Robert Flack, flackr@chromium.org
-Editor: Stephen McGruer, smcgruer@chromium.org
+Editor: Majid Valipour, majidvp@google.com, w3cid 81464
+Editor: Robert Flack, flackr@chromium.org, w3cid 98451
+Editor: Stephen McGruer, smcgruer@chromium.org, w3cid 96463
 Ignored Terms: AnimationWorklet
 </pre>
 
