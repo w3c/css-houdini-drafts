@@ -702,7 +702,7 @@ Conditional Rules {#conditional-rules}
 	and paying no attention to registered properties' syntaxes.
 
 	{{CSS/supports(property, value)}},
-	as specified in [[css-conditional-3]],
+	as specified in [[css3-conditional]],
 	<em>does</em> pay attention to the syntax of registered custom properties.
 
 	The general principle in use
@@ -862,8 +862,8 @@ and affects how the custom property calculates its [=computed value=].
 ------------------------------------------------------------
 
 <div algorithm>
-	To <dfn>reify a registered custom property value</dfn> given a
-	[=syntax descriptor=] |syntax|, run these steps:
+	To <dfn>reify a registered custom property value</dfn> given a property
+	|property| and [=syntax descriptor=] |syntax|, run these steps:
 
 	For specified values:
 
@@ -888,10 +888,12 @@ and affects how the custom property calculates its [=computed value=].
 			return the result.
 		5. If the value is an [=identifier=], [=reify an identifier=] from the value
 			and return the result.
-		6. If the value is a <<declaration-value>>,
+		6. If |syntax| is the [=universal syntax descriptor=],
 			[=reify a list of component values=] from the value, and return the
 			result.
-		7. Otherwise, [=reify as a CSSStyleValue=] and return the result.
+		7. Otherwise, [=reify as a CSSStyleValue=] with the
+			{{[[associatedProperty]]}} internal slot set to |property|, and
+			return the result.
 </div>
 
 
