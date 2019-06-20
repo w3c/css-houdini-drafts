@@ -224,7 +224,13 @@ function createSpring(springConstant, ratio) {
 }
 ```
 
+Note that ideally once sping simulation is finished, the worklet animation would also dispatch
+the `finish` event. Adding the necessary mechanism to enable this is tracked
+[here](https://github.com/w3c/css-houdini-drafts/issues/808).
+
 ## Twitter Header
+
+Note: This assumes experimental [ScrollTimeline][scroll-timeline] feature.
 
 An example of twitter profile header effect where two elements (avatar, and header) are updated in
 sync with scroll offset.
@@ -281,70 +287,135 @@ registerAnimator('twitter-header', class TwitterHeader extends StatelessAnimator
     effect.children[1].localTime = this.timing_(this.clamp(scroll, 0, 1));
   }
 });
-
 ```
 
-## Parallax
+## Swipe-to-Dissmiss
 
-```html
-<style>
-.parallax {
-    position: fixed;
-    top: 0;
-    left: 0;
-    opacity: 0.5;
-}
-</style>
-<div id='scrollingContainer'>
-  <div id="slow" class="parallax"></div>
-  <div id="fast" class="parallax"></div>
-</div>
-<script>
-await CSS.animationWorklet.addModule('parallax-animator.js');
+Another usecase for Animation Worklet is to enable interactive input-driven animation effects that
+are driven both by input events and time.
 
-const parallaxSlowEl = document.getElementById('slow');
-const parallaxFastEl = document.getElementById('fast');
-const scrollingContainer = = document.getElementById('scrollingContainer');
+To enable this we need a way to receive pointer events in worklet (e.g. via [CSS custom
+variables](https://github.com/w3c/css-houdini-drafts/issues/869) or [other
+mechanisms][input-for-worker]) and
+also allow [playback controls](https://github.com/w3c/css-houdini-drafts/issues/808) inside
+worklets. Both of these are natural planned additions to Animation Worklet.
 
-const scrollTimeline = new ScrollTimeline({
-  scrollSource: scrollingContainer,
-  orientation: 'block',
-  timeRange: 1000
-});
-const scrollRange = scrollingContainerEl.scrollHeight - scrollingContainerEl.clientHeight;
 
-const slowParallax = new WorkletAnimation(
-    'parallax',
-    new KeyframeEffect(parallaxSlowEl, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
-    scrollTimeline,
-    {rate : 0.4}
-);
-slowParallax.play();
+Consider a simple swipe-to-dismiss effect which follows the user swipe gesture and when finger lifts
+then continues to completion (either dismissed or returned to origin) with a curve that matches the
+swipe gesture's velocity. (See this [example](https://twitter.com/kzzzf/status/917444054887124992))
 
-const fastParallax = new WorkletAnimation(
-    'parallax',
-    new KeyframeEffect(parallaxFastEl, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], scrollRange),
-    scrollTimeline,
-    {rate : 0.8}
-);
-fastParallax.play();
-</script>
+With Animation Worklet, this can be modeled as a stateful animator which consumes both time and
+pointer events and have the following state machines:
 
-```
+![SwipeToCompletionAnimation](img/swipe-to-dismiss-state.png)
 
-parallax-animator.js:
 
-```js
-// Inside AnimationWorkletGlobalScope
-registerAnimator('parallax', class Parallax extends StatelessAnimator{
-  constructor(options) {
-    this.rate_ = options.rate;
+Here are the three main states:
+
+1. Animation is idle, where it is `paused` so that it is not actively ticking
+2. As soon as the user touches down, the animation moves the target to follow the user touchpoint
+   while staying `paused` (optionally calculate the movement velocity, and overall delta).
+3. As soon as the user lift their finger the animation will the switch to 'playing' so that it is
+   ticked by time until it reaches its finished state. The final state may be decided on overall
+   delta and velocity and the animation curve adapts to the movement velocity.
+
+Note that while in (3), if the user touches down we go back to (2) which ensures responsiveness to
+user touch input.
+
+To make this more concrete, here is how this may be implemented (assuming strawman proposed APIs for
+playback controls and also receiving pointer events). Note that all the state machine transitions and
+various state data (velocity, phase) and internal to the animator. Main thread only needs to provide
+appropriate keyframes that can used to translate the element on the viewport as appropriate (e.g.,
+`Keyframes(target, {transform: ['translateX(-100vw)', 'translateX(100vw)']})`).
+
+
+```javascript
+registerAnimator('swipe-to-dismiss', class SwipeAnimator extends StatefulAnimator {
+  constructor(options, state = {velocity: 0, phase: 'idle'}) {
+    this.velocity = state.velocity;
+    this.phase = state.phase;
+
+    if (phase == 'idle') {
+      // Pause until we receive pointer events.
+      this.pause();
+    }
+
+    // Assumes we have an API to receive pointer events for our target.
+    this.addEventListener("eventtargetadded", (event) => {
+     for (type of ["pointerdown", "pointermove", "pointerup"])  {
+        event.target.addEventListener(type,onPointerEvent );
+     }
+    });
+  }
+
+  onpointerevent(event) {
+    if (event.type == "pointerdown" || event.type == "pointermove") {
+      this.phase = "follow_pointer";
+    } else {
+      this.phase = "animate_to_completion";
+      // Also decide what is the completion phase (e.g., hide or show)
+    }
+
+    this.pointer_position = event.screenX;
+
+    // Allow the animation to play for *one* frame to react to the pointer event.
+    this.play();
   }
 
   animate(currentTime, effect) {
-    effect.localTime = currentTime * this.rate_;
+    if (this.phase == "follow_pointer") {
+      effect.localTime = position_curve(this.pointer_position);
+      update_velocity(currentTime, this.pointer_position);
+      // Pause, no need to produce frames until next pointer event.
+      this.pause();
+    } else if (this.phase = "animate_to_completion") {
+      effect.localTime = time_curve(currentTime, velocity);
+
+      if (effect.localTime == 0 || effect.localTime == effect.duration) {
+        // The animation is complete. Pause and become idle until next user interaction.
+        this.phase = "idle";
+        this.pause();
+      } else {
+        // Continue producing frames based on time until we complete or the user interacts again.
+        this.play();
+      }
+    }
+
+  }
+
+  position_curve(x) {
+    // map finger position to local time so we follow user's touch.
+  }
+
+  time_curve(time, velocity) {
+    // Map current time delta and given movement velocity to appropriate local time so that over
+    // time we animate to a final position.
+  }
+
+  update_velocity(time, x) {
+    this.velocity = (x - last_x) / (time - last_time);
+    this.last_time = time;
+    this.last_x = x;
+  }
+
+  state() {
+    return {
+      phase: this.phase,
+      velocity: this.velocity
+    }
   }
 });
+```
+
+```javascript
+
+await CSS.animationWorklet.addModule('swipe-to-dismiss-animator.js');
+const target = document.getElementById('target');
+const s2d = new WorkletAnimation(
+    'swipe-to-dismiss',
+    new KeyframeEffect(target, {transform: ['translateX(-100vw)', 'translateX(100vw)']}));
+s2d.play();
 ```
 
 
@@ -465,7 +536,7 @@ registerAnimator('animation-with-local-state', class FoorAnimator extends Statef
     return {
       this.velocity,
       this.acceleration
-    };
+    }
   }
 
   curve(velocity, accerlation, t) {
@@ -476,27 +547,34 @@ registerAnimator('animation-with-local-state', class FoorAnimator extends Statef
 
 # Related Concepts
 
-The following concepts are not part of Animation Worklet specification but animation worklet is
-designed to take advantage of them to enable a richer set of usecases.
+The following concepts are not part of Animation Worklet specification but Animation Worklet is
+designed to take advantage of them to enable a richer set of usecases. These are still in early
+stages of the standardization process so their API may change over time.
 
 ## ScrollTimeline
-[ScrollTimeline](https://wicg.github.io/scroll-animations/#scrolltimeline) is a concept introduced in
+[ScrollTimeline][scroll-timeline] is a concept introduced in
 scroll-linked animation proposal. It defines an animation timeline whose time value depends on
 scroll position of a scroll container. `ScrollTimeline` can be used an an input timeline for
 worklet animations and it is the intended mechanisms to give read access to scroll position.
 
-## GroupEffect
-[GroupEffect](https://w3c.github.io/web-animations/level-2/#the-animationgroup-interfaces) is a
-concept introduced in Web Animation Level 2 specification. It provides a way to group multiple
-effects in a tree structure. `GroupEffect` can be used as the output for worklet animations. It
-makes it possible for worklet animation to drive effects spanning multiple elements.
+We can later add additional properties to this timeline (e.g., scroll phase (active, inertial, overscroll),
+velocity, direction) that can further be used by Animation Worklet.
 
-**TODO**: At the moment, `GroupEffect` only supports just two different scheduling models (i.e.,
-parallel, sequence). These models governs how the group effect time is translated to its children
-effect times by modifying the child effect start time. Animation Worklet allows a much more
-flexible scheduling model by making it possible to to set children effect's local time directly. In
-other words we allow arbitrary start time for child effects. This is something that needs to be
-added to level 2 spec.
+## GroupEffect
+
+[GroupEffect][group-effect] is a concept introduced in Web Animation Level 2 specification. It
+provides a way to group multiple effects in a tree structure. `GroupEffect` can be used as the
+output for Worklet Animations making it possible for it to drive complext effects spanning multiple
+elements. Also with some minor [proposed changes](group-effect-changes) to Group Effect timing
+model, Animation Worklet can enable creation of new custom sequencing models (e.g., with conditions
+and state).
+
+## Event Dispatching to Worker and Worklets
+[Event Dispatching to Worker/Worklets][input-for-worker] is a proposal in WICG which allows workers
+and worklets to passively receive DOM events and in particular Pointer Events. This can be
+benefitial to Animation Worklet as it provides an ergonomic and low latency way for Animation
+Worklet to receive pointer events thus enabling it to implement input driven animations more
+effectively.
 
 # WEBIDL
 
@@ -508,6 +586,7 @@ the animation worklet scope.
  - A sequence of timelines, the first one of which is considered primary timeline and passed to
    `Animation` constructor.
 
+
 ```webidl
 
 [Constructor (DOMString animatorName,
@@ -518,10 +597,6 @@ interface WorkletAnimation : Animation {
         readonly attribute DOMString animatorName;
 }
 ```
-
-**TODO**: At the moment `GroupEffect` constructor requires a timing but this seems unnecessary for
-`WorkletAnimation` where it should be possible to directly control individual child effect local
-times. We need to bring this up with web-animation spec.
 
 `AnimationEffectReadOnly` gets a writable `localTime` attribute which may be used to drive the
 effect from the worklet global scope.
@@ -545,3 +620,7 @@ the most recent version.
 [WA]: https://drafts.csswg.org/web-animations/
 [animation]: https://drafts.csswg.org/web-animations/#animations
 [worklet]: https://drafts.css-houdini.org/worklets/#worklet-section
+[input-for-worker]: https://discourse.wicg.io/t/proposal-exposing-input-events-to-worker-threads/3479
+[group-effect]: https://w3c.github.io/web-animations/level-2/#the-animationgroup-interfaces
+[group-effect-changes]: https://github.com/yi-gu/group_effects
+[scroll-timeline]: https://wicg.github.io/scroll-animations/#scrolltimeline
