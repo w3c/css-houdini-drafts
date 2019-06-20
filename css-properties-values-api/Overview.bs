@@ -686,14 +686,26 @@ Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible
 specify animations and transitions that reference custom properties.
 
 When referenced by animations and transitions,
-custom properties interpolate in a manner defined by their types.
-If their type is defined as a list with "+",
-it's interpolated as a simple list [[!css3-transitions]].
+custom property values [=interpolate=] [=by computed value=],
+in accordance with the type that they parsed as.
 
-If the start and end of an interpolation have matching types, then they
-will interpolate as specified in [[!css3-animations]].
-Otherwise, the interpolation falls back to the default 50% flip described in
-[[!css3-animations]].
+Note: This implies that a list of values,
+such as `<color>+` or `<color>#`,
+will interpolate as a simple list,
+matching up each component index-by-index,
+and failing if the number of components doesn't match.
+
+As an exception to the above rule,
+a value that parsed as a `<transform-list>`,
+a `<transform-function>`,
+or a `<transform-function>+`
+instead interpolates as per the 'transform' property.
+
+Note: If,
+for whatever reason,
+a custom property is defined with a syntax of `<transform-function>#`,
+this will thus first interpolate as a simple list,
+and then each list item will interpolate as a 'transform' value.
 
 Conditional Rules {#conditional-rules}
 --------------------------------------
@@ -705,11 +717,7 @@ Conditional Rules {#conditional-rules}
 	and paying no attention to registered properties' syntaxes.
 
 	{{CSS/supports(property, value)}},
-<<<<<<< HEAD
-	as specified in [[css3-conditional]],
-=======
 	as specified in [[css-conditional-1]],
->>>>>>> [css-properties-values-api] Fix some linking errors.
 	<em>does</em> pay attention to the syntax of registered custom properties.
 
 	The general principle in use
