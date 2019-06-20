@@ -545,6 +545,45 @@ registerAnimator('animation-with-local-state', class FoorAnimator extends Statef
 });
 ```
 
+
+## Threading Model
+
+Animation Worklet is designed to be thread-agnostic. Rendering engines may create one or more
+parallel worklet execution contexts separate from the main javascript execution context, e.g., on
+their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
+animations to run in such contexts. Doing so allows Animation Worklet animations to avoid being
+impacted by main thread jank.
+
+Rendering engines may wish to make a best-effort attempt to execute animate callbacks synchronously
+with visual frame production to ensure smooth animation. However it is legal for rendering engines
+to produce visual frames without blocking to receive animation updates from a worklet (i.e., letting
+the effects slip behind). For example, this could occur when the animate function callback is
+unable to complete before the frame deadline.
+
+We believe that scripted animations which are run in a parallel execution environment and which
+limit themselves to animating properties which do not require the user agent to consult main thread
+will have a much better chance of meeting the strict frame budgets required for smooth playback.
+
+
+Note that due to the asynchronous nature of this animation model a script running in the main
+javascript execution context may see a stale value when reading a target property that is
+being animated in a Worklet Animation, compared to the value currently being used to produce the
+visual frame that is visible to the user. This is similar to the effect of asynchronous scrolling
+when reading scroll offsets in the main javascript execution context.
+
+
+<figure>
+  <img src="img/AnimationWorklet-threading-model.svg" width="600"
+    alt="Overview of the animation worklet threading model.">
+  <figcaption>
+    Overview of the animation worklet threading model. <br>
+
+    A simplified visualization of how animators running in a parallel execution environment can sync
+    their update to main thread while remaining in sync with visual frame production.
+  </figcaption>
+</figure>
+
+
 # Related Concepts
 
 The following concepts are not part of Animation Worklet specification but Animation Worklet is
