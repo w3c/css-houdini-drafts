@@ -36,34 +36,33 @@ address this problem.
 # Motivating Use Cases
 
 *   Scroll driven effects:
-    *   [Hidey-bar](https://googlechromelabs.github.io/houdini-samples/animation-worklet/twitter-header/): animation depends on both time and scroll input.
-    *   [Parallax](https://googlechromelabs.github.io/houdini-samples/animation-worklet/parallax-scrolling/): Simplest scroll-drive effect.
-    *   [Custom paginated slider](http://aw-playground.glitch.me/amp-scroller.html).
+    *   Hidey-bar ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/twitter-header/)): animation depends on both scroll and time input.
+    *   Parallax  ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/parallax-scrolling/)): simplest scroll-driven effect.
+    *   Custom paginated slider ([demo](http://aw-playground.glitch.me/amp-scroller.html)).
     *   Pull-to-refresh: animation depends on both touch and time inputs.
     *   Custom scrollbars.
     *   High-fidelity location tracking and positioning
     *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md) of scroll-driven effects.
 *   Gesture driven effects:
     *   [Image manipulator](https://github.com/w3c/csswg-drafts/issues/2493#issuecomment-422153926) that scales, rotates etc.
-    *   Swipe to dismiss.
+    *   Swipe to Action.
     *   Drag-N-Drop.
     *   Tiled panning e.g., Google maps.
 *   Stateful script driven effects:
-    *   [Spring timing emulations](https://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-timing/).
-    *   [Spring-Sticky effect](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/).
+    *   Spring-Sticky effect ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-sticky/)).
     *   Touch-driven physical environments.
-    *   [Expando](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/): Procedural animations with multiple elements.
+    *   Expando ([demo](http://googlechromelabs.github.io/houdini-samples/animation-worklet/expando/)): Procedural animations with multiple elements.
 *   Animated scroll offsets:
     * Having multiple scrollers scroll in sync e.g. diff viewer keeping old/new in sync when you
       scroll either ([demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/sync-scroller/))
     * Custom smooth scroll animations (e.g., physic based fling curves)
 *   Animation Extensibility:
-    *  Custom timing functions (particularly those that are not calculable a priori)
+    *  Custom animation timings (particularly those that are not calculable a priori e.g., [spring demo](https://googlechromelabs.github.io/houdini-samples/animation-worklet/spring-timing/))
     *  Custom animation sequencing which involves complex coordination across multiple effects.
 
 
 Not all of these usecases are immediately enabled by the current proposed API. However Animation
-Worklet provides a powerfull primitive (off main-thread scriped animation) which when combined with
+Worklet provides a powerfull primitive (off main-thread scripted animation) which when combined with
 other upcoming features (e.g.,
 [Event in Worklets](https://github.com/w3c/css-houdini-drafts/issues/834),
 [ScrollTimeline](https://wicg.github.io/scroll-animations/),
@@ -74,7 +73,6 @@ See [Animation Worklet design principles and goals](principles.md) for a more ex
 of this.
 
 
-
 ***Note***:  Demos work best in the latest Chrome Canary with the experimental
 web platform features enabled (`--enable-experimental-web-platform-features`
 flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
@@ -83,14 +81,15 @@ flag) otherwise they fallback to using main thread rAF to emulate the behaviour.
 # Animation Worklet
 
 Animation Worklet attempts to address the above usecases by introducing a new primitive that enables
-extensibility in the web's core animation model [WebAnimations][WA]): custom animate function!
+extensibility in the web's core animation model [WebAnimations][WA]): custom frame-by-frame animate
+function!
 
 
 ## How It Works
 
-Normally, an active animation takes its timeline time and according to its running state (e.g., playing,
-finished) and playback rate, computes its own **current time** which it then uses to set its
-keyframe effect **local time**. Here is a simple example of a simple animation:
+Normally, an active animation takes its timeline time and according to its running state (e.g.,
+playing, finished) and playback rate, computes its own **current time** which it then uses to set
+its keyframe effect **local time**. Here is a simple example of a simple animation:
 
 ```js
 const effect = new KeyframeEffect(targetEl,
@@ -289,7 +288,7 @@ registerAnimator('twitter-header', class TwitterHeader extends StatelessAnimator
 });
 ```
 
-## Swipe-to-Dissmiss
+## Swipe-to-Action
 
 Another usecase for Animation Worklet is to enable interactive input-driven animation effects that
 are driven both by input events and time.
@@ -301,7 +300,7 @@ also allow [playback controls](https://github.com/w3c/css-houdini-drafts/issues/
 worklets. Both of these are natural planned additions to Animation Worklet.
 
 
-Consider a simple swipe-to-dismiss effect which follows the user swipe gesture and when finger lifts
+Consider a simple swipe-to-action effect which follows the user swipe gesture and when finger lifts
 then continues to completion (either dismissed or returned to origin) with a curve that matches the
 swipe gesture's velocity. (See this [example](https://twitter.com/kzzzf/status/917444054887124992))
 
@@ -324,10 +323,10 @@ Note that while in (3), if the user touches down we go back to (2) which ensures
 user touch input.
 
 To make this more concrete, here is how this may be implemented (assuming strawman proposed APIs for
-playback controls and also receiving pointer events). Note that all the state machine transitions and
-various state data (velocity, phase) and internal to the animator. Main thread only needs to provide
-appropriate keyframes that can used to translate the element on the viewport as appropriate (e.g.,
-`Keyframes(target, {transform: ['translateX(-100vw)', 'translateX(100vw)']})`).
+playback controls and also receiving pointer events). Note that all the state machine transitions
+and various state data (velocity, phase) and internal to the animator. Main thread only needs to
+provide appropriate keyframes that can used to translate the element on the viewport as appropriate
+(e.g., `Keyframes(target, {transform: ['translateX(-100vw)', 'translateX(100vw)']})`).
 
 
 ```javascript
@@ -596,8 +595,8 @@ scroll-linked animation proposal. It defines an animation timeline whose time va
 scroll position of a scroll container. `ScrollTimeline` can be used an an input timeline for
 worklet animations and it is the intended mechanisms to give read access to scroll position.
 
-We can later add additional properties to this timeline (e.g., scroll phase (active, inertial, overscroll),
-velocity, direction) that can further be used by Animation Worklet.
+We can later add additional properties to this timeline (e.g., scroll phase (active, inertial,
+overscroll), velocity, direction) that can further be used by Animation Worklet.
 
 ## GroupEffect
 
@@ -614,6 +613,7 @@ and worklets to passively receive DOM events and in particular Pointer Events. T
 benefitial to Animation Worklet as it provides an ergonomic and low latency way for Animation
 Worklet to receive pointer events thus enabling it to implement input driven animations more
 effectively.
+
 
 # WEBIDL
 
