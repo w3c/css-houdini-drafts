@@ -127,49 +127,6 @@ interface from the Web Animations specification on the main javascript execution
 they can be controlled and inspected from main thread using the same Web Animation APIs.
 
 
-Threading Model {#threading-model}
-==================================
-<em>This section is not normative.</em>
-
-<a>Animation Worklet</a> is designed to be thread-agnostic. Rendering engines may create one or more
-parallel worklet execution contexts separate from the main javascript execution context, e.g., on
-their own dedicated threads. Rendering engines may then choose to assign Animation Worklet
-animations to run in such contexts. Doing so allows Animation Worklet animations to avoid being
-impacted by main thread jank.
-
-Rendering engines may wish to make a best-effort attempt to execute animate callbacks synchronously
-with visual frame production to ensure smooth animation. However it is legal for rendering engines
-to produce visual frames without blocking to receive animation updates from a worklet (i.e., letting
-the effects slip behind). For example, this could occur when the <a>animate function</a> callback is
-unable to complete before the frame deadline.
-
-We believe that scripted animations which are run in a parallel execution environment and which
-limit themselves to animating properties which do not require the user agent to consult main thread
-will have a much better chance of meeting the strict frame budgets required for smooth playback.
-
-If a Worklet Animation animation is executing in a parallel worklet execution context, the last
-known state of its animation effects should be periodically synced back to the main javascript
-execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
-context to the main javascript execution context <em>must</em> occur before <a>running the animation
-frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
-this animation model a script running in the main javascript execution context may see a stale value
-when reading a <a>target property</a> that is being animated in a Worklet Animation, compared to the
-value currently being used to produce the visual frame that is visible to the user. This is similar
-to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
-context.
-
-
-<figure>
-  <img src="img/AnimationWorklet-threading-model.svg" width="600"
-    alt="Overview of the animation worklet threading model.">
-  <figcaption>
-    Overview of the animation worklet threading model. <br>
-
-    A simplified visualization of how animators running in a parallel execution environment can sync
-    their update to main thread while remaining in sync with visual frame production.
-  </figcaption>
-</figure>
-
 Animation Worklet {#animation-worklet-desc}
 ==============================
 <dfn>Animation Worklet</dfn> is a {{Worklet}} responsible for all classes related to custom
@@ -684,6 +641,17 @@ Here are a few implications of the above semantics:
  - Querying the animation effect's local time using {{AnimationEffect/getComputedTiming()}}
     may return stale information, in the case where the <a>animator instance</a> is running in a
     parallel execution context.
+
+If a Worklet Animation animation is executing in a parallel worklet execution context, the last
+known state of its animation effects should be periodically synced back to the main javascript
+execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
+context to the main javascript execution context <em>must</em> occur before <a>running the animation
+frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
+this animation model a script running in the main javascript execution context may see a stale value
+when reading a <a>target property</a> that is being animated by a Worklet Animation, compared to the
+value currently being used to produce the visual frame that is visible to the user. This is similar
+to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
+context.
 
 Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
