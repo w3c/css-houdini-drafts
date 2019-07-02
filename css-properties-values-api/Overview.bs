@@ -1035,15 +1035,10 @@ The <code>CSSPropertyRule</code> interface represents an ''@property'' rule.
 <pre class='idl' export>
 [Exposed=Window]
 interface CSSPropertyRule : CSSRule {
-<<<<<<< HEAD
     readonly attribute CSSOMString name;
     readonly attribute CSSOMString syntax;
     readonly attribute bool inherits;
     readonly attribute CSSOMString? initialValue;
-=======
-    attribute CSSOMString name;
-    readonly attribute CSSStyleDeclaration style;
->>>>>>> New example + mutable 'name' field.
 };
 </pre>
 
