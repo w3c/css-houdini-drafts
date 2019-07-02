@@ -690,15 +690,15 @@ custom property values [=interpolate=] [=by computed value=],
 in accordance with the type that they parsed as.
 
 Note: This implies that a list of values,
-such as `<color>+` or `<color>#`,
+such as `&lt;color>+` or `&lt;color>#`,
 will interpolate as a simple list,
 matching up each component index-by-index,
 and failing if the number of components doesn't match.
 
 As an exception to the above rule,
-a value that parsed as a `<transform-list>`,
-a `<transform-function>`,
-or a `<transform-function>+`
+a value that parsed as a `&lt;transform-list>`,
+a `&lt;transform-function>`,
+or a `&lt;transform-function>+`
 instead interpolates as per the 'transform' property.
 
 Note: If,
