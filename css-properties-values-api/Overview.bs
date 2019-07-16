@@ -711,7 +711,7 @@ Conditional Rules {#conditional-rules}
 --------------------------------------
 
 <div class=note>
-	''@supports'' rules and the {{CSS/supports}} method
+	''@supports'' rules and the {{CSS/supports()}} method
 	behave as specified in [[!css-variables]],
 	without distinguishing between registered and unregistered custom properties,
 	and paying no attention to registered properties' syntaxes.
