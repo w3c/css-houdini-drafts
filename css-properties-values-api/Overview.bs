@@ -850,6 +850,7 @@ CSSOM {#cssom}
 			return the result.
 </div>
 
+
 The <dfn>@property</dfn> rule {#at-property-rule}
 =================================================
 
@@ -884,8 +885,12 @@ if it's missing, the entire rule is invalid and must be ignored.
 If an ''@property'' rule contains any unknown descriptors,
 the entire rule is invalid and must be ignored.
 
-Issue(845): What happens when we have both an ''@property'' rule, and a
-{{registerProperty()}} call for the same property?
+If multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
+the last one in stylesheet order "wins".
+A custom property registration from {{CSS/registerProperty|CSS.registerProperty()}}
+further wins over any ''@property'' rules
+for the same <<custom-property-name>>.
+
 
 Issue(846): What happens when ''@property'' appears inside a shadow tree?
 
