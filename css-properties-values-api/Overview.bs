@@ -23,6 +23,7 @@ Ignored Terms: construct, name map of inputs
 Ignored Vars: arguments, methodPropertyKey, inputStyleMap, workletGlobalScope
 Ignored Terms: WorkletGlobalContext
 Repository: w3c/css-houdini-drafts
+Markup Shorthands: css on, markdown on
 </pre>
 
 <pre class='link-defaults'>
