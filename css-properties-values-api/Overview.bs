@@ -914,16 +914,17 @@ and affects how the custom property calculates its [=computed value=].
 The <dfn>@property</dfn> rule {#at-property-rule}
 =================================================
 
-The ''@property'' rule provides an alternative way to register a custom
-property. Valid ''@property'' rules result in a
-[=register a custom property|registered custom property=], as if
-{{registerProperty()}} had been called with equivalent parameters.
+The ''@property'' rule provides an alternative way to register a custom property,
+directly in a stylesheet
+without having to run any JS.
+Valid ''@property'' rules result in a [=register a custom property|registered custom property=],
+as if {{registerProperty()}} had been called with equivalent parameters.
 
-The semantics of registered properties are the same regardless of
-the mechanism used to perform the registration. This means that, once
-registered, it does not matter whether the registration originated from
-{{registerProperty()}} or ''@property'': the property has the same
-behavior either way.
+The semantics of registered properties are the same
+regardless of the mechanism used to perform the registration.
+This means that, once registered,
+it does not matter whether the registration originated from {{registerProperty()}} or ''@property'':
+the property has the same behavior either way.
 
 The syntax of ''@property'' is:
 
@@ -933,21 +934,22 @@ The syntax of ''@property'' is:
 	}
 	</pre>
 
-''@property'' rules require a 'syntax', and 'inherits' descriptor; if either are
-missing, the ''@property'' rule is invalid, and must not result in a registration.
-The 'initial-value' descriptor is optional only if the syntax is the
-[=universal syntax descriptor=], otherwise the descriptor is required; if it's
-missing, the ''@property'' rule is invalid,
-and must not result in a registration.
+''@property'' rules require a 'syntax' and 'inherits' descriptor;
+if either are missing,
+the entire rule is invalid and must be ignored.
+The 'initial-value' descriptor is optional
+only if the syntax is the [=universal syntax descriptor=],
+otherwise the descriptor is required;
+if it's missing, the entire rule is invalid and must be ignored.
 
-The ''@property'' rule accepts the descriptors defined in this chapter.
-Declarations that contain other descriptors not defined here, must be ignored to
-maintain forwards compatiblity.
+If an ''@property'' rule contains any unknown descriptors,
+the entire rule is invalid and must be ignored.
 
 Issue(845): What happens when we have both an ''@property'' rule, and a
 {{registerProperty()}} call for the same property?
 
 Issue(846): What happens when ''@property'' appears inside a shadow tree?
+
 
 The 'syntax' descriptor {#the-syntax-descriptor}
 ------------------------------------------------
@@ -956,18 +958,19 @@ The 'syntax' descriptor {#the-syntax-descriptor}
 	Name: syntax
 	Value: <<string>>
 	For: @property
-	Initial: "*"
+	Initial: n/a (see prose)
 	</pre>
 
-Specifies the syntax of the custom property, on the form defined by
-[[#syntax-strings]]. This descriptor is equivalent to the
-{{PropertyDescriptor/syntax|syntax}} member of {{PropertyDescriptor}}.
+Specifies the syntax of the custom property,
+in the form defined by [[#syntax-strings]].
+This descriptor is equivalent to the {{PropertyDescriptor/syntax|syntax}} member of {{PropertyDescriptor}}.
 
-The syntax descriptor is required for the ''@property'' rule to be valid;
-if it's missing, the ''@property'' rule has no effect.
+The 'syntax' descriptor is required for the ''@property'' rule to be valid;
+if it's missing, the ''@property'' rule is invalid.
 
-If the provided string does not successfully parse as a syntax descriptor,
-the ''@property'' rule has no effect.
+If the provided string does not successfully [=consume a syntax definition|parse as a syntax definition=],
+the descriptor is invalid and must be ignored.
+
 
 The 'inherits' descriptor {#inherits-descriptor}
 ------------------------------------------------
@@ -976,14 +979,15 @@ The 'inherits' descriptor {#inherits-descriptor}
 	Name: inherits
 	Value: true | false
 	For: @property
-	Initial: Nothing
+	Initial: n/a (see prose)
 	</pre>
 
-Specifies whether or not the custom property inherits. This is equivalent to the
-{{PropertyDescriptor/inherits}} member of {{PropertyDescriptor}}.
+Specifies whether or not the custom property inherits.
+This is equivalent to the {{PropertyDescriptor/inherits}} member of {{PropertyDescriptor}}.
 
 The inherits descriptor is required for the ''@property'' rule to be valid;
-if it's missing, the ''@property'' rule has no effect.
+if it's missing, the ''@property'' rule is invalid.
+
 
 The 'initial-value' descriptor {#initial-value-descriptor}
 ----------------------------------------------------------
@@ -992,77 +996,71 @@ The 'initial-value' descriptor {#initial-value-descriptor}
 	Name: initial-value
 	Value: <<declaration-value>>
 	For: @property
-	Initial: Nothing
+	Initial: the [=guaranteed-invalid value=] (but see prose)
 	</pre>
 
-Specifies the [[css-cascade-4#initial-values|initial value]] of the custom
-property. This is equivalent to the {{PropertyDescriptor/initialValue}} member
-of {{PropertyDescriptor}}.
+Specifies the [=initial value=] of the custom property.
+This is equivalent to the {{PropertyDescriptor/initialValue}} member of {{PropertyDescriptor}}.
 
 If the value of the 'syntax' descriptor is the [=universal syntax descriptor=],
-then the initial-value descriptor may be omitted. If omitted, the initial value
-becomes [[css-variables#invalid-variables|the empty value invalid for substituion]]
-described by [[css-variables]].
+then the 'initial-value' descriptor is optional.
+If omitted, the initial value of the property is the [=guaranteed-invalid value=].
 
-Otherwise, if the value of the 'syntax' descriptor is not the
-[=universal syntax descriptor=], the following conditions must be met for the
-the ''@property'' rule to be valid:
+Otherwise,
+if the value of the 'syntax' descriptor is not the [=universal syntax descriptor=],
+the following conditions must be met for the the ''@property'' rule to be valid:
 
 	* The 'initial-value' descriptor must be present.
-	* The 'initial-value' must parse successfully according to the grammar
-		specified by the [=syntax descriptor=].
+	* The 'initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
+		according to the grammar specified by the [=syntax definition=].
 	* The 'initial-value' must be [=computationally independent=].
 
-If the above conditions are not met, the ''@property'' rule is invalid, and
-has no effect.
+If the above conditions are not met, the ''@property'' rule is invalid.
 
-Extensions to the <code>CSSRule</code> interface {#extensions-to-css-rule-interface}
+
+Extensions to the {{CSSRule}} interface {#extensions-to-css-rule-interface}
 ------------------------------------------------------------------------------------
 
-The <code>CSSRule</code> interface is extended as follows:
+The {{CSSRule}} interface is extended as follows:
 
 <pre class='idl'>
 partial interface CSSRule {
-    const unsigned short PROPERTY_RULE = 16;
+    const unsigned short PROPERTY_RULE = 18;
 };
 </pre>
 
-The <code>CSSPropertyRule</code> interface {#the-css-property-rule-interface}
+The <dfn interface>CSSPropertyRule</dfn> interface {#the-css-property-rule-interface}
 -----------------------------------------------------------------------------
 
-The <code>CSSPropertyRule</code> interface represents an ''@property'' rule.
+The {{CSSPropertyRule}} interface represents an ''@property'' rule.
 
 <pre class='idl' export>
 [Exposed=Window]
 interface CSSPropertyRule : CSSRule {
     readonly attribute CSSOMString name;
     readonly attribute CSSOMString syntax;
-    readonly attribute bool inherits;
+    readonly attribute boolean inherits;
     readonly attribute CSSOMString? initialValue;
 };
 </pre>
 
-<dl class='idl-attributes'>
-	<dt><code>name</code> of type {{CSSOMString}}, readonly</dt>
+<dl dfn-for=CSSPropertyRule dfn-type=attribute>
+	<dt><dfn>name</dfn>
 	<dd>
 		The custom property name associated with the ''@property'' rule.
-	</dd>
 
-	<dt><code>syntax</code> of type {{CSSOMString}}, readonly</dt>
+	<dt><dfn>syntax</dfn>
 	<dd>
 		The syntax associated with the ''@property'', exactly as specified.
-	</dd>
 
-	<dt><code>inherits</code> of type {{bool}}, readonly</dt>
+	<dt><dfn>inherits</dfn>
 	<dd>
 		The inherits descriptor associated withthe ''@property'' rule.
-	</dd>
 
-	<dt><code>initialValue</code> of type {{CSSOMString}}?, readonly</dt>
+	<dt><dfn>initialValue</dfn>
 	<dd>
-		The initial value associated with the ''@property'' rule, which may
-		not be present.
-	</dd>
+		The initial value associated with the ''@property'' rule,
+		which may not be present.
 </dl>
 
 
@@ -1072,72 +1070,69 @@ Examples {#examples}
 Example 1: Using custom properties to add animation behavior {#example-1}
 -------------------------------------------------------------------------
 
-<pre class='lang-markup'>
-&lt;script>
-CSS.registerProperty({
-	name: "--stop-color",
-	syntax: "&lt;color>",
-	inherits: false,
-	initialValue: "rgba(0,0,0,0)"
-});
-&lt;/script>
+<xmp class='lang-markup'>
+	<script>
+	CSS.registerProperty({
+		name: "--stop-color",
+		syntax: "<color>",
+		inherits: false,
+		initialValue: "rgba(0,0,0,0)"
+	});
+	</script>
 
-&lt;style>
+	<style>
+	.button {
+		--stop-color: red;
+		background: linear-gradient(var(--stop-color), black);
+		transition: --stop-color 1s;
+	}
 
-.button {
-	--stop-color: red;
-	background: linear-gradient(var(--stop-color), black);
-	transition: --stop-color 1s;
-}
-
-.button:hover {
-	--stop-color: green;
-}
-
-&lt;/style>
-
-</pre>
+	.button:hover {
+		--stop-color: green;
+	}
+	</style>
+</xmp>
 
 Example 2: Using ''@property'' to register a property {#example-2}
 ------------------------------------------------------------------
-<pre class='lang-markup'>
-&lt;script&gt;
-	CSS.paintWorklet.addModule('circle.js');
-&lt;/script&gt;
-&lt;style&gt;
-	@property --radius {
-		syntax: "&lt;length&gt;";
-		inherits: false;
-		initial-value: 0px;
-	}
+<xmp class='lang-markup'>
+	<script>
+		CSS.paintWorklet.addModule('circle.js');
+	</script>
+	<style>
+		@property --radius {
+			syntax: "<length>";
+			inherits: false;
+			initial-value: 0px;
+		}
 
-	div {
-		width: 100px;
-		height: 100px;
-		--radius: 10px;
-		background: paint(circle);
-		transition: --radius 1s;
-	}
+		div {
+			width: 100px;
+			height: 100px;
+			--radius: 10px;
+			background: paint(circle);
+			transition: --radius 1s;
+		}
 
-	div:hover {
-		--radius: 50px;
-	}
-&lt;/style&gt;
-&lt;div&gt;&lt;/div&gt;
-</pre>
+		div:hover {
+			--radius: 50px;
+		}
+	</style>
+	<div></div>
+</xmp>
 
 <pre class='lang-javascript'>
-// circle.js
-registerPaint('circle', class {
-		static get inputProperties() { return ['--radius']; }
-		paint(ctx, geom, properties) {
-			let radius = properties.get('--radius').value;
-			ctx.fillStyle = 'black';
-			ctx.beginPath();
-			ctx.arc(geom.width / 2, geom.height / 2, radius, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-});
+	// circle.js
+	registerPaint('circle', class {
+			static get inputProperties() { return ['--radius']; }
+			paint(ctx, geom, properties) {
+				let radius = properties.get('--radius').value;
+				ctx.fillStyle = 'black';
+				ctx.beginPath();
+				ctx.arc(geom.width / 2, geom.height / 2, radius, 0, 2 * Math.PI);
+				ctx.fill();
+			}
+	});
 </pre>
 
 Security Considerations {#security-considerations}
