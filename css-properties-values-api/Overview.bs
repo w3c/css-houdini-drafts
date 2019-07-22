@@ -67,7 +67,7 @@ Registering custom properties {#registering-custom-properties}
 ==============================================================
 
 <pre class='idl'>
-dictionary PropertyDescriptor {
+dictionary PropertyDefinition {
 	required DOMString name;
 	         DOMString syntax       = "*";
 	required boolean   inherits;
@@ -75,41 +75,41 @@ dictionary PropertyDescriptor {
 };
 
 partial namespace CSS {
-	void registerProperty(PropertyDescriptor descriptor);
+	void registerProperty(PropertyDefinition definition);
 };
 </pre>
 
 Additional, the {{Document}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
 which is a set of records that describe registered custom properties.
 
-The {{PropertyDescriptor}} dictionary {#the-propertydescriptor-dictionary}
+The {{PropertyDefinition}} dictionary {#the-propertydefinition-dictionary}
 --------------------------------------------------------------------------
 
-A <dfn dictionary>PropertyDescriptor</dfn> dictionary represents author-specified configuration
-options for a custom property. {{PropertyDescriptor}} dictionaries contain the
+A <dfn dictionary>PropertyDefinition</dfn> dictionary represents author-specified configuration
+options for a custom property. {{PropertyDefinition}} dictionaries contain the
 following members:
 
-:   <dfn dict-member for=PropertyDescriptor>name</dfn>
+:   <dfn dict-member for=PropertyDefinition>name</dfn>
 ::  The name of the custom property being defined.
 
-:   <dfn dict-member for=PropertyDescriptor>syntax</dfn>
+:   <dfn dict-member for=PropertyDefinition>syntax</dfn>
 ::  A string representing how this custom property is parsed.
 
-:   <dfn dict-member for=PropertyDescriptor>inherits</dfn>
+:   <dfn dict-member for=PropertyDefinition>inherits</dfn>
 ::  True if this custom property should inherit down the DOM tree; False otherwise.
 
-:   <dfn dict-member for=PropertyDescriptor>initialValue</dfn>
+:   <dfn dict-member for=PropertyDefinition>initialValue</dfn>
 ::  The initial value of this custom property.
 
 The {{registerProperty()}} function {#the-registerproperty-function}
 --------------------------------------------------------------------
 
-The <dfn method for=CSS>registerProperty(PropertyDescriptor descriptor)</dfn> method
+The <dfn method for=CSS>registerProperty(PropertyDefinition definition)</dfn> method
 registers a custom property according to the configuration options provided in
-<code>descriptor</code>.
+<code>definition</code>.
 When it is called,
 it executes the <a>register a custom property</a> algorithm,
-passing the options in its <code>descriptor</code> argument
+passing the options in its <code>definition</code> argument
 as arguments of the same names.
 
 <div algorithm>
@@ -142,11 +142,11 @@ as arguments of the same names.
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
 
-	3. Attempt to [=consume a syntax descriptor=] from |syntax|.
+	3. Attempt to [=consume a syntax definition=] from |syntax|.
 		If it returns failure, <a>throw</a> a {{SyntaxError}}.
-		Otherwise, let |syntax descriptor| be the returned <a>syntax descriptor</a>.
+		Otherwise, let |syntax definition| be the returned <a>syntax definition</a>.
 
-	4. If |syntax descriptor| is the <a>universal syntax descriptor</a>,
+	4. If |syntax definition| is the <a>universal syntax definition</a>,
 		and |initialValue| is not present,
 		let |parsed initial value| be empty.
 		This must be treated identically to the "default" initial value of custom properties,
@@ -154,7 +154,7 @@ as arguments of the same names.
 		Skip to the next step of this algorithm.
 
 		Otherwise,
-		if |syntax descriptor| is the <a>universal syntax descriptor</a>,
+		if |syntax definition| is the <a>universal syntax definition</a>,
 		[=CSS/parse=] |initialValue| as a <<declaration-value>>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
@@ -168,8 +168,8 @@ as arguments of the same names.
 		and exit this algorithm.
 
 		Otherwise,
-		[=CSS/parse=] {{PropertyDescriptor/initialValue}}
-		according to |syntax descriptor|.
+		[=CSS/parse=] {{PropertyDefinition/initialValue}}
+		according to |syntax definition|.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
@@ -183,7 +183,7 @@ as arguments of the same names.
 
 	6. Let |registered property| be a [=struct=]
 		with a property name of |parsed name|,
-		a syntax of |syntax descriptor|,
+		a syntax of |syntax definition|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
 		[=set/Append=] |registered property|
@@ -404,11 +404,11 @@ custom property. Syntax strings consists of
 [=syntax component names=], that are
 optionally [[#multipliers|multiplied]] and [[#combinator|combined]].
 
-A syntax string can be parsed into a <a>syntax descriptor</a>, which is either:
+A syntax string can be parsed into a <a>syntax definition</a>, which is either:
 
 	1. A list of <a>syntax components</a>, each of which accept the value types
 		specified in [[#supported-names]], or
-	2. The <a>universal syntax descriptor</a> ('*'), which accepts any valid token
+	2. The <a>universal syntax definition</a> ('*'), which accepts any valid token
 		stream.
 
 Note: Regardless of the syntax specified, all custom properties accept
@@ -498,7 +498,7 @@ corresponding types accepted by the resulting <a>syntax component</a>.
 		equivalent to <code>"&lt;transform-function>+"</code>
 
 Note: A syntax string of <code>"*"</code> will produce the
-	<a>universal syntax descriptor</a>, which is not a <a>syntax component</a>.
+	<a>universal syntax definition</a>, which is not a <a>syntax component</a>.
 	Therefore, <code>"*"</code> may not be [[#multipliers|multiplied]] or
 	[[#combinator|combined]] with anything else.
 
@@ -529,9 +529,9 @@ The '|' combinator {#combinator}
 
 <a>Syntax strings</a> may use U+007C VERTICAL LINE (|) to provide multiple
 <a>syntax component names</a>. Such syntax strings will result in a
-<a>syntax descriptor</a> with multiple <a>syntax components</a>.
+<a>syntax definition</a> with multiple <a>syntax components</a>.
 
-When a <a>syntax descriptor</a> with multiple <a>syntax components</a> is used
+When a <a>syntax definition</a> with multiple <a>syntax components</a> is used
 to parse a CSS value, the syntax components are matched in the order specified.
 
 Note: That is, given the syntax string <code>"red | &lt;color>"</code>,
@@ -563,18 +563,18 @@ Parsing the syntax string {#parsing-syntax}
 ::  A sequence of <a>code points</a> which is either a <a>data type name</a>,
 	or a sequence that can produce a <<custom-ident>>.
 
-:   <dfn>syntax descriptor</dfn>
+:   <dfn>syntax definition</dfn>
 ::  An object consisting of a list of <a>syntax components</a>.
 
-:   <dfn>universal syntax descriptor</dfn>
-::  A special descriptor which accepts any valid token stream.
+:   <dfn>universal syntax definition</dfn>
+::  A special syntax definition which accepts any valid token stream.
 
-### Consume a syntax descriptor ### {#consume-syntax-descriptor}
+### Consume a syntax definition ### {#consume-syntax-definition}
 
 <div algorithm>
-	This section describes how to <dfn export>consume a syntax descriptor</dfn> from a [=string=] |string|.
-	It either produces a <a>syntax descriptor</a>
-	with a list of <a>syntax components</a>, or the <a>universal syntax descriptor</a>.
+	This section describes how to <dfn export>consume a syntax definition</dfn> from a [=string=] |string|.
+	It either produces a <a>syntax definition</a>
+	with a list of <a>syntax components</a>, or the <a>universal syntax definition</a>.
 
 	1. [=Strip leading and trailing ASCII whitespace=] from |string|.
 
@@ -583,23 +583,23 @@ Parsing the syntax string {#parsing-syntax}
 
 	3. If |string|’s [=string/length=] is 1,
 		and the only [=code point=] in |string| is U+002A ASTERISK (*),
-		return the [=universal syntax descriptor=].
+		return the [=universal syntax definition=].
 
 	4. Let |stream| be an [=input stream=] created from the [=code points=] of |string|,
 		preprocessed as specified in [[css-syntax-3]].
-		Let |descriptor| be an initially empty [=list=] of <a>syntax components</a>.
+		Let |definition| be an initially empty [=list=] of <a>syntax components</a>.
 
 	5. <a>Consume a syntax component</a> from |stream|.
 		If failure was returned,
 		return failure;
 		otherwise,
-		[=list/append=] the returned value to |descriptor|.
+		[=list/append=] the returned value to |definition|.
 
 		Consume as much <a>whitespace</a> as possible from |stream|.
 
 		Consume the <a>next input code point</a> in |stream|:
 		:   EOF
-		:: return |descriptor|.
+		:: return |definition|.
 
 		:   U+007C VERTICAL LINE (|)
 		:: Repeat step 5.
@@ -765,7 +765,7 @@ Fallbacks in ''var()'' references {#fallbacks-in-var-references}
 
 References to registered custom properties using the ''var()'' function may
 provide a fallback. However, the fallback value must match the
-<a>syntax descriptor</a> of the custom property being referenced, otherwise the
+<a>syntax definition</a> of the custom property being referenced, otherwise the
 declaration is <a spec=css-variables>invalid at computed-value time</a>.
 
 Note: This applies regardless of whether or not the fallback is being used.
@@ -822,7 +822,7 @@ CSSOM {#cssom}
 
 <div algorithm>
 	To <dfn>reify a registered custom property value</dfn> given a property
-	|property| and [=syntax descriptor=] |syntax|, run these steps:
+	|property| and [=syntax definition=] |syntax|, run these steps:
 
 	For specified values, [=reify a list of component values=] from the value,
 	and return the result.
@@ -841,7 +841,7 @@ CSSOM {#cssom}
 			return the result.
 		5. If the value is an [=identifier=], [=reify an identifier=] from the value
 			and return the result.
-		6. If |syntax| is the [=universal syntax descriptor=],
+		6. If |syntax| is the [=universal syntax definition=],
 			[=reify a list of component values=] from the value, and return the
 			result.
 		7. Otherwise, [=reify as a CSSStyleValue=] with the
