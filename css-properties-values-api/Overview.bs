@@ -564,7 +564,7 @@ Parsing the syntax string {#parsing-syntax}
 ::  A sequence of <a>code points</a> which is either a <a>data type name</a>,
 	or a sequence that can produce a <<custom-ident>>.
 
-:   <dfn>syntax definition</dfn>
+:   <dfn export>syntax definition</dfn>
 ::  An object consisting of a list of <a>syntax components</a>.
 
 :   <dfn>universal syntax definition</dfn>

@@ -142,7 +142,7 @@ by the paint function). It consists of:
     <code>DOMStrings</code>.
 
  - A <dfn for="document paint definition">input argument syntaxes</dfn> which is a [=list=] of
-    parsed [[css-properties-values-api-1#supported-syntax-strings]].
+    [=syntax definitions=].
 
  - A <dfn for="document paint definition">PaintRenderingContext2DSettings object</dfn>.
 
@@ -204,9 +204,9 @@ called, the user agent <em>must</em> run the following steps:
 
     12. [=list/For each=] |item| in |inputArguments| perform the following substeps:
 
-        1. Let |parsedSyntax| be the result of parsing |item| according to the rules in
-            [[css-properties-values-api-1#supported-syntax-strings]]. If it fails to parse
-            [=throw=] a [=TypeError=] and abort all these steps.
+        1. Attempt to [=consume a syntax definition=] from |item|.
+            If failure was returned, [=throw=] a [=TypeError=] and abort all these steps.
+            Otherwise, let |parsedSyntax| be the returned [=syntax definition=].
 
         2. [=list/Append=] |parsedSyntax| to |inputArgumentSyntaxes|.
 
