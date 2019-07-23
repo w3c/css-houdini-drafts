@@ -1,0 +1,932 @@
+<pre class='metadata'>
+Title:  CSS Animation Worklet API
+Status: ED
+Group: houdini
+ED: https://drafts.css-houdini.org/css-animationworklet-1/
+Shortname: css-animationworklet
+Level: 1
+Abstract:
+Editor: Majid Valipour, majidvp@google.com, w3cid 81464
+Editor: Robert Flack, flackr@chromium.org, w3cid 98451
+Editor: Stephen McGruer, smcgruer@chromium.org, w3cid 96463
+Ignored Terms: AnimationWorklet
+</pre>
+
+<pre class="link-defaults">
+spec:infra; type:dfn; text:list
+spec:dom; type:interface; text:Document
+</pre>
+
+<pre class="anchors">
+urlPrefix: https://heycam.github.io/webidl/; type: dfn;
+    text: NotSupportedError
+    urlPrefix: #dfn-;
+        text: callback this value
+        text: exception
+        text: throw
+        url: throw; text: thrown
+    urlPrefix: #;
+        url: Function; text: Function
+        url: VoidFunction; text: VoidFunction
+    url: invoke-a-callback-function; text: Invoke
+    url: construct-a-callback-function; text: constructing
+    url: es-type-mapping; text: converting
+urlPrefix: https://html.spec.whatwg.org/#; type: dfn;
+    url: run-the-animation-frame-callbacks; text: running the animation frame callbacks
+urlPrefix: http://w3c.github.io/html/infrastructure.html#; type: dfn;
+    text: structuredserialize
+    text: structureddeserialize
+urlPrefix: https://www.w3.org/TR/css3-transitions/#; type: dfn;
+    text: animatable properties
+urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
+    url: the-documents-default-timeline; text: default document timeline
+    url: concept-animation; text: animation
+    text: effect value
+    text: effect stack
+    text: target property
+    text: timeline
+    text: animation effect
+    text: current time
+    text: local time
+    text: inherited time
+    text: ready
+    text: play state
+    text: playback rate
+    text: set the target effect of an animation
+    text: set the timeline of an animation
+    text: finished
+    text: idle
+    text: paused
+    text: pending
+    text: running
+    text: composite operation
+    text: animation class
+urlPrefix: https://w3c.github.io/web-animations/level-2/#;
+    type: dfn;
+        text: group effect
+        text: child effect
+urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
+    text: IsCallable
+    text: IsConstructor
+    text: HasProperty
+    url: ecmascript-data-types-and-values; text: Type
+    url: map-objects; text:map object
+    url: get-o-p; text: Get
+    url: set-o-p-v-throw; text: Set
+    url: samevalue; text: SameValue
+    urlPrefix: native-error-types-used-in-this-standard-
+        text: TypeError
+urlPrefix: https://www.w3.org/TR/hr-time-2/#dom-; type: dfn
+    text: DOMHighResTimeStamp
+urlPrefix: https://wicg.github.io/scroll-animations/#; type: interface
+    url: scrolltimeline; text: ScrollTimeline
+    url: dictdef-scrolltimelineoptions; text: ScrollTimelineOptions
+    url: dom-scrolltimeline-scrollsource; text: scrollSource
+urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
+    url: current-time-algorithm; text: current time of the ScrollTimeline;
+</pre>
+
+<pre class=biblio>
+{
+    "explainer": {
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/README.md",
+        "title": "Animation Worklet Explainer",
+        "deliveredBy": [
+            "https://github.com/w3c/css-houdini-drafts"
+        ]
+    },
+    "principles": {
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/principles.md",
+        "title": "Animation Worklet Design Principles and Goals",
+        "deliveredBy": [
+            "https://github.com/w3c/css-houdini-drafts"
+        ]
+    }
+}
+</pre>
+
+Introduction {#intro}
+=====================
+<em>This section is not normative.</em>
+
+This document introduces a new primitive that provides extensibility in web animations and enables
+high performance interactive procedural animations on the web. For details on the rationale and
+motivation see both [[explainer]] and [[principles]].
+
+The <a>Animation Worklet</a> API provides a method to create scripted animations that control a set
+of <a>animation effects</a>. The API is designed to make it possible for user agents to run such
+animations in their own dedicated thread to provide a degree of performance isolation from main
+thread.
+
+Relationship to the Web Animations API {#relationship-to-web-animations}
+------------------------------------------------------------------------
+<em>This section is not normative.</em>
+
+Animations running inside an <a>Animation Worklet</a> execution context expose the {{Animation}}
+interface from the Web Animations specification on the main javascript execution context. This means
+they can be controlled and inspected from main thread using the same Web Animation APIs.
+
+
+Animation Worklet {#animation-worklet-desc}
+==============================
+<dfn>Animation Worklet</dfn> is a {{Worklet}} responsible for all classes related to custom
+animations. The worklet can be accessed via {{animationWorklet}} attribute.
+
+The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
+
+{{AnimationWorkletGlobalScope}} represents the global execution context of {{animationWorklet}}.
+
+<xmp class='idl'>
+[Exposed=Window]
+partial namespace CSS {
+    [SameObject] readonly attribute Worklet animationWorklet;
+};
+</xmp>
+
+
+
+Animator {#animator-desc}
+========
+
+An <dfn>Animator</dfn> represents an animation instance that is running on the animation thread.
+Animators are identified by a unique name and determine how the animation progresses its keyframe
+effects given current input time. <a>Animator</a> instances live in {{AnimationWorkletGlobalScope}}
+and each one is associated with a {{WorkletAnimation}} instance. An animator can only be
+instantiated by construction of a {{WorkletAnimation}}.
+
+
+Two animators types are supported: {{StatelessAnimator}} and {{StatefulAnimator}} each
+providing a different state management strategy.
+
+
+StatelessAnimator Interface {#stateless-animator-desc}
+---------------------------
+
+This interface represents a stateless animator. This type of animator does not depend on any local
+state either stored on the instance or global scope. Effectively, the animate function of an
+{{StatelessAnimator}} can be treated as a pure function with the expectation that given the same
+input, it produces the same output.
+
+
+
+<xmp class='idl'>
+[Exposed=AnimationWorklet, Global=AnimationWorklet, Constructor (optional any options)]
+interface StatelessAnimator {
+};
+</xmp>
+
+
+
+<div class='note'>
+    This is how the class should look.
+    <pre class='lang-javascript'>
+        class FooAnimator extends StatelessAnimator {
+            constructor(options) {
+                // Called when a new animator is instantiated.
+            }
+            animate(currentTime, effect) {
+                // Animation frame logic goes here.
+            }
+        }
+    </pre>
+</div>
+
+Note: The statelessness allows an animation worklet to perform optimization such as producing
+multiple animation frames in parallel and performing very cheap teardown and setup. Using
+StatelessAnimator is highly recommended to enable such optimizations.
+
+StatefulAnimator Interface {#stateful-animator-desc}
+---------------------------
+
+This interface represents a stateful animator. This animator can have local state and animation
+worklet guarantees that it maintains this state as long as the stateful animator fulfills the
+contract required by this interface as described following.
+
+
+<a>Animation worklet</a> maintains a set of {{WorkletGlobalScope}}s which may exist across different
+threads or processes. Animation worklet may temporarily terminate a global scope (e.g., to preserve
+resources) or move a running <a>animator instance</a> across different global scopes (e.g., if its
+effect is mutable only in a certain thread). Animation worklet guarantees that a stateful animator
+instance's state is maintained even if the instance is respawned in a different global scope.
+
+The basic mechanism for maintaining the state is that the animation worklet snapshots the local
+state that is exposed via the {{StatefulAnimator/state}} function and then reifies it so that it can
+be passed into the constructor when the animator instance is respawned at a later time in a
+potentially different global scope. The <a>migrate an animator instance</a> algorithm specifies this
+process in details.
+
+A user-defined stateful animator is expected to fulfill the required contract which is that its
+state function returns an object representing its state that can be serialized using structured
+serialized algorithm and that it can also recreate its state given that same object passed to
+its constructor.
+
+<xmp class='idl'>
+[Exposed=AnimationWorklet, Global=AnimationWorklet,
+Constructor (optional any options, optional any state)]
+interface StatefulAnimator {
+  any state();
+};
+</xmp>
+
+
+<div class='note'>
+    This is how the class should look.
+    <pre class='lang-javascript'>
+        class BarAnimator extends StatefulAnimator {
+            constructor(options, state) {
+              // Called when a new animator is instantiated (either first time or after being respawned).
+              this.currentVelocity  = state ? state.velocity : 0;
+            }
+            animate(currentTime, effect) {
+                // Animation frame logic goes here and can rely on this.currentVelocity.
+                this.currentVelocity += 0.1;
+            }
+            state() {
+              // The returned object should be serializable using structured clonable algorithm.
+              return {
+                velocity: this.currentVelocity;
+              }
+            }
+        }
+    </pre>
+</div>
+
+
+Animator Definition {#animator-definition-desc}
+-------------------
+
+An <dfn>animator definition</dfn> is a <a>struct</a> which describes the author defined custom
+animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
+
+ - An <dfn>animator name</dfn> <<ident>>#.
+
+ - A <dfn>class constructor</dfn> which is a {{AnimatorInstanceConstructor}} <a>callback function</a> type.
+
+ - An <dfn>animate function</dfn> which is a <a>Function</a> <a>callback function</a> type.
+
+ - A <dfn>stateful flag</dfn>
+
+
+
+Registering an Animator Definition {#registering-animator-definition}
+-------------------------------------
+An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
+The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
+
+
+<xmp class='idl'>
+
+[ Global=(Worklet,AnimationWorklet), Exposed=AnimationWorklet ]
+interface AnimationWorkletGlobalScope : WorkletGlobalScope {
+    void registerAnimator(DOMString name, AnimatorInstanceConstructor animatorCtor);
+};
+
+callback AnimatorInstanceConstructor = any (any options, optional any state);
+
+</xmp>
+
+<div algorithm="register-animator">
+
+When the <dfn method for=AnimationWorkletGlobalScope>registerAnimator(|name|, |animatorCtor|)</dfn>
+method is called in a {{AnimationWorkletGlobalScope}}, the user agent <em>must</em> run the
+following steps:
+
+    1. If |name| is not a valid <<ident>>, <a>throw</a> a <a>TypeError</a> and abort all these
+        steps.
+
+    2. If |name| exists as a key in the <a>animator name to animator definition map</a>,
+        <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+
+    3. If the result of <a>IsConstructor</a>(|animatorCtor|) is <b>false</b>, <a>throw</a> a
+        <a>TypeError</a> and abort all these steps.
+
+
+    4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
+
+
+    5. If <a>SameValue</a>(|prototype|, {{StatelessAnimator}}) is <b>true</b> set |stateful| to be
+        <b>false</b>, otherwise if <a>SameValue</a>(|prototype|, {{StatefulAnimator}}) is
+        <b>true</b> set |stateful| to be <b>true</b>, otherwise <a>throw</a> a <a>TypeError</a> and
+        abort all these steps.
+
+    6. Let |animateValue| be the result of <a>Get</a>(|prototype|, "animate").
+
+    7. Let |animate| be the result of <a>converting</a> |animateValue| to the <a>Function</a>
+        <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
+        all these steps.
+
+    8. Let |definition| be a new <a>animator definition</a> with:
+
+        - <a>animator name</a> being |name|
+
+        - <a>class constructor</a> being |animatorCtor|
+
+        - <a>animate function</a> being |animate|
+
+        - <a>stateful flag</a> being |stateful|
+
+
+    9. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
+        definition map</a>.
+</div>
+
+
+Animator Instance {#animator-instance-section}
+======================================
+
+An <dfn>animator instance</dfn> is a <a>struct</a> which describes a fully realized custom animation
+instance in an {{AnimationWorkletGlobalScope}}. It has a reference to an <a>animator definition</a>
+and owns the instance specific state such as animation effect and timeline. It consists of:
+
+ - An <a>animator name</a>.
+
+ - An <a>animation requested flag</a>.
+
+ - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
+
+ - An <dfn>animator current time</dfn> which is the corresponding <a>worklet animation</a>'s current
+     time.
+
+ - An <dfn>animator timeline</dfn> which is a <a>timeline</a>.
+
+ - An <dfn>animator serialized options</dfn> which is a serializable object.
+
+A <dfn>stateful animator instance</dfn> is an <a>animator instance</a> whose corresponding
+<a>animator definition</a>'s <a>stateful flag</a> is <b>true</b>.
+
+
+Creating an Animator Instance {#creating-animator-instance}
+-----------------------------------------------------------
+
+Each <a>animator instance</a> lives in an {{AnimationWorkletGlobalScope}}.
+
+Each {{AnimationWorkletGlobalScope}} has an <dfn>animator instance set</dfn>. The set is populated
+when the user agent constructs a new <a>animator instance</a> in the {{AnimationWorkletGlobalScope}}
+scope. Each <a>animator instance</a> corresponds to a worklet animation in the document scope.
+
+<div algorithm="create-animator">
+
+To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect|, |serializedOptions|,
+|serializedState|, and |workletGlobalScope|, the user agent <em>must</em> run the following steps:
+
+    1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
+         <a>animator name to animator definition map</a>.
+
+          If |definition| does not exist abort the following steps.
+
+    2. Let |animatorCtor| be the <a>class constructor</a> of |definition|.
+
+    3. Let |options| be <a>StructuredDeserialize</a>(|serializedOptions|).
+
+    4. Let |state| be <a>StructuredDeserialize</a>(|serializedState|).
+
+    5. Let |animatorInstance| be the result of <a>constructing</a> |animatorCtor| with
+        «|options|, |state|» as arguments. If an exception is thrown, rethrow the exception and
+        abort all these steps.
+
+    6. Set the following on |animatorInstance| with:
+        - <a>animator name</a> being |name|
+        - <a>animation requested flag</a> being <a>frame-current</a>
+        - <a>animator current time</a> being unresolved
+        - <a>animator effect</a> being |effect|
+        - <a>animator timeline</a> being |timeline|
+        - <a>animator serialized options</a> being |options|
+
+    7. Add |animatorInstance| to |workletGlobalScope|'s <a>animator instance set</a>.
+
+</div>
+
+
+Running Animators {#running-animators}
+--------------------------------------
+
+When the user agent wants to produce a new animation frame, if for any <a>animator instance</a> the
+associated <a>animation requested flag</a> is <a>frame-requested</a> then the the user agent
+<em>must</em> <a>run animators</a> for the current frame.
+
+Note: The user agent is not required to run animations on every visual frame. It is legal to defer
+      generating an animation frame until a later frame. This allow the user agent to
+      provide a different service level according to their policy.
+
+<div algorithm="run-animators">
+
+When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
+<em>must</em> iterate over all <a>animator instance</a>s in the |workletGlobalScope|'s <a>animator
+instance set</a>. For each such |instance| the user agent <em>must</em> perform the following steps:
+
+  1. Let |animatorName| be |instance|'s <a>animator name</a>
+
+  2. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
+        <a>animator name to animator definition map</a>.
+
+      If |definition| does not exist then abort the following steps.
+
+  3. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the effect
+       belonging to the |instance| will not be visible within the visual viewport of the current
+       frame the user agent <em>may</em> abort all the following steps.
+
+       Issue: Consider giving user agents permission to skip running animator instances to
+       throttle slow animators.
+
+  4. Let |animateFunction| be |definition|'s <a>animate function</a>.
+
+  5. Let |currentTime| be <a>animator current time</a> of |instance|.
+
+  6. Let |effect| be <a>animator effect</a> of |instance|.
+
+  7. <a>Invoke</a> |animateFunction| with arguments «|currentTime|, |effect|»,
+        and with |instance| as the <a>callback this value</a>.
+
+</div>
+Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
+in the same frame.
+
+
+Issue: should be explicit as to what happens if the animateFunction throws an exception. At least
+we should have wording that the localTime values of the keyframes are ignored to avoid incorrect
+partial updates.
+
+Removing an Animator Instance {#removing-animator}
+-----------------------------------------
+
+<div algorithm="remove-animator">
+
+To <dfn>remove an animator instance</dfn> given |instance| and |workletGlobalScope| the user agent
+<em>must</em> run the following steps:
+
+1. Remove |instance| from |workletGlobalScope|'s <a>animator instance set</a>.
+
+</div>
+
+
+Migrating an Animator Instance {#migrating-animator}
+-----------------------------------------
+
+The migration process allows <a>stateful animator instance</a> to be migrated to a different
+{{WorkletGlobalScope}} without losing their local state.
+
+<div algorithm="migrate-animator">
+
+To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to another, given
+|instance|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|, the user agent
+<em>must</em> run the following steps :
+
+  1. Let |serializedState| be undefined.
+
+  2. <a>Queue a task</a> on |sourceWorkletGlobalScope| to run the following steps:
+
+     1. Let |animatorName| be |instance|'s <a>animator name</a>
+
+     2. Let |definition| be the result of looking up |animatorName| on |sourceWorkletGlobalScope|'s
+        <a>animator name to animator definition map</a>.
+
+        If |definition| does not exist then abort the following steps.
+
+     3. Let |stateful| be the <a>stateful flag</a> of |definition|.
+
+     4. If |stateful| is <b>false</b> then abort the following steps.
+
+     4. |stateFunction|
+     5. Let |state| be the result of <a>Invoke</a> |stateFunction| with |instance| as the
+        <a>callback this value</a>.  If any exception is thrown, rethrow the exception and abort
+        the following steps.
+
+     6. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
+        If any exception is thrown, then abort the following steps.
+
+     7. Run the procedure to <a>remove an animator instance</a> given |instance|, and
+        |sourceWorkletGlobalScope|.
+
+  2. Wait for the above task to complete. If the task is aborted, abort the following steps.
+
+  3. <a>Queue a task</a> on |destinationWorkletGlobalScope| to run the following steps:
+
+     1. Run the procedure to <a>create a new animator instance</a> given:
+        - The |instance|'s <a>animator name</a> as name.
+        - The |instance|'s <a>animator timeline</a> as timeline.
+        - The |instance|'s <a>animator effect</a> as effect.
+        - The |instance|'s <a>animator serialized options</a> as options.
+        - The |serializedState| as state.
+        - The |destinationWorkletGlobalScope| as workletGlobalScope.
+
+</div>
+
+If an animator state getter throws the user agent will remove the animator but does not recreate it.
+This effectively removes the animator instance.
+
+
+Requesting Animation Frames {#requesting-animation-frames}
+----------------------------------------------------------
+
+Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
+either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
+<a>frame-current</a>. Different circumstances can cause the <a>animation requested flag</a> to be
+set to <a>frame-requested</a>. These include the following:
+  - Changes in the <a>current time</a> of the animator's <a>timeline</a>
+  - Changes in the <a>current time</a> of the animator's corresponding <a>Worklet Animation</a>
+
+[[#running-animators]] resets the <a>animation requested flag</a> on animators to
+<a>frame-current</a>.
+
+
+Web Animations Integration {#web-animation-integration}
+===============================
+
+
+Worklet Animation {#worklet-animation-desc}
+-------------------------------------------
+<dfn>Worklet animation</dfn> is a kind of <a>animation</a> that delegates the animation playback to
+an <a>animator instance</a>. It controls the lifetime and playback state of its corresponding
+<a>animator instance</a>.
+
+Being an <a>animation</a>, <a>worklet animation</a> has an <a>animation effect</a> and a
+<a>timeline</a>. However unlike other animations the worklet animation's <a>current time</a> does
+not directly determine the animation effect's <a>local time</a> (via its <a>inherited time</a>).
+Instead the associated <a>animator instance</a> controls the animation effect's <a>local time</a>
+directly. Note that this means that the <a>timeline's</a> current time does not fully determine the
+animation's output.
+
+<a>Worklet animation</a> has the following properties in addition to the {{Animation}} interface:
+  - an <dfn>animation animator name</dfn> which identifies its <a>animator definition</a>.
+  - a <dfn>serialized options</dfn> which is serializable object that is used when
+    constructing a new animator instance.
+
+<figure>
+  <img src="img/WorkletAnimation-timing-model.svg" width="600"
+    alt="Overview of the WorkletAnimation timing model.">
+  <figcaption>
+    Overview of the WorkletAnimation timing model. <br>
+
+    The animation current time is input to the animator instance, which produces a local time value
+    for the animation effect. If the animator instance is running in a parallel global scope the
+    implementation may also choose to use the local time value to produce the final effect value and
+    update the visuals in parallel.
+
+  </figcaption>
+</figure>
+
+
+Creating a Worklet Animation {#creating-worklet-animation}
+-----------------------------------------------------------
+
+<xmp class='idl'>
+[Exposed=Window,
+ Constructor (DOMString animatorName,
+              optional (AnimationEffect or sequence<AnimationEffect>)? effects = null,
+              optional AnimationTimeline? timeline,
+              optional any options)]
+interface WorkletAnimation : Animation {
+        readonly attribute DOMString animatorName;
+};
+
+</xmp>
+
+
+<div algorithm="create-worklet-animation">
+<dfn constructor for=WorkletAnimation>WorkletAnimation(|animatorName|, |effects|, |timeline|, |options|)</dfn>
+
+Creates a new {{WorkletAnimation}} object using the following procedure.
+
+    1. Let |workletAnimation| be a new {{WorkletAnimation}} object.
+
+    2. Run the procedure to <a>set the timeline of an animation</a> on |workletAnimation| passing
+        |timeline| as the new timeline or, if a |timeline| argument is not provided,
+        passing the <a>default document timeline</a> of the {{Document}} associated with the
+        {{Window}} that is the <a>current global object</a>.
+
+    3. Let |effect| be the result corresponding to the first matching condition from below.
+         : If |effects| is a {{AnimationEffect}} object,
+         :: Let effect be |effects|.
+         : If |effects| is a <a>list</a> of {{AnimationEffect}}</a> objects,
+         :: Let |effect| be a new {{WorkletGroupEffect}} with its children set to |effects|.
+         : Otherwise,
+         :: Let |effect| be undefined.
+
+    4. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
+         passing |effect| as the new effect.
+
+    5. Let |serializedOptions| be the result of <a>StructuredSerialize</a>(|options|).
+        Rethrow any exceptions.
+
+    6. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
+
+    7. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
+</div>
+
+
+Worklet Animation timing model {#timing-model}
+------------------------------------
+
+This section describes how <a>worklet animation's</a> timing model differs from other
+<a>animations</a>.
+
+In addition to the existing conditions on when the <a>animation</a> is considered <a>ready</a>, a
+<a>worklet animation</a> is only considered <a>ready</a> when the following condition is also true:
+
+  - the user agent has completed any setup required to create the <a>worklet animation's</a>
+     corresponding <a>animator instance</a>.
+
+As described in [[#worklet-animation-desc]], the <a>worklet animation's</a> <a>current time</a> does
+not determine its <a>animation effect's</a> <a>local time</a>. Instead the associated <a>animator
+instance</a> controls the animation effect's <a>local time</a> directly. This means that the
+animation effect's local time is controlled from a {{WorkletGlobalScope}} which may be in a parallel
+execution context.
+
+Here are a few implications of the above semantics:
+
+ - Setting the <a>current time</a> or <a>start time</a> of a <a>worklet animation</a> does not
+    necessarily change its output, but may change the animation <a>play state</a>.
+ - Similarly, invoking {{Animation/finish()}} or updating a <a>worklet animation's</a> <a>playback
+    rate</a> will only change the animation <a>play state</a> and may not change the output.
+ - Querying the animation effect's local time using {{AnimationEffect/getComputedTiming()}}
+    may return stale information, in the case where the <a>animator instance</a> is running in a
+    parallel execution context.
+
+If a Worklet Animation animation is executing in a parallel worklet execution context, the last
+known state of its animation effects should be periodically synced back to the main javascript
+execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
+context to the main javascript execution context <em>must</em> occur before <a>running the animation
+frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
+this animation model a script running in the main javascript execution context may see a stale value
+when reading a <a>target property</a> that is being animated by a Worklet Animation, compared to the
+value currently being used to produce the visual frame that is visible to the user. This is similar
+to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
+context.
+
+Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
+   animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
+   it can react appropriately.
+
+
+Interaction with Animator Instances {#worklet-animation-animator-instances}
+-----------------------------------
+
+A <a>worklet animation</a> corresponds to at most one <a>animator instance</a> at any time, and may
+have no current corresponding <a>animator instance</a>. The correspondance of an <a>animator
+instance</a> for a <a>worklet animation</a> depends on the animation <a>play state</a>.
+
+<div algorithm="associate-animator-instance">
+
+To <dfn>associate animator instance of worklet animation</dfn> given |workletAnimation|,
+the user agent <em>must</em> run the following steps:
+
+  1. If |workletAnimation| has a corresponding <a>animator instance</a>, abort the following steps.
+  2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
+    |workletAnimation|.
+  3. <a>Queue a task</a> on |workletGlobalScope| to run the procedure to <a>create a new animator
+       instance</a>, passing:
+      * The |workletAnimation|'s <a>animation animator name</a> as name.
+      * The |workletAnimation|'s <a>timeline</a> as timeline.
+      * The |workletAnimation|'s <a>animation effect</a> as effect.
+      * The |workletAnimation|'s <a>serialized options</a> as options.
+      * The |workletGlobalScope| as workletGlobalScope.
+  4. If the procedure was successful, set the resulting <a>animator instance</a> as corresponding to
+    |workletAnimation|.
+
+</div>
+
+<div algorithm="disassociate-animator-instance">
+
+To <dfn>disassociate animator instance of worklet animation</dfn> given
+|workletAnimation|, the user age <em>must</em> run the following steps:
+
+  1. If |workletAnimation| does not have a corresponding <a>animator instance</a>, abort the
+    following steps.
+  2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
+    |workletAnimation|.
+  3. Let |animatorInstance| be |workletAnimation|'s corresponding <a>animator instance</a>.
+  4. <a>Queue a task</a> on the |workletGlobalScope| to run the procedure to <a>remove an animator
+     instance</a>, passing |animatorInstance| as instance and |workletGlobalScope| as
+     workletGlobalScope.
+  5. Set |workletAnimation| as having no corresponding <a>animator instance</a>.
+
+</div>
+
+
+<div algorithm="set-animator-instance">
+
+To <dfn>set animator instance of worklet animation</dfn> given
+|workletAnimation|, the user agent <em>must</em> run the following steps:
+
+  1. <a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
+  2. <a>associate animator instance of worklet animation</a> given |workletAnimation|.
+
+</div>
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
+<a>paused</a>, run the procedure to
+<a>associate animator instance of worklet animation</a> given |workletAnimation|.
+
+
+When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>,
+run the procedure to
+<a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
+
+When the procedure to <a>set the target effect of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
+
+When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
+
+
+
+ScrollTimeline {#scroll-timeline}
+---------------------------------
+<em>This section is not normative.</em>
+
+
+{{ScrollTimeline}} is a new concept being proposed for addition to web animation API. It defines
+an animation timeline whose time value depends on the scroll position of a scroll container.
+<a>Worklet animations</a> can have a scroll timeline and thus drive their scripted effects based
+on a scroll offset.
+
+Note: <strong>Access to input</strong>: We are interested on exposing additional user input beside
+scrolling (e.g., touch/pointer input) to these animations so that authors can create jank-free
+input driven animations which are not really possible today. We are still trying to figure out the
+right abstractions and mechanisms to do this.
+
+WorkletGroupEffect {#worklet-group-effect}
+------------------
+
+{{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
+<a>local times</a> to be mutated individually.
+
+When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a {{WorkletAnimation}}, the
+corresponding <a>animator instance</a> can directly control the <a>child effects</a>' <a>local
+times</a>. This allows a single worklet animation to coordinate multiple effects - see
+[[#example-2]] for an example of such a use-case.
+
+<xmp class='idl'>
+[Exposed=AnimationWorklet]
+interface WorkletGroupEffect {
+  sequence<AnimationEffect> getChildren();
+};
+
+[Exposed=AnimationWorklet]
+partial interface AnimationEffect {
+    // Intended for use inside Animation Worklet scope to drive the effect.
+    attribute double localTime;
+};
+</xmp>
+
+<div algorithm="set-local-time">
+
+To set the {{localTime}} property on a |effect| to value |t|, the user agent should perform the
+action that corresponds to the first matching condition from the following:
+
+ :  If the |effect| does not have a parent group,
+ :: Set the |effect| local time to |t|.
+ :  If the |effect| has a parent group and it is of {{WorkletGroupEffect}} type,
+ :: Set the effect start time to (parent's transformed time - t). Note this effectively set's the
+    |effect|'s local time to t.
+ :  Otherwise
+ :: Throw an exception indicating that the child effect time can only be controlled by
+    its parent group.
+
+</div>
+
+Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset
+of GroupEffect proposed as part of web-animation-2. We should instead move this
+into a delta spec against the web-animation.
+
+
+Effect Stack and Composite Order {#effect-stack-composite-order}
+--------------------------------
+
+As with other animations, <a>worklet animations</a> participate in the <a>effect stack</a>.  A
+worklet animation does not have a specific <a>animation class</a> which means it has the same
+composite order as other Javascript created web animations.
+
+
+Security Considerations {#security-considerations}
+==================================================
+
+There are no known security issues introduced by these features.
+
+Privacy Considerations {#privacy-considerations}
+================================================
+
+There are no known privacy issues introduced by these features.
+
+Examples {#examples}
+====================
+
+
+Example 1: Twitter header. {#example-1}
+--------------------------
+An example of twitter profile header effect where two elements (avatar, and header) are updated in
+sync with scroll offset.
+
+
+<xmp class='lang-markup'>
+// In document scope.
+<div id='scrollingContainer'>
+  <div id='header' style='height: 150px'></div>
+  <div id='avatar'><img></div>
+</div>
+
+<script>
+await CSS.animationWorklet.addModule('twitter-header-animator.js');
+const animation = new WorkletAnimation(
+    'twitter-header',
+    [new KeyframeEffect($avatar,  /* scales down as we scroll up */
+                    [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
+                    {duration: 1000, iterations: 1}),
+    new KeyframeEffect($header, /* loses transparency as we scroll up */
+                    [{opacity: 0}, {opacity: 0.8}],
+                    {duration: 1000, iterations: 1})],
+    new ScrollTimeline({
+      scrollSource: $scrollingContainer,
+      orientation: 'block',
+      timeRange: 1000,
+      startScrollOffset: 0,
+      endScrollOffset: $header.clientHeight}));
+animation.play();
+
+// Since this animation is using a group effect, the same animation instance
+// is accessible via different handles: $avatarEl.getAnimations()[0], $headerEl.getAnimations()[0]
+
+</script>
+
+</xmp>
+
+<xmp class='lang-javascript'>
+// Inside AnimationWorkletGlobalScope.
+registerAnimator('twitter-header', class HeaderAnimator extends StatelessAnimator {
+  constructor(options) {
+    this.timing_ = new CubicBezier('ease-out');
+  }
+
+  animate(currentTime, effect) {
+    const scroll = currentTime;  // scroll is in [0, 1000] range
+
+    // Drive the output group effect by setting its children local times individually.
+    effect.children[0].localTime = scroll;
+    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 500));
+  }
+});
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+</xmp>
+
+Example 2: Parallax backgrounds. {#example-2}
+-----------------------------------------
+A simple parallax background example.
+
+<xmp class='lang-markup'>
+<style>
+.parallax {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+}
+</style>
+<div id='scrollingContainer'>
+  <div id="slow" class="parallax"></div>
+  <div id="fast" class="parallax"></div>
+</div>
+
+<script>
+await CSS.animationWorklet.addModule('parallax-animator.js');
+const scrollTimeline = new ScrollTimeline({
+  scrollSource: $scrollingContainer,
+  orientation: 'block',
+  timeRange: 1000
+});
+const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
+
+const slowParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_slow, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    scrollTimeline,
+    {rate : 0.4}
+);
+slowParallax.play();
+
+const fastParallax = new WorkletAnimation(
+    'parallax',
+    new KeyframeEffect($parallax_fast, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    scrollTimeline,
+    {rate : 0.8}
+);
+fastParallax.play();
+</script>
+
+</xmp>
+
+<xmp class='lang-javascript'>
+// Inside AnimationWorkletGlobalScope.
+registerAnimator('parallax', class ParallaxAnimator extends StatelessAnimator {
+  constructor(options) {
+    this.rate_ = options.rate;
+  }
+
+  animate(currentTime, effect) {
+    effect.localTime = currentTime * this.rate_;
+  }
+});
+</xmp>

@@ -67,7 +67,7 @@ Disable scroll chaining
 - Eg. Facebook chat widget (or any position:fixed overlay window)
   - position: fixed container with an overflow:scroll div inside
   - When the scroller has scrollTop=0, user attempting to scroll up on top of the widget should NOT cause the document to scroll
-- IE/Edge have [-ms-scroll-chaining](https://msdn.microsoft.com/en-us/library/windows/apps/hh466007.aspx) for this
+- Similar to IE/Edge's [-ms-scroll-chaining](https://msdn.microsoft.com/en-us/library/windows/apps/hh466007.aspx) except that effects only the chaining that occurs during a scroll gesture.  The use case here may want to disable chaining even at the start of a new scroll gesture.
 
 Custom scroll limit
 -----

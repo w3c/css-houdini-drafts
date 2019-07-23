@@ -6,15 +6,15 @@ ED: https://drafts.css-houdini.org/box-tree-api-1/
 Shortname: box-tree-api
 Level: 1
 Abstract: Layout as described by CSS produces boxes that control how content is displayed and positioned. This specification describes an API for accessing information about these boxes.
-Editor: Tab Atkins, jackalmage@gmail.com
-Editor: Peter Linss, peter.linss@hp.com
-Editor: Ian Kilpatrick, ikilpatrick@chromium.org
-Editor: Rossen Atanassov, rossen.atanassov@microsoft.com
-Editor: Shane Stephens, shanestephens@google.com
+Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
+Editor: Peter Linss, peter.linss@hp.com, w3cid 4200
+Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
+Editor: Rossen Atanassov, rossen.atanassov@microsoft.com, w3cid 49885
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 </pre>
 
 <pre class='link-defaults'>
-spec:dom-ls; type:interface; text:Document
+spec:dom; type:interface; text:Document
 </pre>
 
 <h2 id='intro'>Introduction</h2>
@@ -79,7 +79,7 @@ interface DeadFragmentInformation {
 	readonly attribute double top;
 	readonly attribute double left;
 	readonly attribute boolean isOverflowed;
-	readonly attribute sequence&lt;DeadFragmentInformation>? children;
+	readonly attribute FrozenArray&lt;DeadFragmentInformation>? children;
 	readonly attribute DeadFragmentInformation? nextSibling;
 	readonly attribute DeadFragmentInformation? previousSibling;
 	readonly attribute DeadFragmentInformation? nextInBox;

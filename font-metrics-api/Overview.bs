@@ -6,7 +6,204 @@ ED: https://drafts.css-houdini.org/font-metrics-api-1/
 Shortname: font-metrics-api
 Level: 1
 Abstract: 
-Editor: Stephen Zilles, szilles@adobe.com
-Editor: Alan Stearns, stearns@adobe.com
-Editor: Chris Lilley, chris@w3.org
+Editor: Emil A Eklund, eae@google.com, w3cid 93298
+Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
 </pre>
+
+<pre class=link-defaults>
+spec:dom; type:interface; text:Document
+spec:dom; type:interface; text:Element;
+spec:cssom-1; type:interface; text:CSS;
+</pre>
+
+Introduction {#intro}
+=====================
+
+The API exposed by this specification is designed to provide basic font metrics
+for both in-document and out-of-document content.
+
+Note: In a future version of this spec support may be added for exposing
+information about individual runs of text, including information about
+directionality, script, and character properties.
+
+Measure API {#measure-api}
+============================================
+
+<pre class='idl'>
+partial interface Document {
+    FontMetrics measureElement(Element element);
+    FontMetrics measureText(DOMString text, StylePropertyMapReadOnly styleMap);
+};
+</pre>
+
+Two methods are provided for measuring text, one for in-document measurements
+and another for out-of-document measurements. Both return a {{FontMetrics}}
+object.
+
+{{Document/measureElement()}} takes an {{Element}} and returns a {{FontMetrics}}
+object. If the {{Element}} is not in the document or isn't rendered an empty
+{{FontMetrics}} object will be returned.
+
+{{Document/measureText()}} takes a {{DOMString}} and a
+{{StylePropertyMapReadOnly}}, returning a {{FontMetrics}} object. Unless a font
+is specified as a part of the styleMap the user agents default will be used.
+
+Note: The only styles that apply to the {{Document/measureText()}} method are
+those that are passed in as a part of the styleMap. Document styles do not apply.
+
+{{FontMetrics}} object {#fontmetrics-definition}
+----------------------------
+
+<pre class='idl'>
+interface FontMetrics {
+  readonly attribute double width;
+  readonly attribute FrozenArray&lt;double> advances;
+
+  readonly attribute double boundingBoxLeft;
+  readonly attribute double boundingBoxRight;
+
+  readonly attribute double height;
+  readonly attribute double emHeightAscent;
+  readonly attribute double emHeightDescent;
+  readonly attribute double boundingBoxAscent;
+  readonly attribute double boundingBoxDescent;
+  readonly attribute double fontBoundingBoxAscent;
+  readonly attribute double fontBoundingBoxDescent;
+
+  readonly attribute Baseline dominantBaseline;
+  readonly attribute FrozenArray&lt;Baseline> baselines;
+  readonly attribute FrozenArray&lt;Font> fonts;
+};
+</pre>
+
+The {{FontMetrics}} object has the following attributes:
+
+{{FontMetrics/width}}
+The advance width of the line box, in CSS pixels.
+
+{{FontMetrics/advances}}
+List of advances for each codepoint in the given text relative to the preceding
+codepoint, in CSS pixels. Where a glyph is composed of a sequence of codepoints
+the advance for the all but the first codepoint in the sequence will be zero.
+
+{{FontMetrics/boundingBoxLeft}}
+The distance parallel to the {{FontMetrics/dominantBaseline}} from the alignment
+point given by the text-align property to the left side of the bounding
+rectangle of the given text, in CSS pixels; positive numbers indicating a
+distance going left from the given alignment point.
+
+Note: The sum of this value and {{FontMetrics/boundingBoxRight}} can be wider
+than the {{FontMetrics/width}}, in particular with slanted fonts where
+characters overhang their advance width.
+
+{{FontMetrics/boundingBoxRight}}
+The distance parallel to the {{FontMetrics/dominantBaseline}} from the alignment
+point given by the text-align property to the right side of the bounding
+rectangle of the given text, in CSS pixels. Positive numbers indicating a
+distance going right from the given alignment point.
+
+{{FontMetrics/height}}
+The distance between the highest top and the lowest bottom of the em squares in
+the line box, in CSS pixels.
+
+{{FontMetrics/emHeightAscent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the highest top of the
+em squares in the line box, in CSS pixels.
+Positive numbers indicating that the {{FontMetrics/dominantBaseline}} is below
+the top of that em square (so this value will usually be positive).
+Zero if the {{FontMetrics/dominantBaseline}} is the top of that em square.
+Half the font size if the {{FontMetrics/dominantBaseline}} is the middle of that
+em square.
+
+{{FontMetrics/emHeightDescent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the lowest bottom of
+the em squares in the line box, in CSS pixels.
+Positive numbers indicating that the {{FontMetrics/dominantBaseline}} is below
+the bottom of that em square (so this value will usually be negative).
+Zero if the {{FontMetrics/dominantBaseline}} is the bottom of that em square.
+
+{{FontMetrics/boundingBoxAscent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the top of the
+bounding rectangle of the given text, in CSS pixels; positive numbers indicating
+a distance going up from the {{FontMetrics/dominantBaseline}}.
+
+Note: This number can vary greatly based on the input text, even if the first
+font specified covers all the characters in the input.
+
+{{FontMetrics/boundingBoxDescent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the bottom of the
+bounding rectangle of the given text, in CSS pixels; positive numbers indicating
+a distance going down from the {{FontMetrics/dominantBaseline}}.
+
+{{FontMetrics/fontBoundingBoxAscent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the top of the highest
+bounding rectangle of all the fonts used to render the text, in CSS pixels;
+positive numbers indicating a distance going up from the
+{{FontMetrics/dominantBaseline}}.
+
+Note: This value and {{FontMetrics/fontBoundingBoxDescent}} are useful when
+metrics independent of the actual text being measured are desired as the values
+will be consistent regardless of the text as long as the same fonts are being
+used.
+The {{FontMetrics/boundingBoxAscent}} attribute (and its corresponding attribute
+for the descent) are useful when metrics specific to the given text are desired.
+
+{{FontMetrics/fontBoundingBoxDescent}}
+The distance from the {{FontMetrics/dominantBaseline}} to the bottom of the
+lowest bounding rectangle of all the fonts used to render the text, in
+CSS pixels; positive numbers indicating a distance going down from the
+{{FontMetrics/dominantBaseline}}.
+
+{{FontMetrics/dominantBaseline}}
+Reference to the dominant {{Baseline}} for the given text in the list of
+{{FontMetrics/baselines}}.
+
+{{FontMetrics/baselines}}
+List of all {{Baseline}}s for the given text.
+
+
+{{Baseline}} object {#baseline-definition}
+----------------------------
+
+<pre class='idl'>
+interface Baseline {
+  readonly attribute DOMString name;
+  readonly attribute double value;
+};
+</pre>
+
+Each {{Baseline}} object represents a baseline of the measured text and has the
+following attributes:
+
+{{Baseline/name}}
+Name of the baseline in question.
+
+{{Baseline/value}}
+Distance from the {{FontMetrics/dominantBaseline}}, in CSS pixels.
+Positive numbers indicating a distance going down from the
+{{FontMetrics/dominantBaseline}}.
+
+
+{{Font}} object {#font-definition}
+----------------------------
+
+<pre class='idl'>
+interface Font {
+  readonly attribute DOMString name;
+  readonly attribute unsigned long glyphsRendered;
+};
+</pre>
+
+Each {{Font}} object represents a font that was used for at least one glyph in
+the measured text. It contains the following fields:
+
+{{Font/name}}
+Font family name.
+
+{{Font/glyphsRendered}}
+Number of glyphs used from the specific font. If multiple fonts are required to
+render the specified text this attribute will indicate how many glyphs where
+used from each font.
+
+Note: Indicates the number of glyphs which may be lower than the number of
+codepoints.
