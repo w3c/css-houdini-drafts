@@ -39,6 +39,12 @@ spec:webidl; type:dfn; for:interface; text:inherit
 </pre>
 
 <pre class="anchors">
+urlPrefix: https://fetch.spec.whatwg.org/; type: dfn;
+    urlPrefix: #concept-;
+        text: fetch
+urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html; type: dfn;
+    text: effective script origin
+    url: #origin-2; text: origin
 urlPrefix: http://heycam.github.io/webidl/; type: dfn;
     urlPrefix: #es-;
         text: invoking callback functions
@@ -58,6 +64,10 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: InitializeHostDefinedRealm
     text: Invoke
     text: strict mode code
+</pre>
+<pre class="link-defaults">
+spec:url; type:dfn; text:url; for:url
+spec:webidl; type:dfn; for:interface; text:inherit
 </pre>
 
 Introduction {#intro}
@@ -553,8 +563,6 @@ For these examples we'll use a fake worklet on window.
     </pre>
 
     <pre class='idl'>
-    callback Function = any (any... arguments);
-
     [Global=(Worklet,FakeWorklet),Exposed=FakeWorklet]
     interface FakeWorkletGlobalScope : WorkletGlobalScope {
         void registerAnArbitaryClass(DOMString type, Function classConstructor);
