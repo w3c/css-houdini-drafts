@@ -882,8 +882,8 @@ only if the syntax is the [=universal syntax descriptor=],
 otherwise the descriptor is required;
 if it's missing, the entire rule is invalid and must be ignored.
 
-If an ''@property'' rule contains any unknown descriptors,
-the entire rule is invalid and must be ignored.
+Unknown descriptors are invalid and ignored,
+but do not invalidate the ''@property'' rule.
 
 If multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
 the last one in stylesheet order "wins".
