@@ -155,32 +155,23 @@ and each one is associated with a {{WorkletAnimation}} instance. An animator can
 instantiated by construction of a {{WorkletAnimation}}.
 
 
-Two animators types are supported: {{StatelessAnimator}} and {{StatefulAnimator}} each
+Two animators types are supported: <a>Stateless Animator</a> and <a>Stateful Animator</a> each
 providing a different state management strategy.
 
 
-StatelessAnimator Interface {#stateless-animator-desc}
+Stateless Animator {#stateless-animator-desc}
 ---------------------------
 
-This interface represents a stateless animator. This type of animator does not depend on any local
-state either stored on the instance or global scope. Effectively, the animate function of an
-{{StatelessAnimator}} can be treated as a pure function with the expectation that given the same
-input, it produces the same output.
-
-
-
-<xmp class='idl'>
-[Exposed=AnimationWorklet, Global=AnimationWorklet, Constructor (optional any options)]
-interface StatelessAnimator {
-};
-</xmp>
-
+A <dfn>Stateless Animator</dfn> is a type of animator does not depend on any local state either
+stored on the instance or global scope. Effectively, the animate function of an <a>Stateless
+Animator</a> can be treated as a pure function with the expectation that given the same input, it
+produces the same output.
 
 
 <div class='note'>
-    This is how the class should look.
+    This is how an stateless animator class should look.
     <pre class='lang-javascript'>
-        class FooAnimator extends StatelessAnimator {
+        class FooAnimator {
             constructor(options) {
                 // Called when a new animator is instantiated.
             }
@@ -193,14 +184,14 @@ interface StatelessAnimator {
 
 Note: The statelessness allows an animation worklet to perform optimization such as producing
 multiple animation frames in parallel and performing very cheap teardown and setup. Using
-StatelessAnimator is highly recommended to enable such optimizations.
+<a>Stateless Animator</a> is highly recommended to enable such optimizations.
 
-StatefulAnimator Interface {#stateful-animator-desc}
+Stateful Animator {#stateful-animator-desc}
 ---------------------------
 
-This interface represents a stateful animator. This animator can have local state and animation
-worklet guarantees that it maintains this state as long as the stateful animator fulfills the
-contract required by this interface as described following.
+A <dfn>Stateful Animator</dfn> is a type of animator that can have local state and animation worklet
+guarantees that it maintains this state as long as the stateful animator fulfills the contract
+required by its interface as described following.
 
 
 <a>Animation worklet</a> maintains a set of {{WorkletGlobalScope}}s which may exist across different
@@ -210,29 +201,20 @@ effect is mutable only in a certain thread). Animation worklet guarantees that a
 instance's state is maintained even if the instance is respawned in a different global scope.
 
 The basic mechanism for maintaining the state is that the animation worklet snapshots the local
-state that is exposed via the {{StatefulAnimator/state}} function and then reifies it so that it can
-be passed into the constructor when the animator instance is respawned at a later time in a
-potentially different global scope. The <a>migrate an animator instance</a> algorithm specifies this
-process in details.
+state that is exposed via the <a>state function</a> and then reifies it so that it can be passed
+into the constructor when the animator instance is respawned at a later time in a potentially
+different global scope. The <a>migrate an animator instance</a> algorithm specifies this process in
+details.
 
 A user-defined stateful animator is expected to fulfill the required contract which is that its
 state function returns an object representing its state that can be serialized using structured
 serialized algorithm and that it can also recreate its state given that same object passed to
 its constructor.
 
-<xmp class='idl'>
-[Exposed=AnimationWorklet, Global=AnimationWorklet,
-Constructor (optional any options, optional any state)]
-interface StatefulAnimator {
-  any state();
-};
-</xmp>
-
-
 <div class='note'>
-    This is how the class should look.
+    This is how a stateful animator class should look.
     <pre class='lang-javascript'>
-        class BarAnimator extends StatefulAnimator {
+        class BarAnimator {
             constructor(options, state) {
               // Called when a new animator is instantiated (either first time or after being respawned).
               this.currentVelocity  = state ? state.velocity : 0;
@@ -264,8 +246,13 @@ animation as needed by {{AnimationWorkletGlobalScope}}. It consists of:
 
  - An <dfn>animate function</dfn> which is a <a>Function</a> <a>callback function</a> type.
 
- - A <dfn>stateful flag</dfn>
+ - A <dfn>state function</dfn> which is a <a>Function</a> <a>callback function</a> type.
 
+ - A <dfn>stateful flag</dfn>.
+
+
+A <dfn>stateful animator definition</dfn> is an <a>animator definition</a> whose <a>stateful
+flag</a> is <b>true</b>.
 
 
 Registering an Animator Definition {#registering-animator-definition}
@@ -284,6 +271,9 @@ interface AnimationWorkletGlobalScope : WorkletGlobalScope {
 callback AnimatorInstanceConstructor = any (any options, optional any state);
 
 </xmp>
+
+Note that to register a <a>stateful animator definition</a> it is simply enough for the registered
+class to have a state function.
 
 <div algorithm="register-animator">
 
@@ -304,24 +294,27 @@ following steps:
     4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
 
 
-    5. If <a>SameValue</a>(|prototype|, {{StatelessAnimator}}) is <b>true</b> set |stateful| to be
-        <b>false</b>, otherwise if <a>SameValue</a>(|prototype|, {{StatefulAnimator}}) is
-        <b>true</b> set |stateful| to be <b>true</b>, otherwise <a>throw</a> a <a>TypeError</a> and
-        abort all these steps.
+    5. Let |animateFuncValue| be the result of <a>Get</a>(|prototype|, "animate").
 
-    6. Let |animateValue| be the result of <a>Get</a>(|prototype|, "animate").
-
-    7. Let |animate| be the result of <a>converting</a> |animateValue| to the <a>Function</a>
+    6. Let |animateFunc| be the result of <a>converting</a> |animateFuncValue| to the <a>Function</a>
         <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
         all these steps.
 
-    8. Let |definition| be a new <a>animator definition</a> with:
+    7. Let |stateFuncValue| be the result of <a>Get</a>(|prototype|, "state").
+
+    8. Let |stateFunc| be the result of <a>converting</a> |stateFuncValue| to the <a>Function</a>
+        <a>callback function</a> type, If an exception is thrown, set |stateful| to be <b>false</b>,
+        otherwise set |stateful| to be <b>true</b> and |stateFunc| to be undefined.
+
+    9. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
         - <a>class constructor</a> being |animatorCtor|
 
-        - <a>animate function</a> being |animate|
+        - <a>animate function</a> being |animateFunc|
+
+        - <a>state function</a> being |stateFunc|
 
         - <a>stateful flag</a> being |stateful|
 
@@ -352,7 +345,8 @@ and owns the instance specific state such as animation effect and timeline. It c
  - An <dfn>animator serialized options</dfn> which is a serializable object.
 
 A <dfn>stateful animator instance</dfn> is an <a>animator instance</a> whose corresponding
-<a>animator definition</a>'s <a>stateful flag</a> is <b>true</b>.
+definition is a <a>stateful animator definition</a>.
+
 
 
 Creating an Animator Instance {#creating-animator-instance}
@@ -852,7 +846,7 @@ animation.play();
 
 <xmp class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope.
-registerAnimator('twitter-header', class HeaderAnimator extends StatelessAnimator {
+registerAnimator('twitter-header', class HeaderAnimator {
   constructor(options) {
     this.timing_ = new CubicBezier('ease-out');
   }
@@ -920,7 +914,7 @@ fastParallax.play();
 
 <xmp class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope.
-registerAnimator('parallax', class ParallaxAnimator extends StatelessAnimator {
+registerAnimator('parallax', class ParallaxAnimator {
   constructor(options) {
     this.rate_ = options.rate;
   }
