@@ -682,6 +682,13 @@ When a given worklet animation's <a>replace state</a> changes from <a>active</a>
 instance of worklet animation</a> given the worklet animation as |workletAnimation|.
 
 
+Issue: In web-animation play state is updated before the actual change in particular some operations
+such as play() are asynchronous. We should really invoke these Animator related operation after the
+appropriate animation operation is complete instead of when play state has changed. This will
+require either finding (or introducing) q new hook in web animation or having override for each such
+async operation.
+
+
 When the procedure to <a>set the target effect of an animation</a> for a given worklet animation
 is called, then <a>set animator instance of worklet animation</a> given the worklet animation as
 |workletAnimation|.
