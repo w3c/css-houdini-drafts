@@ -891,9 +891,12 @@ A custom property registration from {{CSS/registerProperty|CSS.registerProperty(
 further wins over any ''@property'' rules
 for the same <<custom-property-name>>.
 
+A ''@property'' is invalid if it occurs in a stylesheet inside of a [=shadow tree=],
+and must be ignored.
 
-Issue(846): What happens when ''@property'' appears inside a shadow tree?
-
+Note: This might change in the future,
+as the behavior of concept-defining at-rules in shadow trees
+becomes more consistently defined.
 
 The 'syntax' descriptor {#the-syntax-descriptor}
 ------------------------------------------------
