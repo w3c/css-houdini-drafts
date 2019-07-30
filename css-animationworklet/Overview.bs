@@ -3,6 +3,7 @@ Title:  CSS Animation Worklet API
 Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-animationworklet-1/
+TR: https://www.w3.org/TR/css-animation-worklet-1/
 Shortname: css-animationworklet
 Level: 1
 Abstract:
