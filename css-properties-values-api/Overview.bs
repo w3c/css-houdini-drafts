@@ -964,18 +964,6 @@ the following conditions must be met for the the ''@property'' rule to be valid:
 
 If the above conditions are not met, the ''@property'' rule is invalid.
 
-
-Extensions to the {{CSSRule}} interface {#extensions-to-css-rule-interface}
-------------------------------------------------------------------------------------
-
-The {{CSSRule}} interface is extended as follows:
-
-<pre class='idl'>
-partial interface CSSRule {
-    const unsigned short PROPERTY_RULE = 18;
-};
-</pre>
-
 The <dfn interface>CSSPropertyRule</dfn> interface {#the-css-property-rule-interface}
 -----------------------------------------------------------------------------
 
@@ -1002,7 +990,7 @@ interface CSSPropertyRule : CSSRule {
 
 	<dt><dfn>inherits</dfn>
 	<dd>
-		The inherits descriptor associated withthe ''@property'' rule.
+		The inherits descriptor associated with the ''@property'' rule.
 
 	<dt><dfn>initialValue</dfn>
 	<dd>
