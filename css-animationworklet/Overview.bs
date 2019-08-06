@@ -39,7 +39,7 @@ urlPrefix: http://w3c.github.io/html/infrastructure.html#; type: dfn;
     text: structureddeserialize
 urlPrefix: https://www.w3.org/TR/css3-transitions/#; type: dfn;
     text: animatable properties
-urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
+urlPrefix: https://drafts.csswg.org/web-animations#; type: dfn;
     url: the-documents-default-timeline; text: default document timeline
     url: concept-animation; text: animation
     text: effect value
@@ -62,6 +62,11 @@ urlPrefix: https://w3c.github.io/web-animations/#; type: dfn;
     text: running
     text: composite operation
     text: animation class
+    text: replace state
+    text: active
+    text: persisted
+    text: removed
+
 urlPrefix: https://w3c.github.io/web-animations/level-2/#;
     type: dfn;
         text: group effect
@@ -338,8 +343,8 @@ and owns the instance specific state such as animation effect and timeline. It c
 
  - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
 
- - An <dfn>animator current time</dfn> which is the corresponding <a>worklet animation</a>'s current
-     time.
+ - An <dfn>animator current time</dfn> which is equivalent to its corresponding
+    <a>worklet animation</a>'s current time.
 
  - An <dfn>animator timeline</dfn> which is a <a>timeline</a>.
 
@@ -518,9 +523,9 @@ either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially s
 <a>frame-current</a>. Different circumstances can cause the <a>animation requested flag</a> to be
 set to <a>frame-requested</a>. These include the following:
   - Changes in the <a>current time</a> of the animator's <a>timeline</a>
-  - Changes in the <a>current time</a> of the animator's corresponding <a>Worklet Animation</a>
+  - Changes in the <a>current time</a> of the animator's corresponding <a>worklet animation</a>
 
-[[#running-animators]] resets the <a>animation requested flag</a> on animators to
+Performing <a>run animators</a> resets the <a>animation requested flag</a> on animators to
 <a>frame-current</a>.
 
 
@@ -531,8 +536,8 @@ Web Animations Integration {#web-animation-integration}
 Worklet Animation {#worklet-animation-desc}
 -------------------------------------------
 <dfn>Worklet animation</dfn> is a kind of <a>animation</a> that delegates the animation playback to
-an <a>animator instance</a>. It controls the lifetime and playback state of its corresponding
-<a>animator instance</a>.
+an <a>animator instance</a>. It controls the lifetime and playback state of its <a>corresponding
+animator instance</a>.
 
 Being an <a>animation</a>, <a>worklet animation</a> has an <a>animation effect</a> and a
 <a>timeline</a>. However unlike other animations the worklet animation's <a>current time</a> does
@@ -543,26 +548,14 @@ animation's output.
 
 <a>Worklet animation</a> has the following properties in addition to the {{Animation}} interface:
   - an <dfn>animation animator name</dfn> which identifies its <a>animator definition</a>.
-  - a <dfn>serialized options</dfn> which is serializable object that is used when
+  - a <dfn>serialized options</dfn> which is serializable options object that is used when
     constructing a new animator instance.
-
-<figure>
-  <img src="img/WorkletAnimation-timing-model.svg" width="600"
-    alt="Overview of the WorkletAnimation timing model.">
-  <figcaption>
-    Overview of the WorkletAnimation timing model. <br>
-
-    The animation current time is input to the animator instance, which produces a local time value
-    for the animation effect. If the animator instance is running in a parallel global scope the
-    implementation may also choose to use the local time value to produce the final effect value and
-    update the visuals in parallel.
-
-  </figcaption>
-</figure>
+  - a <dfn>corresponding animator instance</dfn> which is an <a>Animator Instance</a>.
 
 
-Creating a Worklet Animation {#creating-worklet-animation}
------------------------------------------------------------
+The existence of <a>corresponding animator instance</a> for a <a>worklet animation</a> depends on
+the animation <a>play state</a>. See [[#web-animation-overrides]] for details on when and this
+correspondence changes.
 
 <xmp class='idl'>
 [Exposed=Window,
@@ -577,10 +570,28 @@ interface WorkletAnimation : Animation {
 </xmp>
 
 
+<figure>
+  <img src="img/WorkletAnimation-timing-model.svg" width="600"
+    alt="Overview of the WorkletAnimation timing model.">
+  <figcaption>
+    Overview of the worklet animation timing model. <br>
+
+    The animation current time is input to the animator instance, which produces a local time value
+    for the animation effect. If the animator instance is running in a parallel global scope the
+    implementation may also choose to use the local time value to produce the final effect value and
+    update the visuals in parallel.
+
+  </figcaption>
+</figure>
+
+
+Creating a Worklet Animation {#creating-worklet-animation}
+-----------------------------------------------------------
+
 <div algorithm="create-worklet-animation">
 <dfn constructor for=WorkletAnimation>WorkletAnimation(|animatorName|, |effects|, |timeline|, |options|)</dfn>
 
-Creates a new {{WorkletAnimation}} object using the following procedure.
+Creates a new {{WorkletAnimation}} object using the following procedure:
 
     1. Let |workletAnimation| be a new {{WorkletAnimation}} object.
 
@@ -597,19 +608,22 @@ Creates a new {{WorkletAnimation}} object using the following procedure.
          : Otherwise,
          :: Let |effect| be undefined.
 
-    4. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
-         passing |effect| as the new effect.
-
-    5. Let |serializedOptions| be the result of <a>StructuredSerialize</a>(|options|).
+    4. Let |serializedOptions| be the result of <a>StructuredSerialize</a>(|options|).
         Rethrow any exceptions.
 
-    6. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
+    5. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
 
-    7. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
+    6. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
+
+    7. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
+        passing |effect| as the new effect. Note that this may trigger action to
+        <a>set animator instance of worklet animation</a>. See [[#web-animation-overrides]] for more
+        details.
+
 </div>
 
 
-Worklet Animation timing model {#timing-model}
+Worklet Animation Timing Model {#timing-model}
 ------------------------------------
 
 This section describes how <a>worklet animation's</a> timing model differs from other
@@ -653,19 +667,44 @@ Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to ge
    it can react appropriately.
 
 
-Interaction with Animator Instances {#worklet-animation-animator-instances}
+Web Animations Overrides {#web-animation-overrides}
 -----------------------------------
 
-A <a>worklet animation</a> corresponds to at most one <a>animator instance</a> at any time, and may
-have no current corresponding <a>animator instance</a>. The correspondance of an <a>animator
-instance</a> for a <a>worklet animation</a> depends on the animation <a>play state</a>.
+When a given worklet animation's <a>play state</a> changes from <a>idle</a> to <a>finished</a>,
+<a>running</a>, or <a>paused</a>, run the procedure to <a>associate animator instance of worklet
+animation</a> given the worket animation as |workletAnimation|.
+
+When a given worklet animation's <a>play state</a> changes from <a>finished</a>, <a>running</a> or
+<a>paused</a> to <a>idle</a>, run the procedure to <a>disassociate animator
+instance of worklet animation</a> given the worklet animation as |workletAnimation|.
+
+When a given worklet animation's <a>replace state</a> changes from <a>active</a> to either
+<a>persisted</a> or <a>removed</a> run the procedure to <a>disassociate animator
+instance of worklet animation</a> given the worklet animation as |workletAnimation|.
+
+
+Issue: In web-animation play state is updated before the actual change in particular some operations
+such as play() are asynchronous. We should really invoke these Animator related operation after the
+appropriate animation operation is complete instead of when play state has changed. This will
+require either finding (or introducing) q new hook in web animation or having override for each such
+async operation.
+
+
+When the procedure to <a>set the target effect of an animation</a> for a given worklet animation
+is called, then <a>set animator instance of worklet animation</a> given the worklet animation as
+|workletAnimation|.
+
+When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
+is called, then <a>set animator instance of worklet animation</a> given the worklet animation as
+|workletAnimation|.
+
 
 <div algorithm="associate-animator-instance">
 
 To <dfn>associate animator instance of worklet animation</dfn> given |workletAnimation|,
 the user agent <em>must</em> run the following steps:
 
-  1. If |workletAnimation| has a corresponding <a>animator instance</a>, abort the following steps.
+  1. If |workletAnimation| has a <a>corresponding animator instance</a>, abort the following steps.
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
     |workletAnimation|.
   3. <a>Queue a task</a> on |workletGlobalScope| to run the procedure to <a>create a new animator
@@ -675,8 +714,8 @@ the user agent <em>must</em> run the following steps:
       * The |workletAnimation|'s <a>animation effect</a> as effect.
       * The |workletAnimation|'s <a>serialized options</a> as options.
       * The |workletGlobalScope| as workletGlobalScope.
-  4. If the procedure was successful, set the resulting <a>animator instance</a> as corresponding to
-    |workletAnimation|.
+  4. If the procedure was successful, set the resulting <a>animator instance</a> to be the
+     <a>corresponding animator instance</a> of |workletAnimation|.
 
 </div>
 
@@ -685,18 +724,17 @@ the user agent <em>must</em> run the following steps:
 To <dfn>disassociate animator instance of worklet animation</dfn> given
 |workletAnimation|, the user age <em>must</em> run the following steps:
 
-  1. If |workletAnimation| does not have a corresponding <a>animator instance</a>, abort the
+  1. If |workletAnimation| does not have a <a>corresponding animator instance</a>, abort the
     following steps.
   2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
     |workletAnimation|.
-  3. Let |animatorInstance| be |workletAnimation|'s corresponding <a>animator instance</a>.
+  3. Let |animatorInstance| be |workletAnimation|'s <a>corresponding animator instance</a>.
   4. <a>Queue a task</a> on the |workletGlobalScope| to run the procedure to <a>remove an animator
      instance</a>, passing |animatorInstance| as instance and |workletGlobalScope| as
      workletGlobalScope.
-  5. Set |workletAnimation| as having no corresponding <a>animator instance</a>.
+  5. Set |workletAnimation|'s <a>corresponding animator instance</a> as undefined.
 
 </div>
-
 
 <div algorithm="set-animator-instance">
 
@@ -707,21 +745,6 @@ To <dfn>set animator instance of worklet animation</dfn> given
   2. <a>associate animator instance of worklet animation</a> given |workletAnimation|.
 
 </div>
-
-When a given |workletAnimation|'s <a>play state</a> changes to <a>pending</a>, <a>running</a>, or
-<a>paused</a>, run the procedure to
-<a>associate animator instance of worklet animation</a> given |workletAnimation|.
-
-
-When a given |workletAnimation|'s <a>play state</a> changes to <a>idle</a> or <a>finished</a>,
-run the procedure to
-<a>disassociate animator instance of worklet animation</a> given |workletAnimation|.
-
-When the procedure to <a>set the target effect of an animation</a> for a given |workletAnimation|
-is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
-
-When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
-is called, then <a>set animator instance of worklet animation</a> given |workletAnimation|.
 
 
 
@@ -746,8 +769,8 @@ WorkletGroupEffect {#worklet-group-effect}
 {{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
 <a>local times</a> to be mutated individually.
 
-When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a {{WorkletAnimation}}, the
-corresponding <a>animator instance</a> can directly control the <a>child effects</a>' <a>local
+When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a <a>worklet animation</a>,
+its <a>corresponding animator instance</a> can directly control the <a>child effects</a>' <a>local
 times</a>. This allows a single worklet animation to coordinate multiple effects - see
 [[#example-2]] for an example of such a use-case.
 
