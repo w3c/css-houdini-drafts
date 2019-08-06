@@ -123,24 +123,24 @@ Introduction {#intro}
 =====================
 
 CSS stylesheets are parsed into abstract UA-internal data structures,
-the <dfn for=CSS export>underlying values</dfn> of CSS,
+the <dfn for=CSS export lt="internal representation">internal representations</dfn> of CSS,
 which various specification algorithms manipulate.
 
-Underlying values can't be directly manipulated,
+[=Internal representations=] can't be directly manipulated,
 as they are implementation-dependent;
-UAs have to agree on how to *interpret* the underlying values,
-but the values themselves are purposely left undefined
+UAs have to agree on how to *interpret* the [=internal representations=],
+but the representations themselves are purposely left undefined
 so that UAs can store and manipulate CSS
 in whatever way is most efficient for them.
 
-Previously, the only way to read or write to the underlying values
+Previously, the only way to read or write to the [=internal representations=]
 was via strings--
 stylesheets or the CSSOM allowed authors to send strings to the UA,
-which were parsed into underlying values,
+which were parsed into [=internal representations=],
 and the CSSOM allowed authors to request
-that the UA serialize their underlying values back into strings.
+that the UA serialize their [=internal representations=] back into strings.
 
-This specification introduces a new way to interact with [=underlying values=],
+This specification introduces a new way to interact with [=internal representations=],
 by representing them with specialized JS objects
 that can be manipulated and understood more easily and more reliably
 than string parsing/concatenation.
@@ -149,7 +149,7 @@ This new approach is both easier for authors
 and have unit-aware mathematical operations defined for them)
 and in many cases are more performant,
 as values can be directly manipulated
-and then cheaply translated back into [=underlying values=]
+and then cheaply translated back into [=internal representations=]
 without having to build and then parse strings of CSS.
 
 <!--
@@ -270,11 +270,11 @@ are instead represented as {{CSSStyleValue}} objects.
 
 Each {{CSSStyleValue}} object is associated with a particular CSS property,
 via its {{[[associatedProperty]]}} internal slot,
-and a particular, immutable, [=underlying value=].
-These objects are said to "represent" the particular [=underlying value=]
+and a particular, immutable, [=internal representation=].
+These objects are said to "represent" the particular [=internal representation=]
 they were [=reified=] from,
 such that if they are set back into a stylesheet for the same property,
-they reproduce an equivalent [=underlying value=].
+they reproduce an equivalent [=internal representation=].
 
 These {{CSSStyleValue}} objects are only considered valid for the property that they were parsed for.
 This is enforced by {{CSSStyleValue}} objects having a <dfn attribute for=CSSStyleValue>\[[associatedProperty]]</dfn> internal slot,
@@ -339,7 +339,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
     Note: The [=CSSStyleDeclaration/declarations=] are not yet defined using [[infra]] terminology,
     but for the purpose of this spec
     it's assumed to be a [=map=] whose keys are [=strings=] (representing property names)
-    and whose values are [=underlying values=] for those properties.
+    and whose values are [=internal representations=] for those properties.
 
     Unless otherwise stated,
     the initial ordering of the {{[[declarations]]}} internal slot
@@ -515,7 +515,7 @@ probably in an appendix.
     7. Let |values to set| be an empty [=list=].
 
     8. For each |value| in |values|,
-        [=create an underlying value=] for |property| and |value|,
+        [=create an internal representation=] for |property| and |value|,
         and append the result to |values to set|.
 
     9. Set |props|[|property|] to |values to set|.
@@ -566,7 +566,7 @@ probably in an appendix.
     7. Let |temp values| be an empty [=list=].
 
     8. For each |value| in |values|,
-        [=create an underlying value=] with |property| and |value|,
+        [=create an internal representation=] with |property| and |value|,
         and [=list/append=] the returned value to |temp values|.
 
     <!-- Using a temp list so that nothing gets mutated if normalizing ends up throwing an error. -->
@@ -598,7 +598,7 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    To <dfn export>create an underlying value</dfn>,
+    To <dfn export>create an internal representation</dfn>,
     given a [=string=] |property|
     and a [=string=] or {{CSSStyleValue}} |value|:
 
@@ -2845,17 +2845,17 @@ has the same behavior as in normal CSS.
 {{CSSStyleValue}} Reification {#reify-stylevalue}
 ===========================================================
 
-This section describes how Typed OM objects are constructed from [=underlying values=],
+This section describes how Typed OM objects are constructed from [=internal representations=],
 a process called <dfn export for=CSS lt="reify | reification">reification</dfn>.
 
 Some general principles apply to all [=reification=],
 and so aren't stated in each individual instance:
 
-* If an [=underlying value=] is from a [=list-valued=] property,
+* If an [=internal representation=] is from a [=list-valued=] property,
     this list defines how to reify a single iteration of the property;
     multiple iterations are reflected by returning multiple values from {{StylePropertyMap}}.{{getAll()}}.
 
-* If an [=underlying value=] contains a ''var()'' reference,
+* If an [=internal representation=] contains a ''var()'' reference,
     then it is reified by [=reify a list of component values|reifying a list of component values=],
     regardless of what property it is for.
 
@@ -4615,7 +4615,7 @@ for both specified and computed values.
 Unrepresentable Values {#reify-failure}
 ---------------------------------------
 
-Not all [=underlying values=] are simple enough to be [=reified=]
+Not all [=internal representations=] are simple enough to be [=reified=]
 with the current set of {{CSSStyleValue}} subclasses.
 When this is the case,
 the property is [=reified as a CSSStyleValue=] for a particular property,
