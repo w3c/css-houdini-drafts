@@ -607,7 +607,7 @@ probably in an appendix.
         Return |value|'s associated value.
 
     : If |value| is a {{CSSStyleValue}} subclass,
-    :: If |value| does not [=match a grammar|match the grammar=] of a [=list-valued property iteration=] of |property|,
+    :: If |value| does not [=match the grammar=] of a [=list-valued property iteration=] of |property|,
         [=throw=] a {{TypeError}}.
 
         If any component of |property|’s CSS grammar has a limited numeric range,
@@ -630,7 +630,8 @@ probably in an appendix.
     as defined in [[css-syntax-3#tokenization]].
     {{CSSStyleValue}} objects can also be matched against these grammars, however.
 
-    A {{CSSStyleValue}} is said to <dfn for=CSSStyleValue export>match a grammar</dfn>
+    A {{CSSStyleValue}} is said to
+    <dfn for=CSSStyleValue export lt="match a grammar | match the grammar">match a grammar</dfn>
     based on the following rules:
 
     * A {{CSSKeywordValue}} matches an [=ident=] specified in a grammar
