@@ -66,6 +66,19 @@ urlPrefix: https://drafts.csswg.org/web-animations#; type: dfn;
     text: active
     text: persisted
     text: removed
+    text: start delay
+    text: end delay
+    text: fill mode
+    text: iteration start
+    text: iteration count
+    text: iteration duration
+    text: playback direction
+    text: timing function
+    text: set the start time
+    text: set the current time
+    text: update the timing properties of an animation effect
+
+
 
 urlPrefix: https://w3c.github.io/web-animations/level-2/#;
     type: dfn;
@@ -261,6 +274,7 @@ A <dfn>stateful animator definition</dfn> is an <a>animator definition</a> whose
 flag</a> is <b>true</b>.
 
 
+
 Registering an Animator Definition {#registering-animator-definition}
 -------------------------------------
 An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
@@ -330,6 +344,68 @@ following steps:
 </div>
 
 
+Worklet Animation Effect {#worklet-animation-effect-desc}
+----------------------------------------------------
+
+A <dfn>worklet animation effect</dfn> represents the underlying <a>animation effect</a> inside
+animation worklet.
+
+It has an <dfn>corresponding effect</dfn> property which is a reference to to an underlying
+<a>animation effect</a>
+
+Also it has corresponding properties for the following's <a>animation effect</a> properties:
+     *    [=local time=],
+     *    [=start delay=],
+     *    [=end delay=],
+     *    [=fill mode=],
+     *    [=iteration start=],
+     *    [=iteration count=],
+     *    [=iteration duration=],
+     *    [=playback direction=], and
+     *    [=timing function=].
+
+<a>Worklet animation effect</a> is represented by the abstract {{WorkletAnimationEffect}} interface
+in an {{AnimationWorkletGlobalScope}}.
+
+<xmp class='idl'>
+
+[ Exposed=AnimationWorklet ]
+interface WorkletAnimationEffect {
+    EffectTiming         getTiming();
+    ComputedEffectTiming getComputedTiming();
+
+    attribute double? localTime;
+};
+
+</xmp>
+
+Note: {{WorkletAnimationEffect}} is basically a restricted version of {{AnimationEffect}} interface
+  which does not have {{AnimationEffect/updateTiming}} but additionally allows local time to be set.
+
+<div class=methods>
+
+:   <dfn method for=WorkletAnimationEffect>getTiming()</dfn>
+::  Returns the specified timing properties using the corresponding properties.
+
+:   <dfn method for=WorkletAnimationEffect>getComputedTiming()</dfn>
+::  Returns the calculated timing properties using the corresponding properties.
+
+:   <dfn attribute for=WorkletAnimationEffect>localTime</dfn>
+::  Getting the attribute returns the corresponding <a>local time</a>.
+    Setting the attribute updates the local time given this effect as |effect|
+    and the attribute value as |time|:
+
+    1. If the |time| is the same as |effect|'s <a>local time</a> then skip following steps.
+
+    2. Set the |effect|'s <a>local time</a> to |time|.
+
+    3. Set the |effect|'s animator instance's <a>sync requested flag</a> to true.
+
+
+</div>
+
+
+
 Animator Instance {#animator-instance-section}
 ======================================
 
@@ -341,7 +417,9 @@ and owns the instance specific state such as animation effect and timeline. It c
 
  - An <a>animation requested flag</a>.
 
- - An <dfn>animator effect</dfn> which is an <a>animation effect</a>.
+ - A <dfn>sync requested flag</dfn>.
+
+ - An <dfn>effect</dfn> which is an <a>worklet animation effect</a>.
 
  - An <dfn>animator current time</dfn> which is equivalent to its corresponding
     <a>worklet animation</a>'s current time.
@@ -366,8 +444,9 @@ scope. Each <a>animator instance</a> corresponds to a worklet animation in the d
 
 <div algorithm="create-animator">
 
-To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect|, |serializedOptions|,
-|serializedState|, and |workletGlobalScope|, the user agent <em>must</em> run the following steps:
+To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect|,
+|serializedOptions|, |serializedState|, and |workletGlobalScope|, the user agent <em>must</em> run
+the following steps:
 
     1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
          <a>animator name to animator definition map</a>.
@@ -384,15 +463,19 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
         «|options|, |state|» as arguments. If an exception is thrown, rethrow the exception and
         abort all these steps.
 
-    6. Set the following on |animatorInstance| with:
+    6. Let |workletEffect| be the result of <a>constructing</a> a {{WorkletAnimationEffect}}
+        with its <a>corresponding effect</a> being |effect|.
+
+    7. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
         - <a>animation requested flag</a> being <a>frame-current</a>
+        - <a>sync requested flag</a> being false
         - <a>animator current time</a> being unresolved
-        - <a>animator effect</a> being |effect|
+        - <a>effect</a> being |workletEffect|
         - <a>animator timeline</a> being |timeline|
         - <a>animator serialized options</a> being |options|
 
-    7. Add |animatorInstance| to |workletGlobalScope|'s <a>animator instance set</a>.
+    8. Add |animatorInstance| to |workletGlobalScope|'s <a>animator instance set</a>.
 
 </div>
 
@@ -402,7 +485,7 @@ Running Animators {#running-animators}
 
 When the user agent wants to produce a new animation frame, if for any <a>animator instance</a> the
 associated <a>animation requested flag</a> is <a>frame-requested</a> then the the user agent
-<em>must</em> <a>run animators</a> for the current frame.
+<em>must</em> <a>run animators</a> for the current frame in all its associated global scopes.
 
 Note: The user agent is not required to run animations on every visual frame. It is legal to defer
       generating an animation frame until a later frame. This allow the user agent to
@@ -411,33 +494,40 @@ Note: The user agent is not required to run animations on every visual frame. It
 <div algorithm="run-animators">
 
 When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalScope|, it
-<em>must</em> iterate over all <a>animator instance</a>s in the |workletGlobalScope|'s <a>animator
-instance set</a>. For each such |instance| the user agent <em>must</em> perform the following steps:
+<em>must</em> run the following steps:
 
-  1. Let |animatorName| be |instance|'s <a>animator name</a>
+    1. Iterate over all <a>animator instance</a>s in the |workletGlobalScope|'s <a>animator instance
+        set</a>. For each such |animator| the user agent <em>must</em> perform the following steps:
 
-  2. Let the |definition| be the result of looking up |animatorName| on the |workletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
+        1. Let |animatorName| be |animator|'s <a>animator name</a>
 
-      If |definition| does not exist then abort the following steps.
+        2. Let the |definition| be the result of looking up |animatorName| on the
+            |workletGlobalScope|'s <a>animator name to animator definition map</a>.
 
-  3. If the <a>animation requested flag</a> for |instance| is <a>frame-current</a> or the effect
-       belonging to the |instance| will not be visible within the visual viewport of the current
-       frame the user agent <em>may</em> abort all the following steps.
+           If |definition| does not exist then abort the following steps.
 
-       Issue: Consider giving user agents permission to skip running animator instances to
-       throttle slow animators.
+        3. If the <a>animation requested flag</a> for |animator| is <a>frame-current</a> or the
+            effect belonging to the |animator| will not be visible within the visual viewport of the
+            current frame the user agent <em>may</em> abort all the following steps.
 
-  4. Let |animateFunction| be |definition|'s <a>animate function</a>.
+            Issue: Consider giving user agents permission to skip running animator instances to
+            throttle slow animators.
 
-  5. Let |currentTime| be <a>animator current time</a> of |instance|.
+        4. Let |animateFunction| be |definition|'s <a>animate function</a>.
 
-  6. Let |effect| be <a>animator effect</a> of |instance|.
+        5. Let |currentTime| be <a>animator current time</a> of |animator|.
 
-  7. <a>Invoke</a> |animateFunction| with arguments «|currentTime|, |effect|»,
-        and with |instance| as the <a>callback this value</a>.
+        6. Let |effect| be <a>effect</a> of |animator|.
+
+        7. <a>Invoke</a> |animateFunction| with arguments «|currentTime|, |effect|»,
+            and with |animator| as the <a>callback this value</a>.
+
+    2. If any <a>animator instance</a>s in the |workletGlobalScope|'s <a>animator instance set</a>
+        has its <a>sync requested flag</a> set to true then <a>sync local times to document</a>
+        given |workletGlobalScope|.
 
 </div>
+
 Note: Although inefficient, it is legal for the user agent to <a>run animators</a> multiple times
 in the same frame.
 
@@ -451,10 +541,10 @@ Removing an Animator Instance {#removing-animator}
 
 <div algorithm="remove-animator">
 
-To <dfn>remove an animator instance</dfn> given |instance| and |workletGlobalScope| the user agent
+To <dfn>remove an animator instance</dfn> given |animator| and |workletGlobalScope| the user agent
 <em>must</em> run the following steps:
 
-1. Remove |instance| from |workletGlobalScope|'s <a>animator instance set</a>.
+1. Remove |animator| from |workletGlobalScope|'s <a>animator instance set</a>.
 
 </div>
 
@@ -468,14 +558,14 @@ The migration process allows <a>stateful animator instance</a> to be migrated to
 <div algorithm="migrate-animator">
 
 To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to another, given
-|instance|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|, the user agent
+|animator|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|, the user agent
 <em>must</em> run the following steps :
 
   1. Let |serializedState| be undefined.
 
   2. <a>Queue a task</a> on |sourceWorkletGlobalScope| to run the following steps:
 
-     1. Let |animatorName| be |instance|'s <a>animator name</a>
+     1. Let |animatorName| be |animator|'s <a>animator name</a>
 
      2. Let |definition| be the result of looking up |animatorName| on |sourceWorkletGlobalScope|'s
         <a>animator name to animator definition map</a>.
@@ -487,14 +577,14 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
      4. If |stateful| is <b>false</b> then abort the following steps.
 
      4. |stateFunction|
-     5. Let |state| be the result of <a>Invoke</a> |stateFunction| with |instance| as the
+     5. Let |state| be the result of <a>Invoke</a> |stateFunction| with |animator| as the
         <a>callback this value</a>.  If any exception is thrown, rethrow the exception and abort
         the following steps.
 
      6. Set |serializedState| to be the result of <a>StructuredSerialize</a>(|state|).
         If any exception is thrown, then abort the following steps.
 
-     7. Run the procedure to <a>remove an animator instance</a> given |instance|, and
+     7. Run the procedure to <a>remove an animator instance</a> given |animator|, and
         |sourceWorkletGlobalScope|.
 
   2. Wait for the above task to complete. If the task is aborted, abort the following steps.
@@ -502,10 +592,10 @@ To <dfn>migrate an animator instance</dfn> from one {{WorkletGlobalScope}} to an
   3. <a>Queue a task</a> on |destinationWorkletGlobalScope| to run the following steps:
 
      1. Run the procedure to <a>create a new animator instance</a> given:
-        - The |instance|'s <a>animator name</a> as name.
-        - The |instance|'s <a>animator timeline</a> as timeline.
-        - The |instance|'s <a>animator effect</a> as effect.
-        - The |instance|'s <a>animator serialized options</a> as options.
+        - The |animator|'s <a>animator name</a> as name.
+        - The |animator|'s <a>animator timeline</a> as timeline.
+        - The |animator|'s <a>effect</a> as effect.
+        - The |animator|'s <a>animator serialized options</a> as options.
         - The |serializedState| as state.
         - The |destinationWorkletGlobalScope| as workletGlobalScope.
 
@@ -623,8 +713,8 @@ Creates a new {{WorkletAnimation}} object using the following procedure:
 </div>
 
 
-Worklet Animation Timing Model {#timing-model}
-------------------------------------
+Worklet Animation Timing and Sync Model {#timing-and-sync-model}
+----------------------------------------------------------------
 
 This section describes how <a>worklet animation's</a> timing model differs from other
 <a>animations</a>.
@@ -651,16 +741,87 @@ Here are a few implications of the above semantics:
     may return stale information, in the case where the <a>animator instance</a> is running in a
     parallel execution context.
 
+
 If a Worklet Animation animation is executing in a parallel worklet execution context, the last
-known state of its animation effects should be periodically synced back to the main javascript
+known state of its worklet animation effects should be periodically synced back to the main javascript
 execution context. The synchronization of <a>effect values</a> from the parallel worklet execution
 context to the main javascript execution context <em>must</em> occur before <a>running the animation
-frame callbacks</a> as part of the document lifecycle. Note that due to the asynchronous nature of
-this animation model a script running in the main javascript execution context may see a stale value
-when reading a <a>target property</a> that is being animated by a Worklet Animation, compared to the
-value currently being used to produce the visual frame that is visible to the user. This is similar
-to the effect of asynchronous scrolling when reading scroll offsets in the main javascript execution
-context.
+frame callbacks</a> as part of the document lifecycle.
+
+Note that due to the asynchronous nature of this animation model a script running in the main
+javascript execution context may see a stale value when reading a <a>target property</a> that is
+being animated by a Worklet Animation, compared to the value currently being used to produce the
+visual frame that is visible to the user. This is similar to the effect of asynchronous scrolling
+when reading scroll offsets in the main javascript execution context.
+
+
+<div algorithm="sync-local-times">
+
+To <dfn>sync local times to document</dfn> for a given |workletGlobalScope| the user agent
+<em>must</em> perform the action that corresponds to the first matching condition from the
+following:
+
+
+ : If the |workletGlobalScope| is not running in a parallel execution context
+ :: perform the following steps immediately:
+
+ : If the |workletGlobalScope| is running in a parallel execution context
+ ::  <a>queue a task</a> to run the following steps:
+
+  1. Iterate over all <a>animator instance</a>s in the animation worklet's global scope
+     <a>animator instance set</a>. For each such |animator| perform the following steps:
+
+        1. If |animator|'s <a>sync requested flag</a> is false skip the rest of the steps.
+
+        2. Let |workletEffect| be |animator|'s <a>effect</a>.
+
+        3. Let |effect| be |workletEffect|'s <a>corresponding effect</a>.
+
+        4. Set |effect|'s local time to |workletEffect|'s local time.
+
+        5. Set |animator|'s <a>sync requested flag</a> to false.
+
+</div>
+
+<div algorithm="sync-animation-timings">
+
+To <dfn>sync animation timings to worklet</dfn> for a given |workletAnimation| the user agent
+<em>must</em> perform the following steps:
+
+  1. If |workletAnimation| does not have a <a>corresponding animator instance</a>, abort the
+     following steps.
+
+  2. Let |animator| be |workletAnimation|'s <a>corresponding animator instance</a>.
+
+  2. Let |workletGlobalScope| be the {{AnimationWorkletGlobalScope}} associated with
+     |workletAnimation|.
+
+  3. : If the |workletGlobalScope| is not running in a parallel execution context
+     :: perform the following steps immediately.
+
+     : If the |workletGlobalScope| is running in a parallel execution context
+     ::  <a>queue a task</a> to run the following steps:
+
+        1. Set |animator|'s <a>animator current time</a> to |workletAnimation|'s <a>current time</a>
+
+        2. Let |workletEffect| be |animator|'s <a>effect</a>.
+
+        3. Let |effect| be |workletEffect|'s <a>corresponding effect</a>.
+
+        4. Set the following properties on |workletEffect| to be the same as |effect|:
+             *    [=start delay=],
+             *    [=end delay=],
+             *    [=fill mode=],
+             *    [=iteration start=],
+             *    [=iteration count=],
+             *    [=iteration duration=],
+             *    [=playback direction=], and
+             *    [=timing function=].
+
+</div>
+
+     Note: Notice that the local time is not synced from document to worklet scope.
+
 
 Issue(811): Come with appropriate mechanism's for <a>animator instance</a> to get notified when its
    animation currentTime is changing e.g., via reverse(), finish() or playbackRate change. So that
@@ -697,6 +858,14 @@ is called, then <a>set animator instance of worklet animation</a> given the work
 When the procedure to <a>set the timeline of an animation</a> for a given |workletAnimation|
 is called, then <a>set animator instance of worklet animation</a> given the worklet animation as
 |workletAnimation|.
+
+When the procedure to <a>set the current time</a> or <a>set the start time</a> for a given worklet
+animation is called, then <a>sync animation timings to worklet</a> given the worklet animation as
+|workletAnimation|.
+
+When the procedure to <a>update the timing properties of an animation effect</a> for a given effect
+is called and that effect is owned be a worklet animation, then <a>sync animation timings to
+worklet</a> given that worklet animation as |workletAnimation|.
 
 
 <div algorithm="associate-animator-instance">
@@ -748,6 +917,31 @@ To <dfn>set animator instance of worklet animation</dfn> given
 
 
 
+
+Worklet Group Effect {#worklet-group-effect}
+===========================================
+
+{{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
+<a>local times</a> to be mutated individually.
+
+When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a <a>worklet animation</a>,
+its <a>corresponding animator instance</a> can directly control the <a>child effects</a>' <a>local
+times</a>. This allows a single worklet animation to coordinate multiple effects - see
+[[#example-2]] for an example of such a use-case.
+
+<xmp class='idl'>
+[Exposed=AnimationWorklet]
+interface WorkletGroupEffect {
+  sequence<WorkletAnimationEffect> getChildren();
+};
+</xmp>
+
+Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset
+of GroupEffect proposed as part of web-animation-2. We should instead move this
+into a delta spec against the web-animation.
+
+
+
 ScrollTimeline {#scroll-timeline}
 ---------------------------------
 <em>This section is not normative.</em>
@@ -763,49 +957,6 @@ scrolling (e.g., touch/pointer input) to these animations so that authors can cr
 input driven animations which are not really possible today. We are still trying to figure out the
 right abstractions and mechanisms to do this.
 
-WorkletGroupEffect {#worklet-group-effect}
-------------------
-
-{{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
-<a>local times</a> to be mutated individually.
-
-When a {{WorkletGroupEffect}} is set as the <a>animation effect</a> of a <a>worklet animation</a>,
-its <a>corresponding animator instance</a> can directly control the <a>child effects</a>' <a>local
-times</a>. This allows a single worklet animation to coordinate multiple effects - see
-[[#example-2]] for an example of such a use-case.
-
-<xmp class='idl'>
-[Exposed=AnimationWorklet]
-interface WorkletGroupEffect {
-  sequence<AnimationEffect> getChildren();
-};
-
-[Exposed=AnimationWorklet]
-partial interface AnimationEffect {
-    // Intended for use inside Animation Worklet scope to drive the effect.
-    attribute double localTime;
-};
-</xmp>
-
-<div algorithm="set-local-time">
-
-To set the {{localTime}} property on a |effect| to value |t|, the user agent should perform the
-action that corresponds to the first matching condition from the following:
-
- :  If the |effect| does not have a parent group,
- :: Set the |effect| local time to |t|.
- :  If the |effect| has a parent group and it is of {{WorkletGroupEffect}} type,
- :: Set the effect start time to (parent's transformed time - t). Note this effectively set's the
-    |effect|'s local time to t.
- :  Otherwise
- :: Throw an exception indicating that the child effect time can only be controlled by
-    its parent group.
-
-</div>
-
-Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset
-of GroupEffect proposed as part of web-animation-2. We should instead move this
-into a delta spec against the web-animation.
 
 
 Effect Stack and Composite Order {#effect-stack-composite-order}
