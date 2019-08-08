@@ -996,40 +996,118 @@ Examples {#examples}
 ====================
 
 
-Example 1: Twitter header. {#example-1}
---------------------------
-An example of twitter profile header effect where two elements (avatar, and header) are updated in
-sync with scroll offset.
+Example 1: Spring timing. {#example-1}
+---------------------------------------
+Here we use Animation Worklet to create animation with a custom spring timing.
 
 
 <xmp class='lang-markup'>
-// In document scope.
+
+<div id='target'></div>
+
+<script>
+await CSS.animationWorklet.addModule('spring-animator.js');
+targetEl = document.getElementById('target');
+
+const effect = new KeyframeEffect(
+  targetEl,
+  {transform: ['translateX(0)', 'translateX(50vw)']},
+  {duration: 1000}
+);
+const animation = new WorkletAnimation('spring', effect, document.timeline, {k: 2, ratio: 0.7});
+animation.play();
+</script>
+
+</xmp>
+
+
+<xmp class='lang-javascript'>
+registerAnimator('spring', class SpringAnimator {
+  constructor(options = {k: 1, ratio: 0.5}) {
+    this.timing = createSpring(options.k, options.ratio);
+  }
+
+  animate(currentTime, effect) {
+    let delta = this.timing(currentTime);
+    // scale this by target duration
+    delta = delta * (effect.getTimings().duration / 2);
+    effect.localTime = delta;
+    // TODO: Provide a method for animate to mark animation as finished once
+    // spring simulation is complete, e.g., this.finish()
+    // See issue https://github.com/w3c/css-houdini-drafts/issues/808
+  }
+});
+
+function createSpring(springConstant, ratio) {
+  // Normalize mass and distance to 1 and assume a reasonable init velocit
+  // but these can also become options to this animator.
+  const velocity = 0.2;
+  const mass = 1;
+  const distance = 1;
+
+  // Keep ratio < 1 to ensure it is under-damped.
+  ratio = Math.min(ratio, 1 - 1e-5);
+
+  const damping = ratio * 2.0 * Math.sqrt(springConstant);
+  const w = Math.sqrt(4.0 * springConstant - damping * damping) / (2.0 * mass);
+  const r = -(damping / 2.0);
+  const c1 = distance;
+  const c2 = (velocity - r * distance) / w;
+
+  // return a value in [0..distance]
+  return function springTiming(timeMs) {
+    const time = timeMs / 1000; // in seconds
+    const result = Math.pow(Math.E, r * time) *
+                  (c1 * Math.cos(w * time) + c2 * Math.sin(w * time));
+    return distance - result;
+  }
+}
+</xmp>
+
+
+Example 2: Twitter header. {#example-2}
+---------------------------------------
+An example of twitter profile header effect where two elements (avatar, and header) are updated in
+sync with scroll offset with an additional feature where avatar can have additional physic based
+movement based on the velocity and acceleration of the scrolling.
+
+
+<xmp class='lang-markup'>
 <div id='scrollingContainer'>
   <div id='header' style='height: 150px'></div>
   <div id='avatar'><img></div>
 </div>
 
+// In document scope.
 <script>
+const headerEl = document.getElementById('header');
+const avatarEl = document.getElementById('avatar');
+const scrollingContainerEl = document.getElementById('scrollingContainer');
+
+
+const scrollTimeline  = new ScrollTimeline({
+  scrollSource: scrollingContainerEl,
+  orientation: 'block',
+  timeRange: 1000,
+  startScrollOffset: 0,
+  endScrollOffset: headerEl.clientHeight
+});
+
+const effects = [
+    /* avatar scales down as we scroll up */
+    new KeyframeEffect(avatarEl,
+                    {transform: ['scale(1)', 'scale(0.5)']},
+                    {duration: scrollTimeline.timeRange}),
+    /* header loses transparency as we scroll up */
+    new KeyframeEffect(headerEl,
+                    {opacity: [0, 0.8]},
+                    {duration: scrollTimeline.timeRange})
+];
+
 await CSS.animationWorklet.addModule('twitter-header-animator.js');
-const animation = new WorkletAnimation(
-    'twitter-header',
-    [new KeyframeEffect($avatar,  /* scales down as we scroll up */
-                    [{transform: 'scale(1)'}, {transform: 'scale(0.5)'}],
-                    {duration: 1000, iterations: 1}),
-    new KeyframeEffect($header, /* loses transparency as we scroll up */
-                    [{opacity: 0}, {opacity: 0.8}],
-                    {duration: 1000, iterations: 1})],
-    new ScrollTimeline({
-      scrollSource: $scrollingContainer,
-      orientation: 'block',
-      timeRange: 1000,
-      startScrollOffset: 0,
-      endScrollOffset: $header.clientHeight}));
+const animation = new WorkletAnimation('twitter-header', effects, scrollTimeline);
+
 animation.play();
-
-// Since this animation is using a group effect, the same animation instance
-// is accessible via different handles: $avatarEl.getAnimations()[0], $headerEl.getAnimations()[0]
-
 </script>
 
 </xmp>
@@ -1037,27 +1115,53 @@ animation.play();
 <xmp class='lang-javascript'>
 // Inside AnimationWorkletGlobalScope.
 registerAnimator('twitter-header', class HeaderAnimator {
-  constructor(options) {
-    this.timing_ = new CubicBezier('ease-out');
+  constructor(options, state = {velocity: 0, acceleration: 0}) {
+    // `state` is either undefined (first time) or it is the previous state (after an animator
+    // is migrated between global scopes).
+    this.velocity = state.velocity;
+    this.acceleration = state.acceleration;
   }
+
 
   animate(currentTime, effect) {
     const scroll = currentTime;  // scroll is in [0, 1000] range
 
+    if (this.prevScroll) {
+      this.velocity = scroll - this.prevScroll;
+      this.acceleration = this.velocity - this.prevVelocity;
+    }
+    this.prevScroll = scroll;
+    this.prevVelocity = velocity;
+
+
     // Drive the output group effect by setting its children local times individually.
     effect.children[0].localTime = scroll;
-    effect.children[1].localTime = this.timing_(clamp(scroll, 0, 500));
+
+    effect.children[1].localTime = curve(velocity, acceleration, scroll);
   }
+
+  state() {
+    // Invoked before any migration attempts. The returned object must be structure clonable
+    // and will be passed to constructor to help animator restore its state after migration to the
+    // new scope.
+    return {
+      this.velocity,
+      this.acceleration
+    }
+  }
+
 });
 
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
+curve(scroll, velocity, acceleration) {
+
+ return /* compute an return a physical movement curve based on scroll position, and per frame
+           velocity and acceleration. */ ;
 }
 
 </xmp>
 
-Example 2: Parallax backgrounds. {#example-2}
------------------------------------------
+Example 3: Parallax backgrounds. {#example-3}
+---------------------------------------------
 A simple parallax background example.
 
 <xmp class='lang-markup'>
@@ -1076,16 +1180,23 @@ A simple parallax background example.
 
 <script>
 await CSS.animationWorklet.addModule('parallax-animator.js');
+
+const parallaxSlowEl = document.getElementById('slow');
+const parallaxFastEl = document.getElementById('fast');
+const scrollingContainerEl = document.getElementById('scrollingContainer');
+
 const scrollTimeline = new ScrollTimeline({
-  scrollSource: $scrollingContainer,
+  scrollSource: scrollingContainerEl,
   orientation: 'block',
   timeRange: 1000
 });
-const scrollRange = $scrollingContainer.scrollHeight - $scrollingContainer.clientHeight;
+const scrollRange = scrollingContainerEl.scrollHeight - scrollingContainerEl.clientHeight;
 
 const slowParallax = new WorkletAnimation(
     'parallax',
-    new KeyframeEffect($parallax_slow, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    new KeyframeEffect(parallaxSlowEl,
+        {'transform': ['translateY(0)', 'translateY(' + -scrollRange + 'px)']},
+        {duration: scrollTimeline.timeRange}),
     scrollTimeline,
     {rate : 0.4}
 );
@@ -1093,7 +1204,9 @@ slowParallax.play();
 
 const fastParallax = new WorkletAnimation(
     'parallax',
-    new KeyframeEffect($parallax_fast, [{'transform': 'translateY(0)'}, {'transform': 'translateY(' + -scrollRange + 'px)'}], {duration: 1000}),
+    new KeyframeEffect(parallaxFastEl,
+        {'transform': ['translateY(0)', 'translateY(' + -scrollRange + 'px)']},
+        {duration: scrollTimeline.timeRange}),
     scrollTimeline,
     {rate : 0.8}
 );
