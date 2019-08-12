@@ -930,11 +930,28 @@ To <dfn>set animator instance of worklet animation</dfn> given
 
 </div>
 
+Effect Stack and Composite Order {#effect-stack-composite-order}
+----------------------------------------------------------------
 
+As with other animations, <a>worklet animations</a> participate in the <a>effect stack</a>.  A
+worklet animation does not have a specific <a>animation class</a> which means it has the same
+composite order as other Javascript created web animations.
+
+
+
+
+
+Additional Related Concepts {#related-concepts}
+===============================================
 
 
 Worklet Group Effect {#worklet-group-effect}
-===========================================
+--------------------------------------------
+<em>This section is not normative.</em>
+
+
+<a>Group effect</a> is a type of <a>animation effect</a> that enbales multiple child animation
+effects to be animated together as a group.
 
 {{WorkletGroupEffect}} is a type of <a>group effect</a> that allows its <a>child effect's</a>
 <a>local times</a> to be mutated individually.
@@ -951,10 +968,15 @@ interface WorkletGroupEffect {
 };
 </xmp>
 
+
 Issue(w3c/csswg-drafts#2071): The above interface exposes a conservative subset of GroupEffect
 proposed as part of web-animation-2. We should instead move this into a delta spec against the
 web-animation.
 
+
+Note: Group Effect is currently an experimental feature and not well specified in web animations. So
+the concept of {{WorkletGroupEffect}} may change dramatically as <a>Group Effect</a> get specified.
+See https://github.com/yi-gu/group_effect/blob/master/README.md for more details.
 
 
 ScrollTimeline {#scroll-timeline}
@@ -972,14 +994,6 @@ scrolling (e.g., touch/pointer input) to these animations so that authors can cr
 input driven animations which are not really possible today. We are still trying to figure out the
 right abstractions and mechanisms to do this.
 
-
-
-Effect Stack and Composite Order {#effect-stack-composite-order}
-----------------------------------------------------------------
-
-As with other animations, <a>worklet animations</a> participate in the <a>effect stack</a>.  A
-worklet animation does not have a specific <a>animation class</a> which means it has the same
-composite order as other Javascript created web animations.
 
 
 Security Considerations {#security-considerations}
