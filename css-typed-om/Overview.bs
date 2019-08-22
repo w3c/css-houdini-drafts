@@ -2477,7 +2477,7 @@ This list is the object's [=values to iterate over=].
     };
 
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet),
-     Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options)]
+     Constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options = {})]
     interface CSSMatrixComponent : CSSTransformComponent {
         attribute DOMMatrix matrix;
     };
