@@ -794,8 +794,8 @@ by [[cssom#serialize-a-css-value|serializing]] the computed value,
 and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 
 <div class='example'>
-	Suppose that '--x' is registered with ''&lt;length>'' syntax, and that '--y'
-	is an unregistered custom property.
+	Suppose that '--x' is registered with ''&lt;length>'' syntax,
+	and that '--y'is an unregistered custom property.
 
 	<pre class='lang-css'>
 
@@ -806,9 +806,9 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 	}
 	</pre>
 
-	Because the computed value of '--x' (when serialized)  is "80px", the computed
-	value of '--y' is: <<whitespace-token>> followed by
-	<<dimension-token>> with a value of "80" and unit "px".
+	Because the computed value of '--x' (when serialized)  is "80px",
+	the computed value of '--y' is
+	a <<dimension-token>> with a value of "80" and unit "px".
 
 </div>
 
