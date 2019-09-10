@@ -59,7 +59,11 @@ can only impact document layout or paint by being re-incorporated into the value
 of other properties via a var() reference.
 
 This specification extends [[css-variables]], allowing the registration of properties
-that have a value type, an initial value, and a defined inheritance behaviour.
+that have a value type, an initial value, and a defined inheritance behaviour,
+via two methods:
+
+* A JS API, the {{registerProperty()}} method
+* A CSS at-rule, the ''@property'' rule
 
 This specification is complementary to [[css-paint-api-1]] and [[css-layout-api-1]], which
 allow custom properties to directly impact paint and layout behaviours respectively.
