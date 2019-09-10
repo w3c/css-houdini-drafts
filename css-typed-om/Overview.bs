@@ -185,7 +185,7 @@ must [=parse a CSSStyleValue=]
 with property |property|, cssText |cssText|, and parseMultiple set to false,
 and return the result.
 
-The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn>,
+The <dfn method for=CSSStyleValue>parseAll(|property|, |cssText|)</dfn> method,
 when invoked,
 must [=parse a CSSStyleValue=]
 with property |property|, cssText |cssText|, and parseMultiple set to true,
