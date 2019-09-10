@@ -719,7 +719,7 @@ Conditional Rules {#conditional-rules}
 --------------------------------------
 
 <div class=note>
-	''@supports'' rules and the {{CSS/supports()}} method
+	''@supports'' rules and the {{CSS/supports(conditionText)|CSS.supports()}} method
 	behave as specified in [[!css-variables]],
 	without distinguishing between registered and unregistered custom properties,
 	and paying no attention to registered properties' syntaxes.
@@ -885,7 +885,7 @@ The syntax of ''@property'' is:
 if either are missing,
 the entire rule is invalid and must be ignored.
 The 'initial-value' descriptor is optional
-only if the syntax is the [=universal syntax descriptor=],
+only if the syntax is the [=universal syntax definition=],
 otherwise the descriptor is required;
 if it's missing, the entire rule is invalid and must be ignored.
 
@@ -894,7 +894,7 @@ but do not invalidate the ''@property'' rule.
 
 If multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
 the last one in stylesheet order "wins".
-A custom property registration from {{CSS/registerProperty|CSS.registerProperty()}}
+A custom property registration from {{registerProperty()|CSS.registerProperty()}}
 further wins over any ''@property'' rules
 for the same <<custom-property-name>>.
 
@@ -956,12 +956,12 @@ The 'initial-value' Descriptor {#initial-value-descriptor}
 Specifies the [=initial value=] of the custom property.
 This is equivalent to the {{PropertyDescriptor/initialValue}} member of {{PropertyDescriptor}}.
 
-If the value of the 'syntax' descriptor is the [=universal syntax descriptor=],
+If the value of the 'syntax' descriptor is the [=universal syntax definition=],
 then the 'initial-value' descriptor is optional.
 If omitted, the initial value of the property is the [=guaranteed-invalid value=].
 
 Otherwise,
-if the value of the 'syntax' descriptor is not the [=universal syntax descriptor=],
+if the value of the 'syntax' descriptor is not the [=universal syntax definition=],
 the following conditions must be met for the the ''@property'' rule to be valid:
 
 	* The 'initial-value' descriptor must be present.
