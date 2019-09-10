@@ -87,25 +87,6 @@ partial namespace CSS {
 Additional, the {{Document}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
 which is a set of records that describe registered custom properties.
 
-The {{PropertyDefinition}} Dictionary {#the-propertydefinition-dictionary}
---------------------------------------------------------------------------
-
-A <dfn dictionary>PropertyDefinition</dfn> dictionary represents author-specified configuration
-options for a custom property. {{PropertyDefinition}} dictionaries contain the
-following members:
-
-:   <dfn dict-member for=PropertyDefinition>name</dfn>
-::  The name of the custom property being defined.
-
-:   <dfn dict-member for=PropertyDefinition>syntax</dfn>
-::  A string representing how this custom property is parsed.
-
-:   <dfn dict-member for=PropertyDefinition>inherits</dfn>
-::  True if this custom property should inherit down the DOM tree; False otherwise.
-
-:   <dfn dict-member for=PropertyDefinition>initialValue</dfn>
-::  The initial value of this custom property.
-
 The {{registerProperty()}} Function {#the-registerproperty-function}
 --------------------------------------------------------------------
 
@@ -273,6 +254,25 @@ the property becomes [=invalid at computed-value time=]
 	rather than being [=invalid at computed-value time=]
 	and becoming ''inherit''.
 </div>
+
+The {{PropertyDefinition}} Dictionary {#the-propertydefinition-dictionary}
+--------------------------------------------------------------------------
+
+A <dfn dictionary>PropertyDefinition</dfn> dictionary represents author-specified configuration
+options for a custom property. {{PropertyDefinition}} dictionaries contain the
+following members:
+
+:   <dfn dict-member for=PropertyDefinition>name</dfn>
+::  The name of the custom property being defined.
+
+:   <dfn dict-member for=PropertyDefinition>syntax</dfn>
+::  A string representing how this custom property is parsed.
+
+:   <dfn dict-member for=PropertyDefinition>inherits</dfn>
+::  True if this custom property should inherit down the DOM tree; False otherwise.
+
+:   <dfn dict-member for=PropertyDefinition>initialValue</dfn>
+::  The initial value of this custom property.
 
 Calculation of Computed Values {#calculation-of-computed-values}
 ----------------------------------------------------------------
