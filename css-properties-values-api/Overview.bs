@@ -69,6 +69,146 @@ This specification is complementary to [[css-paint-api-1]] and [[css-layout-api-
 allow custom properties to directly impact paint and layout behaviours respectively.
 
 
+
+<!--
+████████  ████████ ██     ██    ███    ██     ██ ████  ███████  ████████
+██     ██ ██       ██     ██   ██ ██   ██     ██  ██  ██     ██ ██     ██
+██     ██ ██       ██     ██  ██   ██  ██     ██  ██  ██     ██ ██     ██
+████████  ██████   █████████ ██     ██ ██     ██  ██  ██     ██ ████████
+██     ██ ██       ██     ██ █████████  ██   ██   ██  ██     ██ ██   ██
+██     ██ ██       ██     ██ ██     ██   ██ ██    ██  ██     ██ ██    ██
+████████  ████████ ██     ██ ██     ██    ███    ████  ███████  ██     ██
+-->
+
+Behavior of Custom Properties {#behavior-of-custom-properties}
+==============================================================
+
+Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
+----------------------------------------------------------------------------------
+
+Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
+specify animations and transitions that reference custom properties.
+
+When referenced by animations and transitions,
+custom property values [=interpolate=] [=by computed value=],
+in accordance with the type that they parsed as.
+
+Note: This implies that a list of values,
+such as `<color>+` or `<color>#`,
+will interpolate as a simple list,
+matching up each component index-by-index,
+and failing if the number of components doesn't match.
+
+As an exception to the above rule,
+a value that parsed as a `<transform-list>`,
+a `<transform-function>`,
+or a `<transform-function>+`
+instead interpolates as per the 'transform' property.
+
+Note: If,
+for whatever reason,
+a custom property is defined with a syntax of `<transform-function>#`,
+this will thus first interpolate as a simple list,
+and then each list item will interpolate as a 'transform' value.
+
+Conditional Rules {#conditional-rules}
+--------------------------------------
+
+<div class=note>
+	''@supports'' rules and the {{CSS/supports(conditionText)|CSS.supports()}} method
+	behave as specified in [[!css-variables]],
+	without distinguishing between registered and unregistered custom properties,
+	and paying no attention to registered properties' syntaxes.
+</div>
+
+Relative URLs {#relative-urls}
+------------------------------
+
+Relative URL values that appear in registered custom properties are resolved
+to full URLs as described in [[!css3-values]].
+
+<div class='example'>
+	Because URLs resolve against the base URL of the stylesheet they appear in, we can
+	end up with multiple relative URLs that resolve against different base URLs, even though
+	they appear in the same property.
+
+	For example, suppose '--url-foo' and '--url-bar' are registered
+	custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
+	<code>/style/foo/foo.css</code>:
+
+	<pre class='lang-css'>
+	div {
+		--url-foo: url("foo.png");
+	}
+	</pre>
+
+	and another stylesheet at <code>/style/bar/bar.css</code>
+	<pre class='lang-css'>
+	div {
+		--url-bar: url("bar.png");
+	}
+	</pre>
+
+	and finally a document at <code>/index.html</code>:
+	<pre class='lang-html'>
+	&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
+	&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
+	&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+	&lt;/div>
+	</pre>
+
+	Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
+	<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
+	against <code>/style/bar</code>.
+
+</div>
+
+
+Fallbacks In ''var()'' References {#fallbacks-in-var-references}
+----------------------------------------------------------------
+
+References to registered custom properties using the ''var()'' function may
+provide a fallback. However, the fallback value must match the
+<a>syntax definition</a> of the custom property being referenced, otherwise the
+declaration is <a spec=css-variables>invalid at computed-value time</a>.
+
+Note: This applies regardless of whether or not the fallback is being used.
+
+
+Substitution {#substitution}
+----------------------------
+
+Like unregistered custom properties,
+the value of a registered custom property can be substituted into another value with the ''var()'' function.
+However, registered custom properties substitute as their [[#calculation-of-computed-values|computed value]],
+rather than the original token sequence used to produce that value.
+
+Any ''var()'' function that references a registered custom property
+must be replaced with an <dfn export>equivalent token sequence</dfn>,
+which is equal to the token sequence that would have been produced
+by [[cssom#serialize-a-css-value|serializing]] the computed value,
+and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
+
+<div class='example'>
+	Suppose that '--x' is registered with ''&lt;length>'' syntax,
+	and that '--y'is an unregistered custom property.
+
+	<pre class='lang-css'>
+
+	div {
+		font-size: 10px;
+		--x: 8em;
+		--y: var(--x);
+	}
+	</pre>
+
+	Because the computed value of '--x' (when serialized)  is "80px",
+	the computed value of '--y' is
+	a <<dimension-token>> with a value of "80" and unit "px".
+
+</div>
+
+
 <!--
       ██  ██████
       ██ ██    ██
@@ -707,143 +847,7 @@ Parsing The Syntax String {#parsing-syntax}
 
 
 
-<!--
-████████  ████████ ██     ██    ███    ██     ██ ████  ███████  ████████
-██     ██ ██       ██     ██   ██ ██   ██     ██  ██  ██     ██ ██     ██
-██     ██ ██       ██     ██  ██   ██  ██     ██  ██  ██     ██ ██     ██
-████████  ██████   █████████ ██     ██ ██     ██  ██  ██     ██ ████████
-██     ██ ██       ██     ██ █████████  ██   ██   ██  ██     ██ ██   ██
-██     ██ ██       ██     ██ ██     ██   ██ ██    ██  ██     ██ ██    ██
-████████  ████████ ██     ██ ██     ██    ███    ████  ███████  ██     ██
--->
 
-Behavior of Custom Properties {#behavior-of-custom-properties}
-==============================================================
-
-Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
-----------------------------------------------------------------------------------
-
-Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
-specify animations and transitions that reference custom properties.
-
-When referenced by animations and transitions,
-custom property values [=interpolate=] [=by computed value=],
-in accordance with the type that they parsed as.
-
-Note: This implies that a list of values,
-such as `<color>+` or `<color>#`,
-will interpolate as a simple list,
-matching up each component index-by-index,
-and failing if the number of components doesn't match.
-
-As an exception to the above rule,
-a value that parsed as a `<transform-list>`,
-a `<transform-function>`,
-or a `<transform-function>+`
-instead interpolates as per the 'transform' property.
-
-Note: If,
-for whatever reason,
-a custom property is defined with a syntax of `<transform-function>#`,
-this will thus first interpolate as a simple list,
-and then each list item will interpolate as a 'transform' value.
-
-Conditional Rules {#conditional-rules}
---------------------------------------
-
-<div class=note>
-	''@supports'' rules and the {{CSS/supports(conditionText)|CSS.supports()}} method
-	behave as specified in [[!css-variables]],
-	without distinguishing between registered and unregistered custom properties,
-	and paying no attention to registered properties' syntaxes.
-</div>
-
-Relative URLs {#relative-urls}
-------------------------------
-
-Relative URL values that appear in registered custom properties are resolved
-to full URLs as described in [[!css3-values]].
-
-<div class='example'>
-	Because URLs resolve against the base URL of the stylesheet they appear in, we can
-	end up with multiple relative URLs that resolve against different base URLs, even though
-	they appear in the same property.
-
-	For example, suppose '--url-foo' and '--url-bar' are registered
-	custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
-	<code>/style/foo/foo.css</code>:
-
-	<pre class='lang-css'>
-	div {
-		--url-foo: url("foo.png");
-	}
-	</pre>
-
-	and another stylesheet at <code>/style/bar/bar.css</code>
-	<pre class='lang-css'>
-	div {
-		--url-bar: url("bar.png");
-	}
-	</pre>
-
-	and finally a document at <code>/index.html</code>:
-	<pre class='lang-html'>
-	&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
-	&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
-	&lt;div style="background-image: var(--url-foo), var(---url-bar);">
-	&lt;/div>
-	</pre>
-
-	Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
-	<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
-	against <code>/style/bar</code>.
-
-</div>
-
-
-Fallbacks In ''var()'' References {#fallbacks-in-var-references}
-----------------------------------------------------------------
-
-References to registered custom properties using the ''var()'' function may
-provide a fallback. However, the fallback value must match the
-<a>syntax definition</a> of the custom property being referenced, otherwise the
-declaration is <a spec=css-variables>invalid at computed-value time</a>.
-
-Note: This applies regardless of whether or not the fallback is being used.
-
-
-Substitution {#substitution}
-----------------------------
-
-Like unregistered custom properties,
-the value of a registered custom property can be substituted into another value with the ''var()'' function.
-However, registered custom properties substitute as their [[#calculation-of-computed-values|computed value]],
-rather than the original token sequence used to produce that value.
-
-Any ''var()'' function that references a registered custom property
-must be replaced with an <dfn export>equivalent token sequence</dfn>,
-which is equal to the token sequence that would have been produced
-by [[cssom#serialize-a-css-value|serializing]] the computed value,
-and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
-
-<div class='example'>
-	Suppose that '--x' is registered with ''&lt;length>'' syntax,
-	and that '--y'is an unregistered custom property.
-
-	<pre class='lang-css'>
-
-	div {
-		font-size: 10px;
-		--x: 8em;
-		--y: var(--x);
-	}
-	</pre>
-
-	Because the computed value of '--x' (when serialized)  is "80px",
-	the computed value of '--y' is
-	a <<dimension-token>> with a value of "80" and unit "px".
-
-</div>
 
 
 
