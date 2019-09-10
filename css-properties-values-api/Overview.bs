@@ -71,6 +71,9 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 Registering Custom Properties {#registering-custom-properties}
 ==============================================================
 
+To register a custom property via JS,
+the {{CSS}} object is extended with a {{registerProperty()}} method:
+
 <pre class='idl'>
 dictionary PropertyDefinition {
 	required DOMString name;
