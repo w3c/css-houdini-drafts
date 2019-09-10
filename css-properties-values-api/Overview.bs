@@ -68,7 +68,7 @@ via two methods:
 This specification is complementary to [[css-paint-api-1]] and [[css-layout-api-1]], which
 allow custom properties to directly impact paint and layout behaviours respectively.
 
-Registering custom properties {#registering-custom-properties}
+Registering Custom Properties {#registering-custom-properties}
 ==============================================================
 
 <pre class='idl'>
@@ -87,7 +87,7 @@ partial namespace CSS {
 Additional, the {{Document}} object gains a new <dfn attribute for=Window>\[[registeredPropertySet]]</dfn> private slot,
 which is a set of records that describe registered custom properties.
 
-The {{PropertyDefinition}} dictionary {#the-propertydefinition-dictionary}
+The {{PropertyDefinition}} Dictionary {#the-propertydefinition-dictionary}
 --------------------------------------------------------------------------
 
 A <dfn dictionary>PropertyDefinition</dfn> dictionary represents author-specified configuration
@@ -106,7 +106,7 @@ following members:
 :   <dfn dict-member for=PropertyDefinition>initialValue</dfn>
 ::  The initial value of this custom property.
 
-The {{registerProperty()}} function {#the-registerproperty-function}
+The {{registerProperty()}} Function {#the-registerproperty-function}
 --------------------------------------------------------------------
 
 The <dfn method for=CSS>registerProperty(PropertyDefinition definition)</dfn> method
@@ -353,7 +353,7 @@ but be automatically [=invalid at computed-value time=].
 As ''@supports'' tests parse behavior,
 it thus also accepts all values as valid regardless of the registered syntax.
 
-Dependency cycles via relative units {#dependency-cycles}
+Dependency Cycles Via Relative Units {#dependency-cycles}
 ---------------------------------------------------------
 
 Registered custom properties follow the same rules for dependency cycle
@@ -450,7 +450,7 @@ that more closely resemble the full breadth of what CSS properties allow.
 The remainder of this chapter describes the internal grammar of the syntax
 strings.
 
-Supported names {#supported-names}
+Supported Names {#supported-names}
 ----------------------------------
 
 This section defines the <dfn for=CSS lt="supported syntax component name">supported syntax component names</dfn>, and the
@@ -507,7 +507,7 @@ Note: A syntax string of <code>"*"</code> will produce the
 	Therefore, <code>"*"</code> may not be [[#multipliers|multiplied]] or
 	[[#combinator|combined]] with anything else.
 
-The '+' and '#' multipliers {#multipliers}
+The '+' and '#' Multipliers {#multipliers}
 ------------------------------------------
 
 Any <a>syntax component name</a> except
@@ -529,7 +529,7 @@ Any <a>syntax component name</a> except
 Note: The multiplier must appear immediately after the <a>syntax component name</a>
 being multiplied.
 
-The '|' combinator {#combinator}
+The '|' Combinator {#combinator}
 --------------------------------
 
 <a>Syntax strings</a> may use U+007C VERTICAL LINE (|) to provide multiple
@@ -550,7 +550,7 @@ while matching the value ''blue'' will parse as a <<color>>.
 	::  accepts foo, a comma-separated list of color values, or a single integer
 </div>
 
-Parsing the syntax string {#parsing-syntax}
+Parsing The Syntax String {#parsing-syntax}
 -------------------------------------------
 
 ### Definitions ### {#parsing-definitions}
@@ -574,7 +574,7 @@ Parsing the syntax string {#parsing-syntax}
 :   <dfn>universal syntax definition</dfn>
 ::  A special syntax definition which accepts any valid token stream.
 
-### Consume a syntax definition ### {#consume-syntax-definition}
+### Consume a Syntax Definition ### {#consume-syntax-definition}
 
 <div algorithm>
 	This section describes how to <dfn export>consume a syntax definition</dfn> from a [=string=] |string|.
@@ -614,7 +614,7 @@ Parsing the syntax string {#parsing-syntax}
 
 </div>
 
-### Consume a syntax component ### {#consume-syntax-component}
+### Consume a Syntax Component ### {#consume-syntax-component}
 
 <div algorithm>
 	To <dfn>consume a syntax component</dfn> from a stream of <a>code points</a> |stream|:
@@ -657,7 +657,7 @@ Parsing the syntax string {#parsing-syntax}
 	Return |component|.
 </div>
 
-### Consume a data type name ### {#consume-data-type-name}
+### Consume a Data Type Name ### {#consume-data-type-name}
 
 <div algorithm>
 	To <dfn>consume a data type name</dfn> from a stream of <a>code points</a>:
@@ -765,7 +765,7 @@ to full URLs as described in [[!css3-values]].
 </div>
 
 
-Fallbacks in ''var()'' references {#fallbacks-in-var-references}
+Fallbacks In ''var()'' References {#fallbacks-in-var-references}
 ----------------------------------------------------------------
 
 References to registered custom properties using the ''var()'' function may
@@ -855,7 +855,7 @@ CSSOM {#cssom}
 </div>
 
 
-The <dfn>@property</dfn> rule {#at-property-rule}
+The <dfn>@property</dfn> Rule {#at-property-rule}
 =================================================
 
 The ''@property'' rule provides an alternative way to register a custom property,
@@ -902,7 +902,7 @@ Note: This might change in the future,
 as the behavior of concept-defining at-rules in shadow trees
 becomes more consistently defined.
 
-The 'syntax' descriptor {#the-syntax-descriptor}
+The 'syntax' Descriptor {#the-syntax-descriptor}
 ------------------------------------------------
 
 	<pre class='descdef'>
@@ -923,7 +923,7 @@ If the provided string does not successfully [=consume a syntax definition|parse
 the descriptor is invalid and must be ignored.
 
 
-The 'inherits' descriptor {#inherits-descriptor}
+The 'inherits' Descriptor {#inherits-descriptor}
 ------------------------------------------------
 
 	<pre class='descdef'>
@@ -940,7 +940,7 @@ The inherits descriptor is required for the ''@property'' rule to be valid;
 if it's missing, the ''@property'' rule is invalid.
 
 
-The 'initial-value' descriptor {#initial-value-descriptor}
+The 'initial-value' Descriptor {#initial-value-descriptor}
 ----------------------------------------------------------
 
 	<pre class='descdef'>
@@ -968,7 +968,19 @@ the following conditions must be met for the the ''@property'' rule to be valid:
 
 If the above conditions are not met, the ''@property'' rule is invalid.
 
-The <dfn interface>CSSPropertyRule</dfn> interface {#the-css-property-rule-interface}
+
+Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
+------------------------------------------------------------------------------------
+
+The {{CSSRule}} interface is extended as follows:
+
+<pre class='idl'>
+partial interface CSSRule {
+    const unsigned short PROPERTY_RULE = 18;
+};
+</pre>
+
+The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
 -----------------------------------------------------------------------------
 
 The {{CSSPropertyRule}} interface represents an ''@property'' rule.
