@@ -782,18 +782,16 @@ Note: This applies regardless of whether or not the fallback is being used.
 Substitution {#substitution}
 ----------------------------
 
-Like unregistered custom properties, the value of a registered custom property
-can be substituted into another value with the ''var()'' function. However,
-registered custom properties substitute as their
-[[#calculation-of-computed-values|computed value]], rather than the original
-token sequence used to produce that value.
+Like unregistered custom properties,
+the value of a registered custom property can be substituted into another value with the ''var()'' function.
+However, registered custom properties substitute as their [[#calculation-of-computed-values|computed value]],
+rather than the original token sequence used to produce that value.
 
-Any ''var()'' function that references a registered custom property must be
-replaced with an <dfn>equivalent token sequence</dfn>, which is equal
-to the token sequence that
-would have been produced by [[cssom#serialize-a-css-value|serializing]]
-the computed value, and [[css-syntax-3#tokenization|tokenizing]] the resulting
-string.
+Any ''var()'' function that references a registered custom property
+must be replaced with an <dfn export>equivalent token sequence</dfn>,
+which is equal to the token sequence that would have been produced
+by [[cssom#serialize-a-css-value|serializing]] the computed value,
+and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 
 <div class='example'>
 	Suppose that '--x' is registered with ''&lt;length>'' syntax, and that '--y'
