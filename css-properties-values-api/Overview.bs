@@ -80,8 +80,86 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 ████████  ████████ ██     ██ ██     ██    ███    ████  ███████  ██     ██
 -->
 
-Behavior of Custom Properties {#behavior-of-custom-properties}
-==============================================================
+Registered Custom Properties {#behavior-of-custom-properties}
+=============================================================
+
+A [=custom property=] can,
+with the methods defined in this specification,
+become a <dfn>registered custom property</dfn>,
+giving it a syntax that's checked by the UA,
+an initial value,
+and a specific inheritance behavior,
+making the [=custom property=]
+act more like a UA-defined property.
+
+A [=custom property=] is considered to be registered for a {{Document}}
+if there is a valid ''@property'' rule
+defined for its name
+in one of the document's stylesheets,
+or its name is [=map/contains|contained=]
+in the document's {{[[registeredPropertySet]]}} slot
+(that is, {{registerProperty()}} was called to register it).
+
+A [=registered custom property=] acts similarly to an unregistered [=custom property=],
+except as defined below.
+
+Parsing Custom Properties {#parsing-custom-properties}
+------------------------------------------------------
+
+[=Registered custom properties=] parse exactly like unregistered [=custom properties=];
+almost anything is allowed.
+The registered syntax of the property is <em>not</em> checked at parse time.
+
+Note: However,
+the syntax is checked at computed-value time,
+before substitution via ''var()''.
+See [[#computed-value]].
+
+<details class=note>
+	<summary>Why aren't custom properties syntax-checked?</summary>
+
+	When parsing a page's CSS,
+	UAs commonly make a number of optimizations
+	to help with both speed and memory.
+
+	One of those optimizations
+	is that they only store the properties that will actually have an effect;
+	they throw away invalid properties,
+	and if you write the same property multiple times in a single declaration block,
+	all but the last valid one will be thrown away.
+
+	This works fine if the syntax of a property never changes over the lifetime of a page.
+	If a custom property is registered, however,
+	it can change its syntax,
+	so that a property that was previously invalid
+	suddenly becomes valid.
+
+	The only way to handle this is to either store every declaration,
+	even those that were initially invalid
+	(increasing the memory cost of pages),
+	or re-parsing the entire page's CSS
+	with the new syntax rules
+	(increasing the processing cost of registering a custom property).
+	Neither of these are very desirable.
+
+	Further,
+	UA-defined properties have their syntax determined
+	by the version of the UA the user is viewing the page with;
+	this is out of the page author's control,
+	which is the entire reason for CSS's error-recovery behavior
+	and the practice of writing multiple declarations for varying levels of support.
+	A custom property, on the other hand,
+	has its syntax controlled by the page author;
+	there's no unpredictability to be managed.
+	Throwing away syntax-violating custom properties
+	would thus only be, at best, a convenience for the page author,
+	not a necessity like for UA-defined properties.
+</details>
+
+Computed Value of Custom Properties {#computed-value}
+-----------------------------------------------------
+
+Issue: Move computed value behavior here.
 
 Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
 ----------------------------------------------------------------------------------
@@ -361,7 +439,7 @@ Registering a custom property must <strong>not</strong> affect the [=cascade=] i
 Regardless of what syntax is specified for a registered property,
 at parse time it is still parsed as normal for a [=custom property=],
 accepting nearly anything.
-If the [=specified value=] for a registered [=custom property=]
+If the [=specified value=] for a [=registered custom property=]
 violates the registered syntax,
 however,
 the property becomes [=invalid at computed-value time=]
