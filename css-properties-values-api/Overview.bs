@@ -127,6 +127,8 @@ See [[#computed-value]].
 	they throw away invalid properties,
 	and if you write the same property multiple times in a single declaration block,
 	all but the last valid one will be thrown away.
+	(This is an important part of CSS's error-recovery
+	and forward-compatibility behavior.)
 
 	This works fine if the syntax of a property never changes over the lifetime of a page.
 	If a custom property is registered, however,
@@ -134,10 +136,10 @@ See [[#computed-value]].
 	so that a property that was previously invalid
 	suddenly becomes valid.
 
-	The only way to handle this is to either store every declaration,
+	The only ways to handle this are to either store every declaration,
 	even those that were initially invalid
 	(increasing the memory cost of pages),
-	or re-parsing the entire page's CSS
+	or to re-parse the entire page's CSS
 	with the new syntax rules
 	(increasing the processing cost of registering a custom property).
 	Neither of these are very desirable.
@@ -149,7 +151,8 @@ See [[#computed-value]].
 	which is the entire reason for CSS's error-recovery behavior
 	and the practice of writing multiple declarations for varying levels of support.
 	A custom property, on the other hand,
-	has its syntax controlled by the page author;
+	has its syntax controlled by the page author,
+	according to whatever stylesheet or script they've included in the page;
 	there's no unpredictability to be managed.
 	Throwing away syntax-violating custom properties
 	would thus only be, at best, a convenience for the page author,
