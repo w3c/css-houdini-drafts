@@ -113,7 +113,7 @@ The registered syntax of the property is <em>not</em> checked at parse time.
 Note: However,
 the syntax is checked at computed-value time,
 before substitution via ''var()''.
-See [[#computed-value]].
+See [[#calculation-of-computed-values]].
 
 <details class=note>
 	<summary>Why aren't custom properties syntax-checked?</summary>
@@ -163,7 +163,7 @@ See [[#computed-value]].
 Calculation of Computed Values {#calculation-of-computed-values}
 ----------------------------------------------------------------
 
-The [=computed value=] of a [=registered property=]
+The [=computed value=] of a [=registered custom property=]
 is determined by the syntax it's registered with.
 
 Note: All properties, regardless of registered syntax,
@@ -172,26 +172,30 @@ such as ''inherit'' or ''revert''.
 These are handled at [=specified value=] time,
 as defined in [[css-cascade-4#defaulting-keywords]].
 
-For <code>"&lt;length>"</code> values,
-the computed value is the absolute length expressed in pixels.
+For <code>"&lt;length>"</code>,
+<code>"&lt;length-percentage>"</code>,
+<code>"&lt;angle>"</code>,
+<code>"&lt;time>"</code>,
+<code>"&lt;resolution>"</code>,
+<code>"&lt;integer>"</code>,
+<code>"&lt;number>"</code>,
+and <code>"&lt;percentage>"</code> values:
 
-For <code>"&lt;length-percentage>"</code> values,
-the computed value is one of the following:
-
-*   if the specified value contains only length units,
-	the computed value is the absolute length expressed in pixels.
-*   if the specified value contains only percentages,
-	the computed value is a simple percentage.
-*   otherwise, the computed value is a calc expression
-	containing an absolute length expressed in pixels,
-	and a percentage value.
-
-For <code>"&lt;angle>"</code>, <code>"&lt;time>"</code> and <code>"&lt;resolution>"</code> values,
-the computed value is the value expressed in its [=canonical unit=],
-with ''calc()'' expressions evaluated [[css-values-4#calc-computed-value|as described in CSS Values]].
+* If the specified value is a [=dimension=] literal
+	(such as ''50em'' or ''.2s''),
+	the computed value is the same value,
+	but with the unit converted to the corresponding [=canonical unit=]
+	for the type of value.
+* If the specified value is any other numeric literal
+	(such as ''5'' or ''20%''),
+	the computed value is as specified.
+	(In particular, percentages are never resolved against anything.)
+* If the specified value is a function that evaluates to one of those types
+	(such as a [=math function=]),
+	the computed value is defined by that function.
 
 For <code>"&lt;color>"</code> values,
-the value is computed as described in [[css-color-4#resolving-color-values]].
+the value is computed by [=resolving color values=].
 
 For <code>"&lt;custom-ident>"</code>, ident, or <code>"*"</code> values,
 the computed value is as specified.
@@ -204,28 +208,17 @@ the computed value is one of the following:
 *   otherwise, the computed value is as specified.
 
 For <code>"&lt;image>"</code> values,
-the computed value is as specified,
-except that relative URLs that appear in the value are resolved to absolute URLs
-as described in [[!css3-values]],
-and all lengths are resolved to their computed values.
+the computed value is the [=computed &lt;image>=].
 
-For <code>"&lt;integer>"</code>, <code>"&lt;number>"</code> and <code>"&lt;percentage>"</code> values,
-the computed value is one of the following:
-
-* if the specified value is a ''calc()'' expression,
-	the computed value is the evaluated result of that expression.
-* otherwise, the computed value is as specified.
-
-For <code>"&lt;transform-function>"</code> values
-(including those contained in <code>"&lt;transform-list>"</code> values),
+For <code>"&lt;transform-function>"</code> and <code>"&lt;transform-list>"</code> values,
 the computed value is as specified but with all lengths resolved to their computed values.
 
-For values specified by a syntax string that include "|" clauses,
-the computed value is given by applying the calculation rules
-for the first clause that matches to the specified value.
+For values with [[#multipliers|multipliers]],
+the computed value is a list of the computed values of the base type.
 
-For list values,
-the computed value is a list of the computed values of the primitives in the list.
+For syntaxes specified with [[#combinator|the | combinator]],
+the computed value is given by applying the computed-value rules
+for the first clause that matches to the specified value.
 
 
 Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
