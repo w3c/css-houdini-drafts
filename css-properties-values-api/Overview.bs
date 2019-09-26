@@ -476,52 +476,6 @@ the following conditions must be met for the the ''@property'' rule to be valid:
 If the above conditions are not met, the ''@property'' rule is invalid.
 
 
-Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
-------------------------------------------------------------------------------------
-
-The {{CSSRule}} interface is extended as follows:
-
-<pre class='idl'>
-partial interface CSSRule {
-    const unsigned short PROPERTY_RULE = 18;
-};
-</pre>
-
-The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
------------------------------------------------------------------------------
-
-The {{CSSPropertyRule}} interface represents an ''@property'' rule.
-
-<pre class='idl' export>
-[Exposed=Window]
-interface CSSPropertyRule : CSSRule {
-    readonly attribute CSSOMString name;
-    readonly attribute CSSOMString syntax;
-    readonly attribute boolean inherits;
-    readonly attribute CSSOMString? initialValue;
-};
-</pre>
-
-<dl dfn-for=CSSPropertyRule dfn-type=attribute>
-	<dt><dfn>name</dfn>
-	<dd>
-		The custom property name associated with the ''@property'' rule.
-
-	<dt><dfn>syntax</dfn>
-	<dd>
-		The syntax associated with the ''@property'', exactly as specified.
-
-	<dt><dfn>inherits</dfn>
-	<dd>
-		The inherits descriptor associated with the ''@property'' rule.
-
-	<dt><dfn>initialValue</dfn>
-	<dd>
-		The initial value associated with the ''@property'' rule,
-		which may not be present.
-</dl>
-
-
 <!--
       ██  ██████
       ██ ██    ██
@@ -1128,6 +1082,52 @@ CSSOM {#cssom}
 	{{[[registeredPropertySet]]}} slot of the associated {{Document}}, and
 	treat all custom properties as unregistered.
 </div>
+
+
+Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
+------------------------------------------------------------------------------------
+
+The {{CSSRule}} interface is extended as follows:
+
+<pre class='idl'>
+partial interface CSSRule {
+    const unsigned short PROPERTY_RULE = 18;
+};
+</pre>
+
+The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
+-----------------------------------------------------------------------------
+
+The {{CSSPropertyRule}} interface represents an ''@property'' rule.
+
+<pre class='idl' export>
+[Exposed=Window]
+interface CSSPropertyRule : CSSRule {
+    readonly attribute CSSOMString name;
+    readonly attribute CSSOMString syntax;
+    readonly attribute boolean inherits;
+    readonly attribute CSSOMString? initialValue;
+};
+</pre>
+
+<dl dfn-for=CSSPropertyRule dfn-type=attribute>
+	<dt><dfn>name</dfn>
+	<dd>
+		The custom property name associated with the ''@property'' rule.
+
+	<dt><dfn>syntax</dfn>
+	<dd>
+		The syntax associated with the ''@property'', exactly as specified.
+
+	<dt><dfn>inherits</dfn>
+	<dd>
+		The inherits descriptor associated with the ''@property'' rule.
+
+	<dt><dfn>initialValue</dfn>
+	<dd>
+		The initial value associated with the ''@property'' rule,
+		which may not be present.
+</dl>
 
 {{CSSStyleValue}} Reification {#css-style-value-reification}
 ------------------------------------------------------------
