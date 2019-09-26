@@ -221,8 +221,8 @@ the computed value is given by applying the computed-value rules
 for the first clause that matches to the specified value.
 
 
-Animation Behavior of Custom Properties {#animation-behavior-of-custom-properties}
-----------------------------------------------------------------------------------
+Animation Behavior {#animation-behavior-of-custom-properties}
+-------------------------------------------------------------
 
 Note: As defined by [[css3-animations]] and [[css3-transitions]], it is possible to
 specify animations and transitions that reference custom properties.
