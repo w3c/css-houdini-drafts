@@ -192,6 +192,10 @@ a custom property is defined with a syntax of `<transform-function>#`,
 this will thus first interpolate as a simple list,
 and then each list item will interpolate as a 'transform' value.
 
+Note: Registering (or changing the registration) of a custom property
+can change its computed value,
+which can start or interrupt a CSS transition.
+
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
