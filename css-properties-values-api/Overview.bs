@@ -351,6 +351,177 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 </div>
 
 
+
+<!--
+ ███████  ████████  ████████   ███████  ████████  ████████ ████████  ████████ ██    ██
+██     ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██     ██  ██
+██ ███ ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██      ████
+██ ███ ██ ████████  ████████  ██     ██ ████████  ██████   ████████     ██       ██
+██ █████  ██        ██   ██   ██     ██ ██        ██       ██   ██      ██       ██
+██        ██        ██    ██  ██     ██ ██        ██       ██    ██     ██       ██
+ ███████  ██        ██     ██  ███████  ██        ████████ ██     ██    ██       ██
+-->
+
+The <dfn>@property</dfn> Rule {#at-property-rule}
+=================================================
+
+The ''@property'' rule provides an alternative way to register a custom property,
+directly in a stylesheet
+without having to run any JS.
+Valid ''@property'' rules result in a [=register a custom property|registered custom property=],
+as if {{registerProperty()}} had been called with equivalent parameters.
+
+The semantics of registered properties are the same
+regardless of the mechanism used to perform the registration.
+This means that, once registered,
+it does not matter whether the registration originated from {{registerProperty()}} or ''@property'':
+the property has the same behavior either way.
+
+The syntax of ''@property'' is:
+
+	<pre class="prod def" nohighlight>
+	@property <<custom-property-name>> {
+		<<declaration-list>>
+	}
+	</pre>
+
+''@property'' rules require a 'syntax' and 'inherits' descriptor;
+if either are missing,
+the entire rule is invalid and must be ignored.
+The 'initial-value' descriptor is optional
+only if the syntax is the [=universal syntax definition=],
+otherwise the descriptor is required;
+if it's missing, the entire rule is invalid and must be ignored.
+
+Unknown descriptors are invalid and ignored,
+but do not invalidate the ''@property'' rule.
+
+If multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
+the last one in stylesheet order "wins".
+A custom property registration from {{registerProperty()|CSS.registerProperty()}}
+further wins over any ''@property'' rules
+for the same <<custom-property-name>>.
+
+A ''@property'' is invalid if it occurs in a stylesheet inside of a [=shadow tree=],
+and must be ignored.
+
+Note: This might change in the future,
+as the behavior of concept-defining at-rules in shadow trees
+becomes more consistently defined.
+
+The 'syntax' Descriptor {#the-syntax-descriptor}
+------------------------------------------------
+
+	<pre class='descdef'>
+	Name: syntax
+	Value: <<string>>
+	For: @property
+	Initial: n/a (see prose)
+	</pre>
+
+Specifies the syntax of the custom property,
+in the form defined by [[#syntax-strings]].
+This descriptor is equivalent to the {{PropertyDescriptor/syntax|syntax}} member of {{PropertyDescriptor}}.
+
+The 'syntax' descriptor is required for the ''@property'' rule to be valid;
+if it's missing, the ''@property'' rule is invalid.
+
+If the provided string does not successfully [=consume a syntax definition|parse as a syntax definition=],
+the descriptor is invalid and must be ignored.
+
+
+The 'inherits' Descriptor {#inherits-descriptor}
+------------------------------------------------
+
+	<pre class='descdef'>
+	Name: inherits
+	Value: true | false
+	For: @property
+	Initial: n/a (see prose)
+	</pre>
+
+Specifies whether or not the custom property inherits.
+This is equivalent to the {{PropertyDescriptor/inherits}} member of {{PropertyDescriptor}}.
+
+The inherits descriptor is required for the ''@property'' rule to be valid;
+if it's missing, the ''@property'' rule is invalid.
+
+
+The 'initial-value' Descriptor {#initial-value-descriptor}
+----------------------------------------------------------
+
+	<pre class='descdef'>
+	Name: initial-value
+	Value: <<declaration-value>>
+	For: @property
+	Initial: the [=guaranteed-invalid value=] (but see prose)
+	</pre>
+
+Specifies the [=initial value=] of the custom property.
+This is equivalent to the {{PropertyDescriptor/initialValue}} member of {{PropertyDescriptor}}.
+
+If the value of the 'syntax' descriptor is the [=universal syntax definition=],
+then the 'initial-value' descriptor is optional.
+If omitted, the initial value of the property is the [=guaranteed-invalid value=].
+
+Otherwise,
+if the value of the 'syntax' descriptor is not the [=universal syntax definition=],
+the following conditions must be met for the the ''@property'' rule to be valid:
+
+	* The 'initial-value' descriptor must be present.
+	* The 'initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
+		according to the grammar specified by the [=syntax definition=].
+	* The 'initial-value' must be [=computationally independent=].
+
+If the above conditions are not met, the ''@property'' rule is invalid.
+
+
+Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
+------------------------------------------------------------------------------------
+
+The {{CSSRule}} interface is extended as follows:
+
+<pre class='idl'>
+partial interface CSSRule {
+    const unsigned short PROPERTY_RULE = 18;
+};
+</pre>
+
+The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
+-----------------------------------------------------------------------------
+
+The {{CSSPropertyRule}} interface represents an ''@property'' rule.
+
+<pre class='idl' export>
+[Exposed=Window]
+interface CSSPropertyRule : CSSRule {
+    readonly attribute CSSOMString name;
+    readonly attribute CSSOMString syntax;
+    readonly attribute boolean inherits;
+    readonly attribute CSSOMString? initialValue;
+};
+</pre>
+
+<dl dfn-for=CSSPropertyRule dfn-type=attribute>
+	<dt><dfn>name</dfn>
+	<dd>
+		The custom property name associated with the ''@property'' rule.
+
+	<dt><dfn>syntax</dfn>
+	<dd>
+		The syntax associated with the ''@property'', exactly as specified.
+
+	<dt><dfn>inherits</dfn>
+	<dd>
+		The inherits descriptor associated with the ''@property'' rule.
+
+	<dt><dfn>initialValue</dfn>
+	<dd>
+		The initial value associated with the ''@property'' rule,
+		which may not be present.
+</dl>
+
+
 <!--
       ██  ██████
       ██ ██    ██
@@ -989,177 +1160,6 @@ CSSOM {#cssom}
 			{{[[associatedProperty]]}} internal slot set to |property|, and
 			return the result.
 </div>
-
-
-
-<!--
- ███████  ████████  ████████   ███████  ████████  ████████ ████████  ████████ ██    ██
-██     ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██     ██  ██
-██ ███ ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██      ████
-██ ███ ██ ████████  ████████  ██     ██ ████████  ██████   ████████     ██       ██
-██ █████  ██        ██   ██   ██     ██ ██        ██       ██   ██      ██       ██
-██        ██        ██    ██  ██     ██ ██        ██       ██    ██     ██       ██
- ███████  ██        ██     ██  ███████  ██        ████████ ██     ██    ██       ██
--->
-
-The <dfn>@property</dfn> Rule {#at-property-rule}
-=================================================
-
-The ''@property'' rule provides an alternative way to register a custom property,
-directly in a stylesheet
-without having to run any JS.
-Valid ''@property'' rules result in a [=register a custom property|registered custom property=],
-as if {{registerProperty()}} had been called with equivalent parameters.
-
-The semantics of registered properties are the same
-regardless of the mechanism used to perform the registration.
-This means that, once registered,
-it does not matter whether the registration originated from {{registerProperty()}} or ''@property'':
-the property has the same behavior either way.
-
-The syntax of ''@property'' is:
-
-	<pre class="prod def" nohighlight>
-	@property <<custom-property-name>> {
-		<<declaration-list>>
-	}
-	</pre>
-
-''@property'' rules require a 'syntax' and 'inherits' descriptor;
-if either are missing,
-the entire rule is invalid and must be ignored.
-The 'initial-value' descriptor is optional
-only if the syntax is the [=universal syntax definition=],
-otherwise the descriptor is required;
-if it's missing, the entire rule is invalid and must be ignored.
-
-Unknown descriptors are invalid and ignored,
-but do not invalidate the ''@property'' rule.
-
-If multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
-the last one in stylesheet order "wins".
-A custom property registration from {{registerProperty()|CSS.registerProperty()}}
-further wins over any ''@property'' rules
-for the same <<custom-property-name>>.
-
-A ''@property'' is invalid if it occurs in a stylesheet inside of a [=shadow tree=],
-and must be ignored.
-
-Note: This might change in the future,
-as the behavior of concept-defining at-rules in shadow trees
-becomes more consistently defined.
-
-The 'syntax' Descriptor {#the-syntax-descriptor}
-------------------------------------------------
-
-	<pre class='descdef'>
-	Name: syntax
-	Value: <<string>>
-	For: @property
-	Initial: n/a (see prose)
-	</pre>
-
-Specifies the syntax of the custom property,
-in the form defined by [[#syntax-strings]].
-This descriptor is equivalent to the {{PropertyDescriptor/syntax|syntax}} member of {{PropertyDescriptor}}.
-
-The 'syntax' descriptor is required for the ''@property'' rule to be valid;
-if it's missing, the ''@property'' rule is invalid.
-
-If the provided string does not successfully [=consume a syntax definition|parse as a syntax definition=],
-the descriptor is invalid and must be ignored.
-
-
-The 'inherits' Descriptor {#inherits-descriptor}
-------------------------------------------------
-
-	<pre class='descdef'>
-	Name: inherits
-	Value: true | false
-	For: @property
-	Initial: n/a (see prose)
-	</pre>
-
-Specifies whether or not the custom property inherits.
-This is equivalent to the {{PropertyDescriptor/inherits}} member of {{PropertyDescriptor}}.
-
-The inherits descriptor is required for the ''@property'' rule to be valid;
-if it's missing, the ''@property'' rule is invalid.
-
-
-The 'initial-value' Descriptor {#initial-value-descriptor}
-----------------------------------------------------------
-
-	<pre class='descdef'>
-	Name: initial-value
-	Value: <<declaration-value>>
-	For: @property
-	Initial: the [=guaranteed-invalid value=] (but see prose)
-	</pre>
-
-Specifies the [=initial value=] of the custom property.
-This is equivalent to the {{PropertyDescriptor/initialValue}} member of {{PropertyDescriptor}}.
-
-If the value of the 'syntax' descriptor is the [=universal syntax definition=],
-then the 'initial-value' descriptor is optional.
-If omitted, the initial value of the property is the [=guaranteed-invalid value=].
-
-Otherwise,
-if the value of the 'syntax' descriptor is not the [=universal syntax definition=],
-the following conditions must be met for the the ''@property'' rule to be valid:
-
-	* The 'initial-value' descriptor must be present.
-	* The 'initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
-		according to the grammar specified by the [=syntax definition=].
-	* The 'initial-value' must be [=computationally independent=].
-
-If the above conditions are not met, the ''@property'' rule is invalid.
-
-
-Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
-------------------------------------------------------------------------------------
-
-The {{CSSRule}} interface is extended as follows:
-
-<pre class='idl'>
-partial interface CSSRule {
-    const unsigned short PROPERTY_RULE = 18;
-};
-</pre>
-
-The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
------------------------------------------------------------------------------
-
-The {{CSSPropertyRule}} interface represents an ''@property'' rule.
-
-<pre class='idl' export>
-[Exposed=Window]
-interface CSSPropertyRule : CSSRule {
-    readonly attribute CSSOMString name;
-    readonly attribute CSSOMString syntax;
-    readonly attribute boolean inherits;
-    readonly attribute CSSOMString? initialValue;
-};
-</pre>
-
-<dl dfn-for=CSSPropertyRule dfn-type=attribute>
-	<dt><dfn>name</dfn>
-	<dd>
-		The custom property name associated with the ''@property'' rule.
-
-	<dt><dfn>syntax</dfn>
-	<dd>
-		The syntax associated with the ''@property'', exactly as specified.
-
-	<dt><dfn>inherits</dfn>
-	<dd>
-		The inherits descriptor associated with the ''@property'' rule.
-
-	<dt><dfn>initialValue</dfn>
-	<dd>
-		The initial value associated with the ''@property'' rule,
-		which may not be present.
-</dl>
 
 
 
