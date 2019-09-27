@@ -354,20 +354,8 @@ to full URLs as described in [[!css3-values]].
 
 </div>
 
-
-Fallbacks In ''var()'' References {#fallbacks-in-var-references}
-----------------------------------------------------------------
-
-References to registered custom properties using the ''var()'' function may
-provide a fallback. However, the fallback value must match the
-<a>syntax definition</a> of the custom property being referenced, otherwise the
-declaration is <a spec=css-variables>invalid at computed-value time</a>.
-
-Note: This applies regardless of whether or not the fallback is being used.
-
-
-Substitution {#substitution}
-----------------------------
+Substitution via ''var()'' {#substitution}
+------------------------------------------
 
 Like unregistered custom properties,
 the value of a registered custom property can be substituted into another value with the ''var()'' function.
@@ -396,12 +384,19 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 	Because the computed value of '--x' (when serialized)  is "80px",
 	the computed value of '--y' is
 	a <<dimension-token>> with a value of "80" and unit "px".
-
 </div>
 
+### Fallbacks In ''var()'' References ### {#fallbacks-in-var-references}
 
-Dependency Cycles Via Relative Units {#dependency-cycles}
----------------------------------------------------------
+References to registered custom properties using the ''var()'' function may
+provide a fallback. However, the fallback value must match the
+<a>syntax definition</a> of the custom property being referenced, otherwise the
+declaration is <a spec=css-variables>invalid at computed-value time</a>.
+
+Note: This applies regardless of whether or not the fallback is being used.
+
+
+### Dependency Cycles via Relative Units ### {#dependency-cycles}
 
 [=Registered custom properties=] follow the same rules for dependency cycle resolution
 as unregistered [=custom properties=],
@@ -586,8 +581,8 @@ If the above conditions are not met, the ''@property'' rule is invalid.
  ██████   ██████
 -->
 
-Registering Custom Properties {#registering-custom-properties}
-==============================================================
+Registering Custom Properties in JS {#registering-custom-properties}
+====================================================================
 
 To register a custom property via JS,
 the {{CSS}} object is extended with a {{registerProperty()}} method:
