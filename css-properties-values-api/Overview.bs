@@ -126,8 +126,8 @@ the last such one in document order is the registration.
 Otherwise there is no registration,
 and the [=custom property=] is <em>not</em> a [=registered custom property=].
 
-Parsing Custom Properties {#parsing-custom-properties}
-------------------------------------------------------
+Parse-Time Behavior {#parsing-custom-properties}
+------------------------------------------------
 
 [=Registered custom properties=] parse exactly like unregistered [=custom properties=];
 almost anything is allowed.
@@ -182,18 +182,21 @@ See [[#calculation-of-computed-values]].
 	not a necessity like for UA-defined properties.
 </details>
 
+[=Specified Value=]-Time Behavior {#specified-value}
+----------------------------------------------------
 
-Calculation of Computed Values {#calculation-of-computed-values}
-----------------------------------------------------------------
+Just like unregistered [=custom properties=],
+all [=registered custom properties=], regardless of registered syntax,
+accept the [=CSS-wide keywords=],
+such as ''inherit'' or ''revert''.
+Their behavior is defined in [[css-cascade-4#defaulting-keywords]].
+
+[=Computed Value=]-Time Behavior {#calculation-of-computed-values}
+------------------------------------------------------------------
 
 The [=computed value=] of a [=registered custom property=]
 is determined by the syntax of its [=registration=].
 
-Note: All properties, regardless of registered syntax,
-accept the [=CSS-wide keywords=],
-such as ''inherit'' or ''revert''.
-These are handled at [=specified value=] time,
-as defined in [[css-cascade-4#defaulting-keywords]].
 
 For <code>"&lt;length>"</code>,
 <code>"&lt;length-percentage>"</code>,
