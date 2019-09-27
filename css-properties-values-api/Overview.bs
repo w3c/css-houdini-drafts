@@ -403,24 +403,25 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 Dependency Cycles Via Relative Units {#dependency-cycles}
 ---------------------------------------------------------
 
-Registered custom properties follow the same rules for dependency cycle
-resolution as unregistered custom properties, with the following additional
-constraints:
+[=Registered custom properties=] follow the same rules for dependency cycle resolution
+as unregistered [=custom properties=],
+with the following additional constraints:
 
-For any registered custom property with a <<length>> or <<length-percentage>> syntax
-component:
+For any registered custom property
+with a <<length>> or <<length-percentage>> syntax component:
 
 * If the property contains any of the following units:
 	''em'', ''ex'', ''cap'', ''ch'', ''ic'', ''lh'';
-	then add an edge between the property and the ''font-size'' of the current
-	element.
+	then add an edge between the property
+	and the ''font-size'' of the current element.
 * If the property contains the ''lh'' unit,
-	add an edge between the property and the ''line-height'' of the current
-	element.
+	add an edge between the property
+	and the ''line-height'' of the current element.
 * If the property contains any of the following units: ''rem'', ''rlh'';
 	then add an edge between the property
 	and the 'font-size'' of the root element.
-* If the property contains the ''rlh'' unit, add an edge between the property
+* If the property contains the ''rlh'' unit,
+	add an edge between the property
 	and the 'line-height'' of the root element.
 
 <div class='example'>
