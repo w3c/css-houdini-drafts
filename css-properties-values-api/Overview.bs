@@ -629,9 +629,7 @@ as arguments of the same names.
 		<a>associated <code>Document</code></a>'s
 		{{[[registeredPropertySet]]}} slot.
 
-	2. Attempt to parse |name|
-		as a <<custom-property-name>>.
-		If this fails,
+	2. If |name| is not a [=custom property name string=],
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
