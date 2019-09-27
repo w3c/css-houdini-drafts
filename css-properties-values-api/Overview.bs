@@ -400,6 +400,54 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 </div>
 
 
+Dependency Cycles Via Relative Units {#dependency-cycles}
+---------------------------------------------------------
+
+Registered custom properties follow the same rules for dependency cycle
+resolution as unregistered custom properties, with the following additional
+constraints:
+
+For any registered custom property with a <<length>> or <<length-percentage>> syntax
+component:
+
+* If the property contains any of the following units:
+	''em'', ''ex'', ''cap'', ''ch'', ''ic'', ''lh'';
+	then add an edge between the property and the ''font-size'' of the current
+	element.
+* If the property contains the ''lh'' unit,
+	add an edge between the property and the ''line-height'' of the current
+	element.
+* If the property contains any of the following units: ''rem'', ''rlh'';
+	then add an edge between the property
+	and the 'font-size'' of the root element.
+* If the property contains the ''rlh'' unit, add an edge between the property
+	and the 'line-height'' of the root element.
+
+<div class='example'>
+	For example, given this registration:
+
+	<pre class='lang-javascript'>
+	CSS.registerProperty({
+	  name: "--my-font-size",
+	  syntax: "&lt;length>",
+	  initialValue: "0px",
+	  inherits: false
+	});
+	</pre>
+
+	the following will produce a dependency cycle:
+
+	<pre class='lang-css'>
+	div {
+		--my-font-size: 10em;
+		font-size: var(--my-font-size);
+	}
+	</pre>
+
+	and ''font-size'' will behave as if the value ''unset'' was specified.
+</div>
+
+
 
 <!--
  ███████  ████████  ████████   ███████  ████████  ████████ ████████  ████████ ██    ██
@@ -745,54 +793,6 @@ following members:
 
 :   <dfn dict-member for=PropertyDefinition>initialValue</dfn>
 ::  The initial value of this custom property.
-
-
-Dependency Cycles Via Relative Units {#dependency-cycles}
----------------------------------------------------------
-
-Registered custom properties follow the same rules for dependency cycle
-resolution as unregistered custom properties, with the following additional
-constraints:
-
-For any registered custom property with a <<length>> or <<length-percentage>> syntax
-component:
-
-* If the property contains any of the following units:
-	''em'', ''ex'', ''cap'', ''ch'', ''ic'', ''lh'';
-	then add an edge between the property and the ''font-size'' of the current
-	element.
-* If the property contains the ''lh'' unit,
-	add an edge between the property and the ''line-height'' of the current
-	element.
-* If the property contains any of the following units: ''rem'', ''rlh'';
-	then add an edge between the property
-	and the 'font-size'' of the root element.
-* If the property contains the ''rlh'' unit, add an edge between the property
-	and the 'line-height'' of the root element.
-
-<div class='example'>
-	For example, given this registration:
-
-	<pre class='lang-javascript'>
-	CSS.registerProperty({
-	  name: "--my-font-size",
-	  syntax: "&lt;length>",
-	  initialValue: "0px",
-	  inherits: false
-	});
-	</pre>
-
-	the following will produce a dependency cycle:
-
-	<pre class='lang-css'>
-	div {
-		--my-font-size: 10em;
-		font-size: var(--my-font-size);
-	}
-	</pre>
-
-	and ''font-size'' will behave as if the value ''unset'' was specified.
-</div>
 
 
 <!--
