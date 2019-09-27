@@ -197,6 +197,17 @@ Their behavior is defined in [[css-cascade-4#defaulting-keywords]].
 The [=computed value=] of a [=registered custom property=]
 is determined by the syntax of its [=registration=].
 
+If the [=registration’s=] syntax is the [=universal syntax definition=],
+the [=computed value=] is the same as for unregistered [=custom properties=]
+(either the specified value with variables substituted,
+or the [=guaranteed-invalid value=]).
+
+Otherwise, attempt to [=CSS/parse=] the property's value
+according to its registered syntax.
+If this fails,
+the [=computed value=] is the [=guaranteed-invalid value=].
+If it succeeds,
+the [=computed value=] depends on the specifics of the syntax:
 
 For <code>"&lt;length>"</code>,
 <code>"&lt;length-percentage>"</code>,
@@ -244,7 +255,7 @@ the computed value is a list of the computed values of the base type.
 
 For syntaxes specified with [[#combinator|the | combinator]],
 the computed value is given by applying the computed-value rules
-for the first clause that matches to the specified value.
+for the first clause that matches the value.
 
 
 Animation Behavior {#animation-behavior-of-custom-properties}
