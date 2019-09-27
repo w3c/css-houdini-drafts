@@ -1156,7 +1156,7 @@ interface CSSPropertyRule : CSSRule {
 ------------------------------------------------------------
 
 <div algorithm>
-	To <dfn>reify a registered custom property value</dfn> given a property
+	To <dfn export>reify a registered custom property value</dfn> given a property
 	|property| and [=syntax definition=] |syntax|, run these steps:
 
 	For specified values, [=reify a list of component values=] from the value,
