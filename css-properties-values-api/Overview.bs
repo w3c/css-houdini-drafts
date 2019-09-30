@@ -244,6 +244,51 @@ the computed value is one of the following:
 	the computed value is the resolved absolute URL as described in [[!css3-values]].
 *   otherwise, the computed value is as specified.
 
+<details class=note>
+	<summary>URL behavior examples</summary>
+	<div class='example'>
+		Because URLs resolve against the base URL of the stylesheet they appear in, we can
+		end up with multiple relative URLs that resolve against different base URLs, even though
+		they appear in the same property.
+
+		For example, suppose '--url-foo' and '--url-bar' are registered
+		custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
+		<code>/style/foo/foo.css</code>:
+
+		<pre class='lang-css'>
+		div {
+			--url-foo: url("foo.png");
+		}
+		</pre>
+
+		and another stylesheet at <code>/style/bar/bar.css</code>
+		<pre class='lang-css'>
+		div {
+			--url-bar: url("bar.png");
+		}
+		</pre>
+
+		and finally a document at <code>/index.html</code>:
+		<pre class='lang-html'>
+		&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
+		&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
+		&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+		&lt;/div>
+		</pre>
+
+		Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
+		<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
+		against <code>/style/bar</code>.
+
+		On the other hand,
+		if both '--url-foo' and '--url-bar' were <em>un</em>registered,
+		they would substitute their literal values
+		(relative URLs)
+		into the <code>/index.html</code> stylesheet,
+		which would then resolve the URLs against <code>/index.html</code> instead.
+	</div>
+</details>
+
 For <code>"&lt;image>"</code> values,
 the computed value is the [=computed &lt;image>=].
 
@@ -312,47 +357,6 @@ but be automatically [=invalid at computed-value time=].
 As ''@supports'' tests parsing behavior,
 it thus also accepts all values as valid regardless of the registered syntax.
 
-Relative URLs {#relative-urls}
-------------------------------
-
-Relative URL values that appear in registered custom properties are resolved
-to full URLs as described in [[!css3-values]].
-
-<div class='example'>
-	Because URLs resolve against the base URL of the stylesheet they appear in, we can
-	end up with multiple relative URLs that resolve against different base URLs, even though
-	they appear in the same property.
-
-	For example, suppose '--url-foo' and '--url-bar' are registered
-	custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
-	<code>/style/foo/foo.css</code>:
-
-	<pre class='lang-css'>
-	div {
-		--url-foo: url("foo.png");
-	}
-	</pre>
-
-	and another stylesheet at <code>/style/bar/bar.css</code>
-	<pre class='lang-css'>
-	div {
-		--url-bar: url("bar.png");
-	}
-	</pre>
-
-	and finally a document at <code>/index.html</code>:
-	<pre class='lang-html'>
-	&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
-	&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
-	&lt;div style="background-image: var(--url-foo), var(---url-bar);">
-	&lt;/div>
-	</pre>
-
-	Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
-	<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
-	against <code>/style/bar</code>.
-
-</div>
 
 Substitution via ''var()'' {#substitution}
 ------------------------------------------
