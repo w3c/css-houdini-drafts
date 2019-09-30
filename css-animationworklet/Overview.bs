@@ -661,15 +661,14 @@ the animation <a>play state</a>. See [[#web-animation-overrides]] for details on
 correspondence changes.
 
 <xmp class='idl'>
-[Exposed=Window,
- Constructor (DOMString animatorName,
+[Exposed=Window]
+interface WorkletAnimation : Animation {
+        constructor(DOMString animatorName,
               optional (AnimationEffect or sequence<AnimationEffect>)? effects = null,
               optional AnimationTimeline? timeline,
-              optional any options)]
-interface WorkletAnimation : Animation {
+              optional any options);
         readonly attribute DOMString animatorName;
 };
-
 </xmp>
 
 
