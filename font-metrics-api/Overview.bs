@@ -55,6 +55,7 @@ those that are passed in as a part of the styleMap. Document styles do not apply
 ----------------------------
 
 <pre class='idl'>
+[Exposed=Window]
 interface FontMetrics {
   readonly attribute double width;
   readonly attribute FrozenArray&lt;double> advances;
@@ -166,6 +167,7 @@ List of all {{Baseline}}s for the given text.
 ----------------------------
 
 <pre class='idl'>
+[Exposed=Window]
 interface Baseline {
   readonly attribute DOMString name;
   readonly attribute double value;
@@ -188,6 +190,7 @@ Positive numbers indicating a distance going down from the
 ----------------------------
 
 <pre class='idl'>
+[Exposed=Window]
 interface Font {
   readonly attribute DOMString name;
   readonly attribute unsigned long glyphsRendered;
