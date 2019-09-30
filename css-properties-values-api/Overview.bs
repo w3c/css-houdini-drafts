@@ -83,7 +83,7 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 Registered Custom Properties {#behavior-of-custom-properties}
 =============================================================
 
-A [=custom property=] can become a <dfn>registered custom property</dfn>,
+A [=custom property=] can become a <dfn local-lt="registered">registered custom property</dfn>,
 making it act more like a UA-defined property:
 giving it a syntax that's checked by the UA,
 an initial value,
