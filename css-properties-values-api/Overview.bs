@@ -637,11 +637,8 @@ as arguments of the same names.
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
-		Otherwise,
-		let |parsed name| be the parsed value.
-
 		If |property set|
-		already contains an entry with |parsed name| as its property name
+		already contains an entry with |name| as its property name
 		(compared codepoint-wise),
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
@@ -686,7 +683,7 @@ as arguments of the same names.
 	5. Set |inherit flag| to the value of |inherits|.
 
 	6. Let |registered property| be a [=struct=]
-		with a property name of |parsed name|,
+		with a property name of |name|,
 		a syntax of |syntax definition|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
