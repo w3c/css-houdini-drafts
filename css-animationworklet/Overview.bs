@@ -151,10 +151,6 @@ Animation Worklet {#animation-worklet-desc}
 <dfn>Animation Worklet</dfn> is a {{Worklet}} responsible for all classes related to custom
 animations. The worklet can be accessed via {{animationWorklet}} attribute.
 
-The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
-
-{{AnimationWorkletGlobalScope}} represents the global execution context of {{animationWorklet}}.
-
 <xmp class='idl'>
 [Exposed=Window]
 partial namespace CSS {
@@ -162,6 +158,20 @@ partial namespace CSS {
 };
 </xmp>
 
+The {{animationWorklet}}'s <a>worklet global scope type</a> is {{AnimationWorkletGlobalScope}}.
+
+{{AnimationWorkletGlobalScope}} represents the global execution context of {{animationWorklet}}.
+
+<xmp class='idl'>
+
+[ Global=(Worklet,AnimationWorklet), Exposed=AnimationWorklet ]
+interface AnimationWorkletGlobalScope : WorkletGlobalScope {
+    void registerAnimator(DOMString name, AnimatorInstanceConstructor animatorCtor);
+};
+
+callback AnimatorInstanceConstructor = any (any options, optional any state);
+
+</xmp>
 
 
 Animator {#animator-desc}
@@ -285,18 +295,6 @@ Registering an Animator Definition {#registering-animator-definition}
 ---------------------------------------------------------------------
 An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
 The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
-
-
-<xmp class='idl'>
-
-[ Global=(Worklet,AnimationWorklet), Exposed=AnimationWorklet ]
-interface AnimationWorkletGlobalScope : WorkletGlobalScope {
-    void registerAnimator(DOMString name, AnimatorInstanceConstructor animatorCtor);
-};
-
-callback AnimatorInstanceConstructor = any (any options, optional any state);
-
-</xmp>
 
 Note that to register a <a>stateful animator definition</a> it is simply enough for the registered
 class to have a <code>state</code> function.
