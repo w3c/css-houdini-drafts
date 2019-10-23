@@ -417,7 +417,7 @@ timeline. It consists of:
  -  : <a>animator name</a>
     :: A string used to identify the animator definition.
 
- -  : <a>animation requested flag</a>
+ -  : <a>frame requested flag</a>
     :: A boolean flag that indicates if the animator needs to animate.
 
  -  : <dfn>sync requested flag</dfn>
@@ -476,7 +476,7 @@ the following steps:
 
     7. Set the following on |animatorInstance| with:
         - <a>animator name</a> being |name|
-        - <a>animation requested flag</a> being <a>frame-current</a>
+        - <a>frame requested flag</a> being <b>false</b>
         - <a>sync requested flag</a> being <b>false</b>
         - <a>animator current time</a> being unresolved
         - <a>effect</a> being |animatorEffect|
@@ -492,8 +492,8 @@ Running Animators {#running-animators}
 --------------------------------------
 
 When the user agent wants to produce a new animation frame, if for any <a>animator instance</a> the
-associated <a>animation requested flag</a> is <a>frame-requested</a> then the the user agent
-<em>must</em> <a>run animators</a> for the current frame in all its associated global scopes.
+associated <a>frame requested flag</a> is <b>true</b> then the the user agent <em>must</em> <a>run
+animators</a> for the current frame in all its associated global scopes.
 
 Note: The user agent is not required to run animations on every visual frame. It is legal to defer
       generating an animation frame until a later frame. This allow the user agent to
@@ -514,9 +514,9 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
 
            If |definition| does not exist then abort the following steps.
 
-        3. If the <a>animation requested flag</a> for |animator| is <a>frame-current</a> or the
-            effect belonging to the |animator| will not be visible within the visual viewport of the
-            current frame the user agent <em>may</em> abort all the following steps.
+        3. If the <a>frame requested flag</a> for |animator| is <b>false</b> or the effect belonging
+            to the |animator| will not be visible within the visual viewport of the current frame
+            the user agent <em>may</em> abort all the following steps.
 
             Issue: Consider giving user agents permission to skip running individual animator
             instances to throttle slow animators.
@@ -617,15 +617,13 @@ This effectively removes the animator instance.
 Requesting Animation Frames {#requesting-animation-frames}
 ----------------------------------------------------------
 
-Each <a>animator instance</a> has an associated <dfn>animation requested flag</dfn>. It must be
-either <dfn>frame-requested</dfn> or <dfn>frame-current</dfn>. It is initially set to
-<a>frame-current</a>. Different circumstances can cause the <a>animation requested flag</a> to be
-set to <a>frame-requested</a>. These include the following:
+Each <a>animator instance</a> has an associated <dfn>frame requested flag</dfn>. It is initially set
+to <b>false</b>. Different circumstances can cause the <a>frame requested flag</a> to be set to
+<b>true</b>. These include the following:
   - Changes in the <a>current time</a> of the animator's <a>timeline</a>
   - Changes in the <a>current time</a> of the animator's corresponding <a>worklet animation</a>
 
-Performing <a>run animators</a> resets the <a>animation requested flag</a> on animators to
-<a>frame-current</a>.
+Performing <a>run animators</a> resets the <a>frame requested flag</a> on animators to <b>false</b>.
 
 
 Web Animations Integration {#web-animation-integration}
