@@ -36,6 +36,9 @@ Ignored Terms: PaintWorklet
 <pre class="link-defaults">
 spec:infra; type:dfn; text:list
 spec:webidl; type:dfn; text:converting
+spec:html; type:dfn;
+    text:set bitmap dimensions;
+    text:reset the rendering context to its default state
 </pre>
 
 <pre class="anchors">
