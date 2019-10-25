@@ -599,8 +599,8 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
         [=computed value=]'s for properties listed in |inputProperties|.
 
     8. Let |renderingContext| be the result of [=create a PaintRenderingContext2D object=] given:
-            - "width" - The width given by |concreteObjectSize|.
-            - "height" - The height given by |concreteObjectSize|.
+            - "width" - The width given by |snappedConcreteObjectSize|.
+            - "height" - The height given by |snappedConcreteObjectSize|.
             - "paintRenderingContext2DSettings" - The
                 [=paint definition/PaintRenderingContext2DSettings object=] given by |definition|.
 
