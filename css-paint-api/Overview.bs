@@ -996,18 +996,12 @@ There are no known privacy issues introduced by these features.
 Changes {#changes}
 ==================
 
-Changes since the last publication:
-	<ul>
-		<li id="change-2018-paint-function-webidl">
-			Adding converting the paint function to the WebIDL Function type, instead of just a raw
-			javascript function.
-			(<a href="https://github.com/w3c/css-houdini-drafts/issues/743">Issue 743</a>)
+Changes since the <a href="https://www.w3.org/TR/2018/CR-css-paint-api-1-20180809/">9 August 2018 CR publication</a>:
 
-		<li id="change-2018-filter-input-properties">
-			Added a step to {{registerPaint()}} to filter out unsupported native CSS properties. These now
-do not appear in the {{StylePropertyMapReadOnly}} provided to the paint function.
-			(<a href="https://github.com/w3c/css-houdini-drafts/issues/523">Issue 523</a>)
-  </ul>
+* Filtered the list of input properties to a paint worklet to be only known or custom properties.
 
-A <a href="https://drafts.css-houdini.org/css-paint-api-1/issues-list-2018-04-10">Disposition of Comments</a> is available.
+* Added alpha flag to {{PaintRenderingContext2D}} to control whether the rendering surface is forced opaque or allows transparency.
 
+* Fix definition for the size of the output bitmap:
+
+    > The size of the output bitmap is the <ins>concrete object size of the object it is rendering to</ins> <del>size of the fragment it is rendering</del>.
