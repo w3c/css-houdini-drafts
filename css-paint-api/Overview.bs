@@ -405,6 +405,7 @@ For interfaces which use the {{CanvasDrawImage}} mixin:
          {{CanvasDrawImage/drawImage}}.
 
 Note: This should eventually be moved to the canvas section of the HTML specification.
+See <a href="https://github.com/w3c/css-houdini-drafts/issues/819">Issue 819</a>.
 
 Drawing an image {#drawing-an-image}
 ====================================
