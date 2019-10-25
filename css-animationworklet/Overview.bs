@@ -283,18 +283,27 @@ animation logic. It consists of:
  -  : <dfn>state function</dfn>
     :: A <a>Function</a> <a>callback function</a> type.
 
- -  : <dfn>stateful flag</dfn>
+ -  : <dfn for="animator definition">stateful flag</dfn>
     :: A boolean flag
 
 
-A <dfn>stateful animator definition</dfn> is an <a>animator definition</a> whose <a>stateful
-flag</a> is <b>true</b>.
+A <dfn>stateful animator definition</dfn> is an <a>animator definition</a> whose
+<a for="animator definition">stateful flag</a> is <b>true</b>.
 
+
+A <dfn>document animator definition</dfn> is a <a>struct</a> which describes the information needed
+by the <a>document</a> about the author defined custom animation. It consists of:
+
+ -  : <dfn for="document animator definition">stateful flag</dfn>
+    :: A boolean flag
 
 Registering an Animator Definition {#registering-animator-definition}
 ---------------------------------------------------------------------
-An {{AnimationWorkletGlobalScope}} has a <dfn>animator name to animator definition map</dfn>.
-The map gets populated when {{registerAnimator(name, animatorCtor)}} is called.
+The <a>document</a> has a <a>map</a> of <dfn>document animator definitions</dfn>. The map gets
+populated when {{registerAnimator(name, animatorCtor)}} is called.
+
+An {{AnimationWorkletGlobalScope}} has a <a>map</a> of <dfn>animator definitions</dfn>. The map gets
+populated when {{registerAnimator(name, animatorCtor)}} is called.
 
 Note that to register a <a>stateful animator definition</a> it is simply enough for the registered
 class to have a <code>state</code> function.
@@ -308,29 +317,30 @@ following steps:
     1. If |name| is not a valid <<ident>>, <a>throw</a> a <a>TypeError</a> and abort all these
         steps.
 
-    2. If |name| exists as a key in the <a>animator name to animator definition map</a>,
-        <a>throw</a> a <a>NotSupportedError</a> and abort all these steps.
+    2. Let |animatorDefinitions| be the {{AnimationWorkletGlobalScope}}'s
+        <a>animator definitions</a> <a>map</a>.
 
-    3. If the result of <a>IsConstructor</a>(|animatorCtor|) is <b>false</b>, <a>throw</a> a
+    3. If |animatorDefinitions|[|name|] <a for=map>exists</a>, <a>throw</a> a <a>NotSupportedError</a>
+        and abort all these steps.
+
+    4. If the result of <a>IsConstructor</a>(|animatorCtor|) is <b>false</b>, <a>throw</a> a
         <a>TypeError</a> and abort all these steps.
 
+    5. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
 
-    4. Let |prototype| be the result of <a>Get</a>(|animatorCtor|, "prototype").
+    6. Let |animateFuncValue| be the result of <a>Get</a>(|prototype|, "animate").
 
-
-    5. Let |animateFuncValue| be the result of <a>Get</a>(|prototype|, "animate").
-
-    6. Let |animateFunc| be the result of <a>converting</a> |animateFuncValue| to the <a>Function</a>
+    7. Let |animateFunc| be the result of <a>converting</a> |animateFuncValue| to the <a>Function</a>
         <a>callback function</a> type. If an exception is thrown, rethrow the exception and abort
         all these steps.
 
-    7. Let |stateFuncValue| be the result of <a>Get</a>(|prototype|, "state").
+    8. Let |stateFuncValue| be the result of <a>Get</a>(|prototype|, "state").
 
-    8. Let |stateFunc| be the result of <a>converting</a> |stateFuncValue| to the <a>Function</a>
+    9. Let |stateFunc| be the result of <a>converting</a> |stateFuncValue| to the <a>Function</a>
         <a>callback function</a> type, If an exception is thrown, set |stateful| to be <b>false</b>,
         otherwise set |stateful| to be <b>true</b> and |stateFunc| to be undefined.
 
-    9. Let |definition| be a new <a>animator definition</a> with:
+    10. Let |definition| be a new <a>animator definition</a> with:
 
         - <a>animator name</a> being |name|
 
@@ -340,11 +350,39 @@ following steps:
 
         - <a>state function</a> being |stateFunc|
 
-        - <a>stateful flag</a> being |stateful|
+        - <a for="animator definition">stateful flag</a> being |stateful|
 
 
-    9. Add the key-value pair (|name| - |definition|) to the <a>animator name to animator
-        definition map</a>.
+    9. <a for=map>set</a> the |animatorDefinitions|[|name|] to |definition|.
+
+    10. <a>Queue a task</a> to run the following steps:
+
+        1. Let |documentAnimatorDefinitions| be the associated <a>document's</a>
+            <a>document animator definitions</a> <a>map</a>.
+
+        2. Let |documentDefinition| be a new <a>document animator definition</a> with:
+
+            - <a for="animator definition">stateful flag</a> being |stateful|
+
+        3. If |documentAnimatorDefinitions|[|name|] <a for=map>exists</a>, run the following steps:
+
+            1. Let |existingDocumentDefinition| be the result of <a for=map>get</a>
+                |documentAnimatorDefinitions|[|name|].
+
+            2. If |existingDocumentDefinition| is <code>"invalid"</code>, abort all these steps.
+
+            3. If |existingDocumentDefinition| and |documentDefinition| are not equivalent, (that is
+                their <a for="document animator definition">stateful flag</a>s are
+                different), then:
+
+                <a for=map>set</a> |documentAnimatorDefinitions|[|name|] to <code>"invalid"</code>.
+
+                Log an error to the debugging console stating that the same class was registered
+                with different <code>stateful flag</code>.
+
+        4. Otherwise, <a for=map>set</a> |documentAnimatorDefinitions|[|name|] to
+            |documentDefinition|.
+
 </div>
 
 
@@ -457,7 +495,7 @@ To <dfn>create a new animator instance</dfn> given a |name|, |timeline|, |effect
 the following steps:
 
     1. Let the |definition| be the result of looking up |name| on the |workletGlobalScope|'s
-         <a>animator name to animator definition map</a>.
+         <a>animator definitions</a>.
 
           If |definition| does not exist abort the following steps.
 
@@ -510,7 +548,7 @@ When the user agent wants to <dfn>run animators</dfn> in a given |workletGlobalS
         1. Let |animatorName| be |animator|'s <a>animator name</a>
 
         2. Let the |definition| be the result of looking up |animatorName| on the
-            |workletGlobalScope|'s <a>animator name to animator definition map</a>.
+            |workletGlobalScope|'s <a>animator definitions</a>.
 
            If |definition| does not exist then abort the following steps.
 
@@ -576,11 +614,11 @@ given |animator|, |sourceWorkletGlobalScope|, |destinationWorkletGlobalScope|, t
      1. Let |animatorName| be |animator|'s <a>animator name</a>
 
      2. Let |definition| be the result of looking up |animatorName| on |sourceWorkletGlobalScope|'s
-        <a>animator name to animator definition map</a>.
+        <a>animator definitions</a>.
 
         If |definition| does not exist then abort the following steps.
 
-     3. Let |stateful| be the <a>stateful flag</a> of |definition|.
+     3. Let |stateful| be the <a for="animator definition">stateful flag</a> of |definition|.
 
      4. If |stateful| is <b>false</b> then abort the following steps.
 
@@ -691,14 +729,23 @@ Creating a Worklet Animation {#creating-worklet-animation}
 
 Creates a new {{WorkletAnimation}} object using the following procedure:
 
-    1. Let |workletAnimation| be a new {{WorkletAnimation}} object.
+    1. Let |documentAnimatorDefinitions| be the associated <a>document's</a> <a>document animator
+        definitions</a> <a>map</a>.
 
-    2. Run the procedure to <a>set the timeline of an animation</a> on |workletAnimation| passing
+    2. If |documentAnimatorDefinitions|[|animatorName|] does not <a for=map>exists</a>, <a>throw</a> an
+        <a>TypeError</a> and abort the following steps.
+
+    3. If |documentAnimatorDefinitions|[|animatorName|] is <code>"invalid"</code>, <a>throw</a> an
+        <a>TypeError</a> and abort the following steps.
+
+    4. Let |workletAnimation| be a new {{WorkletAnimation}} object.
+
+    5. Run the procedure to <a>set the timeline of an animation</a> on |workletAnimation| passing
         |timeline| as the new timeline or, if a |timeline| argument is not provided,
         passing the <a>default document timeline</a> of the {{Document}} associated with the
         {{Window}} that is the <a>current global object</a>.
 
-    3. Let |effect| be the result corresponding to the first matching condition from below.
+    6. Let |effect| be the result corresponding to the first matching condition from below.
          : If |effects| is a {{AnimationEffect}} object,
          :: Let effect be |effects|.
          : If |effects| is a <a>list</a> of {{AnimationEffect}}</a> objects,
@@ -706,14 +753,14 @@ Creates a new {{WorkletAnimation}} object using the following procedure:
          : Otherwise,
          :: Let |effect| be undefined.
 
-    4. Let |serializedOptions| be the result of <a>StructuredSerialize</a>(|options|).
+    7. Let |serializedOptions| be the result of <a>StructuredSerialize</a>(|options|).
         Rethrow any exceptions.
 
-    5. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
+    8. Set the <a>serialized options</a> of |workletAnimation| to |serializedOptions|.
 
-    6. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
+    9. Set the <a>animation animator name</a> of |workletAnimation| to |animatorName|.
 
-    7. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
+    10. Run the procedure to <a>set the target effect of an animation</a> on |workletAnimation|
         passing |effect| as the new effect. Note that this may trigger action to
         <a>set animator instance of worklet animation</a>. See [[#web-animation-overrides]] for more
         details.
@@ -820,6 +867,7 @@ To <dfn>sync animation timings to worklet</dfn> for a given |workletAnimation| t
              *    [=iteration duration=],
              *    [=playback direction=], and
              *    [=timing function=].
+
 
 </div>
 
