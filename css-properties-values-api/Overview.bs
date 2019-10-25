@@ -40,7 +40,9 @@ spec:css-values-4;
 	type:dfn
 		text:identifier
 spec:cssom-1; type:interface; text:CSS
-spec:dom; type:interface; text:Document
+spec:dom;
+	type:interface; text:Document
+	type:dfn; text:shadow tree
 spec:infra; type:dfn;
 	text:string
 	text:list
