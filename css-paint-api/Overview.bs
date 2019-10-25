@@ -994,7 +994,16 @@ There are no known security issues introduced by these features.
 Privacy Considerations {#privacy-considerations}
 ================================================
 
-There are no known privacy issues introduced by these features.
+* The timing of paint callbacks can be used as a high-bandwidth channel for detecting "visited" state for links.
+    (<a href="https://github.com/w3c/css-houdini-drafts/issues/791">details</a>)
+    This is not a fundamentally new privacy leak,
+    as visited state leaks from many interactions,
+    but absent any further mitigations,
+    this is a particularly high-bandwidth channel of the information.
+
+    No official mitigations are planned at this time,
+    as this privacy leak needs to be addressed more directly
+    to fix all such channels.
 
 Changes {#changes}
 ==================
