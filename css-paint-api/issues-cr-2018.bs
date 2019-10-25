@@ -1,5 +1,4 @@
 Draft:    https://www.w3.org/TR/2018/CR-css-paint-api-1-20180809/
-
 Title:    CSS Painting API Level 1
 ----
 Issue 1.
@@ -16,9 +15,9 @@ From:     Deian Stefan
 Comment:  https://github.com/w3c/css-houdini-drafts/issues/791
 Response: https://github.com/w3c/css-houdini-drafts/issues/791#issuecomment-546460085
 Changes:  https://github.com/w3c/css-houdini-drafts/commit/3c72275054d9d541e6526e2988567ad4d209f257
-Open:     Accepted
+Closed:   Accepted
 Resolved: Editor discretion
-Verified: Pending verification.
+Verified: https://github.com/w3c/css-houdini-drafts/issues/791#issuecomment-546466424
 ----
 Issue 3.
 Summary:  Typo: use snappedConcreteObjectSize in paint callback
@@ -26,7 +25,7 @@ From:     Chris Harrelson
 Comment:  https://github.com/w3c/css-houdini-drafts/issues/800
 Changes:  https://github.com/w3c/css-houdini-drafts/commit/735ea42edf09f8d69de1eddbc7e7691528f56963
 Closed:   Accepted
-Rsolved:  Editorial
+Resolved: Editorial
 ----
 Issue 4.
 Summary:  Disconnect between css-paint-api-1 and HTML specs on CanvasImageSource
