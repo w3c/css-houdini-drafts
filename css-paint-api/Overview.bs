@@ -201,7 +201,7 @@ called, the user agent <em>must</em> run the following steps:
 
     10. If |inputArgumentsIterable| is not undefined, then set |inputArguments| to the result of
         [=converting=] |inputArgumentsIterable| to a <code>sequence&lt;DOMString></code>. If an
-        execption is thrown, rethrow the execption and abort all these steps.
+        exception is thrown, rethrow the exception and abort all these steps.
 
     11. Let |inputArgumentSyntaxes| be an [=list/empty=] [=list=].
 
