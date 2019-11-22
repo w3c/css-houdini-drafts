@@ -449,9 +449,20 @@ When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |wo
 
             2. Reject |promise| with an "{{AbortError}}" {{DOMException}}.
 
-    4. <a>Run a module script</a> given |script|.
+    4. If |script|'s <a>error to rethrow</a> is not null, then <a>queue a task</a> on
+        |outsideSettings|'s <a>responsible event loop</a> given |script|'s <a>error to rethrow</a>
+        to run these steps:
 
-    5. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
+        1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
+            run these steps:
+
+            1. Set |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> to <b>-1</b>.
+
+            2. Reject |promise| with <a>error to rethrow</a>.
+
+    5. <a>Run a module script</a> given |script|.
+
+    6. <a>Queue a task</a> on |outsideSettings|'s <a>responsible event loop</a> to run these steps:
 
         1. If |pendingTaskStruct|'s <a for="pending tasks struct">counter</a> is not <b>-1</b>, then
             run these steps:
