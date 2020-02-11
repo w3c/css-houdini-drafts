@@ -1156,8 +1156,8 @@ interface CSSPropertyRule : CSSRule {
 </dl>
 
 <div algorithm>
-To <dfn export>serialize a CSSPropertyRule rule</dfn>, return the concatenation
-of the following:
+To <dfn export>serialize a CSSPropertyRule</dfn>, return the concatenation of
+the following:
 
 	1. The string <code>"@property"</code> followed by a single SPACE (U+0020).
 	2. The result of performing <a>serialize an identifier</a> on the rule's
