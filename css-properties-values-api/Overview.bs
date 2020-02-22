@@ -40,7 +40,9 @@ spec:css-values-4;
 	type:dfn
 		text:identifier
 spec:cssom-1; type:interface; text:CSS
-spec:dom; type:interface; text:Document
+spec:dom;
+	type:interface; text:Document
+	type:dfn; text:shadow tree
 spec:infra; type:dfn;
 	text:string
 	text:list
@@ -83,7 +85,7 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 Registered Custom Properties {#behavior-of-custom-properties}
 =============================================================
 
-A [=custom property=] can become a <dfn>registered custom property</dfn>,
+A [=custom property=] can become a <dfn local-lt="registered">registered custom property</dfn>,
 making it act more like a UA-defined property:
 giving it a syntax that's checked by the UA,
 an initial value,
@@ -244,6 +246,51 @@ the computed value is one of the following:
 	the computed value is the resolved absolute URL as described in [[!css3-values]].
 *   otherwise, the computed value is as specified.
 
+<details class=note>
+	<summary>URL behavior examples</summary>
+	<div class='example'>
+		Because URLs resolve against the base URL of the stylesheet they appear in, we can
+		end up with multiple relative URLs that resolve against different base URLs, even though
+		they appear in the same property.
+
+		For example, suppose '--url-foo' and '--url-bar' are registered
+		custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
+		<code>/style/foo/foo.css</code>:
+
+		<pre class='lang-css'>
+		div {
+			--url-foo: url("foo.png");
+		}
+		</pre>
+
+		and another stylesheet at <code>/style/bar/bar.css</code>
+		<pre class='lang-css'>
+		div {
+			--url-bar: url("bar.png");
+		}
+		</pre>
+
+		and finally a document at <code>/index.html</code>:
+		<pre class='lang-html'>
+		&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
+		&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
+		&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+		&lt;/div>
+		</pre>
+
+		Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
+		<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
+		against <code>/style/bar</code>.
+
+		On the other hand,
+		if both '--url-foo' and '--url-bar' were <em>un</em>registered,
+		they would substitute their literal values
+		(relative URLs)
+		into the <code>/index.html</code> stylesheet,
+		which would then resolve the URLs against <code>/index.html</code> instead.
+	</div>
+</details>
+
 For <code>"&lt;image>"</code> values,
 the computed value is the [=computed &lt;image>=].
 
@@ -293,66 +340,25 @@ which can start or interrupt a CSS transition.
 Conditional Rules {#conditional-rules}
 --------------------------------------
 
-Unregistered custom properties are “always valid”
-when tested via ''@supports'';
-a rule like `@supports (--foo: red) {...}`
-is always true
-so long as you don't violate the (very liberal) syntax for custom properties.
+As stated in [[#parsing-custom-properties]],
+both unregistered and [=registered=] [=custom properties=]
+accept (almost) all possible values at parse-time.
+[=Registered=] [=custom properties=] only apply their syntax at [=computed value=] time.
 
-Registering a custom property does not change this.
-Even if a custom property is, for example,
-registered with `syntax: "&lt;color>"`,
-a rule like `@supports (--foo: 1em) {...}`
-will still evaluate as true and apply those styles.
+So, all [=custom properties=],
+regardless of whether they're [=registered=] or unregistered,
+will test as "true" in an ''@supports'' rule,
+so long as you don't violate the (very liberal) generic syntax for [=custom properties=].
 
-Note: This matches the [[#parsing-custom-properties|parsing behavior]] of registered custom properties.
-A registered custom property specified as `"&lt;color>"`
-but written as `--foo: 1em;` will still be accepted as valid at parse-time,
-but be automatically [=invalid at computed-value time=].
-As ''@supports'' tests parsing behavior,
-it thus also accepts all values as valid regardless of the registered syntax.
-
-Relative URLs {#relative-urls}
-------------------------------
-
-Relative URL values that appear in registered custom properties are resolved
-to full URLs as described in [[!css3-values]].
-
-<div class='example'>
-	Because URLs resolve against the base URL of the stylesheet they appear in, we can
-	end up with multiple relative URLs that resolve against different base URLs, even though
-	they appear in the same property.
-
-	For example, suppose '--url-foo' and '--url-bar' are registered
-	custom properties with ''&lt;url>'' syntax, and that we have a stylesheet at
-	<code>/style/foo/foo.css</code>:
-
-	<pre class='lang-css'>
-	div {
-		--url-foo: url("foo.png");
-	}
-	</pre>
-
-	and another stylesheet at <code>/style/bar/bar.css</code>
-	<pre class='lang-css'>
-	div {
-		--url-bar: url("bar.png");
-	}
-	</pre>
-
-	and finally a document at <code>/index.html</code>:
-	<pre class='lang-html'>
-	&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
-	&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
-	&lt;div style="background-image: var(--url-foo), var(---url-bar);">
-	&lt;/div>
-	</pre>
-
-	Here, the ''var(--url-foo)'' reference would produce a URL that resolves against
-	<code>/style/foo</code>, and the ''var(--url-bar)'' reference would produce a URL that resolves
-	against <code>/style/bar</code>.
-
+<div class=example>
+	For example,
+	even if a custom property is registered
+	with <code highlight=css>syntax: "&lt;color>";</code>,
+	a rule like `@supports (--foo: 1em) {...}`
+	will still evaluate as true and apply those styles,
+	because the declaration <em>does</em> successfully parse as a valid property.
 </div>
+
 
 Substitution via ''var()'' {#substitution}
 ------------------------------------------
@@ -365,7 +371,7 @@ rather than the original token sequence used to produce that value.
 Any ''var()'' function that references a registered custom property
 must be replaced with an <dfn export>equivalent token sequence</dfn>,
 which is equal to the token sequence that would have been produced
-by [[cssom#serialize-a-css-value|serializing]] the computed value,
+by [=serialize a CSS value|serializing=] the computed value,
 and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 
 <div class='example'>
@@ -633,11 +639,8 @@ as arguments of the same names.
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
 
-		Otherwise,
-		let |parsed name| be the parsed value.
-
 		If |property set|
-		already contains an entry with |parsed name| as its property name
+		already contains an entry with |name| as its property name
 		(compared codepoint-wise),
 		<a>throw</a> an {{InvalidModificationError}}
 		and exit this algorithm.
@@ -682,7 +685,7 @@ as arguments of the same names.
 	5. Set |inherit flag| to the value of |inherits|.
 
 	6. Let |registered property| be a [=struct=]
-		with a property name of |parsed name|,
+		with a property name of |name|,
 		a syntax of |syntax definition|,
 		an initial value of |parsed initial value|,
 		and an inherit flag of |inherit flag|.
