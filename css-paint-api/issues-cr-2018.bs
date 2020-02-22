@@ -1,0 +1,57 @@
+Draft:    https://www.w3.org/TR/2018/CR-css-paint-api-1-20180809/
+Title:    CSS Painting API Level 1
+----
+Issue 1.
+Summary:  Broken LInks
+From:     Chris Lilley
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/787
+Response: https://github.com/w3c/css-houdini-drafts/issues/787#issuecomment-411123499
+Closed:   Accepted
+Resolved: Editorial
+----
+Issue 2.
+Summary:  CSS Paint API leaks browsing history
+From:     Deian Stefan
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/791
+Response: https://github.com/w3c/css-houdini-drafts/issues/791#issuecomment-546460085
+Changes:  https://github.com/w3c/css-houdini-drafts/commit/3c72275054d9d541e6526e2988567ad4d209f257
+Closed:   Accepted
+Resolved: Editor discretion
+Verified: https://github.com/w3c/css-houdini-drafts/issues/791#issuecomment-546466424
+----
+Issue 3.
+Summary:  Typo: use snappedConcreteObjectSize in paint callback
+From:     Chris Harrelson
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/800
+Changes:  https://github.com/w3c/css-houdini-drafts/commit/735ea42edf09f8d69de1eddbc7e7691528f56963
+Closed:   Accepted
+Resolved: Editorial
+----
+Issue 4.
+Summary:  Disconnect between css-paint-api-1 and HTML specs on CanvasImageSource
+From:     Alan Jeffrey
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/819
+Response: https://github.com/w3c/css-houdini-drafts/issues/819#issuecomment-424360647
+Open:     Waiting for HTML spec edits
+----
+Issue 5.
+Summary:  Improve passing of large-scale data to PaintWorklet
+From:     John Wiesz
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/872
+Response: https://github.com/w3c/css-houdini-drafts/issues/872#issuecomment-499903766
+Open:     Waiting on edits to add new features to Properties an Values API
+----
+Issue 6.
+Summary:  Cycle possibe using inputProperties()
+From:     Stephen McGruer
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/877
+Response: https://github.com/w3c/css-houdini-drafts/issues/877#issuecomment-499922873
+Open:     Needs Edits
+----
+Issue 7.
+Summary:  Two-way communication between main thread and worklet
+From:     Samad Aghaei
+Comment:  https://github.com/w3c/css-houdini-drafts/issues/881
+Response: https://github.com/w3c/css-houdini-drafts/issues/881#issuecomment-546456591
+Closed:   OutOfScope
+----

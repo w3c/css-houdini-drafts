@@ -55,9 +55,6 @@ spec:css2; type:property; text:max-width
 </pre>
 
 <pre class="anchors">
-urlPrefix: https://heycam.github.io/webidl/; type: dfn;
-    urlPrefix: #dfn-;
-        url: throw; text: thrown
 urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     text: constructor
     text: Construct
@@ -66,10 +63,6 @@ urlPrefix: https://tc39.github.io/ecma262/#sec-; type: dfn;
     url: terms-and-definitions-function; text: function
     urlPrefix: native-error-types-used-in-this-standard-
         text: TypeError
-urlPrefix: https://drafts.csswg.org/css-sizing/#; type: dfn
-    text: intrinsic sizes
-urlPrefix: https://drafts.csswg.org/css-break/#; type: dfn
-    text: fragmentation break
 urlPrefix: https://www.w3.org/TR/CSS21/; type:dfn
     urlPrefix: box.html#;
         url: box-dimensions; text: box model edges
