@@ -896,6 +896,23 @@ Any place that accepts a {{CSSKeywordValue}}
 also accepts a raw {{USVString}},
 by using the following typedef and algorithm:
 
+<pre class=idl>
+typedef (DOMString or CSSKeywordValue) CSSKeywordish;
+</pre>
+
+<div algorithm>
+    To <dfn export>rectify a keywordish value</dfn> |val|,
+    perform the following steps:
+
+    1. If |val| is a {{CSSKeywordValue}},
+        return |val|.
+
+    2. If |val| is a {{DOMString}},
+        return a new {{CSSKeywordValue}}
+        with its {{CSSKeywordValue/value}} internal slot
+        set to |val|.
+</div>
+
 <div algorithm="CSSKeywordValue.value">
     The <dfn attribute for=CSSKeywordValue>value</dfn> attribute of a {{CSSKeywordValue}} |this| must,
     on setting a value |value|,
@@ -1613,35 +1630,35 @@ The following are the arithmetic operations you can perform on dimensions:
                 4. Return the [=list/item=] of |args| whose sole [=list/item=] has the largest [=sum value/value=].
             </div>
     </dl>
+</div>
 
-    <div algorithm>
-        To <dfn export>create a type from a unit map</dfn> |unit map|:
+<div algorithm>
+    To <dfn export>create a type from a unit map</dfn> |unit map|:
 
-        1. Let |types| be an initially empty [=list=].
+    1. Let |types| be an initially empty [=list=].
 
-        2. [=map/For each=] |unit| → |power| in |unit map|:
+    2. [=map/For each=] |unit| → |power| in |unit map|:
 
-            1. Let |type| be the result of [=creating a type=] from |unit|.
-            2. Set |type|’s sole [=map/value=] to |power|.
-            3. [=list/Append=] |type| to |types|.
+        1. Let |type| be the result of [=creating a type=] from |unit|.
+        2. Set |type|’s sole [=map/value=] to |power|.
+        3. [=list/Append=] |type| to |types|.
 
-        3. Return the result of [=CSSNumericValue/multiplying=] all the [=list/items=] of |types|.
-    </div>
+    3. Return the result of [=CSSNumericValue/multiplying=] all the [=list/items=] of |types|.
+</div>
 
-    <div algorithm>
-        The <dfn export>product of two unit maps</dfn> |units1| and |units2|
-        is the result given by the following steps:
+<div algorithm>
+    The <dfn export>product of two unit maps</dfn> |units1| and |units2|
+    is the result given by the following steps:
 
-        1. Let |result| be a copy of |units1|.
+    1. Let |result| be a copy of |units1|.
 
-        2. [=map/For each=] |unit| → |power| in |units2|:
+    2. [=map/For each=] |unit| → |power| in |units2|:
 
-            1. If |result|[|unit|] [=map/exists=],
-                increment |result|[|unit|] by |power|.
-            3. Otherwise, set |result|[|unit|] to |power|.
+        1. If |result|[|unit|] [=map/exists=],
+            increment |result|[|unit|] by |power|.
+        3. Otherwise, set |result|[|unit|] to |power|.
 
-        3. Return |result|.
-    </div>
+    3. Return |result|.
 </div>
 
 The {{CSSNumericValue/parse()}} method allows a {{CSSNumericValue}}
