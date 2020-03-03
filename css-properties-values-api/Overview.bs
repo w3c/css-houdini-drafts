@@ -1155,6 +1155,39 @@ interface CSSPropertyRule : CSSRule {
 		which may not be present.
 </dl>
 
+<div algorithm>
+To <dfn export>serialize a CSSPropertyRule</dfn>, return the concatenation of
+the following:
+
+	1. The string <code>"@property"</code> followed by a single SPACE (U+0020).
+	2. The result of performing <a>serialize an identifier</a> on the rule's
+		'name', followed by a single SPACE (U+0020).
+	3. The string <code>"{ "</code>, i.e., a single
+		LEFT CURLY BRACKET (U+007B), followed by a SPACE (U+0020).
+	4. The string <code>"syntax:"</code>, followed by a single SPACE (U+0020).
+	5. The result of performing <a>serialize a string</a> on the rule's
+		'syntax', followed by a single SEMICOLON (U+003B), followed by a
+		SPACE (U+0020).
+	6. The string <code>"inherits:"</code>, followed by a single SPACE (U+0020).
+	7. For the rule's 'inherits' attribute, one of the following depending on
+		the attribute's value:
+		<dl class=switch>
+			: true
+			:: The string <code>"true"</code> followed by a single
+				SEMICOLON (U+003B), followed by a SPACE (U+0020).
+			: false
+			:: The string <code>"false"</code> followed by a single
+				SEMICOLON (U+003B), followed by a SPACE (U+0020).
+		</dl>
+	8. If the rule's 'initialValue' is present, follow these substeps:
+		1. The string <code>"initialValue:"</code> followed by a single
+			SPACE (U+0020).
+		2. The result of performing <a>serialize a CSS value</a> in the rule's
+			'initialValue' followed by a single SEMICOLON (U+003B), followed by
+			a SPACE (U+0020).
+	9. A single RIGHT CURLY BRACKET (U+007D).
+</div>
+
 {{CSSStyleValue}} Reification {#css-style-value-reification}
 ------------------------------------------------------------
 
