@@ -219,16 +219,16 @@ Note:
 When a user agent is to <dfn export>create a WorkletGlobalScope</dfn>, given |workletGlobalScopeType|,
 |moduleResponsesMap|, and |outsideSettings|, it <em>must</em> run the following steps:
 
-    1. Create the <a>worklet global scope execution environment</a> and run the rest of these steps
-        in that context.
+    1. Let |agent| be the result of [=obtain a worklet agent|obtaining a worklet agent=] given
+        |outsideSettings|. This agent corresponds to the a <a>worklet global scope execution
+        environment</a>. Run the rest of these steps in that context.
 
-    2. Call the JavaScript <a>InitializeHostDefinedRealm</a> abstract operation with the following
-        customizations:
+    2. Let |realmExecutionContext| be the result of
+        [=create a new JavaScript realm|creating a new JavaScript realm=] given |agent| and
+        the following customizations:
 
         - For the global object, create a new |workletGlobalScopeType| object. Let
             |workletGlobalScope| be the created object.
-
-        - Let |realmExecutionContext| be the created JavaScript execution context.
 
     3. Let |insideSettings| be the result of <a>set up a worklet environment settings object</a>
         given |realmExecutionContext|, and |outsideSettings|.
@@ -275,13 +275,11 @@ When a user agent is to <dfn export>set up a worklet environment settings object
 
     5. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
 
-    6. Let |workletEventLoop| be a newly created <a>event loop</a>.
+    6. Let |realm| be the value of |executionContext|'s Realm component.
 
-    7. Let |realm| be the value of |executionContext|'s Realm component.
+    7. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
 
-    8. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
-
-    9. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
+    8. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
         as follows:
 
         : The <a>realm execution context</a>
@@ -293,12 +291,8 @@ When a user agent is to <dfn export>set up a worklet environment settings object
         : The <a>responsible browsing context</a>
         :: Return |inheritedResponsibleBrowsingContext|.
 
-        : The <a>responsible event loop</a>
-        :: Return |workletEventLoop|.
-
         : The <a>responsible document</a>
-        :: Not applicable (the <a>responsible event loop</a> is not a <a>browsing context</a>
-            <a>event loop</a>).
+        :: Not applicable (the <a>responsible event loop</a> is not a <a>window  event loop</a>).
 
         : The <a>API URL character encoding</a>
         :: Return <a>UTF-8</a>.
@@ -309,19 +303,22 @@ When a user agent is to <dfn export>set up a worklet environment settings object
         : The <a for="environment settings object">origin</a>
         :: Return |origin|.
 
+        : The <a for="environment settings object">top-level origin</a>
+        :: Return |outsideSettings|'s <a for="environment settings object">top-level origin</a>.
+
         : The <a>HTTPS state</a>
         :: Return |inheritedHTTPSState|.
 
         : The <a>referrer policy</a>
         :: Return |inheritedReferrerPolicy|.
 
-    10. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
+    9. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
         <a>creation URL</a> to |inheritedAPIBaseURL|, |settingsObject|'s <a>target browsing
         context</a> to null, and |settingsObject|'s <a>active service worker</a> to null.
 
-    11. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
+    10. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
 
-    12. Return |settingsObject|.
+    11. Return |settingsObject|.
 </div>
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
@@ -641,4 +638,3 @@ could follow the following steps:
         Arguments=["true"]).
 
     5. Return |result|.
-
