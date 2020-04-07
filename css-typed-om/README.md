@@ -86,10 +86,6 @@ The class can be broken down into two subclasses:
 
 [CSSTransformValue](https://drafts.css-houdini.org/css-typed-om-1/#csstransformvalue) objects represent via [CSSTransformComponents](https://drafts.css-houdini.org/css-typed-om-1/#csstransformcomponent) values, the different functions used by the `transform` property. 
 
-#### CSSPositionValue
-
-[CSSPositionValue](https://drafts.css-houdini.org/css-typed-om-1/#positionvalue-objects) help express the position of an object (e.g. background image) inside a positioning area (e.g. a div).
-
 #### CSSResourceValue
 
 [CSSResourceValue](https://drafts.css-houdini.org/css-typed-om-1/#resourcevalue-objects) objects represent CSS values that require an asynchronous network fetch. Hence, they also describe the status the resource is in. Properties with image values (e.g. `background-image`), are represented by [CSSImageValues](https://drafts.css-houdini.org/css-typed-om-1/#cssimagevalue)
