@@ -333,7 +333,7 @@ The {{Worklet}} object provides the capability to add module scripts into its as
 <pre class='idl'>
 [Exposed=Window]
 interface Worklet {
-    [NewObject] Promise&lt;void> addModule(USVString moduleURL, optional WorkletOptions options);
+    [NewObject] Promise&lt;void> addModule(USVString moduleURL, optional WorkletOptions options = {});
 };
 
 dictionary WorkletOptions {
