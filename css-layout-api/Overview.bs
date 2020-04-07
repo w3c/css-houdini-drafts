@@ -1587,8 +1587,9 @@ dictionary FragmentResultOptions {
     BreakTokenOptions breakToken = null;
 };
 
-[Constructor(optional FragmentResultOptions options)]
+[Exposed=LayoutWorklet]
 interface FragmentResult {
+    constructor(optional FragmentResultOptions options = {});
     readonly attribute double inlineSize;
     readonly attribute double blockSize;
 };
