@@ -1179,11 +1179,10 @@ the following:
 			:: The string <code>"false"</code> followed by a single
 				SEMICOLON (U+003B), followed by a SPACE (U+0020).
 		</dl>
-	8. If the rule's 'initialValue' is present, follow these substeps:
-		1. The string <code>"initialValue:"</code> followed by a single
-			SPACE (U+0020).
+	8. If the rule's 'initial-value' is present, follow these substeps:
+		1. The string <code>"initial-value:"</code>.
 		2. The result of performing <a>serialize a CSS value</a> in the rule's
-			'initialValue' followed by a single SEMICOLON (U+003B), followed by
+			'initial-value' followed by a single SEMICOLON (U+003B), followed by
 			a SPACE (U+0020).
 	9. A single RIGHT CURLY BRACKET (U+007D).
 </div>
