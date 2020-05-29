@@ -1109,18 +1109,6 @@ CSSOM {#cssom}
 	treat all custom properties as unregistered.
 </div>
 
-
-Extensions to the {{CSSRule}} Interface {#extensions-to-css-rule-interface}
-------------------------------------------------------------------------------------
-
-The {{CSSRule}} interface is extended as follows:
-
-<pre class='idl'>
-partial interface CSSRule {
-    const unsigned short PROPERTY_RULE = 18;
-};
-</pre>
-
 The <dfn interface>CSSPropertyRule</dfn> Interface {#the-css-property-rule-interface}
 -----------------------------------------------------------------------------
 
