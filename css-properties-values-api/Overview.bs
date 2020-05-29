@@ -1149,7 +1149,7 @@ the following:
 
 	1. The string <code>"@property"</code> followed by a single SPACE (U+0020).
 	2. The result of performing <a>serialize an identifier</a> on the rule's
-		'name', followed by a single SPACE (U+0020).
+		name, followed by a single SPACE (U+0020).
 	3. The string <code>"{ "</code>, i.e., a single
 		LEFT CURLY BRACKET (U+007B), followed by a SPACE (U+0020).
 	4. The string <code>"syntax:"</code>, followed by a single SPACE (U+0020).
