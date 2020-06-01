@@ -312,6 +312,9 @@ When a user agent is to <dfn export>set up a worklet environment settings object
         : The <a>referrer policy</a>
         :: Return |inheritedReferrerPolicy|.
 
+        : The <a>embedder policy</a>
+        :: Return |outsideSettings|'s <a for="environment settings object">embedder policy</a>.
+
     9. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
         <a>creation URL</a> to |inheritedAPIBaseURL|, |settingsObject|'s <a>target browsing
         context</a> to null, and |settingsObject|'s <a>active service worker</a> to null.
