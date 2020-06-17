@@ -2,9 +2,9 @@
 Title:  CSS Animation Worklet API
 Status: ED
 Group: houdini
-ED: https://drafts.css-houdini.org/css-animationworklet-1/
+ED: https://drafts.css-houdini.org/css-animation-worklet-1/
 TR: https://www.w3.org/TR/css-animation-worklet-1/
-Shortname: css-animationworklet
+Shortname: css-animation-worklet
 Level: 1
 Abstract:
 Editor: Majid Valipour, majidvp@google.com, w3cid 81464
@@ -108,14 +108,14 @@ urlPrefix: https://wicg.github.io/scroll-animations/#; type: dfn
 <pre class=biblio>
 {
     "explainer": {
-        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/README.md",
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animation-worklet-1/README.md",
         "title": "Animation Worklet Explainer",
         "deliveredBy": [
             "https://github.com/w3c/css-houdini-drafts"
         ]
     },
     "principles": {
-        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animationworklet/principles.md",
+        "href": "https://github.com/w3c/css-houdini-drafts/blob/master/css-animation-worklet-1/principles.md",
         "title": "Animation Worklet Design Principles and Goals",
         "deliveredBy": [
             "https://github.com/w3c/css-houdini-drafts"
