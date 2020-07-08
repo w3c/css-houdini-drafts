@@ -74,6 +74,8 @@ which are related to painting.
 
 The {{paintWorklet}}'s [=worklet global scope type=] is {{PaintWorkletGlobalScope}}.
 
+The {{paintWorklet}}'s <a>worklet destination type</a> is <code>"paintworklet"</code>.
+
 <pre class='idl'>
 partial namespace CSS {
     [SameObject] readonly attribute Worklet paintWorklet;

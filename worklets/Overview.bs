@@ -349,6 +349,9 @@ Note: As an example the <a>worklet global scope type</a> might be a {{PaintWorkl
 A {{Worklet}} has a list of the <dfn export>worklet's WorkletGlobalScopes</dfn>. Initially this list
 is empty; it is populated when the user agent chooses to create its {{WorkletGlobalScope}}.
 
+A {{Worklet}} has a <dfn export>worklet destination type</dfn>. This is used for setting the <a
+for=request>destination</a> requests from <a>fetch a module worker script graph</a>.
+
 A {{Worklet}} has a <dfn>module responses map</dfn>. This is a ordered map of module URLs to values
 that are a <a>fetch</a> responses. The map's entries are ordered based on their insertion order.
 Access to this map should be thread-safe.
@@ -394,7 +397,9 @@ When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method 
 
     9. Let |workletGlobalScopeType| be |worklet|'s <a>worklet global scope type</a>.
 
-    10. If the <a>worklet's WorkletGlobalScopes</a> is empty, run the following steps:
+    10. Let |destination| be |worklet|'s <a>worklet destination type</a>.
+
+    11. If the <a>worklet's WorkletGlobalScopes</a> is empty, run the following steps:
 
         1. <a>Create a WorkletGlobalScope</a> given |workletGlobalScopeType|, |moduleResponsesMap|,
             and |outsideSettings|.
@@ -409,14 +414,14 @@ When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method 
 
         Wait for this step to complete before continuing.
 
-    11. Let |pendingTaskStruct| be a new <a>pending tasks struct</a> with <a
+    12. Let |pendingTaskStruct| be a new <a>pending tasks struct</a> with <a
         for="pending tasks struct">counter</a> initialized to the length of <a>worklet's
         WorkletGlobalScopes</a>.
 
-    12. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, <a>queue a
+    13. For each |workletGlobalScope| in the <a>worklet's WorkletGlobalScopes</a>, <a>queue a
         task</a> on the |workletGlobalScope| to <a>fetch and invoke a worklet script</a> given
-        |workletGlobalScope|, |moduleURLRecord|, |moduleResponsesMap|, |credentialOptions|,
-        |outsideSettings|, |pendingTaskStruct|, and |promise|.
+        |workletGlobalScope|, |moduleURLRecord|, |destination|, |moduleResponsesMap|,
+        |credentialOptions|, |outsideSettings|, |pendingTaskStruct|, and |promise|.
 
     Note: The rejecting and resolving of the |promise| occurs within the <a>fetch and invoke a
         worklet script</a> algorithm.
@@ -424,7 +429,7 @@ When the <dfn method for=Worklet>addModule(|moduleURL|, |options|)</dfn> method 
 
 <div algorithm>
 When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |workletGlobalScope|,
-|moduleURLRecord|, |moduleResponsesMap|, |credentialOptions|, |outsideSettings|,
+|moduleURLRecord|, |destination|, |moduleResponsesMap|, |credentialOptions|, |outsideSettings|,
 |pendingTaskStruct|, and |promise|, the user agent <em>must</em> run the following steps:
 
     Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
@@ -433,8 +438,8 @@ When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |wo
         object</a>.
 
     2. Let |script| by the result of <a>fetch a worklet script</a> given |moduleURLRecord|,
-        |moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and |insideSettings| when it
-        asynchronously completes.
+        |destination|, |moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and
+        |insideSettings| when it asynchronously completes.
 
     3. If |script| is null, then <a>queue a task</a> on |outsideSettings|'s <a>responsible event
         loop</a> to run these steps:
@@ -472,14 +477,14 @@ When the user agent is to <dfn>fetch and invoke a worklet script</dfn> given |wo
 </div>
 
 <div algorithm>
-When the user agent is to <dfn>fetch a worklet script</dfn> given |moduleURLRecord|,
+When the user agent is to <dfn>fetch a worklet script</dfn> given |moduleURLRecord|, |destination|,
 |moduleResponsesMap|, |credentialOptions|, |outsideSettings|, and |insideSettings|, the user agent
 <em>must</em> run the following steps:
 
 Note: This algorithm is to be run within the <a>worklet global scope execution environment</a>.
 
-1. <a>Fetch a module worker script graph</a> given |moduleURLRecord|, |outsideSettings|, "script",
-    |credentialOptions|, and |insideSettings|.
+1. <a>Fetch a module worker script graph</a> given |moduleURLRecord|, |outsideSettings|,
+    |destination|, |credentialOptions|, and |insideSettings|.
 
     To <a>perform the fetch</a> given |request|, perform the following steps:
 
