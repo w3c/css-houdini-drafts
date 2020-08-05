@@ -30,12 +30,9 @@ Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 spec:fetch; type:dfn; for:/; text:fetch
 spec:html; type:dfn; for:/; text:browsing context
 spec:html; type:interface; for:/; text:Document
-spec:html; type:dfn; for:environment settings object;
-    text: global object
-    text: https state
-    text: referrer policy
-spec:html; type:dfn; for:environment; text:id
 spec:webidl; type:dfn; for:interface; text:inherit
+spec:url; type:dfn; text:url; for:url
+spec:html; type:dfn; for:/; text:event loop
 </pre>
 
 <pre class="anchors">
@@ -64,10 +61,6 @@ urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn;
     text: InitializeHostDefinedRealm
     text: Invoke
     text: strict mode code
-</pre>
-<pre class="link-defaults">
-spec:url; type:dfn; text:url; for:url
-spec:webidl; type:dfn; for:interface; text:inherit
 </pre>
 
 Introduction {#intro}
@@ -233,14 +226,12 @@ When a user agent is to <dfn export>create a WorkletGlobalScope</dfn>, given |wo
     3. Let |insideSettings| be the result of <a>set up a worklet environment settings object</a>
         given |realmExecutionContext|, and |outsideSettings|.
 
-    4. Associate the |insideSettings| with |workletGlobalScope|.
-
-    5. Set |workletGlobalScope|'s <a>owner document</a> to |outsideSettings|'s <a>responsible
+    4. Set |workletGlobalScope|'s <a>owner document</a> to |outsideSettings|'s <a>responsible
         document</a>.
 
-    6. Invoke the <a>initialize a global object's CSP list</a> algorithm given |workletGlobalScope|.
+    5. Invoke the <a>initialize a global object's CSP list</a> algorithm given |workletGlobalScope|.
 
-    7. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
+    6. For each |entry| in the given |moduleResponsesMap| (in insertion order), run the following
         substeps:
 
         1. Let |moduleURLRecord| be |entry|'s key.
@@ -264,61 +255,55 @@ When a user agent is to <dfn export>create a WorkletGlobalScope</dfn>, given |wo
 <div algorithm>
 When a user agent is to <dfn export>set up a worklet environment settings object</dfn>, given a
 |executionContext|, and |outsideSettings|, it must run the following steps:
-    1. Let |inheritedResponsibleBrowsingContext| be |outsideSettings|'s <a>responsible browsing
-        context</a>.
+    1. Let |origin| be a unique <a>opaque origin</a>.
 
     2. Let |inheritedAPIBaseURL| be |outsideSettings|'s <a>API base URL</a>.
 
-    3. Let |origin| be a unique <a>opaque origin</a>.
+    3. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a for="environment settings object">referrer policy</a>.
 
-    4. Let |inheritedHTTPSState| be |outsideSettings|'s <a>HTTPS state</a>.
+    4. Let |inheritedEmbedderPolicy| be |outsideSettings|'s <a for="environment settings object">embedder policy</a>.
 
-    5. Let |inheritedReferrerPolicy| be |outsideSettings|'s <a>referrer policy</a>.
+    5. Let |realm| be the value of |executionContext|'s Realm component.
 
-    6. Let |realm| be the value of |executionContext|'s Realm component.
+    6. Let |workletGlobalScope| be |realm|'s <a for=Realm>global object</a>.
 
-    7. Let |workletGlobalScope| be |realm|'s <a>global object</a>.
-
-    8. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
+    7. Let |settingsObject| be a new <a>environment settings object</a> whose algorithms are defined
         as follows:
 
-        : The <a>realm execution context</a>
+        : The <a for="environment settings object">realm execution context</a>
         :: Return |executionContext|.
 
-        : The <a>module map</a>.
+        : The <a for="environment settings object">module map</a>.
         :: Return |workletGlobalScope|'s <a for=WorkletGlobalScope>module map</a>.
 
-        : The <a>responsible browsing context</a>
-        :: Return |inheritedResponsibleBrowsingContext|.
+        : The <a for="environment settings object">responsible document</a>
+        :: Not applicable.
 
-        : The <a>responsible document</a>
-        :: Not applicable (the <a>responsible event loop</a> is not a <a>window  event loop</a>).
-
-        : The <a>API URL character encoding</a>
+        : The <a for="environment settings object">API URL character encoding</a>
         :: Return <a>UTF-8</a>.
 
-        : The <a>API base URL</a>
+        : The <a for="environment settings object">API base URL</a>
         :: Return |inheritedAPIBaseURL|.
 
         : The <a for="environment settings object">origin</a>
         :: Return |origin|.
 
-        : The <a for="environment settings object">top-level origin</a>
-        :: Return |outsideSettings|'s <a for="environment settings object">top-level origin</a>.
-
-        : The <a>HTTPS state</a>
-        :: Return |inheritedHTTPSState|.
-
-        : The <a>referrer policy</a>
+        : The <a for="environment settings object">referrer policy</a>
         :: Return |inheritedReferrerPolicy|.
 
-    9. Set |settingsObject|'s <a>id</a> to a new unique opaque string, |settingsObject|'s
-        <a>creation URL</a> to |inheritedAPIBaseURL|, |settingsObject|'s <a>target browsing
-        context</a> to null, and |settingsObject|'s <a>active service worker</a> to null.
+        : The <a for="environment settings object">embedder policy</a>
+        :: Return |inheritedEmbedderPolicy|.
 
-    10. Set |realm|'s \[[HostDefined]] field to |settingsObject|.
+    8.  Set |settingsObject|'s <a for=environment>id</a> to a new unique opaque string,
+        <a for=environment>creation URL</a> to |inheritedAPIBaseURL|,
+        <a for=environment>top-level creation URL</a> to null,
+        <a for=environment>top-level origin</a> to |outsideSettings|'s <a for=environment>top-level origin</a>,
+        <a for=environment>target browsing context</a> to null, and
+        <a for=environment>active service worker</a> to null.
 
-    11. Return |settingsObject|.
+    9.  Set |realm|'s \[[HostDefined]] field to |settingsObject|.
+
+    10. Return |settingsObject|.
 </div>
 
 Issue: Merge this with https://html.spec.whatwg.org/multipage/workers.html#set-up-a-worker-environment-settings-object
