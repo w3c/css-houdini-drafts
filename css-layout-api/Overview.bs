@@ -209,7 +209,7 @@ The {{LayoutWorkletGlobalScope}} is the global execution context of the {{layout
 <pre class='idl'>
 [Global=(Worklet,LayoutWorklet),Exposed=LayoutWorklet]
 interface LayoutWorkletGlobalScope : WorkletGlobalScope {
-    void registerLayout(DOMString name, VoidFunction layoutCtor);
+    undefined registerLayout(DOMString name, VoidFunction layoutCtor);
 };
 </pre>
 
