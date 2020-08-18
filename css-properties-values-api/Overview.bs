@@ -602,7 +602,7 @@ dictionary PropertyDefinition {
 };
 
 partial namespace CSS {
-	void registerProperty(PropertyDefinition definition);
+	undefined registerProperty(PropertyDefinition definition);
 };
 </pre>
 
