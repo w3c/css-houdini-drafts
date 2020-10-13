@@ -4,8 +4,10 @@ Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 TR: https://www.w3.org/TR/css-properties-values-api-1/
+Previous Version: https://www.w3.org/TR/2020/WD-css-properties-values-api-1-20201013/
+Previous Version: https://www.w3.org/TR/2019/WD-css-properties-values-api-1-20191025/
 Previous Version: https://www.w3.org/TR/2017/WD-css-properties-values-api-1-20171109/
-Previous Version: http://www.w3.org/TR/2016/WD-css-properties-values-api-1-20160607/
+Previous Version: https://www.w3.org/TR/2016/WD-css-properties-values-api-1-20160607/
 Shortname: css-properties-values-api
 Level: 1
 Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
