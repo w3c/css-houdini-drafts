@@ -536,11 +536,10 @@ with), given |snappedConcreteObjectSize| it <em>must</em> run the following step
             arguments.
         </div>
 
-    10. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the list of [=worklet's
-        WorkletGlobalScopes=] from the paint {{Worklet}}, following the rules defined in
-        [[#global-scope-selection]].
+    10. Let |workletGlobalScope| be a {{PaintWorkletGlobalScope}} from the the paint {{Worklet}}'s
+        [=Worklet/global scopes=], following the rules defined in [[#global-scope-selection]].
 
-        The user agent <em>may</em> also [=create a WorkletGlobalScope=] at this time, given the
+        The user agent <em>may</em> also [=create a worklet global scope=] at this time, given the
         paint {{Worklet}}.
 
     11. Run [=invoke a paint callback=] given |name|, |inputArguments|, |snappedConcreteObjectSize|,
@@ -686,8 +685,8 @@ Note: The contents of the resulting image are not designed to be accessible. Aut
 Global Scope Selection {#global-scope-selection}
 ------------------------------------------------
 
-When the user agent needs to select a {{PaintWorkletGlobalScope}} from the paint [=worklet's
-WorkletGlobalScopes=] [=list=] it <em>must</em>:
+When the user agent needs to select a {{PaintWorkletGlobalScope}} from the paint {{Worklet}}'s
+[=Worklet/global scopes=] [=list=] it <em>must</em>:
 
     - Select from at <em>least</em> two {{PaintWorkletGlobalScope}}s, unless the user agent is under
         memory constraints.
@@ -698,7 +697,9 @@ WorkletGlobalScopes=] [=list=] it <em>must</em>:
             over time.
 
 Note: These rules exist to ensure that authors do not rely on being able to store state on the
-    global object or non-regeneratable state on the class. See [[worklets-1#code-idempotency]].
+    global object or non-regeneratable state on the class. See
+    <a href="https://html.spec.whatwg.org/multipage/worklets.html#worklets-idempotent">the
+    discussion in the worklets specification about code idempotence</a>.
 
 Examples {#examples}
 ====================
