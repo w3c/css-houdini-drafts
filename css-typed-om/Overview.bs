@@ -1700,8 +1700,16 @@ rather than on {{CSSNumericValue}} instances.
 ### Numeric Value Typing ### {#numeric-typing}
 
 Each {{CSSNumericValue}} has an associated <dfn export for=CSSNumericValue>type</dfn>,
-which is a [=ordered map|map=] of [=base types=] to integers,
-and an associated [=percent hint=].
+which is a [=ordered map|map=] of [=base types=] to integers
+(denoting the exponent of each type,
+so a <<length>><sup>2</sup>,
+such as from ''calc(1px * 1em)'',
+is «[ "length" → 2 ]»),
+and an associated [=percent hint=]
+(indicating that the type actually holds a percentage,
+but that percentage will eventually resolve to the hinted [=base type=],
+and so has been replaced with it in the type).
+
 The <dfn export for=CSSNumericValue lt="base type">base types</dfn> are
 "length",
 "angle",
