@@ -987,7 +987,9 @@ typedef (double or CSSNumericValue) CSSNumberish;
 </pre>
 
 <div algorithm>
-    To <dfn export lt="rectify a numberish value | rectifying a numberish value">rectify a numberish value</dfn> |num|,
+    To <dfn export>rectify a numberish value</dfn> |num|,
+    optionally to a given unit |unit|
+    (defaulting to "number"),
     perform the following steps:
 
     1. If |num| is a {{CSSNumericValue}},
@@ -996,7 +998,7 @@ typedef (double or CSSNumericValue) CSSNumberish;
     2. If |num| is a {{double}},
         return a new {{CSSUnitValue}}
         with its {{CSSUnitValue/value}} internal slot set to |num|
-        and its {{CSSUnitValue/unit}} internal slot set to "number".
+        and its {{CSSUnitValue/unit}} internal slot set to |unit|.
 </div>
 
 
@@ -2856,6 +2858,340 @@ has the same behavior as in normal CSS.
     which CSS treats differently and never fully resolves,
     so it always resolves against the current document.)
 </div>
+
+
+<!--
+ ██████   ███████  ██        ███████  ████████
+██    ██ ██     ██ ██       ██     ██ ██     ██
+██       ██     ██ ██       ██     ██ ██     ██
+██       ██     ██ ██       ██     ██ ████████
+██       ██     ██ ██       ██     ██ ██   ██
+██    ██ ██     ██ ██       ██     ██ ██    ██
+ ██████   ███████  ████████  ███████  ██     ██
+-->
+
+{{CSSColorValue}} objects {#colorvalue-objects}
+-----------------------------------------------
+
+{{CSSColorValue}} objects represent <<color>> values.
+
+<xmp class='idl'>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSColorValue : CSSStyleValue {
+    CSSRGB toRGB();
+    CSSHSL toHSL();
+    CSSHWB toHWB();
+    CSSGray toGray();
+    CSSLCH toLCH();
+    CSSLab toLab();
+    CSSColor toColor(CSSKeywordish colorspace);
+
+    [Exposed=Window] static CSSColorValue parse(USVString cssText);
+};
+</xmp>
+
+<div algorithm="CSSColorValue.to*()">
+    The <dfn method for=CSSColorValue>toRGB()</dfn> method
+    of {{CSSColorValue}} objects must,
+    when called on |this|,
+    convert |this| into an sRGB color,
+    and return a new {{CSSRGB}} object
+    with its {{CSSRGB/r}}, {{CSSRGB/g}}, {{CSSRGB/b}}, and {{CSSRGB/alpha}} internal slots
+    set appropriately to represent that color.
+
+    The <dfn method for=CSSColorValue>toHSL()</dfn>
+    and <dfn method for=CSSColorValue>toHWB()</dfn> methods
+    of {{CSSColorValue}} objects
+    must do the same as {{toRGB()}},
+    but return a {{CSSHSL}} or {{CSSHWB}} object, respectively,
+    with their corresponding internal slots set appropriately.
+
+    The <dfn method for=CSSColorValue>toGray()</dfn>,
+    <dfn method for=CSSColorValue>toLCH()</dfn>,
+    and <dfn method for=CSSColorValue>toLab()</dfn> methods
+    of {{CSSColorValue}} objects must,
+    when called on |this|,
+    convert |this| into a CIE L*a*b* color [[CIELAB]],
+    and return a new {{CSSGray}}, {{CSSLCH}}, or {{CSSLab}} object, respectively,
+    with their corresponding internal slots set appropriately.
+</div>
+
+<div algorithm="CSSColorValue.toColor()">
+    The <dfn method for=CSSColorValue>toColor(|colorspace|)</dfn> method
+    of {{CSSColorValue}} objects must,
+    when called on |this|,
+    perform the following steps:
+
+    1. Replace |colorspace| with the result of [=rectifying a keywordish value=].
+
+    2. If |colorspace|'s value is not one of the [[css-color-4#predefined|predefined colorspaces]],
+        [=throw=] a {{SyntaxError}}.
+
+    3. Convert |this| into a color in the colorspace specified by |colorspace|,
+        and return a new {{CSSColor}} object
+        with TODO.
+</div>
+
+<div algorithm="CSSColorValue.parse()">
+    The <dfn method for=CSSColorValue>parse(|cssText|)</dfn> method,
+    when called,
+    must perform the following steps:
+
+    1. [=CSS/Parse=] |cssText| as a <<color>>
+        and let |result| be the result.
+        If |result| is a syntax error,
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
+
+    2. [=Reify a color value=] from |result|,
+        and return the result.
+</div>
+
+
+
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSRGB : CSSColorValue {
+    constructor(CSSNumberish r, CSSNumberish g, CSSNumberish b, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish r;
+    attribute CSSNumberish g;
+    attribute CSSNumberish b;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSHSL : CSSColorValue {
+    constructor(CSSNumericValue h, CSSNumberish s, CSSNumberish l, optional CSSNumberish alpha = 1);
+    attribute CSSNumericValue h;
+    attribute CSSNumberish s;
+    attribute CSSNumberish l;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSHWB : CSSColorValue {
+    constructor(CSSNumericValue h, CSSNumberish w, CSSNumberish b, optional CSSNumberish alpha = 1);
+    attribute CSSNumericValue h;
+    attribute CSSNumberish w;
+    attribute CSSNumberish b;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSGray : CSSColorValue {
+    constructor(CSSNumberish gray, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish gray;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSLCH : CSSColorValue {
+    constructor(CSSNumberish l, CSSNumberish c, CSSNumericValue h, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish l;
+    attribute CSSNumberish c;
+    attribute CSSNumericValue h;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSLab : CSSColorValue {
+    constructor(CSSNumberish l, CSSNumberish a, CSSNumberish b, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish l;
+    attribute CSSNumberish a;
+    attribute CSSNumberish b;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSColor : CSSColorValue {
+    constructor(sequence<DOMString or CSSNumberish> variant)
+    /* CSSColor(["foo", 0, 1, .5], ["bar", "yellow"], 1, fallbackColor) */
+    /* or just make the alpha and fallback successive optional args? */
+};
+
+</xmp>
+
+Issue: TODO add stringifiers
+
+<div algorithm="CSSRGB()">
+    The <dfn constructor for=CSSRGB>CSSRGB(|r|, |g|, |b|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |r|, |g|, |b|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |r|, |g|, and |b| don't all [=CSSNumericValue/match=] "number" or "percent",
+        [=throw=] a {{TypeError}}.
+        If |alpha| doesn't [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSRGB}}
+        with its {{CSSRGB/r}}, {{CSSRGB/g}}, {{CSSRGB/b}}, and {{CSSRGB/alpha}} internal slots
+        set to |r|, |g|, |b|, and |alpha|.
+</div>
+
+<div algorithm="CSSRGB.r">
+    The <dfn attribute for=CSSRGB>r</dfn>,
+    <dfn attribute for=CSSRGB>g</dfn>,
+    <dfn attribute for=CSSRGB>b</dfn>,
+    and <dfn attribute for=CSSRGB>alpha</dfn> attributes of a {{CSSRGB}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm="CSSHSL()">
+    The <dfn constructor for=CSSHSL>CSSHSL(|h|, |s|, |l|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |s|, |l|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |h| doesn't [=CSSNumericValue/match=] "angle",
+        [=throw=] a {{TypeError}}.
+        If |s|, |l|, and |alpha| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSHSL}}
+        with its {{CSSHSL/h}}, {{CSSHSL/s}}, {{CSSHSL/l}}, and {{CSSHSL/alpha}} internal slots
+        set to |h|, |s|, |l|, and |alpha|.
+</div>
+
+<div algorithm="CSSHSL.s">
+    The <dfn attribute for=CSSHSL>s</dfn>,
+    <dfn attribute for=CSSHSL>l</dfn>,
+    and <dfn attribute for=CSSHSL>alpha</dfn> attributes of a {{CSSHSL}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm="CSSHWB()">
+    The <dfn constructor for=CSSHWB>CSSHWB(|h|, |w|, |b|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |w|, |b|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |h| doesn't [=CSSNumericValue/match=] "angle",
+        [=throw=] a {{TypeError}}.
+        If |w|, |b|, and |alpha| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSHWB}}
+        with its {{CSSHWB/h}}, {{CSSHWB/w}}, {{CSSHWB/b}}, and {{CSSHWB/alpha}} internal slots
+        set to |h|, |w|, |b|, and |alpha|.
+</div>
+
+<div algorithm="CSSHWB.w">
+    The <dfn attribute for=CSSHWB>w</dfn>,
+    <dfn attribute for=CSSHWB>b</dfn>,
+    and <dfn attribute for=CSSHWB>alpha</dfn> attributes of a {{CSSHWB}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm="CSSLCH()">
+    The <dfn constructor for=CSSLCH>CSSLCH(|l|, |c|, |h|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |l|, |c|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |h| doesn't [=CSSNumericValue/match=] "angle",
+        [=throw=] a {{TypeError}}.
+        If |l|, |c|, and |alpha| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSLCH}}
+        with its {{CSSLCH/l}}, {{CSSLCH/c}}, {{CSSLCH/h}}, and {{CSSLCH/alpha}} internal slots
+        set to |l|, |c|, |h|, and |alpha|.
+</div>
+
+<div algorithm="CSSLCH.l">
+    The <dfn attribute for=CSSLCH>l</dfn>,
+    <dfn attribute for=CSSLCH>c</dfn>,
+    and <dfn attribute for=CSSLCH>alpha</dfn> attributes of a {{CSSLCH}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm="CSSLab()">
+    The <dfn constructor for=CSSLab>CSSLab(|l|, |a|, |b|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |l|, |a|, |b|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |l|, |a|, |b|, and |alpha| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSLab}}
+        with its {{CSSLab/l}}, {{CSSLab/a}}, {{CSSLab/b}}, and {{CSSLab/alpha}} internal slots
+        set to |l|, |a|, |b|, and |alpha|.
+</div>
+
+<div algorithm="CSSLab.l">
+    The <dfn attribute for=CSSLab>l</dfn>,
+    <dfn attribute for=CSSLab>a</dfn>,
+    <dfn attribute for=CSSLab>b</dfn>,
+    and <dfn attribute for=CSSLab>alpha</dfn> attributes of a {{CSSLab}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm="CSSColor()">
+    The <dfn constructor for=CSSColor>CSSColor(|colorspace|, |channels|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |colorspace| be replaced by the result of [=rectifying a keywordish value=].
+        Let |channels| be replaced by the result of [=rectifying a percentish value=] for each item in the list.
+        Let |alpha| be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |alpha| and the items of |channels| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSColor}}
+        with its {{CSSColor/colorspace}}, {{CSSColor/channels}}, and {{CSSColor/alpha}} internal slots
+        set to |colorspace|, |channels|, and |alpha|.
+</div>
+
+<div algorithm="CSSColor.colorspace">
+    The <dfn attribute for=CSSColor>colorspace</dfn> attribute of a {{CSSColor}} value
+    must, on setting to a new value |val|,
+    [=rectify a keywordish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+
+    Issue: Phrase the per-item channels setting.
+
+    The <dfn attribute for=CSSColor>alpha</dfn> attribute of a {{CSSColor}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+<div algorithm>
+    To <dfn export>rectify a percentish value</dfn> |num|,
+    perform the following steps:
+
+    1. If |num| is a {{CSSNumericValue}},
+        return |num|.
+
+    2. If |num| is a {{double}},
+        return a [=new unit value=] from (|num|*100, "percent").
+</div>
+
+
+
 
 
 <!--
@@ -5013,7 +5349,7 @@ same rules referenced above.
 Reification can not fail for {{CSSResourceValue}} objects.
 
 <div class='example'>
-The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''. The {{CSSImageValue/intrinsicWidth}}, {{CSSImageValue/intrinsicHeight}} and {{CSSImageValue/intrinsicRatio}} are all set to null.
+The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''.
 </div>
 
 

@@ -441,12 +441,12 @@ boundaries. If it does, the user agent should adjust the |snappedConcreteObjectS
 proportional change from its original size such that the <<paint()>> function can adjust the drawing
 accordingly.
 
-For the purposes of the [=object size negotiation=] algorithm, the paint image has no
-[=intrinsic dimensions=].
+For the purposes of the [=object size negotiation=] algorithm,
+the paint image has no [=natural dimensions=].
 
-Note: In a future version of the spec, the author could have the ability to specify the [=intrinsic
+Note: In a future version of the spec, the author could have the ability to specify the [=natural
     dimensions=] of the paint image. This will probably be exposed as a callback allowing the
-    author to define static [=intrinsic dimensions=] or dynamically updating the [=intrinsic
+    author to define static [=natural dimensions=] or dynamically updating the [=natural
     dimensions=] based on computed style and size changes.
 
 The {{PaintSize}} object represents the size of the image that the author should draw. This is
