@@ -3004,7 +3004,7 @@ interface CSSLab : CSSColorValue {
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSColor : CSSColorValue {
-    constructor(sequence<DOMString or CSSNumberish> variant)
+    constructor(sequence<(DOMString or CSSNumberish)> variant);
     /* CSSColor(["foo", 0, 1, .5], ["bar", "yellow"], 1, fallbackColor) */
     /* or just make the alpha and fallback successive optional args? */
 };
