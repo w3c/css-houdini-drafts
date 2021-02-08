@@ -90,6 +90,10 @@ The class can be broken down into two subclasses:
 
 [CSSResourceValue](https://drafts.css-houdini.org/css-typed-om-1/#resourcevalue-objects) objects represent CSS values that require an asynchronous network fetch. Hence, they also describe the status the resource is in. Properties with image values (e.g. `background-image`), are represented by [CSSImageValues](https://drafts.css-houdini.org/css-typed-om-1/#cssimagevalue)
 
+#### CSSColorValue
+
+[CSSColorValue](https://drafts.css-houdini.org/css-typed-om-1/#colorvalue-objects) objects represent color values.
+
 ### What about Custom Properties?
 
 Unregistered custom properties are represented by [CSSUnparsedValues](https://drafts.css-houdini.org/css-typed-om-1/#cssunparsedvalue) in the Typed OM API. `var()` references are represented using [CSSVariableReferenceValues](https://drafts.css-houdini.org/css-typed-om-1/#cssvariablereferencevalue).
@@ -97,7 +101,7 @@ Unregistered custom properties are represented by [CSSUnparsedValues](https://dr
 ## Future Capabilities
 
 The current specification doesn't have support for the following, however support for the following is under consideration for Typed OM Level 2:
-* Colors,
+
 * URLs (that aren't images),
 * Shapes, 
 * Strings, 
