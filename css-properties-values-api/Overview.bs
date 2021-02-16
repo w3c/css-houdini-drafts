@@ -87,7 +87,7 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 Registered Custom Properties {#behavior-of-custom-properties}
 =============================================================
 
-A [=custom property=] can become a <dfn local-lt="registered">registered custom property</dfn>,
+A [=custom property=] can become a <dfn export local-lt="registered">registered custom property</dfn>,
 making it act more like a UA-defined property:
 giving it a syntax that's checked by the UA,
 an initial value,
@@ -209,7 +209,8 @@ or the [=guaranteed-invalid value=]).
 Otherwise, attempt to [=CSS/parse=] the property's value
 according to its registered syntax.
 If this fails,
-the [=computed value=] is the [=guaranteed-invalid value=].
+the declaration is [=invalid at computed-value time=]
+and the [=computed value=] is determined accordingly.
 If it succeeds,
 the [=computed value=] depends on the specifics of the syntax:
 
@@ -569,7 +570,7 @@ If omitted, the [=initial value=] of the property is the [=guaranteed-invalid va
 
 Otherwise,
 if the value of the 'syntax' descriptor is not the [=universal syntax definition=],
-the following conditions must be met for the the ''@property'' rule to be valid:
+the following conditions must be met for the ''@property'' rule to be valid:
 
 	* The 'initial-value' descriptor must be present.
 	* The 'initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
@@ -974,7 +975,7 @@ Parsing The Syntax String {#parsing-syntax}
 :   <dfn export>syntax definition</dfn>
 ::  An object consisting of a list of <a>syntax components</a>.
 
-:   <dfn>universal syntax definition</dfn>
+:   <dfn export>universal syntax definition</dfn>
 ::  A special syntax definition which accepts any valid token stream.
 
 ### Consume a Syntax Definition ### {#consume-syntax-definition}
