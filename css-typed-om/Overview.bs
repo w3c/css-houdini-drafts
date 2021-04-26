@@ -2874,6 +2874,8 @@ has the same behavior as in normal CSS.
 -----------------------------------------------
 
 {{CSSColorValue}} objects represent <<color>> values.
+It is an abstract superclass,
+with the subclasses representing individual CSS color functions.
 
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -3013,6 +3015,8 @@ interface CSSColor : CSSColorValue {
 
 Issue: TODO add stringifiers
 
+The {{CSSRGB}} class represents the CSS ''rgb()''/''rgba()'' functions.
+
 <div algorithm="CSSRGB()">
     The <dfn constructor for=CSSRGB>CSSRGB(|r|, |g|, |b|, optional |alpha|)</dfn> constructor
     must, when invoked,
@@ -3041,6 +3045,8 @@ Issue: TODO add stringifiers
     and set the corresponding internal slot to the result of that.
 </div>
 
+The {{CSSHSL}} class represents the CSS ''hsl()''/''hsla()'' functions.
+
 <div algorithm="CSSHSL()">
     The <dfn constructor for=CSSHSL>CSSHSL(|h|, |s|, |l|, optional |alpha|)</dfn> constructor
     must, when invoked,
@@ -3067,6 +3073,8 @@ Issue: TODO add stringifiers
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+The {{CSSHWB}} class represents the CSS ''hwb()'' function.
 
 <div algorithm="CSSHWB()">
     The <dfn constructor for=CSSHWB>CSSHWB(|h|, |w|, |b|, optional |alpha|)</dfn> constructor
@@ -3095,6 +3103,33 @@ Issue: TODO add stringifiers
     and set the corresponding internal slot to the result of that.
 </div>
 
+The {{CSSGray}} class represents the CSS ''gray()'' function.
+
+<div algorithm="CSSGray()">
+    The <dfn constructor for=CSSGray>CSSGray(|l|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |l| and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+        If |l| and |alpha| don't both [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSGray}}
+        with its {{CSSGray/l}} and {{CSSGray/alpha}} internal slots
+        set to |l|, and |alpha|.
+</div>
+
+<div algorithm="CSSGray.l">
+    The <dfn attribute for=CSSGray>l</dfn>
+    and <dfn attribute for=CSSGray>alpha</dfn> attributes of a {{CSSGray}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+The {{CSSLCH}} class represents the CSS ''lch()'' function.
+
 <div algorithm="CSSLCH()">
     The <dfn constructor for=CSSLCH>CSSLCH(|l|, |c|, |h|, optional |alpha|)</dfn> constructor
     must, when invoked,
@@ -3122,6 +3157,8 @@ Issue: TODO add stringifiers
     and set the corresponding internal slot to the result of that.
 </div>
 
+The {{CSSLab}} class represents the CSS ''lab()'' function.
+
 <div algorithm="CSSLab()">
     The <dfn constructor for=CSSLab>CSSLab(|l|, |a|, |b|, optional |alpha|)</dfn> constructor
     must, when invoked,
@@ -3147,6 +3184,8 @@ Issue: TODO add stringifiers
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+The {{CSSColor}} class represents the CSS ''color()'' function.
 
 <div algorithm="CSSColor()">
     The <dfn constructor for=CSSColor>CSSColor(|colorspace|, |channels|, optional |alpha|)</dfn> constructor
