@@ -3006,11 +3006,11 @@ interface CSSLab : CSSColorValue {
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSColor : CSSColorValue {
-    constructor(sequence<(DOMString or CSSNumberish)> variant);
-    /* CSSColor(["foo", 0, 1, .5], ["bar", "yellow"], 1, fallbackColor) */
-    /* or just make the alpha and fallback successive optional args? */
+    constructor(CSSKeywordish colorspace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
+    attribute CSSKeywordish colorspace;
+    attribute CSSPercentishArray channels;
+    attribute CSSNumberish alpha;
 };
-
 </xmp>
 
 Issue: TODO add stringifiers
@@ -3193,7 +3193,7 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     perform the following steps:
 
     1. Let |colorspace| be replaced by the result of [=rectifying a keywordish value=].
-        Let |channels| be replaced by the result of [=rectifying a percentish value=] for each item in the list.
+        Let each item in |channels| be replaced by the result of [=rectifying a percentish value=] from the item.
         Let |alpha| be replaced by the result of [=rectifying a percentish value=].
 
     2. If |alpha| and the items of |channels| don't all [=CSSNumericValue/match=] "percent",
@@ -3210,7 +3210,10 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     [=rectify a keywordish value=] from |val|
     and set the corresponding internal slot to the result of that.
 
-    Issue: Phrase the per-item channels setting.
+    The <dfn attribute for=CSSColor>channels</dfn> attribute of a {{CSSColor}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish array=] from |val"
+    and set the corresponding internal slot to the result of that.
 
     The <dfn attribute for=CSSColor>alpha</dfn> attribute of a {{CSSColor}} value
     must, on setting to a new value |val|,
