@@ -316,7 +316,7 @@ The user agent <em>clear</em> the [=styleMap=] internal slot for a [=box=] when:
     <pre class='lang-javascript'>
         registerLayout('example', class {
             static inputProperties = ['--foo'];
-            static childrenInputProperties = ['--bar'];
+            static childInputProperties = ['--bar'];
             static layoutOptions = {
               childDisplay: 'normal',
               sizing: 'block-like'
