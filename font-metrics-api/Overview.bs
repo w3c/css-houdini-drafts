@@ -6,8 +6,8 @@ ED: https://drafts.css-houdini.org/font-metrics-api-1/
 Shortname: font-metrics-api
 Level: 1
 Abstract: 
-Editor: Emil A Eklund, eae@google.com, w3cid 93298
 Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
+Former Editor: Emil A Eklund, eae@google.com, w3cid 93298
 </pre>
 
 <pre class=link-defaults>
