@@ -2887,6 +2887,7 @@ interface CSSColorValue : CSSStyleValue {
     CSSLCH toLCH();
     CSSLab toLab();
     CSSColor toColor(CSSKeywordish colorspace);
+    CSSDeviceCMYK toDeviceCMYK();
 
     [Exposed=Window] static CSSColorValue parse(USVString cssText);
 };
@@ -2933,6 +2934,17 @@ interface CSSColorValue : CSSStyleValue {
         and return a new {{CSSColor}} object
         with TODO.
 </div>
+
+<div algorithm="CSSColorValue.toDeviceCMYK()">
+    The <dfn method for=CSSColorValue>toDeviceCMYK()</dfn> method
+    of {{CSSColorValue}} object must,
+    when called on |this|,
+    convert |this| into an sRGB color,
+    then [=naively convert from RGBA to CMYK=]
+    and return a new {{CSSDeviceCMYK}} object
+    with its {{CSSDeviceCMYK/c}}, {{CSSDeviceCMYK/m}}, {{CSSDeviceCMYK/y}}, {{CSSDeviceCMYK/k}}, and {{CSSDeviceCMYK/alpha}} internal slots
+    set appropriately to represent that color.<
+/div>
 
 <div algorithm="CSSColorValue.parse()">
     The <dfn method for=CSSColorValue>parse(|cssText|)</dfn> method,
@@ -3009,6 +3021,16 @@ interface CSSColor : CSSColorValue {
     constructor(CSSKeywordish colorspace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
     attribute CSSKeywordish colorspace;
     attribute CSSPercentishArray channels;
+    attribute CSSNumberish alpha;
+};
+
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSDeviceCMYK : CSSColorValue {
+    constructor(CSSNumberish c, CSSNumberish m, CSSNumberish y, CSSNumberish k, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish c;
+    attribute CSSNumberish m;
+    attribute CSSNumberish y;
+    attribute CSSNumberish k;
     attribute CSSNumberish alpha;
 };
 </xmp>
@@ -3216,6 +3238,35 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     and set the corresponding internal slot to the result of that.
 
     The <dfn attribute for=CSSColor>alpha</dfn> attribute of a {{CSSColor}} value
+    must, on setting to a new value |val|,
+    [=rectify a percentish value=] from |val|
+    and set the corresponding internal slot to the result of that.
+</div>
+
+The {{CSSDeviceCMYK}} class represents the CSS ''device-cmyk()'' function.
+
+<div algorithm="CSSDeviceCMYK()">
+    The <dfn constructor for=CSSDeviceCMYK>CSSDeviceCMYK(|c|, |m|, |y|, |k|, optional |alpha|)</dfn> constructor
+    must, when invoked,
+    perform the following steps:
+
+    1. Let |c|, |m|, |y|, |k|, and |alpha|
+        be replaced by the result of [=rectifying a percentish value=].
+
+    2. If |c|, |m|, |y|, |k|, and |alpha| don't all [=CSSNumericValue/match=] "percent",
+        [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSDeviceCMYK}}
+        with its {{CSSDeviceCMYK/c}}, {{CSSDeviceCMYK/m}}, {{CSSDeviceCMYK/y}}, {{CSSDeviceCMYK/k}}, and {{CSSLab/alpha}} internal slots
+        set to |c|, |m|, |y|, |k|, and |alpha|.
+</div>
+
+<div algorithm="CSSDeviceCMYK.c">
+    The <dfn attribute for=CSSDeviceCMYK>c</dfn>,
+    <dfn attribute for=CSSDeviceCMYK>m</dfn>,
+    <dfn attribute for=CSSDeviceCMYK>y</dfn>,
+    <dfn attribute for=CSSDeviceCMYK>k</dfn>,
+    and <dfn attribute for=CSSDeviceCMYK>alpha</dfn> attributes of a {{CSSDeviceCMYK}} value
     must, on setting to a new value |val|,
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
