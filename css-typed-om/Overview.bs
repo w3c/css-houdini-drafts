@@ -2900,7 +2900,6 @@ interface CSSColorValue : CSSStyleValue {
         <tr><td>"rgb"<td>{{CSSRGB}}
         <tr><td>"hsl"<td>{{CSSHSL}}
         <tr><td>"hwb"<td>{{CSSHWB}}
-        <tr><td>"gray"<td>{{CSSGray}}
         <tr><td>"lch"<td>{{CSSLCH}}
         <tr><td>"lab"<td>{{CSSLab}}
         <tr><td>"device-cmyk"<td>{{CSSDeviceCMYK}}
@@ -2940,7 +2939,6 @@ interface CSSColorValue : CSSStyleValue {
         <tr><td>"rgb"<td>{{CSSRGB}}
         <tr><td>"hsl"<td>{{CSSHSL}}
         <tr><td>"hwb"<td>{{CSSHWB}}
-        <tr><td>"gray"<td>{{CSSGray}}
         <tr><td>"lch"<td>{{CSSLCH}}
         <tr><td>"lab"<td>{{CSSLab}}
         <tr><td>"device-cmyk"<td>{{CSSDeviceCMYK}}
@@ -3088,40 +3086,6 @@ The {{CSSHWB}} class represents the CSS ''hwb()'' function.
     The <dfn attribute for=CSSHWB>w</dfn>,
     <dfn attribute for=CSSHWB>b</dfn>,
     and <dfn attribute for=CSSHWB>alpha</dfn> attributes of a {{CSSHWB}} value
-    must, on setting to a new value |val|,
-    [=rectify a percentish value=] from |val|
-    and set the corresponding internal slot to the result of that.
-</div>
-
-<xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSGray : CSSColorValue {
-    constructor(CSSNumberish gray, optional CSSNumberish alpha = 1);
-    attribute CSSNumberish gray;
-    attribute CSSNumberish alpha;
-};
-</xmp>
-
-The {{CSSGray}} class represents the CSS ''gray()'' function.
-
-<div algorithm="CSSGray()">
-    The <dfn constructor for=CSSGray>CSSGray(|l|, optional |alpha|)</dfn> constructor
-    must, when invoked,
-    perform the following steps:
-
-    1. Let |l| and |alpha|
-        be replaced by the result of [=rectifying a percentish value=].
-        If |l| and |alpha| don't both [=CSSNumericValue/match=] "percent",
-        [=throw=] a {{TypeError}}.
-
-    3. Return a new {{CSSGray}}
-        with its {{CSSGray/l}} and {{CSSGray/alpha}} internal slots
-        set to |l|, and |alpha|.
-</div>
-
-<div algorithm="CSSGray.l">
-    The <dfn attribute for=CSSGray>l</dfn>
-    and <dfn attribute for=CSSGray>alpha</dfn> attributes of a {{CSSGray}} value
     must, on setting to a new value |val|,
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
