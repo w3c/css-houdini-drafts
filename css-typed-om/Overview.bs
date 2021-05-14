@@ -2961,7 +2961,9 @@ interface CSSColorValue : CSSStyleValue {
         and return the result.
 </div>
 
+<hr>
 
+Issue: TODO add stringifiers
 
 <xmp class=idl>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -2972,70 +2974,7 @@ interface CSSRGB : CSSColorValue {
     attribute CSSNumberish b;
     attribute CSSNumberish alpha;
 };
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSHSL : CSSColorValue {
-    constructor(CSSNumericValue h, CSSNumberish s, CSSNumberish l, optional CSSNumberish alpha = 1);
-    attribute CSSNumericValue h;
-    attribute CSSNumberish s;
-    attribute CSSNumberish l;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSHWB : CSSColorValue {
-    constructor(CSSNumericValue h, CSSNumberish w, CSSNumberish b, optional CSSNumberish alpha = 1);
-    attribute CSSNumericValue h;
-    attribute CSSNumberish w;
-    attribute CSSNumberish b;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSGray : CSSColorValue {
-    constructor(CSSNumberish gray, optional CSSNumberish alpha = 1);
-    attribute CSSNumberish gray;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSLCH : CSSColorValue {
-    constructor(CSSNumberish l, CSSNumberish c, CSSNumericValue h, optional CSSNumberish alpha = 1);
-    attribute CSSNumberish l;
-    attribute CSSNumberish c;
-    attribute CSSNumericValue h;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSLab : CSSColorValue {
-    constructor(CSSNumberish l, CSSNumberish a, CSSNumberish b, optional CSSNumberish alpha = 1);
-    attribute CSSNumberish l;
-    attribute CSSNumberish a;
-    attribute CSSNumberish b;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSColor : CSSColorValue {
-    constructor(CSSKeywordish colorspace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
-    attribute CSSKeywordish colorspace;
-    attribute CSSPercentishArray channels;
-    attribute CSSNumberish alpha;
-};
-
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
-interface CSSDeviceCMYK : CSSColorValue {
-    constructor(CSSNumberish c, CSSNumberish m, CSSNumberish y, CSSNumberish k, optional CSSNumberish alpha = 1);
-    attribute CSSNumberish c;
-    attribute CSSNumberish m;
-    attribute CSSNumberish y;
-    attribute CSSNumberish k;
-    attribute CSSNumberish alpha;
-};
 </xmp>
-
-Issue: TODO add stringifiers
 
 The {{CSSRGB}} class represents the CSS ''rgb()''/''rgba()'' functions.
 
@@ -3067,6 +3006,17 @@ The {{CSSRGB}} class represents the CSS ''rgb()''/''rgba()'' functions.
     and set the corresponding internal slot to the result of that.
 </div>
 
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSHSL : CSSColorValue {
+    constructor(CSSNumericValue h, CSSNumberish s, CSSNumberish l, optional CSSNumberish alpha = 1);
+    attribute CSSNumericValue h;
+    attribute CSSNumberish s;
+    attribute CSSNumberish l;
+    attribute CSSNumberish alpha;
+};
+</xmp>
+
 The {{CSSHSL}} class represents the CSS ''hsl()''/''hsla()'' functions.
 
 <div algorithm="CSSHSL()">
@@ -3095,6 +3045,17 @@ The {{CSSHSL}} class represents the CSS ''hsl()''/''hsla()'' functions.
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSHWB : CSSColorValue {
+    constructor(CSSNumericValue h, CSSNumberish w, CSSNumberish b, optional CSSNumberish alpha = 1);
+    attribute CSSNumericValue h;
+    attribute CSSNumberish w;
+    attribute CSSNumberish b;
+    attribute CSSNumberish alpha;
+};
+</xmp>
 
 The {{CSSHWB}} class represents the CSS ''hwb()'' function.
 
@@ -3125,6 +3086,15 @@ The {{CSSHWB}} class represents the CSS ''hwb()'' function.
     and set the corresponding internal slot to the result of that.
 </div>
 
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSGray : CSSColorValue {
+    constructor(CSSNumberish gray, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish gray;
+    attribute CSSNumberish alpha;
+};
+</xmp>
+
 The {{CSSGray}} class represents the CSS ''gray()'' function.
 
 <div algorithm="CSSGray()">
@@ -3149,6 +3119,17 @@ The {{CSSGray}} class represents the CSS ''gray()'' function.
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSLCH : CSSColorValue {
+    constructor(CSSNumberish l, CSSNumberish c, CSSNumericValue h, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish l;
+    attribute CSSNumberish c;
+    attribute CSSNumericValue h;
+    attribute CSSNumberish alpha;
+};
+</xmp>
 
 The {{CSSLCH}} class represents the CSS ''lch()'' function.
 
@@ -3179,6 +3160,17 @@ The {{CSSLCH}} class represents the CSS ''lch()'' function.
     and set the corresponding internal slot to the result of that.
 </div>
 
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSLab : CSSColorValue {
+    constructor(CSSNumberish l, CSSNumberish a, CSSNumberish b, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish l;
+    attribute CSSNumberish a;
+    attribute CSSNumberish b;
+    attribute CSSNumberish alpha;
+};
+</xmp>
+
 The {{CSSLab}} class represents the CSS ''lab()'' function.
 
 <div algorithm="CSSLab()">
@@ -3206,6 +3198,16 @@ The {{CSSLab}} class represents the CSS ''lab()'' function.
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSColor : CSSColorValue {
+    constructor(CSSKeywordish colorspace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
+    attribute CSSKeywordish colorspace;
+    attribute CSSPercentishArray channels;
+    attribute CSSNumberish alpha;
+};
+</xmp>
 
 The {{CSSColor}} class represents the CSS ''color()'' function.
 
@@ -3242,6 +3244,18 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     [=rectify a percentish value=] from |val|
     and set the corresponding internal slot to the result of that.
 </div>
+
+<xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+interface CSSDeviceCMYK : CSSColorValue {
+    constructor(CSSNumberish c, CSSNumberish m, CSSNumberish y, CSSNumberish k, optional CSSNumberish alpha = 1);
+    attribute CSSNumberish c;
+    attribute CSSNumberish m;
+    attribute CSSNumberish y;
+    attribute CSSNumberish k;
+    attribute CSSNumberish alpha;
+};
+</xmp>
 
 The {{CSSDeviceCMYK}} class represents the CSS ''device-cmyk()'' function.
 
