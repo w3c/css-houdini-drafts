@@ -2880,71 +2880,78 @@ with the subclasses representing individual CSS color functions.
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSColorValue : CSSStyleValue {
-    CSSRGB toRGB();
-    CSSHSL toHSL();
-    CSSHWB toHWB();
-    CSSGray toGray();
-    CSSLCH toLCH();
-    CSSLab toLab();
-    CSSColor toColor(CSSKeywordish colorspace);
-    CSSDeviceCMYK toDeviceCMYK();
-
+    readonly attribute CSSKeywordValue colorSpace;
+    CSSColorValue to(CSSKeywordish colorSpace);
     [Exposed=Window] static CSSColorValue parse(USVString cssText);
 };
 </xmp>
 
-<div algorithm="CSSColorValue.to*()">
-    The <dfn method for=CSSColorValue>toRGB()</dfn> method
-    of {{CSSColorValue}} objects must,
-    when called on |this|,
-    convert |this| into an sRGB color,
-    and return a new {{CSSRGB}} object
-    with its {{CSSRGB/r}}, {{CSSRGB/g}}, {{CSSRGB/b}}, and {{CSSRGB/alpha}} internal slots
-    set appropriately to represent that color.
+<div algorithm=CSSColorValue.colorSpace>
+    The <dfn attribute for=CSSColorValue>colorSpace</dfn> attribute
+    must reflect the color space of the value.
+    For every class but {{CSSColor}},
+    it is a static {{CSSKeywordValue}},
+    with the value given by the following table:
 
-    The <dfn method for=CSSColorValue>toHSL()</dfn>
-    and <dfn method for=CSSColorValue>toHWB()</dfn> methods
-    of {{CSSColorValue}} objects
-    must do the same as {{toRGB()}},
-    but return a {{CSSHSL}} or {{CSSHWB}} object, respectively,
-    with their corresponding internal slots set appropriately.
+    <table class=data>
+        <thead>
+            <tr><th>|colorspace|<th>{{CSSColorValue}} subclass
+        </thead>
+        <tr><td>"rgb"<td>{{CSSRGB}}
+        <tr><td>"hsl"<td>{{CSSHSL}}
+        <tr><td>"hwb"<td>{{CSSHWB}}
+        <tr><td>"gray"<td>{{CSSGray}}
+        <tr><td>"lch"<td>{{CSSLCH}}
+        <tr><td>"lab"<td>{{CSSLab}}
+        <tr><td>"device-cmyk"<td>{{CSSDeviceCMYK}}
+    </table>
 
-    The <dfn method for=CSSColorValue>toGray()</dfn>,
-    <dfn method for=CSSColorValue>toLCH()</dfn>,
-    and <dfn method for=CSSColorValue>toLab()</dfn> methods
-    of {{CSSColorValue}} objects must,
-    when called on |this|,
-    convert |this| into a CIE L*a*b* color [[CIELAB]],
-    and return a new {{CSSGray}}, {{CSSLCH}}, or {{CSSLab}} object, respectively,
-    with their corresponding internal slots set appropriately.
+    {{CSSColor}} defines its behavior for this attribute further down.
 </div>
 
-<div algorithm="CSSColorValue.toColor()">
-    The <dfn method for=CSSColorValue>toColor(|colorspace|)</dfn> method
+<div algorithm="CSSColorValue.to()">
+    The <dfn method for=CSSColorValue>to(colorSpace)</dfn> method
     of {{CSSColorValue}} objects must,
-    when called on |this|,
-    perform the following steps:
+    when called on |this|:
 
-    1. Replace |colorspace| with the result of [=rectifying a keywordish value=].
+    1. [=Rectify a keywordish value=] from |colorspace|,
+        then set |colorspace| to the result's value.
 
-    2. If |colorspace|'s value is not one of the [[css-color-4#predefined|predefined colorspaces]],
-        [=throw=] a {{SyntaxError}}.
+    2. If |colorspace| is not in the table below,
+        [=throw=] a "{{SyntaxError}}" {{DOMException}}.
 
-    3. Convert |this| into a color in the colorspace specified by |colorspace|,
-        and return a new {{CSSColor}} object
-        with TODO.
+    3. If |this| is a {{CSSColor}} value,
+        and its {{CSSColor/colorSpace}} attribute is not a [[css-color-4#predefined|predefined colorspace]],
+        [=throw=] an "{{InvalidModificationError}}" {{DOMException}}.
+
+    2. Convert |this| into the color space indicated by |colorspace|,
+        and return a new object of the appropriate {{CSSColorValue}} subclass
+        with its internal slots set appropriately to represent the color.
+
+    The valid |colorspace| values,
+    and the classes they cause this method to return,
+    are indicated by the following table.
+    Each of these values is [=ASCII case-insensitive=].
+
+    <table class=data>
+        <thead>
+            <tr><th>|colorspace|<th>{{CSSColorValue}} subclass
+        </thead>
+        <tr><td>"rgb"<td>{{CSSRGB}}
+        <tr><td>"hsl"<td>{{CSSHSL}}
+        <tr><td>"hwb"<td>{{CSSHWB}}
+        <tr><td>"gray"<td>{{CSSGray}}
+        <tr><td>"lch"<td>{{CSSLCH}}
+        <tr><td>"lab"<td>{{CSSLab}}
+        <tr><td>"device-cmyk"<td>{{CSSDeviceCMYK}}
+        <tr><td>any [[css-color-4#predefined|predefined colorspace]]<td>{{CSSColor}}
+    </table>
+
+    Issue: Currently, only predefined colorspaces can be converted to or from;
+    ''@color-profile''-defined ones can't be,
+    because it's not clear what context we should be looking in for the ''@color-profile'',
+    when shadow DOM might be involved.
 </div>
-
-<div algorithm="CSSColorValue.toDeviceCMYK()">
-    The <dfn method for=CSSColorValue>toDeviceCMYK()</dfn> method
-    of {{CSSColorValue}} object must,
-    when called on |this|,
-    convert |this| into an sRGB color,
-    then [=naively convert from RGBA to CMYK=]
-    and return a new {{CSSDeviceCMYK}} object
-    with its {{CSSDeviceCMYK/c}}, {{CSSDeviceCMYK/m}}, {{CSSDeviceCMYK/y}}, {{CSSDeviceCMYK/k}}, and {{CSSDeviceCMYK/alpha}} internal slots
-    set appropriately to represent that color.<
-/div>
 
 <div algorithm="CSSColorValue.parse()">
     The <dfn method for=CSSColorValue>parse(|cssText|)</dfn> method,
@@ -3202,8 +3209,8 @@ The {{CSSLab}} class represents the CSS ''lab()'' function.
 <xmp class=idl>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSColor : CSSColorValue {
-    constructor(CSSKeywordish colorspace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
-    attribute CSSKeywordish colorspace;
+    constructor(CSSKeywordish colorSpace, sequence<CSSNumberish> channels, optional CSSNumberish alpha = 1);
+    attribute CSSKeywordish colorSpace;
     attribute CSSPercentishArray channels;
     attribute CSSNumberish alpha;
 };
@@ -3212,7 +3219,7 @@ interface CSSColor : CSSColorValue {
 The {{CSSColor}} class represents the CSS ''color()'' function.
 
 <div algorithm="CSSColor()">
-    The <dfn constructor for=CSSColor>CSSColor(|colorspace|, |channels|, optional |alpha|)</dfn> constructor
+    The <dfn constructor for=CSSColor>CSSColor(|colorSpace|, |channels|, optional |alpha|)</dfn> constructor
     must, when invoked,
     perform the following steps:
 
@@ -3236,7 +3243,7 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
 
     The <dfn attribute for=CSSColor>channels</dfn> attribute of a {{CSSColor}} value
     must, on setting to a new value |val|,
-    [=rectify a percentish array=] from |val"
+    [=rectify a percentish array=] from |val|
     and set the corresponding internal slot to the result of that.
 
     The <dfn attribute for=CSSColor>alpha</dfn> attribute of a {{CSSColor}} value
