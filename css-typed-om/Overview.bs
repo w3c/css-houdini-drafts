@@ -2084,10 +2084,10 @@ interface CSSMathMax : CSSMathValue {
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSMathClamp : CSSMathValue {
-    constructor(CSSNumberish min, CSSNumberish val, CSSNumberish max);
-    readonly attribute CSSNumericValue min;
-    readonly attribute CSSNumericValue val;
-    readonly attribute CSSNumericValue max;
+    constructor(CSSNumberish lower, CSSNumberish value, CSSNumberish upper);
+    readonly attribute CSSNumericValue lower;
+    readonly attribute CSSNumericValue value;
+    readonly attribute CSSNumericValue upper;
 };
 
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -2180,20 +2180,20 @@ of all the "math" operations.
 </div>
 
 <div algorithm="CSSMathClamp(min, val, max)">
-    The <dfn constructor for="CSSMathClamp">CSSMathClamp(|min|, |val|, |max|)</dfn> constructor must,
+    The <dfn constructor for="CSSMathClamp">CSSMathClamp(|lower|, |value|, |upper|)</dfn> constructor must,
     when called,
     perform the following steps:
 
-    1. Replace |min|, |val|, and |max|
+    1. Replace |lower|, |value|, and |upper|
         with the result of [=rectifying a numberish value=] for each.
 
-    2. Let |type| be the result of [=adding=] the [=types=] of |min|, |val|, and |max|.
+    2. Let |type| be the result of [=adding=] the [=types=] of |lower|, |value|, and |upper|.
         If |type| is failure,
         [=throw=] a {{TypeError}}.
 
     3. Return a new {{CSSMathClamp}}
-        whose {{CSSMathClamp/min}}, {{CSSMathClamp/val}}, and {{CSSMathClamp/max}} internal slots
-        are set to |min|, |val|, and |max|, respectively.
+        whose {{CSSMathClamp/lower}}, {{CSSMathClamp/value}}, and {{CSSMathClamp/upper}} internal slots
+        are set to |lower|, |value|, and |upper|, respectively.
 </div>
 
 <div algorithm="CSSMathNegate(arg)">
@@ -2227,7 +2227,7 @@ of all the "math" operations.
 
         : {{CSSMathClamp}}
         :: The [=type=] is the result of [=adding=] the [=types=]
-            of the {{CSSMathClamp/min}}, {{CSSMathClamp/val}}, and {{CSSMathClamp/max}} internal slots.
+            of the {{CSSMathClamp/lower}}, {{CSSMathClamp/value}}, and {{CSSMathClamp/upper}} internal slots.
 
         : {{CSSMathProduct}}
         :: The [=type=] is the result of [=CSSNumericValue/multiplying=] the [=types=]
