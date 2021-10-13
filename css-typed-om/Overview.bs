@@ -2754,7 +2754,9 @@ This list is the object's [=values to iterate over=].
         1. [=Rectify a keywordish value=] from |length|,
             then set |length| to the result's value.
 
-        2. If |length| does not repreent the identifier 'none',
+        2. If |length| does not represent a value
+            that is [=ASCII case-insensitive=] match
+            for the identifier ''perspective()/none'',
             [=throw=] a {{TypeError}}.
 
     3. Return a new {{CSSPerspective}} object
@@ -5418,7 +5420,7 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
                 whose {{CSSPerspective/length}} internal slot
                 is set to the reification of the specified length
                 (see [=reify a numeric value=] if it is a length, and
-                [=reify an identifier=] if it is the keyword 'none')
+                [=reify an identifier=] if it is the keyword ''perspective()/none'')
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `false`.
     </dl>
