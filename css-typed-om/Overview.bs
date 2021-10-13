@@ -2442,6 +2442,8 @@ This list is the object's [=values to iterate over=].
 </div>
 
 <xmp class=idl>
+    typedef (CSSNumericValue or CSSKeywordish) CSSPerspectiveValue;
+
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     interface CSSTransformComponent {
         stringifier;
@@ -2499,8 +2501,8 @@ This list is the object's [=values to iterate over=].
 
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
     interface CSSPerspective : CSSTransformComponent {
-        constructor(CSSNumericValue length);
-        attribute CSSNumericValue length;
+        constructor(CSSPerspectiveValue length);
+        attribute CSSPerspectiveValue length;
     };
 
     [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -2742,10 +2744,20 @@ This list is the object's [=values to iterate over=].
     when invoked,
     perform the following steps:
 
-    1. If |length| does not [=CSSNumericValue/match=] <<length>>,
-        [=throw=] a {{TypeError}}.
+    1. If |length| is a {{CSSNumericValue}}:
 
-    2. Return a new {{CSSPerspective}} object
+        1. If |length| does not [=CSSNumericValue/match=] <<length>>,
+            [=throw=] a {{TypeError}}.
+
+    2. Otherwise (that is, if |length| is not a {{CSSNumericValue}}):
+
+        1. [=Rectify a keywordish value=] from |length|,
+            then set |length| to the result's value.
+
+        2. If |length| does not repreent the identifier 'none',
+            [=throw=] a {{TypeError}}.
+
+    3. Return a new {{CSSPerspective}} object
         with its {{CSSPerspective/length}} internal slot
         set to |length|,
         and its {{CSSTransformComponent/is2D}} internal slot set to `false`.
@@ -5404,7 +5416,9 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
         ::
             1. Return a new {{CSSPerspective}} object,
                 whose {{CSSPerspective/length}} internal slot
-                is set to the [=reify a numeric value|reification=] of the specified length
+                is set to the reification of the specified length
+                (see [=reify a numeric value=] if it is a length, and
+                [=reify an identifier=] if it is the keyword 'none')
                 and whose {{CSSTransformComponent/is2D}} internal slot
                 is `false`.
     </dl>
