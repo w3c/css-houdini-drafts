@@ -17,7 +17,7 @@ Former Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts
 Inline Github Issues: title
 Ignored Vars: type, unit
-Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS, PseudoElement, style
+Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS, PseudoElement, style, reify a url, reify an image, reify a position
 Markup Shorthands: markdown yes
 </pre>
 
@@ -60,7 +60,18 @@ spec:css-align-3; type:property; text:column-gap
 spec:css-color-4;
     type:property; text:color;
     type:value; text:currentcolor;
-spec:css-position-3; type:value; for:left; text:auto;
+spec:css-overflow-3;
+    type: property; text: text-overflow;
+spec:css-position-3;
+    type:value; for:left; text:auto;
+    type: property;
+        text: inset-block-start;
+        text: inset-block-end;
+        text: inset-inline-start;
+        text: inset-inline-end;
+        text: inset;
+        text: inset-block;
+        text: inset-inline;
 spec:css-shapes-1; type: property;
     text: shape-margin
     text: shape-outside
@@ -90,6 +101,8 @@ spec:css-transforms-1;
     type:property;
         text:transform;
         text:transform-origin;
+spec:css-ui-4;
+    type: property; text: pointer-events;
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
@@ -333,7 +346,7 @@ interface StylePropertyMap : StylePropertyMapReadOnly {
 
 <div algorithm="StylePropertyMap.[[declarations]]">
     A {{StylePropertyMapReadOnly}} object
-    has a <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
+    has a <dfn attribute for="StylePropertyMapReadOnly, StylePropertyMap">\[[declarations]]</dfn> internal slot,
     which is a [=map=] reflecting the [=CSS declaration block=]'s [=CSSStyleDeclaration/declarations=].
 
     Note: The [=CSSStyleDeclaration/declarations=] are not yet defined using [[infra]] terminology,
@@ -471,7 +484,7 @@ probably in an appendix.
 </div>
 
 <div algorithm>
-    The <dfn attribute for="StylePropertyMapReadonly, StylePropertyMap">size</dfn> attribute,
+    The <dfn attribute for="StylePropertyMapReadOnly, StylePropertyMap">size</dfn> attribute,
     on getting from a {{StylePropertyMap}} |this|,
     must perform the following steps:
 
@@ -634,17 +647,15 @@ probably in an appendix.
     <dfn for=CSSStyleValue export lt="match a grammar | match the grammar">match a grammar</dfn>
     based on the following rules:
 
-    * A {{CSSKeywordValue}} matches an [=ident=] specified in a grammar
+    * A {{CSSKeywordValue}} matches an <<identifier>> specified in a grammar
         if its {{CSSKeywordValue/value}} internal slot
-        matches the [=ident=].
+        matches the identifier.
 
-        If case-folding rules are in effect normally for that [=ident=]
+        If case-folding rules are in effect normally for that <<identifier>>
         (such as ''Auto'' matching the keyword ''auto'' specified in the grammar for 'width'),
         they apply to this comparison as well.
     * A {{CSSTransformValue}} matches <<transform-list>>.
     * A {{CSSNumericValue}} matches what its type [=CSSNumericValue/matches=].
-    * A {{CSSURLImageValue}} matches <<url>>.
-    * Any subclass of {{CSSImageValue}} matches <<image>>.
     * A {{CSSUnparsedValue}} matches any grammar.
     * A direct {{CSSStyleValue}} object (not a subclass)
         with a non-null {{CSSStyleValue/[[associatedProperty]]}} slot
@@ -2909,7 +2920,7 @@ interface CSSColorValue : CSSStyleValue {
 
     <table class=data>
         <thead>
-            <tr><th>|colorspace|<th>{{CSSColorValue}} subclass
+            <tr><th>{{CSSColorValue/colorSpace}}<th>{{CSSColorValue}} subclass
         </thead>
         <tr><td>"rgb"<td>{{CSSRGB}}
         <tr><td>"hsl"<td>{{CSSHSL}}
@@ -3201,7 +3212,7 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     must, when invoked,
     perform the following steps:
 
-    1. Let |colorspace| be replaced by the result of [=rectifying a keywordish value=].
+    1. Let |colorSpace| be replaced by the result of [=rectifying a keywordish value=].
         Let each item in |channels| be replaced by the result of [=rectifying a percentish value=] from the item.
         Let |alpha| be replaced by the result of [=rectifying a percentish value=].
 
@@ -3210,11 +3221,11 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
 
     3. Return a new {{CSSColor}}
         with its {{CSSColor/colorspace}}, {{CSSColor/channels}}, and {{CSSColor/alpha}} internal slots
-        set to |colorspace|, |channels|, and |alpha|.
+        set to |colorSpace|, |channels|, and |alpha|.
 </div>
 
-<div algorithm="CSSColor.colorspace">
-    The <dfn attribute for=CSSColor>colorspace</dfn> attribute of a {{CSSColor}} value
+<div algorithm="CSSColor.colorSpace">
+    The <dfn attribute for=CSSColor>colorSpace</dfn> attribute of a {{CSSColor}} value
     must, on setting to a new value |val|,
     [=rectify a keywordish value=] from |val|
     and set the corresponding internal slot to the result of that.
@@ -3279,7 +3290,7 @@ The {{CSSDeviceCMYK}} class represents the CSS ''device-cmyk()'' function.
         return |num|.
 
     2. If |num| is a {{double}},
-        return a [=new unit value=] from (|num|*100, "percent").
+        return a [=create a CSSUnitValue from a pair|new unit value=] from (|num|*100, "percent").
 </div>
 
 
@@ -3463,11 +3474,6 @@ for both specified and computed values.
         [=reify an image=] from the value
         and return the result.
 
-: <a>background-image-transform</a>
-:: For both specified and computed values,
-    [=reify an identifier=] from the value
-    and return the result.
-
 : <a>background-position</a>
 :: For both specified and computed values,
     [=reify a position=] from the value
@@ -3631,11 +3637,6 @@ for both specified and computed values.
 : <a>border-color</a>
 :: For both specified and computed values,
     reify as a {{CSSStyleValue}}
-    and return the result.
-
-: <a>border-image-transform</a>
-:: For both specified and computed values,
-    [=reify an identifier=] from the value
     and return the result.
 
 : <a>border-inline</a>
@@ -3976,19 +3977,6 @@ for both specified and computed values.
     2. Otherwise, reify as a {{CSSStyleValue}}
         and return the result.
 
-: <a>font-max-size</a>
-:: For both specified and computed values:
-
-    1. If the value is an <<absolute-size>>, <<relative-size>> or <css>infinity</css>,
-        [=reify an identifier=] from the value
-        and return the result.
-
-    2. Otherwise, [=reify a numeric value=] from the value
-        and return the result.
-
-: <a>font-min-size</a>
-:: Same as 'font-size'
-
 : <a>font-optical-sizing</a>
 :: For both specified and computed values,
     [=reify an identifier=] from the value
@@ -4003,11 +3991,6 @@ for both specified and computed values.
 
     2. Otherwise, reify as a {{CSSStyleValue}}
         and return the result.
-
-: <a>font-presentation</a>
-:: For both specified and computed values,
-    [=reify an identifier=] from the value
-    and return the result.
 
 : <a>font-size</a>
 :: For both specified and computed values:
@@ -4438,19 +4421,10 @@ for both specified and computed values.
 : <a>offset</a>
 ::
 
-: <a>offset-after</a>
-::
-
 : <a>offset-anchor</a>
 ::
 
-: <a>offset-before</a>
-::
-
 : <a>offset-distance</a>
-::
-
-: <a>offset-end</a>
 ::
 
 : <a>offset-path</a>
@@ -4460,9 +4434,6 @@ for both specified and computed values.
 ::
 
 : <a>offset-rotate</a>
-::
-
-: <a>offset-start</a>
 ::
 
 : <a>opacity</a>
@@ -4754,31 +4725,7 @@ for both specified and computed values.
 : <a>scroll-snap-type</a>
 ::
 
-: <a>scrollbar-3dlight-color</a>
-::
-
-: <a>scrollbar-arrow-color</a>
-::
-
-: <a>scrollbar-base-color</a>
-::
-
-: <a>scrollbar-darkshadow-color</a>
-::
-
-: <a>scrollbar-face-color</a>
-::
-
 : <a>scrollbar-gutter</a>
-::
-
-: <a>scrollbar-highlight-color</a>
-::
-
-: <a>scrollbar-shadow-color</a>
-::
-
-: <a>scrollbar-track-color</a>
 ::
 
 : <a>shape-inside</a>
@@ -4794,15 +4741,6 @@ for both specified and computed values.
 ::
 
 : <a>shape-subtract</a>
-::
-
-: <a>size</a>
-::
-
-: <a>solid-color</a>
-::
-
-: <a>solid-opacity</a>
 ::
 
 : <a>speak</a>
@@ -4915,7 +4853,7 @@ for both specified and computed values.
 : <a>text-decoration-stroke</a>
 ::
 
-: <a>text-decoration-width</a>
+: <a>text-decoration-thickness</a>
 ::
 
 : <a>text-emphasis-skip</a>
@@ -5427,26 +5365,6 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 </div>
 
 
-<<url>> (and subtype) Values {#reify-url}
---------------------------------------------------------------
-
-Resource references are reified by determining whether the reference is invalid
-(in which case {{CSSResourceValue/state}} is set to ''error'') or
-requires network data (in which case {{CSSResourceValue/state}}
-is set to ''loading''). If data is not required and the reference is valid then
-{{CSSResourceValue/state}} is set to ''loaded''.
-
-If {{CSSResourceValue/state}} is set to ''loading'' then the image
-reference is reevaluated once the pending data becomes available, according to the
-same rules referenced above.
-
-Reification can not fail for {{CSSResourceValue}} objects.
-
-<div class='example'>
-The string 'url(''bike.png'')' is converted into a {{CSSURLImageValue}} with {{CSSResourceValue/state}} set to ''unloaded'' and the {{CSSURLImageValue/url}} set to ''https://drafts.css-houdini.org/css-typed-om/bike.png''.
-</div>
-
-
 
 
 <!--
@@ -5867,13 +5785,6 @@ length3.toString(); // "42px";
     1. Return the [=DOMMatrixReadOnly/stringification behavior|serialization=]
         of |this|’s {{CSSMatrixComponent/matrix}} internal slot.
 </div>
-
-
-{{CSSURLImageValue}} Serialization {#urlimagevalue-serialization}
------------------------------------------------------------
-
-{{CSSURLImageValue}} objects are serialized to the string given by
-'url("' + {{CSSURLImageValue/url}} + '")'.
 
 Serialization from CSSOM Values {#cssom-serialization}
 ------------------------------------------------------
