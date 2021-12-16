@@ -1984,7 +1984,7 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <div algorithm>
-    To <dfn export>create a CSSUnitValue from a pair</dfn> (|num|, |unit|),
+    To <dfn export lt="create a CSSUnitValue from a pair | new unit value">create a CSSUnitValue from a pair</dfn> (|num|, |unit|),
     return a new {{CSSUnitValue}} object
     with its {{CSSUnitValue/value}} internal slot
     set to |num|,
@@ -1992,7 +1992,7 @@ are represented as {{CSSUnitValue}}s.
     set to |unit|.
 
     <div class=example>
-        For example, [=create a CSSUnitValue from a pair|creating a CSSUnitValue=] from `(5, "px")`
+        For example, creating a [=new unit value=] from `(5, "px")`
         creates an object equivalent to
         <code>new CSSUnitValue(5, "px")</code>.
     </div>
@@ -2610,7 +2610,7 @@ This list is the object's [=values to iterate over=].
 
     4. If |z| was not passed,
         set |this|’s {{CSSTranslate/z}} internal slot
-        to [=create a CSSUnitValue from a pair|new unit value=] of `(0, "px")`,
+        to a [=new unit value=] of `(0, "px")`,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot
         to `true`.
 
@@ -2629,9 +2629,9 @@ This list is the object's [=values to iterate over=].
         with its {{CSSRotate/angle}} internal slot
         set to |angle|,
         its {{CSSRotate/x}} and {{CSSRotate/y}} internal slots
-        set to [=create a CSSUnitValue from a pair|new unit values=] of `(0, "number")`,
+        set to [=new unit values=] of `(0, "number")`,
         its {{CSSRotate/z}} internal slot
-        set to a [=create a CSSUnitValue from a pair|new unit value=] of `(1, "number")`,
+        set to a [=new unit value=] of `(1, "number")`,
         and its {{CSSTransformComponent/is2D}} internal slot set to `true`.
 </div>
 
@@ -2686,7 +2686,7 @@ This list is the object's [=values to iterate over=].
 
     5. If |z| was not passed,
         set |this|’s {{CSSScale/z}} internal slot
-        to a [=create a CSSUnitValue from a pair|new unit value=] of `(1, "number")`,
+        to a [=new unit value=] of `(1, "number")`,
         and set |this|’s {{CSSTransformComponent/is2D}} internal slot to `true`.
 
     6. Return |this|.
@@ -3290,7 +3290,7 @@ The {{CSSDeviceCMYK}} class represents the CSS ''device-cmyk()'' function.
         return |num|.
 
     2. If |num| is a {{double}},
-        return a [=create a CSSUnitValue from a pair|new unit value=] from (|num|*100, "percent").
+        return a [=new unit value=] from (|num|*100, "percent").
 </div>
 
 
