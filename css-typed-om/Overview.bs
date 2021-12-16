@@ -2907,7 +2907,7 @@ with the subclasses representing individual CSS color functions.
 interface CSSColorValue : CSSStyleValue {
     readonly attribute CSSKeywordValue colorSpace;
     CSSColorValue to(CSSKeywordish colorSpace);
-    [Exposed=Window] static CSSColorValue parse(USVString cssText);
+    [Exposed=Window] static (CSSColorValue or CSSStyleValue) parse(USVString cssText);
 };
 </xmp>
 
@@ -5248,9 +5248,101 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
     (depending on the value of an ''em'' in that context).
 </div>
 
+<<color>> Values {#reify-color}
+-------------------------------
 
-<<transform-list>> and <<transform-function>> values {#reify-transformvalue}
-------------------------------------------------------------------------------------
+CSS <<color>> values become either {{CSSColorValue}}s
+(if they can be resolved to an absolute color)
+or generic {{CSSStyleValue}}s (otherwise).
+
+<div algorithm>
+    To <dfn>reify a color value</dfn> |val| for a property |prop|:
+
+    1. If |val| is a <<hex-color>>,
+        an ''rgb()'' function,
+        or an ''rgba()'' function,
+        then return a new {{CSSRGB}} object
+        with its {{CSSRGB/r}},
+        {{CSSRGB/g}},
+        {{CSSRGB/b}},
+        and {{CSSRGB/alpha}} internal slots
+        set to the [=reification=]
+        of its red, green, blue, and alpha components, respectively.
+
+    2. If |val| is an ''hsl()'' or ''hsla()'' function,
+        then return a new {{CSSHSL}} object
+        with its {{CSSHSL/h}},
+        {{CSSHSL/s}},
+        {{CSSHSL/l}},
+        and {{CSSHSL/alpha}} internal slots
+        set to the [=reification=]
+        of its hue angle, saturation, lightness, and alpha components, respectively.
+
+    3. If |val| is an ''hwb()'' function,
+        then return a new {{CSSHWB}} object
+        with its {{CSSHWB/h}},
+        {{CSSHWB/w}},
+        {{CSSHWB/b}},
+        and {{CSSHWB/alpha}} internal slots
+        set to the [=reification=]
+        of its hue angle, whiteness, blackness, and alpha components, respectively.
+
+    4. If |val| is an ''lch()'' function,
+        then return a new {{CSSLCH}} object
+        with its {{CSSLCH/l}},
+        {{CSSLCH/c}},
+        {{CSSLCH/h}},
+        and {{CSSLCH/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, chroma, hue angle, and alpha components, respectively.
+
+    5. If |val| is an ''lab()'' function,
+        then return a new {{CSSLab}} object
+        with its {{CSSLab/l}},
+        {{CSSLab/a}},
+        {{CSSLab/b}},
+        and {{CSSLab/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, a, b, and alpha components, respectively.
+
+    6. If |val| is a ''device-cmyk()'' function,
+        then return a new {{CSSDeviceCMYK}} object
+        with its {{CSSDeviceCMYK/c}},
+        {{CSSDeviceCMYK/m}},
+        {{CSSDeviceCMYK/y}},
+        {{CSSDeviceCMYK/k}},
+        and {{CSSDeviceCMYK/alpha}} internal slots
+        set to the [=reification=]
+        of its cyan, magenta, yellow, key, and alpha components, respectively.
+
+    7. If |val| is a ''color()'' function,
+        then return a new {{CSSColor}} object
+        with its {{CSSColor/colorSpace}} internal slot
+        set to the result of [=reifying an identifier=]
+        from |val|'s color space,
+        its {{CSSColor/channels}} internal slot
+        set to the result of [=reifying a percentish array=]
+        from |val|'s list of non-alpha components,
+        and {{CSSColor/alpha}} internal slot
+        set to the result of [=reifying=] |val|'s alpha component.
+
+    8. If |val| is a <<named-color>> or the keyword ''transparent'',
+        then return a new {{CSSRGB}} object
+        with its {{CSSRGB/r}},
+        {{CSSRGB/g}},
+        {{CSSRGB/b}},
+        and {{CSSRGB/alpha}} internal slots
+        set to the [=reification=]
+        of its red, green, blue, and alpha components, respectively.
+
+    8. If |val| is any other color keyword,
+        return the result of [=reifying as a CSSStyleValue=] |val| for |prop|.
+</div>
+
+
+
+<<transform-list>> and <<transform-function>> Values {#reify-transformvalue}
+----------------------------------------------------------------------------
 
 CSS <<transform-list>> values become {{CSSTransformValue}}s in the Typed OM,
 while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
