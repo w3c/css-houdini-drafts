@@ -12,9 +12,9 @@ Abstract:
 Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
-Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
-Editor: Robert O'Callahan, robert@ocallahan.org
 Editor: Rossen Atanassov, rossen.atanassov@microsoft.com, w3cid 49885
+Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
+Former Editor: Robert O'Callahan, robert@ocallahan.org
 Ignored Terms: LayoutWorklet
 </pre>
 
