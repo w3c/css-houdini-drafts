@@ -114,7 +114,7 @@ rendering engine. You are given:
  - `constraints`, the constraints which the fragment you produce should meet.
  - `style`, the _readonly_ style for the current layout.
 
-Layout eventually will return a dictionary will what the resulting fragment of that layout should
+Layout eventually will return a dictionary with what the resulting fragment of that layout should
 be.
 
 The above example would be used in CSS by:
