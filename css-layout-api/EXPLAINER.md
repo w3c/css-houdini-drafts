@@ -53,7 +53,7 @@ if ('layoutWorklet' in CSS) {
 See the worklets [explainer](../worklets/EXPLAINER.md) for a more involved explanation of worklets.
 
 After the promise returned from the `addModule` method resolves the layouts defined in the script
-will apply to the page.
+apply to the page.
 
 A Centering Layout
 ------------------
@@ -114,7 +114,7 @@ rendering engine. You are given:
  - `constraints`, the constraints which the fragment you produce should meet.
  - `style`, the _readonly_ style for the current layout.
 
-Layout eventually will return a dictionary will what the resulting fragment of that layout should
+Layout eventually will return a dictionary with what the resulting fragment of that layout should
 be.
 
 The above example would be used in CSS by:
