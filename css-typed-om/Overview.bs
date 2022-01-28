@@ -1695,8 +1695,13 @@ rather than on {{CSSNumericValue}} instances.
         or a [=math function=],
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
+    
+    3. If |result| is a <<dimension-token>>
+       and [=creating a type=] from |result|'s unit returns failure,
+       [=throw=] a {{SyntaxError}}
+       and abort this algorithm.
 
-    3. [=Reify a numeric value=] |result|,
+    4. [=Reify a numeric value=] |result|,
         and return the result.
 </div>
 
