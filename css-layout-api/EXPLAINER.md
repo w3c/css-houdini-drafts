@@ -330,8 +330,8 @@ registerLayout('basic-inline', class {
       const fragment = await child.layoutNextFragment(constraints, childBreakToken);
       childFragments.push(fragment);
 
-      // Position the fragment, note we coulld do something special here, like
-      // placing all the lines on a "rythimic grid", or similar.
+      // Position the fragment, note we could do something special here, like
+      // placing all the lines on a "rythmic grid", or similar.
       fragment.inlineOffset = edges.inlineStart;
       fragment.blockOffset = blockOffset;
 
