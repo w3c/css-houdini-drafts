@@ -5474,7 +5474,7 @@ CSS <<color>> values become either {{CSSColorValue}}s
 or generic {{CSSStyleValue}}s (otherwise).
 
 <div algorithm>
-    To <dfn>reify a color value</dfn> |val| for a property |prop|:
+    To <dfn>reify a color value</dfn> |val|:
 
     1. If |val| is a <<hex-color>>,
         an ''rgb()'' function,
