@@ -452,6 +452,87 @@ with a <<length>> or <<length-percentage>> syntax component:
 	and ''font-size'' will behave as if the value ''unset'' was specified.
 </div>
 
+Shadow DOM {#shadow-dom}
+------------------------
+
+Unlike many concepts in CSS
+(see [[css-scoping-1#shadow-names]]),
+property registrations are <strong>not</strong> scoped to a tree scope.
+All registrations,
+whether they appear in the outermost document
+or within a shadow tree,
+interact in a single global registration map for the {{Document}}.
+
+<details class=note>
+	<summary>Why can't registrations be scoped?</summary>
+
+	There are clear use-cases for property registrations to be scoped--
+	a component using Shadow DOM
+	and registering some custom properties
+	for its own internal use
+	probably doesn't intend for the outer page
+	to see the registration,
+	since the outer page doesn't even know the component is using that property.
+
+	However, there are also reasons to not scope the registration--
+	custom properties are used to pipe data <em>into</em> a component,
+	and it's useful for the outer page
+	to be able to set such custom properties
+	and have them syntax-checked by the registration;
+	similarly, concepts such as a property's initial value
+	don't make much sense
+	unless the property registration exists globally,
+	so it applies to the property even at the document's root.
+
+	But the above just means that registration scope
+	might be something that should be controllable,
+	not that it should be forced to be global.
+
+	The reason registrations must be global
+	is because elements can exist in multiple tree scopes
+	at the same time,
+	with styles from each tree scope
+	intermingling and cascading together.
+	This applies to the [=host element=],
+	which lives in the outer tree
+	but is stylable from the shadow tree
+	by the '':host'' selector,
+	but also elements inside a shadow DOM
+	that are targetable from the outer tree
+	by the ''::part()'' pseudo-element.
+
+	If registrations could be scoped to a tree scope,
+	and a single property was registered
+	both inside and outside,
+	it's not clear which registration should be applied
+	to parse the value.
+	Even if we tracked which tree a value came from
+	(something we do for other tree-scoped values)
+	and applied the corresponding registration,
+	it's not clear that this would give a reasonable result--
+	the shadow DOM might expect a property to have a particular value space,
+	and be surprised when it receives something completely different
+	due to the outer tree winning the cascade
+	and applying its own registration.
+</details>
+
+When custom properties are exposed
+as part of a Shadow DOM-using component's public API,
+this global registration behavior works as intended.
+If the outer page is using a custom property of the same name
+for different purposes,
+that is already a conflict that needs to be resolved,
+and the registration behavior does not make it worse.
+
+If a custom property is intended for private internal usage for a component, however,
+it is recommended that the property
+be given a likely-unique name,
+to minimize the possibility of a clash with any other context.
+This can be done, for example,
+by including the project name,
+or some short random string of text,
+in the name of the property.
+
 
 
 <!--
