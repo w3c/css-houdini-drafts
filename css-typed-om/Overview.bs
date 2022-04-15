@@ -5554,7 +5554,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         of its red, green, blue, and alpha components, respectively.
 
     9. If |val| is any other color keyword,
-        return the result of [=reifying as an identifier=] |val|.
+        return the result of [=reifying an identifier=] from |val|.
 </div>
 
 
