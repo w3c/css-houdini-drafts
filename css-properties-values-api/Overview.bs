@@ -32,8 +32,8 @@ Markup Shorthands: css on, markdown on
 spec:css-color-4; type:property; text:color
 spec:css-syntax-3; type:dfn;
 	text:input stream
-	text:starts with an identifier
-	text:consume a name
+	text:starts with an ident sequence
+	text:consume an ident sequence
 spec:css-transforms-1; type:type; text:<transform-function>
 spec:css-values-4;
 	type:value;
@@ -566,10 +566,10 @@ A valid ''@property'' rule represents a [=custom property registration=],
 with the property name being the serialization of the <<custom-property-name>>
 in the rule's prelude.
 
-''@property'' rules require a 'syntax' and 'inherits' descriptor;
+''@property'' rules require a '@property/syntax' and '@property/inherits' descriptor;
 if either are missing,
 the entire rule is invalid and must be ignored.
-The 'initial-value' descriptor is optional
+The '@property/initial-value' descriptor is optional
 only if the syntax is the [=universal syntax definition=],
 otherwise the descriptor is required;
 if it's missing, the entire rule is invalid and must be ignored.
@@ -591,7 +591,7 @@ Issue(939): This will likely change in the future,
 as the behavior of concept-defining at-rules in shadow trees
 becomes more consistently defined.
 
-The 'syntax' Descriptor {#the-syntax-descriptor}
+The '@property/syntax' Descriptor {#the-syntax-descriptor}
 ------------------------------------------------
 
 	<pre class='descdef'>
@@ -605,7 +605,7 @@ Specifies the syntax of the [=custom property registration=]
 represented by the ''@property'' rule,
 controlling how the property's value is parsed at [=computed value=] time.
 
-The 'syntax' descriptor is required for the ''@property'' rule to be valid;
+The '@property/syntax' descriptor is required for the ''@property'' rule to be valid;
 if it's missing, the ''@property'' rule is invalid.
 
 If the provided string is not a valid [=syntax string=]
@@ -613,7 +613,7 @@ If the provided string is not a valid [=syntax string=]
 the descriptor is invalid and must be ignored.
 
 
-The 'inherits' Descriptor {#inherits-descriptor}
+The '@property/inherits' Descriptor {#inherits-descriptor}
 ------------------------------------------------
 
 	<pre class='descdef'>
@@ -627,11 +627,11 @@ Specifies the inherit flag of the [=custom property registration=]
 represented by the ''@property'' rule,
 controlling whether or not the property inherits by default.
 
-The 'inherits' descriptor is required for the ''@property'' rule to be valid;
+The '@property/inherits' descriptor is required for the ''@property'' rule to be valid;
 if it's missing, the ''@property'' rule is invalid.
 
 
-The 'initial-value' Descriptor {#initial-value-descriptor}
+The '@property/initial-value' Descriptor {#initial-value-descriptor}
 ----------------------------------------------------------
 
 	<pre class='descdef'>
@@ -645,18 +645,18 @@ Specifies the initial value of the [=custom property registration=]
 represented by the ''@property'' rule,
 controlling the property’s [=initial value=].
 
-If the value of the 'syntax' descriptor is the [=universal syntax definition=],
-then the 'initial-value' descriptor is optional.
+If the value of the '@property/syntax' descriptor is the [=universal syntax definition=],
+then the '@property/initial-value' descriptor is optional.
 If omitted, the [=initial value=] of the property is the [=guaranteed-invalid value=].
 
 Otherwise,
-if the value of the 'syntax' descriptor is not the [=universal syntax definition=],
+if the value of the '@property/syntax' descriptor is not the [=universal syntax definition=],
 the following conditions must be met for the ''@property'' rule to be valid:
 
-	* The 'initial-value' descriptor must be present.
-	* The 'initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
+	* The '@property/initial-value' descriptor must be present.
+	* The '@property/initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
 		according to the grammar specified by the [=syntax definition=].
-	* The 'initial-value' must be [=computationally independent=].
+	* The '@property/initial-value' must be [=computationally independent=].
 
 If the above conditions are not met, the ''@property'' rule is invalid.
 
@@ -1041,7 +1041,7 @@ Parsing The Syntax String {#parsing-syntax}
 ### Definitions ### {#parsing-definitions}
 
 :   <dfn>data type name</dfn>
-::  A sequence of <a>code points</a> consisting of a U+003C LESS-THAN SIGN (&lt;), followed be zero or more <a>name code points</a>, and terminated by U+003E GREATER-THAN SIGN (>).
+::  A sequence of <a>code points</a> consisting of a U+003C LESS-THAN SIGN (&lt;), followed be zero or more <a>ident code points</a>, and terminated by U+003E GREATER-THAN SIGN (>).
 
 :   <dfn>pre-multiplied data type name</dfn>
 ::  A [=data type name=] that represents another [=syntax component=] with a [[#multipliers|multiplier]] already included.
@@ -1116,11 +1116,11 @@ Parsing The Syntax String {#parsing-syntax}
 		If it returned a [=string=], set |component|'s |name| to the returned value.
 		Otherwise, return failure.
 
-	:   <a>name-start code point</a>
+	:   <a>ident-start code point</a>
 	:   U+005C REVERSE SOLIDUS (\)
-	::  If the stream [=starts with an identifier=],
+	::  If the stream [=starts with an ident sequence=],
 		<a>reconsume the current input code point</a> from |stream|
-		then [=consume a name=] from |stream|,
+		then [=consume an ident sequence=] from |stream|,
 		and set |component|’s |name| to the returned value.
 		Otherwise return failure.
 
@@ -1159,7 +1159,7 @@ Parsing The Syntax String {#parsing-syntax}
 		return |name|.
 		Otherwise return failure.
 
-	:   <a>name code point</a>
+	:   <a>ident code point</a>
 	::  Append the <a>code point</a> to |name|.
 
 	:   anything else
@@ -1238,10 +1238,10 @@ the following:
 		LEFT CURLY BRACKET (U+007B), followed by a SPACE (U+0020).
 	4. The string <code>"syntax:"</code>, followed by a single SPACE (U+0020).
 	5. The result of performing <a>serialize a string</a> on the rule's
-		'syntax', followed by a single SEMICOLON (U+003B), followed by a
+		'@property/syntax', followed by a single SEMICOLON (U+003B), followed by a
 		SPACE (U+0020).
 	6. The string <code>"inherits:"</code>, followed by a single SPACE (U+0020).
-	7. For the rule's 'inherits' attribute, one of the following depending on
+	7. For the rule's '@property/inherits' attribute, one of the following depending on
 		the attribute's value:
 		<dl class=switch>
 			: true
@@ -1251,10 +1251,10 @@ the following:
 			:: The string <code>"false"</code> followed by a single
 				SEMICOLON (U+003B), followed by a SPACE (U+0020).
 		</dl>
-	8. If the rule's 'initial-value' is present, follow these substeps:
+	8. If the rule's '@property/initial-value' is present, follow these substeps:
 		1. The string <code>"initial-value:"</code>.
 		2. The result of performing <a>serialize a CSS value</a> in the rule's
-			'initial-value' followed by a single SEMICOLON (U+003B), followed by
+			'@property/initial-value' followed by a single SEMICOLON (U+003B), followed by
 			a SPACE (U+0020).
 	9. A single RIGHT CURLY BRACKET (U+007D).
 </div>
