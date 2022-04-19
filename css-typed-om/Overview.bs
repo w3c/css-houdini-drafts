@@ -3001,11 +3001,6 @@ interface CSSColorValue : CSSStyleValue {
         <tr><td>"oklch"<td>{{CSSOKLCH}}
         <tr><td>any [[css-color-4#predefined|predefined color space]]<td>{{CSSColor}}
     </table>
-
-    Issue: Currently, only predefined color spaces can be converted to or from;
-    ''@color-profile''-defined ones can't be,
-    because it's not clear what context we should be looking in for the ''@color-profile'',
-    when shadow DOM might be involved.
 </div>
 
 <div algorithm="CSSColorValue.parse()">
