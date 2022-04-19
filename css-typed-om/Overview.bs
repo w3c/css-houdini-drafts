@@ -1697,9 +1697,9 @@ rather than on {{CSSNumericValue}} instances.
         and abort this algorithm.
     
     3. If |result| is a <<dimension-token>>
-       and [=creating a type=] from |result|'s unit returns failure,
-       [=throw=] a {{SyntaxError}}
-       and abort this algorithm.
+        and [=creating a type=] from |result|'s unit returns failure,
+        [=throw=] a {{SyntaxError}}
+        and abort this algorithm.
 
     4. [=Reify a numeric value=] |result|,
         and return the result.
@@ -5762,11 +5762,33 @@ length3.toString(); // "42px";
 </div>
 
 
-{{CSSUnitValue}} Serialization {#numericvalue-serialization}
-------------------------------------------------------------
+{{CSSNumericValue}} Serialization {#numericvalue-serialization}
+---------------------------------------------------------------
 
 <div algorithm>
-    To <dfn export>serialize a {{CSSUnitValue}}</dfn> |this|:
+    To <dfn export>serialize a {{CSSNumericValue}}</dfn> |this|,
+    given
+    an optional |minimum|, a numeric value,
+    and optional |maximum|, a numeric value:
+
+    1. If |this| is a {{CSSUnitValue}},
+        [=serialize a CSSUnitValue=] from |this|,
+        passing |minimum| and |maximum|.
+        Return the result.
+
+    2. Otherwise,
+        [=serialize a CSSMathValue=] from |this|,
+        and return the result.
+</div>
+
+{{CSSUnitValue}} Serialization {#unitvalue-serialization}
+---------------------------------------------------------
+
+<div algorithm>
+    To <dfn export>serialize a {{CSSUnitValue}}</dfn> |this|,
+    with optional arguments
+    |minimum|, a numeric value,
+    and |maximum|, a numeric value:
 
     1. Let |value| and |unit| be
         |this|‘s {{CSSUnitValue/value}} and {{CSSUnitValue/unit}} internal slots.
@@ -5774,15 +5796,30 @@ length3.toString(); // "42px";
     2. Set |s| to the result of serializing a <<number>> from |value|,
         per [[cssom#serializing-css-values]].
 
-    3. If |unit| is "number",
-        return |s|.
+    3. If |unit| is:
 
-    4. Otherwise, if |unit| is "percent",
-        append "%" to |s|,
-        then return |s|.
+        <dl class=switch>
+            : "number"
+            :: Do nothing.
 
-    5. Otherwise, append |unit| to |s|,
-        then return |s|.
+            : "percent"
+            :: Append "%" to |s|.
+
+            : anything else
+            :: Append |unit| to |s|.
+        </dl>
+
+    4. If |minimum| was passed
+        and |this| is less than |minimum|,
+        or if |maximum| was passed
+        and |this| is greater than |maximum|,
+        or either |minimum| and/or |maximum| were passed
+        and the relative size of |this| and |minimum|/|maximum|
+        can't be determined with the available information at this time,
+        prepend "calc(" to |s|,
+        then append ")" to |s|.
+
+    5. Return |s|.
 </div>
 
 
@@ -5791,8 +5828,10 @@ length3.toString(); // "42px";
 
 <div algorithm>
     To <dfn export>serialize a {{CSSMathValue}}</dfn> |this|,
-    with additional flags |nested|, a boolean (defaulting to false if unspecified),
-    and |paren-less|, a boolean (defaulting to false if unspecified):
+    with optional arguments
+    |nested|, a boolean (defaulting to false if unspecified),
+    |paren-less|, a boolean (defaulting to false if unspecified),
+    perform the following steps.
 
     1. Let |s| initially be the empty [=string=].
 
@@ -6083,6 +6122,7 @@ length3.toString(); // "42px";
     1. Let |s| initially be "perspective(".
 
     2. Serialize |this|’s {{CSSPerspective/length}} internal slot,
+        with a <var ignore>minimum</var> of ''0px'',
         and append it to |s|.
 
     3. Append ")" to |s|,
