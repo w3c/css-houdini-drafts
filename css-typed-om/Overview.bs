@@ -87,8 +87,6 @@ spec:css-speech-1; type:property;
     text:pause-before;
     text:speak;
     text:voice-family;
-spec:css-syntax-3;
-    type:dfn; text:identifier
 spec:css-tables-3; type:property;
     text:border-collapse;
     text:caption-side;
@@ -106,7 +104,9 @@ spec:css-ui-4;
 spec:css-values-4;
     type:type; text:<position>
     type:value; text:in
-    type:dfn; text:relative length
+    type:dfn;
+        text:relative length
+        text:identifier
 spec:dom; type:interface;
     text:Document
     text:Element;
@@ -130,6 +130,7 @@ spec:svg2;
         text: stroke-miterlimit
         text: stroke-opacity
         text: stroke-width
+        text: color-rendering
 </pre>
 
 Introduction {#intro}
@@ -647,11 +648,11 @@ probably in an appendix.
     <dfn for=CSSStyleValue export lt="match a grammar | match the grammar">match a grammar</dfn>
     based on the following rules:
 
-    * A {{CSSKeywordValue}} matches an <<identifier>> specified in a grammar
+    * A {{CSSKeywordValue}} matches an <<ident>> specified in a grammar
         if its {{CSSKeywordValue/value}} internal slot
         matches the identifier.
 
-        If case-folding rules are in effect normally for that <<identifier>>
+        If case-folding rules are in effect normally for that <<ident>>
         (such as ''Auto'' matching the keyword ''auto'' specified in the grammar for 'width'),
         they apply to this comparison as well.
     * A {{CSSTransformValue}} matches <<transform-list>>.
@@ -882,7 +883,7 @@ of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
 {{CSSKeywordValue}} objects {#keywordvalue-objects}
 ---------------------------------------------------
 
-{{CSSKeywordValue}} objects represent CSS keywords and other [=identifiers=].
+{{CSSKeywordValue}} objects represent CSS keywords and other [=idents=].
 
 <pre class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
@@ -2795,8 +2796,8 @@ This list is the object's [=values to iterate over=].
             then set |length| to the result's value.
 
         2. If |length| does not represent a value
-            that is [=ASCII case-insensitive=] match
-            for the identifier ''perspective()/none'',
+            that is an [=ASCII case-insensitive=] match
+            for the keyword ''perspective()/none'',
             [=throw=] a {{TypeError}}.
 
     3. Return a new {{CSSPerspective}} object
@@ -2956,40 +2957,40 @@ interface CSSColorValue : CSSStyleValue {
         <tr><td>"hwb"<td>{{CSSHWB}}
         <tr><td>"lch"<td>{{CSSLCH}}
         <tr><td>"lab"<td>{{CSSLab}}
-        <td><td>"oklab"<td>{{CSSOKLab}}
-        <td><td>"oklch"<td>{{CSSOKLCH}}
+        <tr><td>"oklab"<td>{{CSSOKLab}}
+        <tr><td>"oklch"<td>{{CSSOKLCH}}
     </table>
 
     {{CSSColor}} defines its behavior for this attribute further down.
 </div>
 
 <div algorithm="CSSColorValue.to()">
-    The <dfn method for=CSSColorValue>to(colorSpace)</dfn> method
+    The <dfn method for=CSSColorValue>to(|colorSpace|)</dfn> method
     of {{CSSColorValue}} objects must,
     when called on |this|:
 
-    1. [=Rectify a keywordish value=] from |colorspace|,
-        then set |colorspace| to the result's value.
+    1. [=Rectify a keywordish value=] from |colorSpace|,
+        then set |colorSpace| to the result's value.
 
-    2. If |colorspace| is not in the table below,
+    2. If |colorSpace| is not in the table below,
         [=throw=] a "{{SyntaxError}}" {{DOMException}}.
 
     3. If |this| is a {{CSSColor}} value,
-        and its {{CSSColor/colorSpace}} attribute is not a [[css-color-4#predefined|predefined colorspace]],
+        and its {{CSSColor/colorSpace}} attribute is not a [[css-color-4#predefined|predefined color space]],
         [=throw=] an "{{InvalidModificationError}}" {{DOMException}}.
 
-    2. Convert |this| into the color space indicated by |colorspace|,
+    2. Convert |this| into the color space indicated by |colorSpace|,
         and return a new object of the appropriate {{CSSColorValue}} subclass
         with its internal slots set appropriately to represent the color.
 
-    The valid |colorspace| values,
+    The valid |colorSpace| values,
     and the classes they cause this method to return,
     are indicated by the following table.
     Each of these values is [=ASCII case-insensitive=].
 
     <table class=data>
         <thead>
-            <tr><th>|colorspace|<th>{{CSSColorValue}} subclass
+            <tr><th>|colorSpace|<th>{{CSSColorValue}} subclass
         </thead>
         <tr><td>"rgb"<td>{{CSSRGB}}
         <tr><td>"hsl"<td>{{CSSHSL}}
@@ -2998,10 +2999,10 @@ interface CSSColorValue : CSSStyleValue {
         <tr><td>"lab"<td>{{CSSLab}}
         <tr><td>"oklab"<td>{{CSSOKLab}}
         <tr><td>"oklch"<td>{{CSSOKLCH}}
-        <tr><td>any [[css-color-4#predefined|predefined colorspace]]<td>{{CSSColor}}
+        <tr><td>any [[css-color-4#predefined|predefined color space]]<td>{{CSSColor}}
     </table>
 
-    Issue: Currently, only predefined colorspaces can be converted to or from;
+    Issue: Currently, only predefined color spaces can be converted to or from;
     ''@color-profile''-defined ones can't be,
     because it's not clear what context we should be looking in for the ''@color-profile'',
     when shadow DOM might be involved.
@@ -3480,7 +3481,7 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
         Let |alpha| be replaced by the result of [=rectifying a CSSColorPercent=] from it.
 
     2. Return a new {{CSSColor}}
-        with its {{CSSColor/colorspace}}, {{CSSColor/channels}}, and {{CSSColor/alpha}} internal slots
+        with its {{CSSColor/colorSpace}}, {{CSSColor/channels}}, and {{CSSColor/alpha}} internal slots
         set to |colorSpace|, |channels|, and |alpha|.
 </div>
 
@@ -5523,28 +5524,18 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its lightness, a, b, and alpha components, respectively.
 
-    6. If |val| is a ''device-cmyk()'' function,
-        then return a new {{CSSDeviceCMYK}} object
-        with its {{CSSDeviceCMYK/c}},
-        {{CSSDeviceCMYK/m}},
-        {{CSSDeviceCMYK/y}},
-        {{CSSDeviceCMYK/k}},
-        and {{CSSDeviceCMYK/alpha}} internal slots
-        set to the [=reification=]
-        of its cyan, magenta, yellow, key, and alpha components, respectively.
-
-    7. If |val| is a ''color()'' function,
+    6. If |val| is a ''color()'' function,
         then return a new {{CSSColor}} object
         with its {{CSSColor/colorSpace}} internal slot
         set to the result of [=reifying an identifier=]
         from |val|'s color space,
-        its {{CSSColor/channels}} internal slot
-        set to the result of [=reifying a percentish array=]
-        from |val|'s list of non-alpha components,
+        its {{CSSColor/channels}} internal slot's [=observable array attribute/backing list=]
+        set to the result of [=reifying=]
+        |val|'s list of non-alpha components,
         and {{CSSColor/alpha}} internal slot
         set to the result of [=reifying=] |val|'s alpha component.
 
-    8. If |val| is a <<named-color>> or the keyword ''transparent'',
+    7. If |val| is a <<named-color>> or the keyword ''transparent'',
         then return a new {{CSSRGB}} object
         with its {{CSSRGB/r}},
         {{CSSRGB/g}},
@@ -5553,7 +5544,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its red, green, blue, and alpha components, respectively.
 
-    9. If |val| is any other color keyword,
+    8. If |val| is any other color keyword,
         return the result of [=reifying an identifier=] from |val|.
 </div>
 
