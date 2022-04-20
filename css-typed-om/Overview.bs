@@ -2935,73 +2935,9 @@ with the subclasses representing individual CSS color functions.
 <xmp class='idl'>
 [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 interface CSSColorValue : CSSStyleValue {
-    readonly attribute CSSKeywordValue colorSpace;
-    CSSColorValue to(CSSKeywordish colorSpace);
     [Exposed=Window] static (CSSColorValue or CSSStyleValue) parse(USVString cssText);
 };
 </xmp>
-
-<div algorithm=CSSColorValue.colorSpace>
-    The <dfn attribute for=CSSColorValue>colorSpace</dfn> attribute
-    must reflect the color space of the value.
-    For every class but {{CSSColor}},
-    it is a static {{CSSKeywordValue}},
-    with the value given by the following table:
-
-    <table class=data>
-        <thead>
-            <tr><th>{{CSSColorValue/colorSpace}}<th>{{CSSColorValue}} subclass
-        </thead>
-        <tr><td>"rgb"<td>{{CSSRGB}}
-        <tr><td>"hsl"<td>{{CSSHSL}}
-        <tr><td>"hwb"<td>{{CSSHWB}}
-        <tr><td>"lch"<td>{{CSSLCH}}
-        <tr><td>"lab"<td>{{CSSLab}}
-        <tr><td>"oklab"<td>{{CSSOKLab}}
-        <tr><td>"oklch"<td>{{CSSOKLCH}}
-    </table>
-
-    {{CSSColor}} defines its behavior for this attribute further down.
-</div>
-
-<div algorithm="CSSColorValue.to()">
-    The <dfn method for=CSSColorValue>to(|colorSpace|)</dfn> method
-    of {{CSSColorValue}} objects must,
-    when called on |this|:
-
-    1. [=Rectify a keywordish value=] from |colorSpace|,
-        then set |colorSpace| to the result's value.
-
-    2. If |colorSpace| is not in the table below,
-        [=throw=] a "{{SyntaxError}}" {{DOMException}}.
-
-    3. If |this| is a {{CSSColor}} value,
-        and its {{CSSColor/colorSpace}} attribute is not a [[css-color-4#predefined|predefined color space]],
-        [=throw=] an "{{InvalidModificationError}}" {{DOMException}}.
-
-    2. Convert |this| into the color space indicated by |colorSpace|,
-        and return a new object of the appropriate {{CSSColorValue}} subclass
-        with its internal slots set appropriately to represent the color.
-
-    The valid |colorSpace| values,
-    and the classes they cause this method to return,
-    are indicated by the following table.
-    Each of these values is [=ASCII case-insensitive=].
-
-    <table class=data>
-        <thead>
-            <tr><th>|colorSpace|<th>{{CSSColorValue}} subclass
-        </thead>
-        <tr><td>"rgb"<td>{{CSSRGB}}
-        <tr><td>"hsl"<td>{{CSSHSL}}
-        <tr><td>"hwb"<td>{{CSSHWB}}
-        <tr><td>"lch"<td>{{CSSLCH}}
-        <tr><td>"lab"<td>{{CSSLab}}
-        <tr><td>"oklab"<td>{{CSSOKLab}}
-        <tr><td>"oklch"<td>{{CSSOKLCH}}
-        <tr><td>any [[css-color-4#predefined|predefined color space]]<td>{{CSSColor}}
-    </table>
-</div>
 
 <div algorithm="CSSColorValue.parse()">
     The <dfn method for=CSSColorValue>parse(|cssText|)</dfn> method,
@@ -3485,7 +3421,9 @@ The {{CSSColor}} class represents the CSS ''color()'' function.
     must, on setting to a new value |val|,
     [=rectify a keywordish value=] from |val|
     and set the corresponding internal slot to the result of that.
+</div>
 
+<div algorithm="CSSColor.alpha">
     The <dfn attribute for=CSSColor>alpha</dfn> attribute of a {{CSSColor}} value
     must, on setting to a new value |val|,
     [=rectify a CSSColorPercent=] from |val|
