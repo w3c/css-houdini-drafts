@@ -115,7 +115,7 @@ instance that represent this particlar animation and then on each animation fram
 `animate` function to determine the local time which ultimately drives the keyframe effect.
 
 
-![Overview of the WorkletAnimation Timing Model](img/WorkletAnimation-timing-model.svg)
+![Overview of the WorkletAnimation Timing Model](images/WorkletAnimation-timing-model.svg)
 
 Here the same simple example but using Animation Worklet instead.
 

@@ -818,7 +818,7 @@ box</b>, before transform or positioning (e.g. if a fragment is [=relatively pos
 been applied.
 
 <figure>
-    <img src="img/layout-fragment-offsets.png" width="800"
+    <img src="images/layout-fragment-offsets.png" width="800"
       alt="An example of position a fragment in different writing modes.">
     <figcaption>
         A simple visualization showing positioning a {{LayoutFragment}} using
@@ -1255,7 +1255,7 @@ The {{LayoutEdges/inline}}, and {{LayoutEdges/block}} on the {{LayoutEdges}} obj
 attributes which represent the sum in that direction.
 
 <figure>
-    <img src="img/edges.png" width="800"
+    <img src="images/edges.png" width="800"
       alt="An example of layout edges.">
     <figcaption>
         A visualization showing the {{LayoutEdges}} object for a [=box=] with different sized

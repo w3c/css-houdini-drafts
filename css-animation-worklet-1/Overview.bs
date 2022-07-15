@@ -704,7 +704,7 @@ interface WorkletAnimation : Animation {
 
 
 <figure>
-  <img src="img/WorkletAnimation-timing-model.svg" width="600"
+  <img src="images/WorkletAnimation-timing-model.svg" width="600"
     alt="Overview of the WorkletAnimation timing model.">
   <figcaption>
     Overview of the worklet animation timing model.
