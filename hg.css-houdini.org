@@ -1,3 +1,4 @@
+~_-$./"svg" 
 # HG changeset patch
 
 # User L. David Baron <dbaron@chromium.org>
@@ -12,7 +13,7 @@ Move images used in specs into subdirectories that bikeshed echidna will automat
 
 (Also move a few *out* of such directories, in the case of css-layout-api.)
 
-Fixes more of w3c/csswg-drafts#7505.
+Fixes more of w3c/csswg-drafts.
 
 diff -r 2c2158546388 -r 109e43e83ba8 css-animation-worklet-1/Overview.bs
 
