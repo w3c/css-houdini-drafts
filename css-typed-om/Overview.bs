@@ -2368,6 +2368,39 @@ partial namespace CSS {
     to avoid defining the unit individually for all ~60 functions.
 </div>
 
+The above list of methods reflects the set of CSS's valid predefined units
+at one particular point in time.
+It will be updated over time,
+but might be out-of-date at any given moment.
+If an implementation supports additional CSS units
+that do not have a corresponding method in the above list,
+but that do correspond to one of the existing {{CSSNumericType}} values,
+it must additionally support such a method,
+named after the unit
+in its defined canonical casing,
+using the generic behavior defined above.
+
+If an implementation supports units
+that do <em>not</em> correspond to one of the existing {{CSSNumericType}} values,
+it must not support those units in the APIs defined in this specification;
+it should request the units and their types
+be added explicitly to this specification,
+as the appropriate type name is not implicit from the unit.
+
+If an implementation does not support a given unit,
+it must not implement its corresponding method from the list above.
+
+<div class=example>
+    For example, the CSS Speech spec [[CSS-SPEECH-1]]
+    defines two additional units,
+    the decibel <css>dB</css> and semitone <css>st</css>.
+    No current browser implementation supports these
+    or has plans to,
+    so they're not included in the above list,
+    but if an implementation <em>does</em> support the Speec spec,
+    it must also expose <code>CSS.dB()</code> and <code>CSS.st()</code> methods.
+</div>
+
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
