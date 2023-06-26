@@ -672,10 +672,10 @@ the {{CSS}} object is extended with a {{registerProperty()}} method:
 
 <pre class='idl'>
 dictionary PropertyDefinition {
-	required DOMString name;
-	         DOMString syntax       = "*";
+	required CSSOMString name;
+	         CSSOMString syntax       = "*";
 	required boolean   inherits;
-	         DOMString initialValue;
+	         CSSOMString initialValue;
 };
 
 partial namespace CSS {
