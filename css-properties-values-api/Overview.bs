@@ -629,7 +629,7 @@ The '@property/initial-value' Descriptor {#initial-value-descriptor}
 
 	<pre class='descdef'>
 	Name: initial-value
-	Value: <<declaration-value>>
+	Value: <<declaration-value>>?
 	For: @property
 	Initial: the [=guaranteed-invalid value=] (but see prose)
 	</pre>
