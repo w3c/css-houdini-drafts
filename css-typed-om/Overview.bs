@@ -1025,7 +1025,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         "time",
         "frequency",
         "resolution",
-        "fraction",
+        "flex",
         "percent",
     };
 
@@ -1035,7 +1035,7 @@ are represented by subclasses of the {{CSSNumericValue}} interface.
         long time;
         long frequency;
         long resolution;
-        long fraction;
+        long flex;
         long percent;
         CSSNumericBaseType percentHint;
     };
@@ -1733,7 +1733,7 @@ The <dfn export for=CSSNumericValue lt="base type">base types</dfn> are
 "time",
 "frequency",
 "resolution",
-"fraction",
+"flex",
 and "percent".
 The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
 The <dfn export for=CSSNumericValue>percent hint</dfn>
@@ -1763,7 +1763,7 @@ and to the CSS [=math functions=].
         : |unit| is a <<resolution>> unit
         :: Return «[ "resolution" → 1 ]»
         : |unit| is a <<fraction>> unit
-        :: Return «[ "fraction" → 1 ]»
+        :: Return «[ "flex" → 1 ]»
         : anything else
         :: Return failure.
     </dl>
