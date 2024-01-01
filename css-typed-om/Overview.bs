@@ -1762,7 +1762,7 @@ and to the CSS [=math functions=].
         :: Return «[ "frequency" → 1 ]»
         : |unit| is a <<resolution>> unit
         :: Return «[ "resolution" → 1 ]»
-        : |unit| is a <<flex>> unit
+        : |unit| is a <<fraction>> unit
         :: Return «[ "flex" → 1 ]»
         : anything else
         :: Return failure.
@@ -1901,7 +1901,7 @@ A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS producti
 * A [=type=] matches <<length>>
     if its only non-zero [=map/entry=] is «[ "length" → 1 ]»
     and its [=percent hint=] is null.
-    Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
+    Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<fraction>>.
 * A [=type=] matches <<percentage>>
     if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
 * A [=type=] matches <<length-percentage>>
@@ -2352,7 +2352,7 @@ partial namespace CSS {
     CSSUnitValue dpcm(double value);
     CSSUnitValue dppx(double value);
 
-    // <flex>
+    // <fraction>
     CSSUnitValue fr(double value);
 };
 </xmp>
