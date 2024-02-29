@@ -1890,7 +1890,7 @@ and to the CSS [=math functions=].
 
     1. Let |result| be a new [=type=]
         with an initially empty [=ordered map=]
-        and an initially null [=percent hint=]
+        and a [=percent hint=] matching that of |type|.
     1. [=map/For each=] |unit| → |exponent| of |type|,
         set |result|[|unit|] to (-1 * |exponent|).
     3. Return |result|.
