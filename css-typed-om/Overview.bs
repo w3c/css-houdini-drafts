@@ -1896,30 +1896,32 @@ and to the CSS [=math functions=].
     3. Return |result|.
 </div>
 
-A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
+<div algorithm>
+    A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
 
-* A [=type=] matches <<length>>
-    if its only non-zero [=map/entry=] is «[ "length" → 1 ]»
-    and its [=percent hint=] is null.
-    Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
-* A [=type=] matches <<percentage>>
-    if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
-* A [=type=] matches <<length-percentage>>
-    if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percent" → 1 ]»
-    Same for <<angle-percentage>>, <<time-percentage>>, etc.
-* A [=type=] matches <<number>>
-    if it has no non-zero [=map/entries=]
-    and its [=percent hint=] is null.
-* A [=type=] matches <<number-percentage>>
-    if it has no non-zero [=map/entries=],
-    or its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
+    * A [=type=] matches <<length>>
+        if its only non-zero [=map/entry=] is «[ "length" → 1 ]».
+        Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
 
-Many specifications use ''[ <<length>> | <<percentage>> ]''
-instead of ''<<length-percentage>>'' in their grammar,
-and specify in prose that the <<length>> and <<percentage>> can be combined.
-For the purposes of [=CSSNumericValue/matching=],
-these cases should be treated as <<length-percentage>>.
-Similarly for <<angle-percentage>>, etc.
+        If the context in which the value is used
+        does not allow <<percentage>> values,
+        then the [=type=] must additionally have
+        a null [=percent hint=]
+        to be considered [=CSSNumericValue/matching=].
+    * A [=type=] matches <<percentage>>
+        if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
+    * A [=type=] matches <<length-percentage>>
+        if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percent" → 1 ]».
+        Same for <<angle-percentage>>, <<time-percentage>>, etc.
+    * A [=type=] matches <<number>>
+        if it has no non-zero [=map/entries=].
+
+        If the context in which the value is used
+        does not allow <<percentage>> values,
+        then the [=type=] must additionally have
+        a null [=percent hint=]
+        to be considered [=CSSNumericValue/matching=].
+</div>
 
 Note: [=Types=] form a semi-group under both addition
 and a monoid under multiplication
