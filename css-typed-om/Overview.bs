@@ -6198,3 +6198,54 @@ Privacy Considerations {#privacy-considerations}
 ==================================================
 
 There are no known privacy issues introduced by these features.
+
+Changes {#changes}
+==================
+
+<h3 id="#changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10 
+April 2018 Working Draft</a></h3>
+
+<!-- To 4 March 2024 -->
+* Fixed the type match algorithm to refer to the percent hint more abstractly.
+* Clarified that "invert a type" needs to preserve the percent hint.
+* Added missing font units to CSS numeric factory. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1107">#1107</a>)
+* Specified that the list of unit shorthand methods must be reduced or expanded to match the implementation's support.
+* Used undefined union value for "StylePropertyMapReadOnly.get()". (<a href="https://github.com/w3c/css-houdini-drafts/pull/1087">#1087</a>)
+* Removed .to() and the CSSColorValue.colorSpace, as conversion isn't really in Typed OM's remit. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1070">#1070</a>)
+* Added min/max to "serialize a CSSUnitValue", and pass it when serializing the argument of CSSPerspective. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1069">#1069</a>)
+*  Changed reifying from "a CSSStyleValue" to "an identifier". (<a href="https://github.com/w3c/css-houdini-drafts/pull/1068">#1068</a>)
+* Added factory functions for new viewport/container units. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1067">#1067</a>)
+* Added type checking to CSSNumericValue.parse. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1065">#1065</a>)
+* Removed CSSDeviceCMYK, add CSSOKLab and CSSOKLCH, made all the color classes accept the "none" keyword.
+* Defined how to reify a color value. 
+* Allowed "new unit value" to link to "create a CSSUnitValue from a pair" since that phrasing is used everywhere already.
+* Added support for perspective(none) to CSSPerspective. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1053">#1053</a>)
+* Fixed accidental clash of CSSClampValue.min/max with CSSNumericValue.min/max. (<a href="https://github.com/w3c/css-houdini-drafts/issues/855">#855</a>)
+* Simplified the Abstract
+* Removed CSSGray and associated spec text, since Color 4 <em>dropped</em> gray() some time ago. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1027">#1027</a>)
+* Moved .colorSpace up to the CSSColorValue superclass. Swapped the .to*() color-conversion functions for a generic .to(colorSpace) method. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1036">#1036</a>)
+* Added device-cmyk() support. 
+* Fix the OM for CSSColor to match recent simplifications.
+* Specified which color function each CSSColorValue subclass represents, and added CSSGray.
+* Added missing parentheses for union. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1016">#1016</a>)
+* Added some explanatory text about the makeup of a "type".
+* Aligned with Web IDL specification. (<a href="https://github.com/w3c/css-houdini-drafts/pull/965">#965</a> and <a href="https://github.com/w3c/css-houdini-drafts/pull/1006">#1006</a> )
+* Fixed algorithm nesting.
+* Added default dictionary value, required by update to <a href="https://github.com/whatwg/webidl/pull/750">WebIDL</a>. (<a href="https://github.com/w3c/css-houdini-drafts/pull/936">#936</a>)
+* Switched term from "underlying value" to :internal representation", as Web Animations already uses "underlying value" for something different.
+* Clarified that reifying as a CSSSTyleValue requires a property.
+* Defined reification behavior for registered custom properties (<a href="https://github.com/w3c/css-houdini-drafts/pull/886">#886</a>)
+* Used partial interface mixin ElementCSSInlineStyle (<a href="https://github.com/w3c/css-houdini-drafts/pull/853">#853</a>) 
+* Used the correct name from WebIDL for indexed property getter. 
+* Exported a number of terms for use in other specifications
+* Droped CSSPositionValue from this level. 
+* Added CSSMathClamp for the "clamp()"" function. 
+* Made the "match a grammar" algorithm a little more precise. 
+* Reifying computed numeric values uses the canonical unit. (<a href="https://github.com/w3c/css-houdini-drafts/issues/725">#725</a>)
+* Added note about new unit types. (<a href="https://github.com/w3c/css-houdini-drafts/issues/734">#734</a>)
+* Used correct unit "percent", not "percentage" (<a href="https://github.com/w3c/css-houdini-drafts/issues/761">#761</a>). 
+* Added note about custom property parsing 
+* Moved Naina Raisinghani to Former Editor
+* Added an 'invert a type' operation. 
+* Exported several numeric-type terms, so CSS Values & Units can refer to them.
+* Moved Shane Stephens to Former Editor
