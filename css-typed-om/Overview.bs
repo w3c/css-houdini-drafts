@@ -43,6 +43,9 @@ Markup Shorthands: markdown yes
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec: ecma-262
     text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
 </pre>
+<pre class='ignored-specs'>
+    spec:vc-data-model-2.0
+</pre>
 
 <pre class=link-defaults>
 spec:css-sizing; type:property;
@@ -57,9 +60,55 @@ spec:cssom-1;
         text: CSS declaration block
         text: declarations; for: CSSStyleDeclaration
 spec:css-align-3; type:property; text:column-gap
+spec:css-borders-4; 
+    type:property; 
+        text:border-block;
+        text:border-block-color;
+        text:border-block-end;
+        text:border-block-end-color;
+        text:border-block-end-style;
+        text:border-block-end-width;
+        text:border-block-start;
+        text:border-block-start-color;
+        text:border-block-start-style;
+        text:border-block-start-width;
+        text:border-block-style;
+        text:border-block-width;
+        text:border-bottom;
+        text:border-bottom-color;
+        text:border-bottom-style;
+        text:border-bottom-width;
+        text:border-color;
+        text:border-inline;
+        text:border-inline-color;
+        text:border-inline-end;
+        text:border-inline-end-color;
+        text:border-inline-end-style;
+        text:border-inline-end-style;
+        text:border-inline-end-width;
+        text:border-inline-start;
+        text:border-inline-start-color;
+        text:border-inline-start-style;
+        text:border-inline-start-width;
+        text:border-inline-style;
+        text:border-inline-width;
+        text:border-left;
+        text:border-left-color;
+        text:border-left-style;
+        text:border-left-width;
+        text:border-radius;
+        text:border-right;
+        text:border-right-color;
+        text:border-right-style;
+        text:border-right-width;
+        text:border-top;
+        text:border-top-color;
+        text:border-top-style;
+        text:border-top-width;
 spec:css-color-4;
     type:property; text:color;
     type:value; text:currentcolor;
+    type:function; text:color()
 spec:css-overflow-3;
     type: property; text: text-overflow;
 spec:css-position-3;
@@ -99,6 +148,10 @@ spec:css-transforms-1;
     type:property;
         text:transform;
         text:transform-origin;
+spec:css-typed-om-1; 
+    type:dfn; for:CSSNumericValue; 
+        text:type
+        text: types
 spec:css-ui-4;
     type: property; text: pointer-events;
 spec:css-values-4;
