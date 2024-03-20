@@ -647,7 +647,7 @@ if the value of the '@property/syntax' descriptor is not the [=universal syntax 
 the following conditions must be met for the ''@property'' rule to be valid:
 
 	* The '@property/initial-value' descriptor must be present.
-	* The '@property/initial-value' descriptor's value must [=consume a syntax definition|parse successfully=]
+	* The '@property/initial-value' descriptor's value must [=parse=] successfully
 		according to the grammar specified by the [=syntax definition=].
 	* The '@property/initial-value' must be [=computationally independent=].
 
