@@ -1,6 +1,8 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
-Status: ED
+Status: WD
+Date: 2024-03-21
+Prepare for TR: yes
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 TR: https://www.w3.org/TR/css-typed-om-1/
@@ -6255,7 +6257,7 @@ There are no known privacy issues introduced by these features.
 Changes {#changes}
 ==================
 
-<h3 id="#changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10 
+<h3 id="changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10 
 April 2018 Working Draft</a></h3>
 
 <!-- To 4 March 2024 -->
