@@ -1,11 +1,11 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
-Status: WD
-Date: 2024-03-21
-Prepare for TR: yes
+Status: ED
+Prepare for TR: no
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 TR: https://www.w3.org/TR/css-typed-om-1/
+Previous Version: https://www.w3.org/TR/2024/WD-css-typed-om-1-20240321/
 Previous Version: https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/
 Previous Version: https://www.w3.org/TR/2017/WD-css-typed-om-1-20170801/
 Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
