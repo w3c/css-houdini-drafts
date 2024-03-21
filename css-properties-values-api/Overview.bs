@@ -1376,3 +1376,17 @@ Privacy Considerations {#privacy-considerations}
 ==================================================
 
 There are no known privacy issues introduced by these features.
+
+Changes {#changes}
+==================
+
+<h3 id="changes-20201013">
+	Changes since the <a href="https://www.w3.org/TR/2020/WD-css-properties-values-api-1-20201013/">Working Draft of 13 October 2020</a>
+</h3>
+
+/* to 20 March 2024 */
+* Made "initial-value" have a &lt;declaration-value>?, same as custom properties. (<a href="https://github.com/w3c/csswg-drafts/issues/9078">#9078</a>)
+* Allowed @Property in shadow trees. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1085">#1085</a>)
+* Added section explaining why property registration is global, rather than shadow-scoped.
+* Exported the terms "registered custom property" and "universal syntax definition", for use in other specifications. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1020">#1020</a>)
+* Used the term "invalid at computed-value time" rather than "guaranteed-invalid value".
