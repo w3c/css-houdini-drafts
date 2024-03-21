@@ -237,7 +237,8 @@ and <code>"&lt;percentage>"</code> values:
 	the computed value is defined by that function.
 
 For <code>"&lt;color>"</code> values,
-the value is computed by [=resolving color values=].
+the value is computed by resolving color values,
+per [[css-color-4#resolving-color-values]].
 
 For <code>"&lt;custom-ident>"</code>, ident, or <code>"*"</code> values,
 the computed value is as specified.
