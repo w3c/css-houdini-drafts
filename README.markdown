@@ -1,6 +1,6 @@
 ### [CSS-TAG Houdini Task Force](https://wiki.css-houdini.org/) Specifications
 
-This is the repository containing the [CSS/TAG Houdini Task Force specifications](https://drafts.css-houdini.org/). For an overview of current status, see [Is Houdine Ready Yet?](https://ishoudinireadyyet.com/)
+This is the repository containing the [CSS/TAG Houdini Task Force specifications](https://drafts.css-houdini.org/). For an overview of current status, see [Is Houdini Ready Yet?](https://ishoudinireadyyet.com/)
 
 In addition to this git repository, a Mercurial mirror is maintained at `https://hg.css-houdini.org/drafts`, if for whatever reason you prefer Mercurial.
 
