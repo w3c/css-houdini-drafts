@@ -236,6 +236,9 @@ and <code>"&lt;percentage>"</code> values:
 	(such as a [=math function=]),
 	the computed value is defined by that function.
 
+For <code>"&lt;string>"</code> values,
+the computed value is as specified.
+
 For <code>"&lt;color>"</code> values,
 the value is computed by resolving color values,
 per [[css-color-4#resolving-color-values]].
@@ -944,6 +947,8 @@ corresponding types accepted by the resulting <a>syntax component</a>.
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
 	expression combining <<length>> and <<percentage>> components.
+:   "&lt;string>"
+::  Any valid <<string>> value
 :   "&lt;color>"
 ::  Any valid <<color>> value
 :   "&lt;image>"
