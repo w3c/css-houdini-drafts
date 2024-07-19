@@ -281,7 +281,7 @@ the computed value is one of the following:
 		<pre class='lang-html'>
 		&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
 		&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
-		&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+		&lt;div style="background-image: var(--url-foo), var(--url-bar);">
 		&lt;/div>
 		</pre>
 
