@@ -1,8 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Properties and Values API Level 1
-Status: WD
-Date: 2024-03-26
-Prepare for TR: Yes
+Status: ED
+Prepare for TR: no
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 TR: https://www.w3.org/TR/css-properties-values-api-1/
