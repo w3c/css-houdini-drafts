@@ -1,6 +1,8 @@
 <pre class='metadata'>
 Title:  CSS Properties and Values API Level 1
-Status: ED
+Status: WD
+Date: 2024-03-26
+Prepare for TR: Yes
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 TR: https://www.w3.org/TR/css-properties-values-api-1/
@@ -13,10 +15,10 @@ Level: 1
 Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
-Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com, w3cid 13329
+Former Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com, w3cid 13329
 Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
 Former Editor: Elliot Sprehn, esprehn@chromium.org
-Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
+Editor: Greg Whitworth,  gwhitworth@salesforce.com , w3cid 69511
 Ignored Terms: boolean, Animatable, Map, Context, isolated worker, SyntaxError,
 Ignored Terms: InvalidModificationError, NotFoundError, StylePropertyMapReadOnly,
 Ignored Terms: worklet global scope
