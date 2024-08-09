@@ -70,6 +70,8 @@ urlPrefix: https://www.w3.org/TR/CSS21/; type:dfn
 urlPrefix: https://html.spec.whatwg.org/#; type: dfn
     text: structuredserializeforstorage
     text: structureddeserialize
+urlPrefix: https://webidl.spec.whatwg.org/; type: dfn
+    url: #is-a-platform-object; text: is a platform object
 </pre>
 
 Introduction {#intro}
@@ -352,8 +354,9 @@ is called, the user agent <em>must</em> run the following steps:
     5. Let |inputPropertiesIterable| be the result of [=Get=](|layoutCtor|, "inputProperties").
 
     6. If |inputPropertiesIterable| is not undefined, then set |inputProperties| to the result of
-        [=converting=] |inputPropertiesIterable| to a <code>sequence&lt;DOMString></code>. If an
-        exception is [=thrown=], rethrow the exception and abort all these steps.
+        [=converted to an IDL value|converting=] |inputPropertiesIterable| to a
+        <code>sequence&lt;DOMString></code>. If an exception is [=thrown=], rethrow the exception
+        and abort all these steps.
 
     7. Filter |inputProperties| so that it only contains [=supported CSS properties=] and [=custom
         properties=].
@@ -373,7 +376,7 @@ is called, the user agent <em>must</em> run the following steps:
         "childInputProperties").
 
     10. If |childInputPropertiesIterable| is not undefined, then set |childInputProperties| to the
-        result of [=converting=] |childInputPropertiesIterable| to a
+        result of [=converted to an IDL value|converting=] |childInputPropertiesIterable| to a
         <code>sequence&lt;DOMString></code>. If an exception is [=thrown=], rethrow the exception
         and abort all these steps.
 
@@ -382,9 +385,9 @@ is called, the user agent <em>must</em> run the following steps:
 
     12. Let |layoutOptionsValue| be the result of [=Get=](|layoutCtor|, "layoutOptions").
 
-    13. Let |layoutOptions| be the result of [=converting=] |layoutOptionsValue| to a
-        {{LayoutOptions}}. If an exception is [=thrown=], rethrow the exception and abort all these
-        steps.
+    13. Let |layoutOptions| be the result of [=converted to an IDL value|converting=]
+        |layoutOptionsValue| to a {{LayoutOptions}}. If an exception is [=thrown=], rethrow the
+        exception and abort all these steps.
 
     14. Let |prototype| be the result of [=Get=](|layoutCtor|, "prototype").
 
@@ -393,13 +396,14 @@ is called, the user agent <em>must</em> run the following steps:
 
     16. Let |intrinsicSizesValue| be the result of [=Get=](|prototype|, "intrinsicSizes").
 
-    17. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to the
-        [=Function=] [=callback function=] type. Rethrow any exceptions from the conversion.
+    17. Let |intrinsicSizes| be the result of [=converted to an IDL value|converting=]
+        |intrinsicSizesValue| to the {{Function}} [=callback function=] type. Rethrow any 
+        exceptions from the conversion.
 
     18. Let |layoutValue| be the result of [=Get=](|prototype|, <code>"layout"</code>).
 
-    19. Let |layout| be the result of [=converting=] |layoutValue| to the [=Function=] [=callback
-        function=] type. Rethrow any exceptions from the conversion.
+    19. Let |layout| be the result of [=converted to an IDL value|converting=] |layoutValue| to
+        the {{Function}} [=callback function=] type. Rethrow any exceptions from the conversion.
 
     20. Let |definition| be a new [=layout definition=] with:
 
@@ -1827,8 +1831,9 @@ When the user agent wants to <dfn>invoke an intrinsic sizes callback</dfn> given
 
     10. Let |intrinsicSizesFunction| be |definition|'s [=intrinsic sizes function=].
 
-    11. Let |value| be the result of [=Invoke=](|intrinsicSizesFunction|, |layoutInstance|,
-            «|children|, |edges|, |styleMap|»).
+    11. Let |value| be the result of [=invoking=] |intrinsicSizesFunction| with « |children|,
+        |edges|, |styleMap| » and "`rethrow`", and with |layoutInstance| as the [=callback this
+        value=].
 
         If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
         these steps.
@@ -1847,9 +1852,9 @@ When the user agent wants to <dfn>invoke an intrinsic sizes callback</dfn> given
 
             1. Let |intrinsicSizesValue| be |value|.
 
-    13. Let |intrinsicSizes| be the result of [=converting=] |intrinsicSizesValue| to a
-        {{IntrinsicSizesResultOptions}}. If an exception is [=thrown=], let |box| fallback to the
-        [=flow layout=] and abort all these steps.
+    13. Let |intrinsicSizes| be the result of [=converted to an IDL value|converting=]
+        |intrinsicSizesValue| to a {{IntrinsicSizesResultOptions}}. If an exception is [=thrown=],
+        let |box| fallback to the [=flow layout=] and abort all these steps.
 
     14. Set the [=intrinsic sizes=] of |box|:
 
@@ -1950,8 +1955,9 @@ following steps:
 
     13. Let |layoutFunction| be |definition|'s [=layout function=].
 
-    14. Let |value| be the result of [=Invoke=](|layoutFunction|, |layoutInstance|, «|children|,
-            |edges|, |layoutConstraints|, |styleMap|, |breakToken|»).
+    14. Let |value| be the result of [=invoking =] |layoutFunction| with « |children|, |edges|,
+        |layoutConstraints|, |styleMap|, |breakToken| », and with |layoutInstance| as the [=callback
+        this value=].
 
         If an exception is [=thrown=] the let |box| fallback to the [=flow layout=] and abort all
         these steps.
@@ -1969,20 +1975,20 @@ following steps:
 
             1. Let |fragmentResultValue| be |value|.
 
-    16. If |fragmentResultValue| is a [=platform object=]:
+    16. If |fragmentResultValue| [=is a platform object=]:
 
         - Then:
 
-            1. Let |fragmentResult| be the result [=converting=] |fragmentResultValue| to a
-                {{FragmentResult}}.
+            1. Let |fragmentResult| be the result [=converted to an IDL value|converting=]
+                |fragmentResultValue| to a {{FragmentResult}}.
 
                 If an exception is [=thrown=], let |box| fallback to the [=flow layout=] and abort all
                 these steps.
 
         - Otherwise:
 
-            1. Let |fragmentResultOptions| be the result of [=converting=] |fragmentResultValue| to
-                a {{FragmentResultOptions}}.
+            1. Let |fragmentResultOptions| be the result of [=converted to an IDL value|converting=]
+                |fragmentResultValue| to a {{FragmentResultOptions}}.
 
                 If an exception is [=thrown=], let |box| fallback to the [=flow layout=] and abort
                 all these steps.
