@@ -1959,26 +1959,44 @@ and to the CSS [=math functions=].
         Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
 
         If the context in which the value is used
-        does not allow <<percentage>> values,
-        then the [=type=] must additionally have
-        a null [=percent hint=]
-        to be considered [=CSSNumericValue/matching=].
+        allows <<percentage>> values,
+        and those percentages are resolved against another type,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        it must either have a null [=percent hint=],
+        or the [=percent hint=] must match the other type.
+
+        If the context does <em>not</em> allow <<percentage>> values
+        to be mixed with <<length>>/etc values
+        (or doesn't allow <<percentage>> values at all,
+        such as 'border-width'),
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must be null.
+
     * A [=type=] matches <<percentage>>
-        if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
+        if its only non-zero [=map/entry=] is «[ "percent" → 1 ]»,
+        and it has a null [=percent hint=].
     * A [=type=] matches <<length-percentage>>
-        if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percent" → 1 ]».
+        if it matches <<length>> or matches <<percentage>>.
         Same for <<angle-percentage>>, <<time-percentage>>, etc.
     * A [=type=] matches <<number>>
         if it has no non-zero [=map/entries=].
 
         If the context in which the value is used
-        does not allow <<percentage>> values,
-        then the [=type=] must additionally have
-        a null [=percent hint=]
-        to be considered [=CSSNumericValue/matching=].
+        allows <<percentage>> values,
+        and those percentages are resolved against another type,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        it must either have a null [=percent hint=],
+        or the [=percent hint=] must match the other type.
+
+        If the context does <em>not</em> allow <<percentage>> values,
+        or allows them but does not resolve them against another type
+        (or treats them equivalent to a <<number>>,
+        such as in 'opacity'),
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must be null.
 </div>
 
-Note: [=Types=] form a semi-group under both addition
+Note: [=Types=] form a semi-group under addition,
 and a monoid under multiplication
 (with the multiplicative identity being «[ ]» with a null [=percent hint=]),
 meaning that they're associative and commutative.
