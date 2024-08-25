@@ -51,6 +51,7 @@ spec:css22; type:property;
     text:min-height
     text:min-width
 spec:css2; type:property; text:max-width
+spec:webidl; type:dfn; text:is a platform object
 </pre>
 
 <pre class="anchors">
@@ -70,8 +71,6 @@ urlPrefix: https://www.w3.org/TR/CSS21/; type:dfn
 urlPrefix: https://html.spec.whatwg.org/#; type: dfn
     text: structuredserializeforstorage
     text: structureddeserialize
-urlPrefix: https://webidl.spec.whatwg.org/; type: dfn
-    url: #is-a-platform-object; text: is a platform object
 </pre>
 
 Introduction {#intro}
