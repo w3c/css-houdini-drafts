@@ -740,7 +740,7 @@ as arguments of the same names.
 
 		Otherwise,
 		if |syntax definition| is the <a>universal syntax definition</a>,
-		[=CSS/parse=] |initialValue| as a <<declaration-value>>.
+		[=CSS/parse=] |initialValue| according to <code><<declaration-value>>?</code>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
