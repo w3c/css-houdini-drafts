@@ -1792,11 +1792,19 @@ The <dfn export for=CSSNumericValue lt="base type">base types</dfn> are
 and "percent".
 The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
 The <dfn export for=CSSNumericValue>percent hint</dfn>
-is either null or a [=base type=] other than "percent".
+is either null or a [=base type=].
 
 Note: As new unit types are added to CSS,
 they'll be added to this list of [=base types=],
 and to the CSS [=math functions=].
+
+Note: A [=percent hint=] can be "percent",
+indicating the percentage is used as itself
+(or, equivalently, evaluated against a plain number),
+but this is not produced by the Typed OM methods;
+it only occurs when the type machinery
+is used directly by CSS,
+where a value's context is actually known.
 
 <div algorithm>
     To <dfn export for="CSSNumericValue" lt="create a type|creating a type">create a type</dfn> from a string |unit|,
@@ -1898,13 +1906,17 @@ and to the CSS [=math functions=].
 </div>
 
 <div algorithm>
-    To <dfn export>apply the percent hint</dfn> |hint| to a |type|,
+    To <dfn export>apply the percent hint</dfn> |hint|
+    to a |type| without a [=percent hint=],
     perform the following steps:
 
-    1. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
-    2. If |type| [=map/contains=] "percent", add |type|["percent"] to |type|[|hint|],
+    1. Set |type|’s [=percent hint=] to |hint|,
+    2. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
+    3. If |hint| is anything other than "percent",
+        and |type| [=map/contains=] "percent",
+        add |type|["percent"] to |type|[|hint|],
         then set |type|["percent"] to 0.
-    4. Set |type|’s [=percent hint=] to |hint|.
+    4. Return |type|.
 </div>
 
 <div algorithm>
@@ -1974,24 +1986,29 @@ and to the CSS [=math functions=].
 
     * A [=type=] matches <<percentage>>
         if its only non-zero [=map/entry=] is «[ "percent" → 1 ]»,
-        and it has a null [=percent hint=].
+        and its [=percent hint=] is either null or "percent".
+
     * A [=type=] matches <<length-percentage>>
         if it matches <<length>> or matches <<percentage>>.
         Same for <<angle-percentage>>, <<time-percentage>>, etc.
+
     * A [=type=] matches <<number>>
         if it has no non-zero [=map/entries=].
 
         If the context in which the value is used
         allows <<percentage>> values,
-        and those percentages are resolved against another type,
+        and those percentages are resolved against a type other than <<number>>,
         then for the [=type=] to be considered [=CSSNumericValue/matching=]
-        it must either have a null [=percent hint=],
-        or the [=percent hint=] must match the other type.
+        the [=percent hint=] must either be null
+        or match the other type.
+
+        If the context allows <<percentage>> values,
+        but either doesn't resolve them against another type
+        or resolves them against a <<number>>,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must either be null or "percent".
 
         If the context does <em>not</em> allow <<percentage>> values,
-        or allows them but does not resolve them against another type
-        (or treats them equivalent to a <<number>>,
-        such as in 'opacity'),
         then for the [=type=] to be considered [=CSSNumericValue/matching=]
         the [=percent hint=] must be null.
 </div>
