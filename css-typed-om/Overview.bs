@@ -1910,7 +1910,7 @@ where a value's context is actually known.
     to a |type| without a [=percent hint=],
     perform the following steps:
 
-    1. Set |type|’s [=percent hint=] to |hint|,
+    1. Set |type|’s [=percent hint=] to |hint|.
     2. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
     3. If |hint| is anything other than "percent",
         and |type| [=map/contains=] "percent",
