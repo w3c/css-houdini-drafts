@@ -66,6 +66,7 @@ below. You should read the code below with its explanatory section.
 
 ```js
 registerLayout('centering', class {
+  async intrinsicSizes() {}
   async layout(children, edges, constraints, styleMap) {
     // (1) Determine our (inner) available size.
     const availableInlineSize = constraints.fixedInlineSize - edges.inline;
@@ -229,6 +230,7 @@ registerLayout('style-read', class {
   static inputProperties = ['--a-number'];
   static childInputProperties = ['--a-string'];
 
+  async intrinsicSizes() {}
   async layout(children, edges, constraints, styleMap) {
     // We can read our own style:
     styleMap.get('--a-number').value === 42;
@@ -307,13 +309,14 @@ We pass the `BreakToken` to add back into the `layout()` call in order to produc
 registerLayout('basic-inline', class {
   static layoutOptions = {childDisplay: 'normal'};
 
+  async intrinsicSizes() {}
   async layout(children, edges, constraints, styleMap) {
     // Determine our (inner) available size.
     const availableInlineSize = constraints.fixedInlineSize - edges.inline;
     const availableBlockSize = constraints.fixedBlockSize !== null ?
         constraints.fixedBlockSize - edges.block : null;
 
-    const constraints = {
+    const childConstraints = {
       availableInlineSize,
       availableBlockSize,
     };
@@ -327,10 +330,10 @@ registerLayout('basic-inline', class {
       // Layout the next line, the produced line will try and respect the
       // availableInlineSize given, you could use this to achieve a column
       // effect or similar.
-      const fragment = await child.layoutNextFragment(constraints, childBreakToken);
+      const fragment = await child.layoutNextFragment(childConstraints, childBreakToken);
       childFragments.push(fragment);
 
-      // Position the fragment, note we coulld do something special here, like
+      // Position the fragment, note we could do something special here, like
       // placing all the lines on a "rythimic grid", or similar.
       fragment.inlineOffset = edges.inlineStart;
       fragment.blockOffset = blockOffset;
@@ -409,6 +412,7 @@ We can make our children fragment by passing them a constraint space with a frag
 
 ```js
 registerLayout('special-multi-col', class {
+  async intrinsicSizes() {}
   async layout(children, edges, constraints, styleMap, breakToken) {
     for (let child of children) {
       // Create a constraint space with a fragmentation line.
@@ -435,6 +439,7 @@ We can also allow our own layout to be fragmented by respecting the fragmentatio
 
 ```js
 registerLayout('basic-inline', class {
+  async intrinsicSizes() {}
   async layout(children, edges, constraints, styleMap, breakToken) {
 
     // We can check if we need to fragment in the block direction.
