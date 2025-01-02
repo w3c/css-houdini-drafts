@@ -1117,6 +1117,7 @@ Parsing The Syntax String {#parsing-syntax}
 		Otherwise, return failure.
 
 	:   <a>ident-start code point</a>
+	:   U+002D HYPHEN-MINUS
 	:   U+005C REVERSE SOLIDUS (\)
 	::  If the stream [=starts with an ident sequence=],
 		<a>reconsume the current input code point</a> from |stream|
