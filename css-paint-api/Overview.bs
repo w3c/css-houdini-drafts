@@ -334,6 +334,7 @@ PaintRenderingContext2D includes CanvasCompositing;
 PaintRenderingContext2D includes CanvasImageSmoothing;
 PaintRenderingContext2D includes CanvasFillStrokeStyles;
 PaintRenderingContext2D includes CanvasShadowStyles;
+PaintRenderingContext2D includes CanvasFilters;
 PaintRenderingContext2D includes CanvasRect;
 PaintRenderingContext2D includes CanvasDrawPath;
 PaintRenderingContext2D includes CanvasDrawImage;
