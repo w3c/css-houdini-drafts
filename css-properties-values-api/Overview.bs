@@ -400,16 +400,6 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 	a <<dimension-token>> with a value of "80" and unit "px".
 </div>
 
-### Fallbacks In ''var()'' References ### {#fallbacks-in-var-references}
-
-References to registered custom properties using the ''var()'' function may
-provide a fallback. However, the fallback value must match the
-<a>syntax definition</a> of the custom property being referenced, otherwise the
-declaration is <a spec=css-variables>invalid at computed-value time</a>.
-
-Note: This applies regardless of whether or not the fallback is being used.
-
-
 ### Dependency Cycles via Relative Units ### {#dependency-cycles}
 
 [=Registered custom properties=] follow the same rules for dependency cycle resolution
