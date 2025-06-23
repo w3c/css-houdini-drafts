@@ -1136,7 +1136,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the sum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
@@ -1284,7 +1284,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the minimum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
@@ -1315,7 +1315,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the maximum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
