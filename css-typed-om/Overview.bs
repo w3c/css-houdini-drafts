@@ -5585,7 +5585,25 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its lightness, a, b, and alpha components, respectively.
 
-    6. If |val| is a ''color()'' function,
+    6. If |val| is an ''oklch()'' function,
+        then return a new {{CSSOKLCH}} object
+        with its {{CSSOKLCH/l}},
+        {{CSSOKLCH/c}},
+        {{CSSOKLCH/h}},
+        and {{CSSOKLCH/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, chroma, hue angle, and alpha components, respectively.
+
+    7. If |val| is an ''oklab()'' function,
+        then return a new {{CSSOKLab}} object
+        with its {{CSSOKLab/l}},
+        {{CSSOKLab/a}},
+        {{CSSOKLab/b}},
+        and {{CSSOKLab/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, a, b, and alpha components, respectively.
+
+    8. If |val| is a ''color()'' function,
         then return a new {{CSSColor}} object
         with its {{CSSColor/colorSpace}} internal slot
         set to the result of [=reifying an identifier=]
@@ -5596,7 +5614,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         and {{CSSColor/alpha}} internal slot
         set to the result of [=reifying=] |val|'s alpha component.
 
-    7. If |val| is a <<named-color>> or the keyword ''transparent'',
+    9. If |val| is a <<named-color>> or the keyword ''transparent'',
         then return a new {{CSSRGB}} object
         with its {{CSSRGB/r}},
         {{CSSRGB/g}},
@@ -5605,7 +5623,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its red, green, blue, and alpha components, respectively.
 
-    8. If |val| is any other color keyword,
+    10. If |val| is any other color keyword,
         return the result of [=reifying an identifier=] from |val|.
 </div>
 
