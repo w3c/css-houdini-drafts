@@ -475,7 +475,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -498,7 +498,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -521,7 +521,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">has(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -539,7 +539,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn attribute for="StylePropertyMapReadOnly, StylePropertyMap">size</dfn> attribute,
-    on getting from a {{StylePropertyMap}} |this|,
+    on getting from a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot.
