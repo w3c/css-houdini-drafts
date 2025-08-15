@@ -1518,7 +1518,7 @@ The following are the arithmetic operations you can perform on dimensions:
             set |result|[|baseType|] to |power|.
 
     3. If the [=percent hint=] of |this| is not null,
-        1. Set {{CSSNumericType/percentHint}} to the [=percent hint=] of |this|.
+        1. Set |result|[|percentHint|] to the [=percent hint=] of |this|.
 
     4. Return |result|.
 </div>
@@ -5808,7 +5808,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
 
-    1. Let |s| initally be "var(".
+    1. Let |s| initially be "var(".
 
     2. Append |this|’s {{CSSVariableReferenceValue/variable}} internal slot to |s|.
 
