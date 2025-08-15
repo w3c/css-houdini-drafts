@@ -1518,7 +1518,7 @@ The following are the arithmetic operations you can perform on dimensions:
             set |result|[|baseType|] to |power|.
 
     3. If the [=percent hint=] of |this| is not null,
-        1. Set {{CSSNumericType/percentHint}} to the [=percent hint=] of |this|.
+        1. Set |result|[|percentHint|] to the [=percent hint=] of |this|.
 
     4. Return |result|.
 </div>
