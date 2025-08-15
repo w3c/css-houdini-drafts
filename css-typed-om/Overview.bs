@@ -5808,7 +5808,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
 
-    1. Let |s| initally be "var(".
+    1. Let |s| initially be "var(".
 
     2. Append |this|’s {{CSSVariableReferenceValue/variable}} internal slot to |s|.
 
