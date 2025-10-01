@@ -307,10 +307,10 @@ The <<paint()>> function is an additional notation to be supported by the <<imag
 
 <div class="example">
     <pre class=lang-markup>
-        &ltstyle>
+        &lt;style>
             .logo { background-image: paint(company-logo); }
             .chat-bubble { background-image: paint(chat-bubble, blue); }
-        &lt/style>
+        &lt;/style>
     </pre>
 </div>
 
@@ -664,7 +664,8 @@ When the user agent wants to <dfn>invoke a paint callback</dfn> given |name|, |i
     11. Let |paintFunctionCallback| be |definition|'s [=paint function=].
 
     12. [=Invoke=] |paintFunctionCallback| with arguments «|renderingContext|, |paintSize|,
-        |styleMap|, |inputArguments|», and with |paintInstance| as the [=callback this value=].
+        |styleMap|, |inputArguments|» and "`rethrow`", and with |paintInstance| as the
+        [=callback this value=].
 
         If |paintFunctionCallback| does not complete within an acceptable time (as determined by the
         user agent, i.e. it is a "long running script") the user agent <em>may</em> terminate the

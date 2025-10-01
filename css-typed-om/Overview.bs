@@ -1,9 +1,11 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 1
 Status: ED
+Prepare for TR: no
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-1/
 TR: https://www.w3.org/TR/css-typed-om-1/
+Previous Version: https://www.w3.org/TR/2024/WD-css-typed-om-1-20240321/
 Previous Version: https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/
 Previous Version: https://www.w3.org/TR/2017/WD-css-typed-om-1-20170801/
 Previous Version: https://www.w3.org/TR/2016/WD-css-typed-om-1-20160607/
@@ -43,6 +45,9 @@ Markup Shorthands: markdown yes
 urlPrefix: http://www.ecma-international.org/ecma-262/6.0/#sec-; type: dfn; spec: ecma-262
     text: RangeError; url: native-error-types-used-in-this-standard-rangeerror
 </pre>
+<pre class='ignored-specs'>
+    spec:vc-data-model-2.0
+</pre>
 
 <pre class=link-defaults>
 spec:css-sizing; type:property;
@@ -57,9 +62,55 @@ spec:cssom-1;
         text: CSS declaration block
         text: declarations; for: CSSStyleDeclaration
 spec:css-align-3; type:property; text:column-gap
+spec:css-borders-4; 
+    type:property; 
+        text:border-block;
+        text:border-block-color;
+        text:border-block-end;
+        text:border-block-end-color;
+        text:border-block-end-style;
+        text:border-block-end-width;
+        text:border-block-start;
+        text:border-block-start-color;
+        text:border-block-start-style;
+        text:border-block-start-width;
+        text:border-block-style;
+        text:border-block-width;
+        text:border-bottom;
+        text:border-bottom-color;
+        text:border-bottom-style;
+        text:border-bottom-width;
+        text:border-color;
+        text:border-inline;
+        text:border-inline-color;
+        text:border-inline-end;
+        text:border-inline-end-color;
+        text:border-inline-end-style;
+        text:border-inline-end-style;
+        text:border-inline-end-width;
+        text:border-inline-start;
+        text:border-inline-start-color;
+        text:border-inline-start-style;
+        text:border-inline-start-width;
+        text:border-inline-style;
+        text:border-inline-width;
+        text:border-left;
+        text:border-left-color;
+        text:border-left-style;
+        text:border-left-width;
+        text:border-radius;
+        text:border-right;
+        text:border-right-color;
+        text:border-right-style;
+        text:border-right-width;
+        text:border-top;
+        text:border-top-color;
+        text:border-top-style;
+        text:border-top-width;
 spec:css-color-4;
     type:property; text:color;
     type:value; text:currentcolor;
+    type:function; text:color()
 spec:css-overflow-3;
     type: property; text: text-overflow;
 spec:css-position-3;
@@ -99,6 +150,10 @@ spec:css-transforms-1;
     type:property;
         text:transform;
         text:transform-origin;
+spec:css-typed-om-1; 
+    type:dfn; for:CSSNumericValue; 
+        text:type
+        text: types
 spec:css-ui-4;
     type: property; text: pointer-events;
 spec:css-values-4;
@@ -420,7 +475,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">get(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -443,7 +498,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">getAll(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -466,7 +521,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn method for="StylePropertyMapReadOnly, StylePropertyMap">has(|property|)</dfn> method,
-    when called on a {{StylePropertyMap}} |this|,
+    when called on a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. If |property| is not a [=custom property name string=],
@@ -484,7 +539,7 @@ probably in an appendix.
 
 <div algorithm>
     The <dfn attribute for="StylePropertyMapReadOnly, StylePropertyMap">size</dfn> attribute,
-    on getting from a {{StylePropertyMap}} |this|,
+    on getting from a {{StylePropertyMapReadOnly}} |this|,
     must perform the following steps:
 
     1. Return the [=map/size=] of the value of |this|’s {{[[declarations]]}} internal slot.
@@ -783,7 +838,7 @@ interface CSSUnparsedValue : CSSStyleValue {
     iterable<CSSUnparsedSegment>;
     readonly attribute unsigned long length;
     getter CSSUnparsedSegment (unsigned long index);
-    setter CSSUnparsedSegment (unsigned long index, CSSUnparsedSegment val);
+    setter undefined (unsigned long index, CSSUnparsedSegment val);
 };
 
 typedef (USVString or CSSVariableReferenceValue) CSSUnparsedSegment;
@@ -1081,7 +1136,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the sum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
@@ -1229,7 +1284,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the minimum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
@@ -1260,7 +1315,7 @@ The following are the arithmetic operations you can perform on dimensions:
     3. If all of the [=list/items=] in |values| are {{CSSUnitValue}}s
         and have the same {{CSSUnitValue/unit}},
         return a new {{CSSUnitValue}}
-        whose {{CSSUnitValue/unit}} internal slot is set to |this|’s {{CSSUnitValue/unit}} internal slot,
+        whose {{CSSUnitValue/unit}} internal slot is set to that unit,
         and {{CSSUnitValue/value}} internal slot is set to the maximum of
         the {{CSSUnitValue/value}} internal slots
         of the [=list/items=] in |values|.
@@ -1463,7 +1518,7 @@ The following are the arithmetic operations you can perform on dimensions:
             set |result|[|baseType|] to |power|.
 
     3. If the [=percent hint=] of |this| is not null,
-        1. Set {{CSSNumericType/percentHint}} to the [=percent hint=] of |this|.
+        1. Set |result|[|percentHint|] to the [=percent hint=] of |this|.
 
     4. Return |result|.
 </div>
@@ -1737,11 +1792,19 @@ The <dfn export for=CSSNumericValue lt="base type">base types</dfn> are
 and "percent".
 The ordering of a [=type=]’s entries always matches this [=base type=] ordering.
 The <dfn export for=CSSNumericValue>percent hint</dfn>
-is either null or a [=base type=] other than "percent".
+is either null or a [=base type=].
 
 Note: As new unit types are added to CSS,
 they'll be added to this list of [=base types=],
 and to the CSS [=math functions=].
+
+Note: A [=percent hint=] can be "percent",
+indicating the percentage is used as itself
+(or, equivalently, evaluated against a plain number),
+but this is not produced by the Typed OM methods;
+it only occurs when the type machinery
+is used directly by CSS,
+where a value's context is actually known.
 
 <div algorithm>
     To <dfn export for="CSSNumericValue" lt="create a type|creating a type">create a type</dfn> from a string |unit|,
@@ -1843,13 +1906,17 @@ and to the CSS [=math functions=].
 </div>
 
 <div algorithm>
-    To <dfn export>apply the percent hint</dfn> |hint| to a |type|,
+    To <dfn export>apply the percent hint</dfn> |hint|
+    to a |type| without a [=percent hint=],
     perform the following steps:
 
-    1. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
-    2. If |type| [=map/contains=] "percent", add |type|["percent"] to |type|[|hint|],
+    1. Set |type|’s [=percent hint=] to |hint|.
+    2. If |type| doesn't [=map/contain=] |hint|, set |type|[|hint|] to 0.
+    3. If |hint| is anything other than "percent",
+        and |type| [=map/contains=] "percent",
+        add |type|["percent"] to |type|[|hint|],
         then set |type|["percent"] to 0.
-    4. Set |type|’s [=percent hint=] to |hint|.
+    4. Return |type|.
 </div>
 
 <div algorithm>
@@ -1890,38 +1957,63 @@ and to the CSS [=math functions=].
 
     1. Let |result| be a new [=type=]
         with an initially empty [=ordered map=]
-        and an initially null [=percent hint=]
+        and a [=percent hint=] matching that of |type|.
     1. [=map/For each=] |unit| → |exponent| of |type|,
         set |result|[|unit|] to (-1 * |exponent|).
     3. Return |result|.
 </div>
 
-A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
+<div algorithm>
+    A [=type=] is said to <dfn export for=CSSNumericValue>match</dfn> a CSS production in some circumstances:
 
-* A [=type=] matches <<length>>
-    if its only non-zero [=map/entry=] is «[ "length" → 1 ]»
-    and its [=percent hint=] is null.
-    Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
-* A [=type=] matches <<percentage>>
-    if its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
-* A [=type=] matches <<length-percentage>>
-    if its only non-zero [=map/entry=] is either «[ "length" → 1 ]» or «[ "percent" → 1 ]»
-    Same for <<angle-percentage>>, <<time-percentage>>, etc.
-* A [=type=] matches <<number>>
-    if it has no non-zero [=map/entries=]
-    and its [=percent hint=] is null.
-* A [=type=] matches <<number-percentage>>
-    if it has no non-zero [=map/entries=],
-    or its only non-zero [=map/entry=] is «[ "percent" → 1 ]».
+    * A [=type=] matches <<length>>
+        if its only non-zero [=map/entry=] is «[ "length" → 1 ]».
+        Similarly for <<angle>>, <<time>>, <<frequency>>, <<resolution>>, and <<flex>>.
 
-Many specifications use ''[ <<length>> | <<percentage>> ]''
-instead of ''<<length-percentage>>'' in their grammar,
-and specify in prose that the <<length>> and <<percentage>> can be combined.
-For the purposes of [=CSSNumericValue/matching=],
-these cases should be treated as <<length-percentage>>.
-Similarly for <<angle-percentage>>, etc.
+        If the context in which the value is used
+        allows <<percentage>> values,
+        and those percentages are resolved against another type,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        it must either have a null [=percent hint=],
+        or the [=percent hint=] must match the other type.
 
-Note: [=Types=] form a semi-group under both addition
+        If the context does <em>not</em> allow <<percentage>> values
+        to be mixed with <<length>>/etc values
+        (or doesn't allow <<percentage>> values at all,
+        such as 'border-width'),
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must be null.
+
+    * A [=type=] matches <<percentage>>
+        if its only non-zero [=map/entry=] is «[ "percent" → 1 ]»,
+        and its [=percent hint=] is either null or "percent".
+
+    * A [=type=] matches <<length-percentage>>
+        if it matches <<length>> or matches <<percentage>>.
+        Same for <<angle-percentage>>, <<time-percentage>>, etc.
+
+    * A [=type=] matches <<number>>
+        if it has no non-zero [=map/entries=].
+
+        If the context in which the value is used
+        allows <<percentage>> values,
+        and those percentages are resolved against a type other than <<number>>,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must either be null
+        or match the other type.
+
+        If the context allows <<percentage>> values,
+        but either doesn't resolve them against another type
+        or resolves them against a <<number>>,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must either be null or "percent".
+
+        If the context does <em>not</em> allow <<percentage>> values,
+        then for the [=type=] to be considered [=CSSNumericValue/matching=]
+        the [=percent hint=] must be null.
+</div>
+
+Note: [=Types=] form a semi-group under addition,
 and a monoid under multiplication
 (with the multiplicative identity being «[ ]» with a null [=percent hint=]),
 meaning that they're associative and commutative.
@@ -2283,12 +2375,17 @@ partial namespace CSS {
     CSSUnitValue percent(double value);
 
     // <length>
+    CSSUnitValue cap(double value);
+    CSSUnitValue ch(double value);
     CSSUnitValue em(double value);
     CSSUnitValue ex(double value);
-    CSSUnitValue ch(double value);
     CSSUnitValue ic(double value);
-    CSSUnitValue rem(double value);
     CSSUnitValue lh(double value);
+    CSSUnitValue rcap(double value);
+    CSSUnitValue rch(double value);
+    CSSUnitValue rem(double value);
+    CSSUnitValue rex(double value);
+    CSSUnitValue ric(double value);
     CSSUnitValue rlh(double value);
     CSSUnitValue vw(double value);
     CSSUnitValue vh(double value);
@@ -2368,6 +2465,39 @@ partial namespace CSS {
     to avoid defining the unit individually for all ~60 functions.
 </div>
 
+The above list of methods reflects the set of CSS's valid predefined units
+at one particular point in time.
+It will be updated over time,
+but might be out-of-date at any given moment.
+If an implementation supports additional CSS units
+that do not have a corresponding method in the above list,
+but that do correspond to one of the existing {{CSSNumericType}} values,
+it must additionally support such a method,
+named after the unit
+in its defined canonical casing,
+using the generic behavior defined above.
+
+If an implementation supports units
+that do <em>not</em> correspond to one of the existing {{CSSNumericType}} values,
+it must not support those units in the APIs defined in this specification;
+it should request the units and their types
+be added explicitly to this specification,
+as the appropriate type name is not implicit from the unit.
+
+If an implementation does not support a given unit,
+it must not implement its corresponding method from the list above.
+
+<div class=example>
+    For example, the CSS Speech spec [[CSS-SPEECH-1]]
+    defines two additional units,
+    the decibel <css>dB</css> and semitone <css>st</css>.
+    No current browser implementation supports these
+    or has plans to,
+    so they're not included in the above list,
+    but if an implementation <em>does</em> support the Speec spec,
+    it must also expose <code>CSS.dB()</code> and <code>CSS.st()</code> methods.
+</div>
+
 
 <!--
 ████████ ████████     ███    ██    ██  ██████  ████████  ███████  ████████  ██     ██
@@ -2394,7 +2524,7 @@ interface CSSTransformValue : CSSStyleValue {
     iterable<CSSTransformComponent>;
     readonly attribute unsigned long length;
     getter CSSTransformComponent (unsigned long index);
-    setter CSSTransformComponent (unsigned long index, CSSTransformComponent val);
+    setter undefined (unsigned long index, CSSTransformComponent val);
 
     readonly attribute boolean is2D;
     DOMMatrix toMatrix();
@@ -5455,7 +5585,25 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its lightness, a, b, and alpha components, respectively.
 
-    6. If |val| is a ''color()'' function,
+    6. If |val| is an ''oklch()'' function,
+        then return a new {{CSSOKLCH}} object
+        with its {{CSSOKLCH/l}},
+        {{CSSOKLCH/c}},
+        {{CSSOKLCH/h}},
+        and {{CSSOKLCH/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, chroma, hue angle, and alpha components, respectively.
+
+    7. If |val| is an ''oklab()'' function,
+        then return a new {{CSSOKLab}} object
+        with its {{CSSOKLab/l}},
+        {{CSSOKLab/a}},
+        {{CSSOKLab/b}},
+        and {{CSSOKLab/alpha}} internal slots
+        set to the [=reification=]
+        of its lightness, a, b, and alpha components, respectively.
+
+    8. If |val| is a ''color()'' function,
         then return a new {{CSSColor}} object
         with its {{CSSColor/colorSpace}} internal slot
         set to the result of [=reifying an identifier=]
@@ -5466,7 +5614,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         and {{CSSColor/alpha}} internal slot
         set to the result of [=reifying=] |val|'s alpha component.
 
-    7. If |val| is a <<named-color>> or the keyword ''transparent'',
+    9. If |val| is a <<named-color>> or the keyword ''transparent'',
         then return a new {{CSSRGB}} object
         with its {{CSSRGB/r}},
         {{CSSRGB/g}},
@@ -5475,7 +5623,7 @@ or generic {{CSSStyleValue}}s (otherwise).
         set to the [=reification=]
         of its red, green, blue, and alpha components, respectively.
 
-    8. If |val| is any other color keyword,
+    10. If |val| is any other color keyword,
         return the result of [=reifying an identifier=] from |val|.
 </div>
 
@@ -5660,7 +5808,7 @@ length3.toString(); // "42px";
 <div algorithm>
     To <dfn export>serialize a {{CSSVariableReferenceValue}}</dfn> |this|:
 
-    1. Let |s| initally be "var(".
+    1. Let |s| initially be "var(".
 
     2. Append |this|’s {{CSSVariableReferenceValue/variable}} internal slot to |s|.
 
@@ -6158,3 +6306,54 @@ Privacy Considerations {#privacy-considerations}
 ==================================================
 
 There are no known privacy issues introduced by these features.
+
+Changes {#changes}
+==================
+
+<h3 id="changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10 
+April 2018 Working Draft</a></h3>
+
+<!-- To 4 March 2024 -->
+* Fixed the type match algorithm to refer to the percent hint more abstractly.
+* Clarified that "invert a type" needs to preserve the percent hint.
+* Added missing font units to CSS numeric factory. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1107">#1107</a>)
+* Specified that the list of unit shorthand methods must be reduced or expanded to match the implementation's support.
+* Used undefined union value for "StylePropertyMapReadOnly.get()". (<a href="https://github.com/w3c/css-houdini-drafts/pull/1087">#1087</a>)
+* Removed .to() and the CSSColorValue.colorSpace, as conversion isn't really in Typed OM's remit. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1070">#1070</a>)
+* Added min/max to "serialize a CSSUnitValue", and pass it when serializing the argument of CSSPerspective. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1069">#1069</a>)
+*  Changed reifying from "a CSSStyleValue" to "an identifier". (<a href="https://github.com/w3c/css-houdini-drafts/pull/1068">#1068</a>)
+* Added factory functions for new viewport/container units. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1067">#1067</a>)
+* Added type checking to CSSNumericValue.parse. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1065">#1065</a>)
+* Removed CSSDeviceCMYK, add CSSOKLab and CSSOKLCH, made all the color classes accept the "none" keyword.
+* Defined how to reify a color value. 
+* Allowed "new unit value" to link to "create a CSSUnitValue from a pair" since that phrasing is used everywhere already.
+* Added support for perspective(none) to CSSPerspective. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1053">#1053</a>)
+* Fixed accidental clash of CSSClampValue.min/max with CSSNumericValue.min/max. (<a href="https://github.com/w3c/css-houdini-drafts/issues/855">#855</a>)
+* Simplified the Abstract
+* Removed CSSGray and associated spec text, since Color 4 <em>dropped</em> gray() some time ago. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1027">#1027</a>)
+* Moved .colorSpace up to the CSSColorValue superclass. Swapped the .to*() color-conversion functions for a generic .to(colorSpace) method. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1036">#1036</a>)
+* Added device-cmyk() support. 
+* Fix the OM for CSSColor to match recent simplifications.
+* Specified which color function each CSSColorValue subclass represents, and added CSSGray.
+* Added missing parentheses for union. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1016">#1016</a>)
+* Added some explanatory text about the makeup of a "type".
+* Aligned with Web IDL specification. (<a href="https://github.com/w3c/css-houdini-drafts/pull/965">#965</a> and <a href="https://github.com/w3c/css-houdini-drafts/pull/1006">#1006</a> )
+* Fixed algorithm nesting.
+* Added default dictionary value, required by update to <a href="https://github.com/whatwg/webidl/pull/750">WebIDL</a>. (<a href="https://github.com/w3c/css-houdini-drafts/pull/936">#936</a>)
+* Switched term from "underlying value" to :internal representation", as Web Animations already uses "underlying value" for something different.
+* Clarified that reifying as a CSSSTyleValue requires a property.
+* Defined reification behavior for registered custom properties (<a href="https://github.com/w3c/css-houdini-drafts/pull/886">#886</a>)
+* Used partial interface mixin ElementCSSInlineStyle (<a href="https://github.com/w3c/css-houdini-drafts/pull/853">#853</a>) 
+* Used the correct name from WebIDL for indexed property getter. 
+* Exported a number of terms for use in other specifications
+* Droped CSSPositionValue from this level. 
+* Added CSSMathClamp for the "clamp()"" function. 
+* Made the "match a grammar" algorithm a little more precise. 
+* Reifying computed numeric values uses the canonical unit. (<a href="https://github.com/w3c/css-houdini-drafts/issues/725">#725</a>)
+* Added note about new unit types. (<a href="https://github.com/w3c/css-houdini-drafts/issues/734">#734</a>)
+* Used correct unit "percent", not "percentage" (<a href="https://github.com/w3c/css-houdini-drafts/issues/761">#761</a>). 
+* Added note about custom property parsing 
+* Moved Naina Raisinghani to Former Editor
+* Added an 'invert a type' operation. 
+* Exported several numeric-type terms, so CSS Values & Units can refer to them.
+* Moved Shane Stephens to Former Editor

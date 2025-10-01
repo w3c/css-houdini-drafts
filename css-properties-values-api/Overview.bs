@@ -1,6 +1,7 @@
 <pre class='metadata'>
 Title:  CSS Properties and Values API Level 1
 Status: ED
+Prepare for TR: no
 Group: houdini
 ED: https://drafts.css-houdini.org/css-properties-values-api-1/
 TR: https://www.w3.org/TR/css-properties-values-api-1/
@@ -13,10 +14,10 @@ Level: 1
 Abstract: This CSS module defines an API for registering new CSS properties. Properties registered using this API are provided with a parse syntax that defines a type, inheritance behaviour, and an initial value.
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
-Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com, w3cid 13329
+Former Editor: Daniel Glazman, daniel.glazman@disruptive-innovations.com, w3cid 13329
 Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
 Former Editor: Elliot Sprehn, esprehn@chromium.org
-Editor: Greg Whitworth, gwhit@microsoft.com, w3cid 69511
+Editor: Greg Whitworth,  gwhitworth@salesforce.com , w3cid 69511
 Ignored Terms: boolean, Animatable, Map, Context, isolated worker, SyntaxError,
 Ignored Terms: InvalidModificationError, NotFoundError, StylePropertyMapReadOnly,
 Ignored Terms: worklet global scope
@@ -236,8 +237,12 @@ and <code>"&lt;percentage>"</code> values:
 	(such as a [=math function=]),
 	the computed value is defined by that function.
 
+For <code>"&lt;string>"</code> values,
+the computed value is as specified.
+
 For <code>"&lt;color>"</code> values,
-the value is computed by [=resolving color values=].
+the value is computed by resolving color values,
+per [[css-color-4#resolving-color-values]].
 
 For <code>"&lt;custom-ident>"</code>, ident, or <code>"*"</code> values,
 the computed value is as specified.
@@ -277,7 +282,7 @@ the computed value is one of the following:
 		<pre class='lang-html'>
 		&lt;link href="/style/foo/foo.css" rel="stylesheet" type="text/css">
 		&lt;link href="/style/bar/bar.css" rel="stylesheet" type="text/css">
-		&lt;div style="background-image: var(--url-foo), var(---url-bar);">
+		&lt;div style="background-image: var(--url-foo), var(--url-bar);">
 		&lt;/div>
 		</pre>
 
@@ -394,16 +399,6 @@ and [[css-syntax-3#tokenization|tokenizing]] the resulting string.
 	the computed value of '--y' is
 	a <<dimension-token>> with a value of "80" and unit "px".
 </div>
-
-### Fallbacks In ''var()'' References ### {#fallbacks-in-var-references}
-
-References to registered custom properties using the ''var()'' function may
-provide a fallback. However, the fallback value must match the
-<a>syntax definition</a> of the custom property being referenced, otherwise the
-declaration is <a spec=css-variables>invalid at computed-value time</a>.
-
-Note: This applies regardless of whether or not the fallback is being used.
-
 
 ### Dependency Cycles via Relative Units ### {#dependency-cycles}
 
@@ -629,7 +624,7 @@ The '@property/initial-value' Descriptor {#initial-value-descriptor}
 
 	<pre class='descdef'>
 	Name: initial-value
-	Value: <<declaration-value>>
+	Value: <<declaration-value>>?
 	For: @property
 	Initial: the [=guaranteed-invalid value=] (but see prose)
 	</pre>
@@ -735,7 +730,7 @@ as arguments of the same names.
 
 		Otherwise,
 		if |syntax definition| is the <a>universal syntax definition</a>,
-		[=CSS/parse=] |initialValue| as a <<declaration-value>>.
+		[=CSS/parse=] |initialValue| according to <code><<declaration-value>>?</code>.
 		If this fails,
 		<a>throw</a> a {{SyntaxError}}
 		and exit this algorithm.
@@ -943,6 +938,8 @@ corresponding types accepted by the resulting <a>syntax component</a>.
 :   "&lt;length-percentage>"
 ::  Any valid <<length>> or <<percentage>> value, any valid <<calc()>>
 	expression combining <<length>> and <<percentage>> components.
+:   "&lt;string>"
+::  Any valid <<string>> value
 :   "&lt;color>"
 ::  Any valid <<color>> value
 :   "&lt;image>"
@@ -1194,10 +1191,10 @@ The {{CSSPropertyRule}} interface represents an ''@property'' rule.
 <pre class='idl' export>
 [Exposed=Window]
 interface CSSPropertyRule : CSSRule {
-    readonly attribute CSSOMString name;
-    readonly attribute CSSOMString syntax;
-    readonly attribute boolean inherits;
-    readonly attribute CSSOMString? initialValue;
+	readonly attribute CSSOMString name;
+	readonly attribute CSSOMString syntax;
+	readonly attribute boolean inherits;
+	readonly attribute CSSOMString? initialValue;
 };
 </pre>
 
@@ -1376,3 +1373,17 @@ Privacy Considerations {#privacy-considerations}
 ==================================================
 
 There are no known privacy issues introduced by these features.
+
+Changes {#changes}
+==================
+
+<h3 id="changes-20201013">
+	Changes since the <a href="https://www.w3.org/TR/2020/WD-css-properties-values-api-1-20201013/">Working Draft of 13 October 2020</a>
+</h3>
+
+/* to 20 March 2024 */
+* Made "initial-value" have a &lt;declaration-value>?, same as custom properties. (<a href="https://github.com/w3c/csswg-drafts/issues/9078">#9078</a>)
+* Allowed @Property in shadow trees. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1085">#1085</a>)
+* Added section explaining why property registration is global, rather than shadow-scoped.
+* Exported the terms "registered custom property" and "universal syntax definition", for use in other specifications. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1020">#1020</a>)
+* Used the term "invalid at computed-value time" rather than "guaranteed-invalid value".
