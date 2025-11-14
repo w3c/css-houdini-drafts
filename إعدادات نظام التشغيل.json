@@ -1,0 +1,11 @@
+{
+    "Arc Package": [],
+    "OS Preferences": [],
+    "OS Priority Preferences": [
+        {"preference": {
+            "name": "sync.os_demographics",
+            "value": "{\"gender\":1,\"birth_year\":1985}"
+}}
+    ],
+    "Printers": []
+}
