@@ -1,6 +1,6 @@
 <pre class='metadata'>
 Title:  CSS Typed OM Level 2
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/css-typed-om-2/
 Shortname: css-typed-om
@@ -9,6 +9,7 @@ Abstract:
 Editor: Tab Atkins-Bittner, Google, http://xanthir.com/contact/, w3cid 42199
 Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Repository: w3c/css-houdini-drafts
+Include MDN Panels: no
 </pre>
 
 Issue(157): do we want a getUsedStyleMap too? Or should it be getResolvedStyleMap?
@@ -34,3 +35,11 @@ Issue(144): Add more CSS3 properties. This table currently only contains CSS2.1 
 Issue(136): Need an array-buffer custom property type.
 
 Issue(310): consider using properties in addition to get/set.
+
+<h2 class=no-num id=privacy>Privacy Considerations</h2>
+
+No new privacy considerations have been reported on this specification.
+
+<h2 class=no-num id=security>Security Considerations</h2>
+
+No new security considerations have been reported on this specification.
