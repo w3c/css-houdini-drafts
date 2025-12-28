@@ -43,7 +43,9 @@ spec:css-pseudo-4; type:selector; text:::after
 spec:css-pseudo-4; type:selector; text:::before
 spec:css-pseudo-4; type:selector; text:::first-letter
 spec:css-pseudo-4; type:selector; text:::first-line
-spec:dom; type:dfn; for:/; text:element
+spec:dom; type:dfn; for:/;
+    text:document
+    text:element
 spec:infra; type:dfn; text:list
 spec:html; type:dfn; for:global object; text:realm
 spec:css22; type:property;
@@ -333,7 +335,6 @@ The user agent <em>clear</em> the [=styleMap=] internal slot for a [=box=] when:
         });
     </pre>
 </div>
-</div>
 
 The algorithm below is run when the {{registerLayout(name, layoutCtor)}} is called. It notifies the
 user agent layout engine about the new user defined layout.
@@ -396,7 +397,7 @@ is called, the user agent <em>must</em> run the following steps:
     16. Let |intrinsicSizesValue| be the result of [=Get=](|prototype|, "intrinsicSizes").
 
     17. Let |intrinsicSizes| be the result of [=converted to an IDL value|converting=]
-        |intrinsicSizesValue| to the {{Function}} [=callback function=] type. Rethrow any 
+        |intrinsicSizesValue| to the {{Function}} [=callback function=] type. Rethrow any
         exceptions from the conversion.
 
     18. Let |layoutValue| be the result of [=Get=](|prototype|, <code>"layout"</code>).
@@ -671,7 +672,7 @@ called on a {{LayoutChild}} |this|, the user agent must perform the following st
         Note: This is to ensure that only {{LayoutChild}}ren passed in as arguments to either the
             layout or intrinsicSizes method are used.
 
-    4. If |breakToken|'s {{ChildBreakToken/[[unique id]]} is not equal to |context|'s [=unique id=],
+    4. If |breakToken|'s {{ChildBreakToken/[[unique id]]}} is not equal to |context|'s [=unique id=],
         reject |p| with a "{{InvalidStateError}}" {{DOMException}}, and abort all these steps.
 
     5. If |context|'s [=layout API context/mode=] is <code>"intrinsic-sizes"</code>, reject |p| with
