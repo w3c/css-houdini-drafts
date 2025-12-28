@@ -18,7 +18,7 @@ Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Former Editor: Naina Raisinghani, Google, nainar@google.com, w3cid 100915
 Repository: w3c/css-houdini-drafts
 Inline Github Issues: title
-Ignored Vars: type, unit
+Ignored Vars: percentHint, type, unit
 Ignored Terms: Drawable, paint image definition, list-valued property, list-valued property iteration, parse a CSSStyleValue, values to iterate over, CSS, PseudoElement, style, reify a url, reify an image, reify a position
 Markup Shorthands: markdown yes
 </pre>
@@ -62,8 +62,9 @@ spec:cssom-1;
         text: CSS declaration block
         text: declarations; for: CSSStyleDeclaration
 spec:css-align-3; type:property; text:column-gap
-spec:css-borders-4; 
-    type:property; 
+spec:css-borders-4;
+    type:property;
+        text:border;
         text:border-block;
         text:border-block-color;
         text:border-block-end;
@@ -81,6 +82,12 @@ spec:css-borders-4;
         text:border-bottom-style;
         text:border-bottom-width;
         text:border-color;
+        text:border-image;
+        text:border-image-outset;
+        text:border-image-repeat;
+        text:border-image-slice;
+        text:border-image-source;
+        text:border-image-width;
         text:border-inline;
         text:border-inline-color;
         text:border-inline-end;
@@ -103,14 +110,20 @@ spec:css-borders-4;
         text:border-right-color;
         text:border-right-style;
         text:border-right-width;
+        text:border-style;
         text:border-top;
         text:border-top-color;
         text:border-top-style;
         text:border-top-width;
+        text:border-width;
+    type:value;
+        text:fill
+        text:stretch
 spec:css-color-4;
     type:property; text:color;
     type:value; text:currentcolor;
     type:function; text:color()
+spec:css-fonts-4; type:property; text:font-size-adjust
 spec:css-overflow-3;
     type: property; text: text-overflow;
 spec:css-position-3;
@@ -150,8 +163,8 @@ spec:css-transforms-1;
     type:property;
         text:transform;
         text:transform-origin;
-spec:css-typed-om-1; 
-    type:dfn; for:CSSNumericValue; 
+spec:css-typed-om-1;
+    type:dfn; for:CSSNumericValue;
         text:type
         text: types
 spec:css-ui-4;
@@ -165,7 +178,6 @@ spec:css-values-4;
 spec:dom; type:interface;
     text:Document
     text:Element;
-spec:geometry-1; type:dfn; for:DOMMatrixReadOnly; text:stringification behavior
 spec:html; type:element; text:style
 spec:infra;
     type: dfn;
@@ -1259,7 +1271,7 @@ The following are the arithmetic operations you can perform on dimensions:
             [=throw=] a {{RangeError}}.
         2. Else return a new {{CSSUnitValue}}
             with the {{CSSUnitValue/unit}} internal slot set to "number",
-            and a {{CSSUnitValue/value}} internal slot set to 1 divided by |this|’s {CSSUnitValue/value}} internal slot.
+            and a {{CSSUnitValue/value}} internal slot set to 1 divided by |this|’s {{CSSUnitValue/value}} internal slot.
 
     3. Otherwise,
         return a new {{CSSMathInvert}} object
@@ -1656,7 +1668,7 @@ The following are the arithmetic operations you can perform on dimensions:
                 2. If |values| is failure,
                     return failure.
 
-                3. If the length of [=values=] is more than one,
+                3. If the length of |values| is more than one,
                     return failure.
 
                 3. Invert (find the reciprocal of) the [=sum value/value=] of the [=list/item=] in |values|,
@@ -1749,7 +1761,7 @@ rather than on {{CSSNumericValue}} instances.
         or a [=math function=],
         [=throw=] a {{SyntaxError}}
         and abort this algorithm.
-    
+
     3. If |result| is a <<dimension-token>>
         and [=creating a type=] from |result|'s unit returns failure,
         [=throw=] a {{SyntaxError}}
@@ -4359,9 +4371,6 @@ for both specified and computed values.
 : <a>gap</a>
 ::
 
-: <a>globalcompositeoperation</a>
-::
-
 : <a>glyph-orientation-vertical</a>
 ::
 
@@ -4863,9 +4872,6 @@ for both specified and computed values.
 :: For both specified and computed values,
     [=reify an identifier=] from the value
     and return the result.
-
-: <a>presentation-level</a>
-::
 
 : <a>quotes</a>
 ::
@@ -5640,7 +5646,7 @@ while CSS <<transform-function>> values become {{CSSTransformComponent}}s.
 
     1. Return a new {{CSSTransformValue}}
         whose [=values to iterate over=]
-        are the result of mapping the [=reify a &lt;transform-function>=] algorithm
+        are the result of mapping the [=reify a <transform-function>=] algorithm
         over |list|.
 </div>
 
@@ -6310,7 +6316,7 @@ There are no known privacy issues introduced by these features.
 Changes {#changes}
 ==================
 
-<h3 id="changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10 
+<h3 id="changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10
 April 2018 Working Draft</a></h3>
 
 <!-- To 4 March 2024 -->
@@ -6325,14 +6331,14 @@ April 2018 Working Draft</a></h3>
 * Added factory functions for new viewport/container units. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1067">#1067</a>)
 * Added type checking to CSSNumericValue.parse. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1065">#1065</a>)
 * Removed CSSDeviceCMYK, add CSSOKLab and CSSOKLCH, made all the color classes accept the "none" keyword.
-* Defined how to reify a color value. 
+* Defined how to reify a color value.
 * Allowed "new unit value" to link to "create a CSSUnitValue from a pair" since that phrasing is used everywhere already.
 * Added support for perspective(none) to CSSPerspective. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1053">#1053</a>)
 * Fixed accidental clash of CSSClampValue.min/max with CSSNumericValue.min/max. (<a href="https://github.com/w3c/css-houdini-drafts/issues/855">#855</a>)
 * Simplified the Abstract
 * Removed CSSGray and associated spec text, since Color 4 <em>dropped</em> gray() some time ago. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1027">#1027</a>)
 * Moved .colorSpace up to the CSSColorValue superclass. Swapped the .to*() color-conversion functions for a generic .to(colorSpace) method. (<a href="https://github.com/w3c/css-houdini-drafts/issues/1036">#1036</a>)
-* Added device-cmyk() support. 
+* Added device-cmyk() support.
 * Fix the OM for CSSColor to match recent simplifications.
 * Specified which color function each CSSColorValue subclass represents, and added CSSGray.
 * Added missing parentheses for union. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1016">#1016</a>)
@@ -6343,17 +6349,17 @@ April 2018 Working Draft</a></h3>
 * Switched term from "underlying value" to :internal representation", as Web Animations already uses "underlying value" for something different.
 * Clarified that reifying as a CSSSTyleValue requires a property.
 * Defined reification behavior for registered custom properties (<a href="https://github.com/w3c/css-houdini-drafts/pull/886">#886</a>)
-* Used partial interface mixin ElementCSSInlineStyle (<a href="https://github.com/w3c/css-houdini-drafts/pull/853">#853</a>) 
-* Used the correct name from WebIDL for indexed property getter. 
+* Used partial interface mixin ElementCSSInlineStyle (<a href="https://github.com/w3c/css-houdini-drafts/pull/853">#853</a>)
+* Used the correct name from WebIDL for indexed property getter.
 * Exported a number of terms for use in other specifications
-* Droped CSSPositionValue from this level. 
-* Added CSSMathClamp for the "clamp()"" function. 
-* Made the "match a grammar" algorithm a little more precise. 
+* Droped CSSPositionValue from this level.
+* Added CSSMathClamp for the "clamp()"" function.
+* Made the "match a grammar" algorithm a little more precise.
 * Reifying computed numeric values uses the canonical unit. (<a href="https://github.com/w3c/css-houdini-drafts/issues/725">#725</a>)
 * Added note about new unit types. (<a href="https://github.com/w3c/css-houdini-drafts/issues/734">#734</a>)
-* Used correct unit "percent", not "percentage" (<a href="https://github.com/w3c/css-houdini-drafts/issues/761">#761</a>). 
-* Added note about custom property parsing 
+* Used correct unit "percent", not "percentage" (<a href="https://github.com/w3c/css-houdini-drafts/issues/761">#761</a>).
+* Added note about custom property parsing
 * Moved Naina Raisinghani to Former Editor
-* Added an 'invert a type' operation. 
+* Added an 'invert a type' operation.
 * Exported several numeric-type terms, so CSS Values & Units can refer to them.
 * Moved Shane Stephens to Former Editor
