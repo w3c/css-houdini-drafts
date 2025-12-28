@@ -15,7 +15,10 @@ Ignored Terms: AnimationWorklet
 
 <pre class="link-defaults">
 spec:infra; type:dfn; text:list
-spec:dom; type:interface; text:Document
+spec:dom;
+    type:dfn; for:/; text:document
+    type:interface; text:Document
+spec:web-animations-1; type:dfn; text:start time
 </pre>
 
 <pre class="anchors">
@@ -726,8 +729,7 @@ Creating a Worklet Animation {#creating-worklet-animation}
 
 Creates a new {{WorkletAnimation}} object using the following procedure:
 
-    1. Let |documentAnimatorDefinitions| be the associated [=document's=] <a>document animator
-        definitions</a> [=map=].
+    1. Let |documentAnimatorDefinitions| be the associated [=document's=] <a>document animator definitions</a> [=map=].
 
     2. If |documentAnimatorDefinitions|[|animatorName|] does not [=map/exists=], [=throw=] an
         [=TypeError=] and abort the following steps.
@@ -745,7 +747,7 @@ Creates a new {{WorkletAnimation}} object using the following procedure:
     6. Let |effect| be the result corresponding to the first matching condition from below.
          : If |effects| is a {{AnimationEffect}} object,
          :: Let effect be |effects|.
-         : If |effects| is a [=list=] of {{AnimationEffect}}</a> objects,
+         : If |effects| is a [=list=] of {{AnimationEffect}} objects,
          :: Let |effect| be a new {{WorkletGroupEffect}} with its children set to |effects|.
          : Otherwise,
          :: Let |effect| be undefined.
@@ -898,7 +900,7 @@ When a given worklet animation's [=play state=] changes from [=finished=], [=run
 
 When a given worklet animation's [=replace state=] changes from [=active=] to either
 [=persisted=] or [=removed=] run the procedure to
-[=disassociate animator instance of worklet animation]= given the worklet animation as
+[=disassociate animator instance of worklet animation=] given the worklet animation as
 |workletAnimation|.
 
 
