@@ -1,6 +1,6 @@
 <pre class='metadata'>
 Title: Box Tree API Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/box-tree-api-1/
 Shortname: box-tree-api
@@ -97,6 +97,14 @@ partial interface Element {
 };
 
 partial interface Document {
-	void layoutNow();
+	undefined layoutNow();
 };
 </pre>
+
+<h2 id='security'>Security Considerations</h2>
+
+There are no known security issues introduced by these features.
+
+<h2 id='privacy'>Privacy Considerations</h2>
+
+There are no known privacy issues introduced by these features.
