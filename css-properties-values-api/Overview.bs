@@ -42,7 +42,6 @@ spec:css-values-4;
 		text:cap
 	type:dfn
 		text:identifier
-spec:cssom-1; type:interface; text:CSS
 spec:dom;
 	type:interface; text:Document
 	type:dfn; text:shadow tree
@@ -300,7 +299,7 @@ the computed value is one of the following:
 </details>
 
 For <code>"&lt;image>"</code> values,
-the computed value is the [=computed &lt;image>=].
+the computed value is the [=computed <image>=].
 
 For <code>"&lt;transform-function>"</code> and <code>"&lt;transform-list>"</code> values,
 the computed value is as specified but with all lengths resolved to their computed values.
@@ -1265,10 +1264,10 @@ the following:
 			<<time>>, <<resolution>>, <<percentage>> or <<length-percentage>>;
 			[=reify a numeric value=] from the value and return the result.
 		2. If the value is a <<transform-function>>,
-			[=reify a &lt;transform-function>=] from the value and return the
+			[=reify a <transform-function>=] from the value and return the
 			result.
 		3. If the value is a <<transform-list>>,
-			[=reify a &lt;transform-list>=] from the value and return the result.
+			[=reify a <transform-list>=] from the value and return the result.
 		4. If the value is an <<image>>, reify a CSSImageValue from the value and
 			return the result.
 		5. If the value is an [=identifier=], [=reify an identifier=] from the value
