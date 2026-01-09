@@ -7,3 +7,5 @@ syntax: glob
 .hg/*
 
 */Overview.html
+
+.vscode
