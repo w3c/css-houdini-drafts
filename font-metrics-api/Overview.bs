@@ -1,11 +1,11 @@
 <pre class='metadata'>
 Title:  Font Metrics API Level 1
-Status: DREAM
+Status: ED
 Group: houdini
 ED: https://drafts.css-houdini.org/font-metrics-api-1/
 Shortname: font-metrics-api
 Level: 1
-Abstract: 
+Abstract:
 Editor: Alan Stearns, stearns@adobe.com, w3cid 46659
 Former Editor: Emil A Eklund, eae@google.com, w3cid 93298
 </pre>
@@ -210,3 +210,13 @@ used from each font.
 
 Note: Indicates the number of glyphs which may be lower than the number of
 codepoints.
+
+Privacy Considerations {#privacy}
+=================================
+
+No new privacy considerations have been reported on this specification.
+
+Security Considerations {#security}
+===================================
+
+No new security considerations have been reported on this specification.
