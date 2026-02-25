@@ -1,6 +1,6 @@
 # Scroll customization
 
-Many native mobile applications have [UI effects that interact with scrolling](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md), for example snapping the scroll position to image boundaries in an image carousell.  To do this web developers must [resort](http://cubiq.org/iscroll-5) to re-implementing all of scrolling on top of raw input events. There are four major drawbacks with such an approach:
+Many native mobile applications have [UI effects that interact with scrolling](https://github.com/w3c/css-houdini-drafts/blob/main/scroll-customization-api/UseCases.md), for example snapping the scroll position to image boundaries in an image carousell.  To do this web developers must [resort](http://cubiq.org/iscroll-5) to re-implementing all of scrolling on top of raw input events. There are four major drawbacks with such an approach:
 - Threaded scrolling is disabled, so any main thread work >16ms will lead to dropped frames.
 - Accessibility is often broken, as the browser (and any assistive technologies) have no idea that scrolling is occurring.
 - Such components cannot compose properly with other scrollers (native or JS), for example for proper scroll chaining.
@@ -10,7 +10,7 @@ The fundamental problem here is that scrolling on the web is a big "magical" bla
 
 ## Supporting Threaded scrolling
 
-Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  We want to allow arbitrary scroll effects to be written using JavaScript that runs every scroll frame. This proposal builds on [Compositor Worker](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.
+Modern browsers implement scrolling off of the main JavaScript thread to ensure that scrolling can be serviced reliably at 60fps.  We want to allow arbitrary scroll effects to be written using JavaScript that runs every scroll frame. This proposal builds on [Compositor Worker](https://github.com/w3c/css-houdini-drafts/blob/main/composited-scrolling-and-animation/Explainer.md) to permit customizations that typically run in-sync with scrolling.
 
 In the future we also want high performance applications to be able to opt-out of threaded scrolling and use a variant of these APIs from the main JavaScript execution context.  The details of how to permit such customization without risking poor performance are complex and controversial and so are not yet covered as part of this proposal.  But regardless of the thread in which it's executing, the mental model for scroll customization is the same.
 

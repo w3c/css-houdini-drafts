@@ -11,7 +11,7 @@ Level: 1
 Abstract:
     An API for allowing web developers to define a custom CSS <<image>> with javascript, which will
     respond to style and size changes.
-    See <a href="https://github.com/w3c/css-houdini-drafts/blob/master/css-paint-api/EXPLAINER.md">EXPLAINER</a>.
+    See <a href="https://github.com/w3c/css-houdini-drafts/blob/main/css-paint-api/EXPLAINER.md">EXPLAINER</a>.
 Former Editor: Shane Stephens, shanestephens@google.com, w3cid 47691
 Editor: Ian Kilpatrick, ikilpatrick@chromium.org, w3cid 73001
 Editor: Dean Jackson, dino@apple.com, w3cid 42080

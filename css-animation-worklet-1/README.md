@@ -42,7 +42,7 @@ address this problem.
     *   Pull-to-refresh: animation depends on both touch and time inputs.
     *   Custom scrollbars.
     *   High-fidelity location tracking and positioning
-    *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md) of scroll-driven effects.
+    *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/main/scroll-customization-api/UseCases.md) of scroll-driven effects.
 *   Gesture driven effects:
     *   [Image manipulator](https://github.com/w3c/csswg-drafts/issues/2493#issuecomment-422153926) that scales, rotates etc.
     *   Swipe to Action.
@@ -655,7 +655,7 @@ the most recent version.
 
 
 [roc-thread]: https://lists.w3.org/Archives/Public/public-houdini/2015Mar/0020.html
-[cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/Explainer.md
+[cw-proposal]: https://github.com/w3c/css-houdini-drafts/blob/main/composited-scrolling-and-animation/Explainer.md
 [WA]: https://drafts.csswg.org/web-animations/
 [animation]: https://drafts.csswg.org/web-animations/#animations
 [worklet]: https://drafts.css-houdini.org/worklets/#worklet-section

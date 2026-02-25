@@ -1,9 +1,9 @@
 
-The [Composited Scrolling](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/UseCases.md) use cases include effects that respond to and are synchronized with scroll position.  Below are additional use cases which require more control over exactly how scrolling behaves.
+The [Composited Scrolling](https://github.com/w3c/css-houdini-drafts/blob/main/composited-scrolling-and-animation/UseCases.md) use cases include effects that respond to and are synchronized with scroll position.  Below are additional use cases which require more control over exactly how scrolling behaves.
 
 Hidey bars
 ----
-- Similar to a [Scroll header](https://github.com/w3c/css-houdini-drafts/blob/master/composited-scrolling-and-animation/UseCases.md#scroll-header) 
+- Similar to a [Scroll header](https://github.com/w3c/css-houdini-drafts/blob/main/composited-scrolling-and-animation/UseCases.md#scroll-header) 
 - Typically have a different effect depending on the direction of scroll, and depending on whether they are attached to the top or bottom of their scroll area
  - e.g. scrolling down the bar moves with the container, and disappears outside the bounds
 - scrolling up, the bar animates in with a timed animation. It's position is relative to its container at this point.
