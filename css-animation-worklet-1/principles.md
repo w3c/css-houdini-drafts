@@ -53,7 +53,7 @@ Examples of rich interactive effects that are (or will be made) possible with An
     *   [Custom paginated slider](http://aw-playground.glitch.me/amp-scroller.html).
     *   Pull-to-refresh: animation depends on both touch and time inputs.
     *   Custom scrollbars.
-    *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/master/scroll-customization-api/UseCases.md) of scroll-driven effects.
+    *   [More examples](https://github.com/w3c/css-houdini-drafts/blob/main/scroll-customization-api/UseCases.md) of scroll-driven effects.
 *   Gesture driven effects:
     *   [Image manipulator](https://github.com/w3c/csswg-drafts/issues/2493#issuecomment-422153926) that scales, rotates etc.
     *   Swipe to dismiss.
@@ -133,4 +133,4 @@ calculate pointer velocity, acceleration and other computed values inside an ani
 
 [performance]: https://paul.kinlan.me/what-news-readers-want/
 [rails]: https://developers.google.com/web/fundamentals/performance/rail#goals-and-guidelines
-[specification]: https://github.com/w3c/css-houdini-drafts/tree/master/css-animationworklet
+[specification]: https://github.com/w3c/css-houdini-drafts/tree/main/css-animationworklet
