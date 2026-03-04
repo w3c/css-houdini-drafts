@@ -951,7 +951,7 @@ of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
 {{CSSKeywordValue}} objects represent CSS keywords and other [=idents=].
 
 <pre class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSKeywordValue : CSSStyleValue {
     constructor(USVString value);
     attribute USVString value;
@@ -2064,7 +2064,7 @@ are represented as {{CSSUnitValue}}s.
 </div>
 
 <xmp class=idl>
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSUnitValue : CSSNumericValue {
         constructor(double value, USVString unit);
         attribute double value;
@@ -2160,48 +2160,48 @@ are represented in this way.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathValue : CSSNumericValue {
     readonly attribute CSSMathOperator operator;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathSum : CSSMathValue {
     constructor(CSSNumberish... args);
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathProduct : CSSMathValue {
     constructor(CSSNumberish... args);
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathNegate : CSSMathValue {
     constructor(CSSNumberish arg);
     readonly attribute CSSNumericValue value;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathInvert : CSSMathValue {
     constructor(CSSNumberish arg);
     readonly attribute CSSNumericValue value;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathMin : CSSMathValue {
     constructor(CSSNumberish... args);
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathMax : CSSMathValue {
     constructor(CSSNumberish... args);
     readonly attribute CSSNumericArray values;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSMathClamp : CSSMathValue {
     constructor(CSSNumberish lower, CSSNumberish value, CSSNumberish upper);
     readonly attribute CSSNumericValue lower;
@@ -2209,7 +2209,7 @@ interface CSSMathClamp : CSSMathValue {
     readonly attribute CSSNumericValue upper;
 };
 
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSNumericArray {
     iterable<CSSNumericValue>;
     readonly attribute unsigned long length;
@@ -2530,7 +2530,7 @@ They "contain" one or more {{CSSTransformComponent}}s,
 which represent individual <<transform-function>> values.
 
 <xmp class='idl'>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSTransformValue : CSSStyleValue {
     constructor(sequence<CSSTransformComponent> transforms);
     iterable<CSSTransformComponent>;
@@ -2625,14 +2625,14 @@ This list is the object's [=values to iterate over=].
 <xmp class=idl>
     typedef (CSSNumericValue or CSSKeywordish) CSSPerspectiveValue;
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSTransformComponent {
         stringifier;
         attribute boolean is2D;
         DOMMatrix toMatrix();
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSTranslate : CSSTransformComponent {
         constructor(CSSNumericValue x, CSSNumericValue y, optional CSSNumericValue z);
         attribute CSSNumericValue x;
@@ -2640,7 +2640,7 @@ This list is the object's [=values to iterate over=].
         attribute CSSNumericValue z;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSRotate : CSSTransformComponent {
         constructor(CSSNumericValue angle);
         constructor(CSSNumberish x, CSSNumberish y, CSSNumberish z, CSSNumericValue angle);
@@ -2650,7 +2650,7 @@ This list is the object's [=values to iterate over=].
         attribute CSSNumericValue angle;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSScale : CSSTransformComponent {
         constructor(CSSNumberish x, CSSNumberish y, optional CSSNumberish z);
         attribute CSSNumberish x;
@@ -2658,20 +2658,20 @@ This list is the object's [=values to iterate over=].
         attribute CSSNumberish z;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSSkew : CSSTransformComponent {
         constructor(CSSNumericValue ax, CSSNumericValue ay);
         attribute CSSNumericValue ax;
         attribute CSSNumericValue ay;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSSkewX : CSSTransformComponent {
         constructor(CSSNumericValue ax);
         attribute CSSNumericValue ax;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSSkewY : CSSTransformComponent {
         constructor(CSSNumericValue ay);
         attribute CSSNumericValue ay;
@@ -2680,13 +2680,13 @@ This list is the object's [=values to iterate over=].
     /* Note that skew(x,y) is *not* the same as skewX(x) skewY(y),
        thus the separate interfaces for all three. */
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSPerspective : CSSTransformComponent {
         constructor(CSSPerspectiveValue length);
         attribute CSSPerspectiveValue length;
     };
 
-    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+    [Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
     interface CSSMatrixComponent : CSSTransformComponent {
         constructor(DOMMatrixReadOnly matrix, optional CSSMatrixComponentOptions options = {});
         attribute DOMMatrix matrix;
@@ -3211,7 +3211,7 @@ into a {{CSSNumericValue}}.
 Issue: TODO add stringifiers
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSRGB : CSSColorValue {
     constructor(CSSColorRGBComp r, CSSColorRGBComp g, CSSColorRGBComp b, optional CSSColorPercent alpha = 1);
     attribute CSSColorRGBComp r;
@@ -3259,7 +3259,7 @@ The {{CSSRGB}} class represents the CSS ''rgb()''/''rgba()'' functions.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSHSL : CSSColorValue {
     constructor(CSSColorAngle h, CSSColorPercent s, CSSColorPercent l, optional CSSColorPercent alpha = 1);
     attribute CSSColorAngle h;
@@ -3304,7 +3304,7 @@ The {{CSSHSL}} class represents the CSS ''hsl()''/''hsla()'' functions.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSHWB : CSSColorValue {
     constructor(CSSNumericValue h, CSSNumberish w, CSSNumberish b, optional CSSNumberish alpha = 1);
     attribute CSSNumericValue h;
@@ -3349,7 +3349,7 @@ The {{CSSHWB}} class represents the CSS ''hwb()'' function.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSLab : CSSColorValue {
     constructor(CSSColorPercent l, CSSColorNumber a, CSSColorNumber b, optional CSSColorPercent alpha = 1);
     attribute CSSColorPercent l;
@@ -3395,7 +3395,7 @@ The {{CSSLab}} class represents the CSS ''lab()'' function.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSLCH : CSSColorValue {
     constructor(CSSColorPercent l, CSSColorPercent c, CSSColorAngle h, optional CSSColorPercent alpha = 1);
     attribute CSSColorPercent l;
@@ -3440,7 +3440,7 @@ The {{CSSLCH}} class represents the CSS ''lch()'' function.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSOKLab : CSSColorValue {
     constructor(CSSColorPercent l, CSSColorNumber a, CSSColorNumber b, optional CSSColorPercent alpha = 1);
     attribute CSSColorPercent l;
@@ -3486,7 +3486,7 @@ The {{CSSOKLab}} class represents the CSS ''oklab()'' function.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSOKLCH : CSSColorValue {
     constructor(CSSColorPercent l, CSSColorPercent c, CSSColorAngle h, optional CSSColorPercent alpha = 1);
     attribute CSSColorPercent l;
@@ -3531,7 +3531,7 @@ The {{CSSOKLCH}} class represents the CSS ''lch()'' function.
 </div>
 
 <xmp class=idl>
-[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet), Serializable]
 interface CSSColor : CSSColorValue {
     constructor(CSSKeywordish colorSpace, sequence<CSSColorPercent> channels, optional CSSNumberish alpha = 1);
     attribute CSSKeywordish colorSpace;
