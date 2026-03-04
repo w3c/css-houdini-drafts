@@ -169,6 +169,28 @@ for shortname, specgroup in specgroups.items():
         if shortname != currentWorkDir:
             create_symlink(shortname, currentWorkDir)
 
+# Create versioned aliases (e.g., font-metrics-api-1 → font-metrics-api)
+# for specs whose folder names don’t include the level suffix.
+for shortname, specgroup in specgroups.items():
+    for spec in specgroup:
+        if spec["level"]:
+            versioned_name = f"{spec['shortname']}-{spec['level']}"
+            if versioned_name != spec["dir"]:
+                create_symlink(versioned_name, spec["dir"])
+
+# Legacy path redirects for old URLs that used different names.
+LEGACY_REDIRECTS = {
+    "css-animationworklet-1": "css-animation-worklet-1",
+    "css-animationworklet": "css-animation-worklet-1",
+}
+
+for old_path, new_path in LEGACY_REDIRECTS.items():
+    if os.path.exists(new_path) and not os.path.exists(old_path):
+        try:
+            os.symlink(new_path, old_path)
+        except OSError:
+            pass
+
 with open('./timestamps.json', 'w') as f:
     json.dump(timestamps, f, indent=2, sort_keys=True)
 
