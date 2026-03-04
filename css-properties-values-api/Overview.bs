@@ -694,9 +694,9 @@ as arguments of the same names.
 <div algorithm>
 	To <dfn>register a custom property</dfn>
 	with |name| being a string,
+	|inherits| being a boolean,
 	and optionally
 	|syntax| being a string,
-	|inherits| being a boolean,
 	and |initialValue| being a string,
 	execute these steps:
 
