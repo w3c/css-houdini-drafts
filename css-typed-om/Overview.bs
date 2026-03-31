@@ -694,6 +694,9 @@ probably in an appendix.
         replace that value with the result of wrapping it in a fresh {{CSSMathSum}}
         whose {{CSSMathSum/values}} internal slot contains only that part of |value|.
 
+        If |value| is a {{CSSMathValue}},
+        replace it with the corresponding [=simplify a calculation tree|simplified=] value.
+
         Return the |value|.
 
     : If |value| is a {{USVString}},
