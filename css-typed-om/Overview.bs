@@ -877,30 +877,28 @@ of the {{CSSUnparsedValue/[[tokens]]}} internal slot.
     The [=supported property indices|supported property indexes=]
     of a {{CSSUnparsedValue}} |this|
     are the integers greater than or equal to 0,
-    and less than the [=list/size=] of |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+    and less than the [=list/size=] of |this|’s {{CSSUnparsedValue/[[tokens]]}}.
 
-    To [=determine the value of an indexed property=]
+    To perform the <dfn export for=CSSUnparsedValue>
+    [=/indexed property getter=]</dfn>
     of a {{CSSUnparsedValue}} |this|
-    and an index |n|,
-    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
-    and return |tokens|[|n|].
+    and an index |n|:
 
-    To [=set the value of an existing indexed property=]
+    1. Let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+    2. Return |tokens|[|n|].
+
+    To perform the <dfn export for=CSSUnparsedValue>
+    [=/indexed property setter=]</dfn>
     of a {{CSSUnparsedValue}} |this|,
     an index |n|,
-    and a value |new value|,
-    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot,
-    and set |tokens|[|n|] to |new value|.
+    and a value |new value|:
 
-    To [=set the value of a new indexed property=]
-    of a {{CSSUnparsedValue}} |this|,
-    an index |n|,
-    and a value |new value|,
-    let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
-    If |n| is not equal to the [=list/size=] of |tokens|,
-    [=throw=] a {{RangeError}}.
-    Otherwise,
-    [=list/append=] |new value| to |tokens|.
+    1. Let |tokens| be |this|’s {{CSSUnparsedValue/[[tokens]]}} internal slot.
+    2. If |n| is greater than the [=list/size=] of |tokens|,
+        [=throw=] a {{RangeError}}.
+    3. If |n| is less than the [=list/size=] of |tokens|,
+        set |tokens|[|n|] to |new value|.
+    4. Otherwise, [=list/append=] |new value| to |tokens|.
 </div>
 
 <div algorithm="CSSVariableReferenceValue.variable">
@@ -6319,7 +6317,8 @@ Changes {#changes}
 <h3 id="changes-20180410">Changes since the <a href="https://www.w3.org/TR/2018/WD-css-typed-om-1-20180410/">10
 April 2018 Working Draft</a></h3>
 
-<!-- To 4 March 2024 -->
+<!-- To 8 April 2026 -->
+* Define CSSUnparsedValue indexed property getter and setter and make them linkable. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1172">#1172</a>)
 * Fixed the type match algorithm to refer to the percent hint more abstractly.
 * Clarified that "invert a type" needs to preserve the percent hint.
 * Added missing font units to CSS numeric factory. (<a href="https://github.com/w3c/css-houdini-drafts/pull/1107">#1107</a>)
