@@ -335,9 +335,6 @@ registerLayout('basic-inline', class {
 
       // Position the fragment, note we could do something special here, like
       // placing all the lines on a "rythmic grid", or similar.
-||||||| parent of a2dd8db ([css-layout-api][explainer] add mandatory intrinsicSizes function)
-      // Position the fragment, note we coulld do something special here, like
-      // placing all the lines on a "rythimic grid", or similar.
       fragment.inlineOffset = edges.inlineStart;
       fragment.blockOffset = blockOffset;
 
