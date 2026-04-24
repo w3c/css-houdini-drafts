@@ -551,14 +551,15 @@ as if {{registerProperty()}} had been called with equivalent parameters.
 The syntax of ''@property'' is:
 
 	<pre class="prod def" nohighlight>
-	@property <<custom-property-name>> {
+	@property <<custom-property-name>># {
 		<<declaration-list>>
 	}
 	</pre>
 
-A valid ''@property'' rule represents a [=custom property registration=],
-with the property name being the serialization of the <<custom-property-name>>
-in the rule's prelude.
+A valid ''@property'' rule represents one or more [=custom property registrations=],
+one for each <<custom-property-name>> in the rule's prelude.
+Each such registration has the property name being the serialization
+of the corresponding <<custom-property-name>>.
 
 ''@property'' rules require a '@property/syntax' and '@property/inherits' descriptor;
 if either are missing,
@@ -568,12 +569,19 @@ only if the syntax is the [=universal syntax definition=],
 otherwise the descriptor is required;
 if it's missing, the entire rule is invalid and must be ignored.
 
+Note: When multiple <<custom-property-name>>s are listed in the prelude,
+all of them share the same descriptors,
+so a single ''@property'' rule can register several properties at once
+when they have the same syntax, inheritance, and initial value.
+
 Unknown descriptors are invalid and ignored,
 but do not invalidate the ''@property'' rule.
 
 Note: As specified in [[#determining-registration]],
-if multiple valid ''@property'' rules are defined for the same <<custom-property-name>>,
+if multiple valid ''@property'' rules register the same <<custom-property-name>>,
 the last one in stylesheet order "wins".
+This includes the case where the same name appears
+in the preludes of multiple ''@property'' rules.
 A custom property registration from {{registerProperty()|CSS.registerProperty()}}
 further wins over any ''@property'' rules
 for the same <<custom-property-name>>.
@@ -1191,6 +1199,7 @@ The {{CSSPropertyRule}} interface represents an ''@property'' rule.
 [Exposed=Window]
 interface CSSPropertyRule : CSSRule {
 	readonly attribute CSSOMString name;
+	readonly attribute FrozenArray<CSSOMString> names;
 	readonly attribute CSSOMString syntax;
 	readonly attribute boolean inherits;
 	readonly attribute CSSOMString? initialValue;
@@ -1200,7 +1209,12 @@ interface CSSPropertyRule : CSSRule {
 <dl dfn-for=CSSPropertyRule dfn-type=attribute>
 	<dt><dfn>name</dfn>
 	<dd>
-		The custom property name associated with the ''@property'' rule.
+		The first custom property name associated with the ''@property'' rule.
+
+	<dt><dfn>names</dfn>
+	<dd>
+		The list of custom property names associated with the ''@property'' rule,
+		in the order they appear in the prelude.
 
 	<dt><dfn>syntax</dfn>
 	<dd>
@@ -1221,8 +1235,10 @@ To <dfn export>serialize a CSSPropertyRule</dfn>, return the concatenation of
 the following:
 
 	1. The string <code>"@property"</code> followed by a single SPACE (U+0020).
-	2. The result of performing <a>serialize an identifier</a> on the rule's
-		name, followed by a single SPACE (U+0020).
+	2. For each |name| in the rule's {{CSSPropertyRule/names}},
+		the result of performing <a>serialize an identifier</a> on |name|,
+		separated by <code>", "</code> (a COMMA (U+002C) followed by a SPACE (U+0020)),
+		followed by a single SPACE (U+0020).
 	3. The string <code>"{ "</code>, i.e., a single
 		LEFT CURLY BRACKET (U+007B), followed by a SPACE (U+0020).
 	4. The string <code>"syntax:"</code>, followed by a single SPACE (U+0020).
@@ -1363,6 +1379,53 @@ Example 2: Using ''@property'' to register a property {#example-2}
 	});
 </pre>
 
+Example 3: Registering multiple properties with one rule {#example-3}
+----------------------------------------------------------------------
+
+When several custom properties share the same syntax, inheritance, and initial value,
+they can be registered together using a comma-separated list of names:
+
+<xmp class='lang-markup'>
+	<style>
+	@property --stop-color, --bg-color {
+		syntax: "<color>";
+		inherits: false;
+		initial-value: black;
+	}
+
+	.gradient-box {
+		--stop-color: red;
+		--bg-color: white;
+		background: linear-gradient(var(--stop-color), var(--bg-color));
+		transition: --stop-color 1s, --bg-color 1s;
+	}
+
+	.gradient-box:hover {
+		--stop-color: blue;
+		--bg-color: yellow;
+	}
+	</style>
+	<div class="gradient-box"></div>
+</xmp>
+
+This is equivalent to writing two separate ''@property'' rules,
+one for each name in the prelude:
+
+<xmp class='lang-markup'>
+	<style>
+	@property --stop-color {
+		syntax: "<color>";
+		inherits: false;
+		initial-value: black;
+	}
+	@property --bg-color {
+		syntax: "<color>";
+		inherits: false;
+		initial-value: black;
+	}
+	</style>
+</xmp>
+
 Security Considerations {#security-considerations}
 ==================================================
 
@@ -1379,6 +1442,9 @@ Changes {#changes}
 <h3 id="changes-20201013">
 	Changes since the <a href="https://www.w3.org/TR/2020/WD-css-properties-values-api-1-20201013/">Working Draft of 13 October 2020</a>
 </h3>
+
+/* to 3 April 2026 */
+* Allowed a comma-separated list of custom property names in the ''@property'' prelude, so that multiple properties sharing the same descriptors can be registered in a single rule. Added the {{CSSPropertyRule/names}} attribute to {{CSSPropertyRule}}. (<a href="https://github.com/w3c/csswg-drafts/issues/7523">#7523</a>)
 
 /* to 20 March 2024 */
 * Made "initial-value" have a &lt;declaration-value>?, same as custom properties. (<a href="https://github.com/w3c/csswg-drafts/issues/9078">#9078</a>)
