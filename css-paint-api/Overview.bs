@@ -339,6 +339,7 @@ PaintRenderingContext2D includes CanvasDrawPath;
 PaintRenderingContext2D includes CanvasDrawImage;
 PaintRenderingContext2D includes CanvasPathDrawingStyles;
 PaintRenderingContext2D includes CanvasPath;
+PaintRenderingContext2D includes CanvasFilters;
 </pre>
 
 Note: The {{PaintRenderingContext2D}} implements a subset of the {{CanvasRenderingContext2D}} API.
