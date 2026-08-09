@@ -2385,6 +2385,7 @@ to create new numeric values much less verbosely
 than using the constructors directly.
 
 <xmp class=idl>
+[Exposed=(Window, Worker, PaintWorklet, LayoutWorklet)]
 partial namespace CSS {
     CSSUnitValue number(double value);
     CSSUnitValue percent(double value);
