@@ -75,14 +75,15 @@ allow custom properties to directly impact paint and layout behaviours respectiv
 
 
 
-<!--
-████████  ████████ ██     ██    ███    ██     ██ ████  ███████  ████████
-██     ██ ██       ██     ██   ██ ██   ██     ██  ██  ██     ██ ██     ██
-██     ██ ██       ██     ██  ██   ██  ██     ██  ██  ██     ██ ██     ██
-████████  ██████   █████████ ██     ██ ██     ██  ██  ██     ██ ████████
-██     ██ ██       ██     ██ █████████  ██   ██   ██  ██     ██ ██   ██
-██     ██ ██       ██     ██ ██     ██   ██ ██    ██  ██     ██ ██    ██
-████████  ████████ ██     ██ ██     ██    ███    ████  ███████  ██     ██
+<!-- Big Text: behavior
+
+████▌  █████▌ █▌  █▌  ███▌  █▌   █▌ ████  ███▌  ████▌
+█▌  █▌ █▌     █▌  █▌ ▐█ ▐█  █▌   █▌  ▐▌  █▌  █▌ █▌  █▌
+█▌  █▌ █▌     █▌  █▌ █▌  █▌ █▌   █▌  ▐▌  █▌  █▌ █▌  █▌
+█████  ████   █████▌ █▌  █▌ ▐▌   █   ▐▌  █▌  █▌ ████▌
+█▌  █▌ █▌     █▌  █▌ █████▌  █  ▐▌   ▐▌  █▌  █▌ █▌▐█
+█▌  █▌ █▌     █▌  █▌ █▌  █▌  ▐▌ █    ▐▌  █▌  █▌ █▌ ▐█
+████▌  █████▌ █▌  █▌ █▌  █▌   ▐█    ████  ███▌  █▌  █▌
 -->
 
 Registered Custom Properties {#behavior-of-custom-properties}
@@ -534,14 +535,15 @@ in the name of the property.
 
 
 
-<!--
- ███████  ████████  ████████   ███████  ████████  ████████ ████████  ████████ ██    ██
-██     ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██     ██  ██
-██ ███ ██ ██     ██ ██     ██ ██     ██ ██     ██ ██       ██     ██    ██      ████
-██ ███ ██ ████████  ████████  ██     ██ ████████  ██████   ████████     ██       ██
-██ █████  ██        ██   ██   ██     ██ ██        ██       ██   ██      ██       ██
-██        ██        ██    ██  ██     ██ ██        ██       ██    ██     ██       ██
- ███████  ██        ██     ██  ███████  ██        ████████ ██     ██    ██       ██
+<!-- Big Text: @property
+
+ ████▌  ████▌  ████▌   ███▌  ████▌  █████▌ ████▌  █████▌ █   ▐▌
+█▌   █▌ █▌  █▌ █▌  █▌ █▌  █▌ █▌  █▌ █▌     █▌  █▌   █▌   ▐▌  █
+█▌▐█ █▌ █▌  █▌ █▌  █▌ █▌  █▌ █▌  █▌ █▌     █▌  █▌   █▌    █ ▐▌
+█▌▐█ █▌ ████▌  ████▌  █▌  █▌ ████▌  ████   ████▌    █▌    ▐▌█
+█▌ ██▌  █▌     █▌▐█   █▌  █▌ █▌     █▌     █▌▐█     █▌     █▌
+█▌      █▌     █▌ ▐█  █▌  █▌ █▌     █▌     █▌ ▐█    █▌     █▌
+ ████▌  █▌     █▌  █▌  ███▌  █▌     █████▌ █▌  █▌   █▌     █▌
 -->
 
 The <dfn>@property</dfn> Rule {#at-property-rule}
@@ -648,15 +650,76 @@ the value of the '@property/initial-value' descriptor
 must successfully [=CSS/parse=] according to the rule's '@property/syntax' descriptor,
 or else the descriptor is invalid and ignored.
 
+Shorthand Syntax {#shorthand}
+-----------------------------
 
-<!--
-      ██  ██████
-      ██ ██    ██
-      ██ ██
-      ██  ██████
-██    ██       ██
-██    ██ ██    ██
- ██████   ██████
+For the most commonly-set options,
+''@property'' can be written in an alternate, more compact form,
+as a statement.
+Its syntax is:
+
+<pre class=prod nohighlight>
+@property <<custom-property-name>> <<css-type>>? [: <<declaration-value>>? ]? ;
+</pre>
+
+This ''@property'' statement is exactly equivalent to the normal rule form,
+except that it's more limited in what it can express:
+
+* The <<custom-property-name>> gives the property name of the [=custom property registration=].
+* If specified, the <<css-type>> is equivalent to specifying the '@property/syntax' descriptor.
+* If specified, the <<declaration-value>> is equivalent to specifying the '@property/initial-value' descriptor.
+
+	Note: Whether or not this component is omitted is determined
+	by the presence or absence of the colon separator;
+	the <<declaration-value>> itself can be validly omitted
+	to specify an empty initial value.
+* The other descriptors of the ''@property'' rule are always treated as omitted.
+	(So, for example, any property registered with this syntax will inherit.)
+
+Note: The syntax and interpretation of this rule
+intentionally matches that of a [=custom function=] or [=mixin=] argument definition,
+as arguments are similarly defining a [=custom property registration=]
+in a compact form.
+
+Whether a ''@property'' is specified as a rule
+or in this statement form
+is not preserved after parsing.
+Both are represented by {{CSSPropertyRule}},
+and will thus serialize in the block form.
+
+<div class=example>
+	For example, the following two ''@property'' rules are identical:
+
+	<xmp highlight=css>
+	@property --foo {
+		syntax: <integer>;
+		initial-value: 0;
+	}
+	@property --foo <integer>: 0;
+	</xmp>
+
+	Like in [=custom function=] parameters,
+	complex types will need to be wrapped in a ''@function/type()'' function,
+	making the following two equivalent as well:
+
+	<pre highlight=css>
+	@property --bar {
+		syntax: "narrow | normal | wide";
+	}
+	@property --bar type(narrow | normal | wide);
+	</pre>
+</div>
+
+
+<!-- Big Text: JS
+
+    █▌  ███▌
+    █▌ █▌  █▌
+    █▌ █▌
+    █▌  ███▌
+█▌  █▌     █▌
+█▌  █▌ █▌  █▌
+ ███▌   ███▌
 -->
 
 Registering Custom Properties in JS {#registering-custom-properties}
@@ -855,14 +918,15 @@ the other components default to how an unregistered [=custom property=] works.
 (Accepting any value, inheriting, and using the [=guaranteed-invalid value=] by default.)
 
 
-<!--
- ██████  ██    ██ ██    ██ ████████    ███    ██     ██
-██    ██  ██  ██  ███   ██    ██      ██ ██    ██   ██
-██         ████   ████  ██    ██     ██   ██    ██ ██
- ██████     ██    ██ ██ ██    ██    ██     ██    ███
-      ██    ██    ██  ████    ██    █████████   ██ ██
-██    ██    ██    ██   ███    ██    ██     ██  ██   ██
- ██████     ██    ██    ██    ██    ██     ██ ██     ██
+<!--Big Text: syntax
+
+ ███▌  █   ▐▌ █    █▌ █████▌  ███▌  █     █
+█▌  █▌ ▐▌  █  █▌   █▌   █▌   ▐█ ▐█   █   █
+█▌      █ ▐▌  ██▌  █▌   █▌   █▌  █▌   █ █
+ ███▌   ▐▌█   █▌▐█ █▌   █▌   █▌  █▌    █
+    █▌   █▌   █▌  ██▌   █▌   █████▌   █ █
+█▌  █▌   █▌   █▌   █▌   █▌   █▌  █▌  █   █
+ ███▌    █▌   █▌   ▐▌   █▌   █▌  █▌ █     █
 -->
 
 Syntax Strings {#syntax-strings}
@@ -1153,14 +1217,15 @@ Parsing The Syntax String {#parsing-syntax}
 
 
 
-<!--
- ██████   ██████   ██████   ███████  ██     ██
-██    ██ ██    ██ ██    ██ ██     ██ ███   ███
-██       ██       ██       ██     ██ ████ ████
-██        ██████   ██████  ██     ██ ██ ███ ██
-██             ██       ██ ██     ██ ██     ██
-██    ██ ██    ██ ██    ██ ██     ██ ██     ██
- ██████   ██████   ██████   ███████  ██     ██
+<!-- Big Text: cssom
+
+ ███▌   ███▌   ███▌   ███▌  █     █
+█▌  █▌ █▌  █▌ █▌  █▌ █▌  █▌ ██   ██
+█▌     █▌     █▌     █▌  █▌ █▌█ █▐█
+█▌      ███▌   ███▌  █▌  █▌ █▌ █ ▐█
+█▌         █▌     █▌ █▌  █▌ █▌   ▐█
+█▌  █▌ █▌  █▌ █▌  █▌ █▌  █▌ █▌   ▐█
+ ███▌   ███▌   ███▌   ███▌  █▌   ▐█
 -->
 
 CSSOM {#cssom}
@@ -1276,14 +1341,15 @@ the following:
 
 
 
-<!--
-████████ ██     ██    ███    ██     ██ ████████  ██       ████████  ██████
-██        ██   ██    ██ ██   ███   ███ ██     ██ ██       ██       ██    ██
-██         ██ ██    ██   ██  ████ ████ ██     ██ ██       ██       ██
-██████      ███    ██     ██ ██ ███ ██ ████████  ██       ██████    ██████
-██         ██ ██   █████████ ██     ██ ██        ██       ██             ██
-██        ██   ██  ██     ██ ██     ██ ██        ██       ██       ██    ██
-████████ ██     ██ ██     ██ ██     ██ ██        ████████ ████████  ██████
+<!-- Big Text: examples
+
+█████▌ █     █  ███▌  █     █ ████▌  █▌    █████▌  ███▌
+█▌      █   █  ▐█ ▐█  ██   ██ █▌  █▌ █▌    █▌     █▌  █▌
+█▌       █ █   █▌  █▌ █▌█ █▐█ █▌  █▌ █▌    █▌     █▌
+████      █    █▌  █▌ █▌ █ ▐█ ████▌  █▌    ████    ███▌
+█▌       █ █   █████▌ █▌   ▐█ █▌     █▌    █▌         █▌
+█▌      █   █  █▌  █▌ █▌   ▐█ █▌     █▌    █▌     █▌  █▌
+█████▌ █     █ █▌  █▌ █▌   ▐█ █▌     █████ █████▌  ███▌
 -->
 
 Examples {#examples}
