@@ -771,7 +771,7 @@ run the following steps:
 
     4. <a for=map>For each</a> |layoutChild| in |layoutChildMap|:
 
-        1. |layoutChild|'s {{[[styleMap]]}} to null.
+        1. Set |layoutChild|'s {{[[styleMap]]}} to null.
 </div>
 
 When the [=computed values=] of [=document layout definition/child input properties=] for a [=box=]
