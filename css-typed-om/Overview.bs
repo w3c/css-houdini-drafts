@@ -216,7 +216,7 @@ in whatever way is most efficient for them.
 
 Previously, the only way to read or write to the [=internal representations=]
 was via strings--
-stylesheets or the CSSOM allowed authors to send strings to the UA,
+stylesheets or the CSSOM (CSS Object Model) allowed authors to send strings to the UA,
 which were parsed into [=internal representations=],
 and the CSSOM allowed authors to request
 that the UA serialize their [=internal representations=] back into strings.
