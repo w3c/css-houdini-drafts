@@ -1858,11 +1858,11 @@ When the user agent wants to <dfn>invoke an intrinsic sizes callback</dfn> given
 
     14. Set the [=intrinsic sizes=] of |box|:
 
-        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/minContentSize}} be the [=min-content
-            size=] of |box|.
+        - Set the [=min-content size=] of |box| to
+          |intrinsicSizes|'s {{IntrinsicSizesResultOptions/minContentSize}}.
 
-        - Let |intrinsicSizes|'s {{IntrinsicSizesResultOptions/maxContentSize}} be the [=max-content
-            size=] of |box|.
+        - Set the [=max-content size=] of |box| to
+          |intrinsicSizes|'s {{IntrinsicSizesResultOptions/maxContentSize}}.
 </div>
 
 ### Generating Fragments ### {#generating-fragments}
