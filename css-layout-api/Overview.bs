@@ -2301,7 +2301,7 @@ registerLayout('flex-distribution-like', class {
           return sum + childSizes.maxContentSize;
       }, 0) + edges.inline;
 
-      const minContentSize = childrenSizes.reduce((max, childSizes) => {
+      const minContentSize = childrenSizes.reduce((sum, childSizes) => {
           return sum + childSizes.minContentSize;
       }, 0) + edges.inline;
 
@@ -2328,7 +2328,7 @@ registerLayout('flex-distribution-like', class {
         }, 0);
 
         // Distribute spare space between children.
-        const remainingSpace = Math.max(0, inlineSize - totalSize);
+        const remainingSpace = Math.max(0, availableInlineSize - totalSize);
         const extraSpace = remainingSpace / children.length;
 
         const childFragments = await Promise.all(children.map((child, i) => {
