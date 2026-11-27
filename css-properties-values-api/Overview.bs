@@ -736,6 +736,7 @@ dictionary PropertyDefinition {
 	         DOMString initialValue; 
 };
 
+[Exposed=Window]
 partial namespace CSS {
 	undefined registerProperty(PropertyDefinition definition);
 };

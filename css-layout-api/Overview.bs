@@ -201,6 +201,7 @@ which are related to layout.
 The {{layoutWorklet}}'s [=worklet global scope type=] is {{LayoutWorkletGlobalScope}}.
 
 <pre class='idl'>
+[Exposed=Window]
 partial namespace CSS {
     [SameObject] readonly attribute Worklet layoutWorklet;
 };
