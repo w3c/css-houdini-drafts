@@ -2459,6 +2459,7 @@ partial namespace CSS {
     CSSUnitValue dpi(double value);
     CSSUnitValue dpcm(double value);
     CSSUnitValue dppx(double value);
+    CSSUnitValue x(double value);
 
     // <flex>
     CSSUnitValue fr(double value);
