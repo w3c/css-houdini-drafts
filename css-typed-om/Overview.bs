@@ -5428,7 +5428,7 @@ CSS <<number>>, <<percentage>>, and <<dimension>> values become {{CSSNumericValu
         <div class=example highlight=js>
             For example, if an element has `style="width: 1in;"`,
             `el.attributeStyleMap.get('width')` will return `CSS.in(1)`,
-            but `el.computedStyleMap.get('width')` will return `CSS.px(96)`,
+            but `el.computedStyleMap().get('width')` will return `CSS.px(96)`,
             as ''px'' is the [=canonical unit=] for absolute lengths.
         </div>
 </div>
